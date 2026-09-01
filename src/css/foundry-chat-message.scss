@@ -673,13 +673,6 @@
             margin-bottom: 0.35rem;
         }
 
-        .card-content--buyhits {
-            margin-bottom: 0.35rem;
-            justify-content: center;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
         .card-description {
             margin: 0.35rem 0.45rem 0;
             padding: 0.45rem 0.5rem;
@@ -837,6 +830,11 @@
             }
         }
 
+        .test-outcome-bought-hits {
+            margin-right: 0.3rem;
+            color: var(--sr5-card-accent);
+        }
+
         .glitch-content--critical {
             border-color: rgba(255, 119, 119, 0.45);
             background: rgba(95, 18, 18, 0.35);
@@ -898,6 +896,14 @@
                     color: #18520b;
                     filter: sepia(0.5) hue-rotate(60deg);
                 }
+            }
+
+            &--bought-hits {
+                color: var(--sr5-card-accent);
+                font-size: var(--font-size-11);
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
             }
         }
 
