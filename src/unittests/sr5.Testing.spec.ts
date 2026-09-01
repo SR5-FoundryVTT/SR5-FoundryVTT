@@ -90,6 +90,44 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(test.pool.value, 10);
         });
 
+        describe('outcome hits', () => {
+            // The verdict must use the same hits as the outcome calculation.
+            it('reports the rolled hits for a normal test', () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+
+                assert.isFalse(test.extended);
+                assert.strictEqual(test.outcomeHits, test.hits);
+            });
+
+            it('reports the accumulated hits for an extended test', () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+                test.data.extendedInterval = { value: 30, unit: 'minutes' };
+
+                assert.isTrue(test.extended);
+                assert.strictEqual(test.outcomeHits, test.extendedHits);
+            });
+        });
+
+        describe('outcome label visibility', () => {
+            // Zero hits is a definite failure even without a threshold.
+            it('shows a generic failure verdict without a threshold', () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+
+                assert.isFalse(test.hasThreshold);
+                assert.strictEqual(test.failureLabel, 'SR5.TestResults.Failure');
+                assert.isTrue(test.showsFailureOutcome);
+            });
+
+            it('never shows the Results placeholder, threshold or not', () => {
+                const test = TestCreator.fromPool(
+                    { pool: 10, threshold: 3 }, { showMessage: false, showDialog: false });
+                Object.defineProperty(test, 'failureLabel', { get: () => 'SR5.TestResults.Results' });
+
+                assert.isTrue(test.hasThreshold);
+                assert.isFalse(test.showsFailureOutcome);
+            });
+        });
+
         describe('limit usage UI state', () => {
             const COMMON_PARTIAL = 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs';
 

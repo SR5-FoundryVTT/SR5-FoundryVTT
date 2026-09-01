@@ -32,6 +32,8 @@ export const preloadHandlebarsTemplates = async () => {
             'item/tabs/details/skill',
             'item/footer/skill',
             'common/generic-data-properties',
+            // Shared by the value modifier tooltip and the chat card's inline panel.
+            'common/value-modifiers-rows',
             'list-items/connect-network-icon',
             'list-items/connected-icons-toggle',
             'list-items/edit-delete-icons',

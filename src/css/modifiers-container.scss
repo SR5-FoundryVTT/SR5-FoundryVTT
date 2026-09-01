@@ -11,11 +11,19 @@
         border: 1px solid var(--sr5-theme-border);
         border-radius: 4px;
     }
+}
 
+// Shared tooltip and inline-panel rows.
+.sr5v2,
+.value-modifiers-panel {
     .value-modifiers {
         color: var(--sr5-theme-text-primary);
 
+        // The inline panel does not inherit the .sr5v2 list layout.
         .list-item {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
             gap: .5rem;
             &.total {
                 font-weight: bold;
@@ -30,6 +38,20 @@
             min-width: 4rem;
             text-align: right;
             padding-right: 0.5rem;
+        }
+
+        // Truncate names while keeping values right-aligned.
+        .value-modifier-name {
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow: hidden;
+
+            > label {
+                display: block;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
         }
 
         .value-modifier-name,

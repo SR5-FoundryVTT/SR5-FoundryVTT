@@ -34,8 +34,8 @@
 
 .chat-message {
     --sr5-message-header-bg: var(--sr5-theme-chat-bg);
-    background: var(--sr5-theme-surface-elevated);
-    border: 1px solid var(--sr5-theme-chat-border);
+    background: var(--sr5-theme-chat-body-bg);
+    border: none;
     color: var(--sr5-theme-text-primary);
     box-shadow: none;
 
@@ -54,7 +54,6 @@
     }
 
     .message-content {
-        background: var(--sr5-theme-surface-elevated);
         color: var(--sr5-theme-text-primary);
     }
 }
@@ -553,8 +552,89 @@
             margin-top: 0.35rem;
         }
 
+        // Resolved pool, limit, and threshold values.
+        .card-content--parameters {
+            display: flex;
+            flex-flow: row wrap;
+            gap: 0 0.6rem;
+            margin-top: 0.2rem;
+            @include mixins.systemFonts;
+            font-size: var(--font-size-12);
+
+            .test-parameter[data-tooltip-source] {
+                cursor: var(--cursor-pointer);
+            }
+
+            .test-parameter-label {
+                color: var(--sr5-card-text-soft);
+                margin-right: 0.3rem;
+            }
+
+            .test-parameter-value {
+                color: var(--sr5-card-accent);
+                font-weight: bold;
+            }
+
+            // Visual separator between parameters.
+            .test-parameter + .test-parameter::before {
+                content: '·';
+                margin-right: 0.6rem;
+                color: var(--sr5-card-border-soft);
+            }
+
+            // Shared full-width modifier panel.
+            .test-parameter-details {
+                flex: 0 0 100%;
+                // Allow long modifier names to truncate.
+                min-width: 0;
+                margin-top: 0.35rem;
+
+                // Hide when every breakdown is collapsed.
+                &:not(:has(.test-parameter-detail:not([hidden]))) {
+                    display: none;
+                }
+            }
+
+            // Inline panel styled as part of the card.
+            .value-modifiers-panel {
+                padding: 0.25rem 0.35rem;
+                background: var(--sr5-card-surface-soft);
+                border: 1px solid var(--sr5-card-border-soft);
+                border-radius: 4px;
+
+                .list-item.has-tooltip {
+                    cursor: var(--cursor-pointer);
+
+                    // Keep the row as Foundry's tooltip target.
+                    > * {
+                        pointer-events: none;
+                    }
+                }
+            }
+        }
+
+        // Ordinary tests may have no remaining metric rows.
+        .card-content--metrics:not(:has(.metric-row)) {
+            display: none;
+        }
+
+        // Hide empty outcome containers.
+        .glitch-content:not(:has(.test-outcome-hits, .glitch)) {
+            display: none;
+        }
+
+        .card-test-content--status:not(:has(.test-outcome-hits, .glitch)) {
+            display: none;
+        }
+
         .card-content--metrics {
             cursor: pointer;
+
+            // Handlebars whitespace prevents using :empty.
+            .left-side:not(:has(*)),
+            .right-side:not(:has(*)) {
+                display: none;
+            }
 
             .metric-row--template .value-result {
                 color: var(--sr5-card-accent);
@@ -706,6 +786,37 @@
             .glitch[data-glitch]:hover:before,
             .glitch[data-glitch]:hover:after {
                 opacity: 0.55;
+            }
+        }
+
+        // Keep "4 HITS - SUCCESS" on one text flow.
+        .test-outcome {
+            text-align: center;
+
+            .glitch {
+                display: inline;
+            }
+        }
+
+        .test-outcome-hits {
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: var(--font-size-11);
+            font-weight: 700;
+            color: var(--sr5-card-text);
+
+            &[data-tooltip-source] {
+                cursor: var(--cursor-pointer);
+            }
+
+            .test-outcome-hits-value {
+                font-size: var(--font-size-14);
+                color: var(--sr5-card-accent);
+            }
+
+            // Add a separator only before a verdict.
+            &:has(+ .glitch)::after {
+                content: ' -';
             }
         }
 

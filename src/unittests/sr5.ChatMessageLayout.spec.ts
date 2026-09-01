@@ -1,5 +1,6 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SR5ChatMessage } from '@/module/chatMessage/SR5ChatMessage';
+import { SuccessTest } from '@/module/tests/SuccessTest';
 
 function createMessage(content: string, { whisper = false, canDelete = true } = {}): HTMLElement {
     const wrapper = document.createElement('div');
@@ -160,6 +161,66 @@ export const shadowrunChatMessageLayoutTesting = (context: QuenchBatchContext) =
 
             assert.isFalse(html.classList.contains('sr5-chat-message'));
             assert.notExists(html.querySelector('.sr5-message-system-header'));
+        });
+
+        describe('parameter modifier panels', () => {
+            // Reproduce the hydrated parameter markup.
+            function createParameters(): HTMLElement {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = `
+                    <div class="card-content card-content--parameters">
+                        <span class="test-parameter" data-tooltip-source="pool"
+                              role="button" tabindex="0" aria-expanded="false">Pool 6</span>
+                        <span class="test-parameter" data-tooltip-source="limit"
+                              role="button" tabindex="0" aria-expanded="false">Limit 5</span>
+                        <div class="test-parameter-details">
+                            <div class="test-parameter-detail" data-source="pool" hidden>pool mods</div>
+                            <div class="test-parameter-detail" data-source="limit" hidden>limit mods</div>
+                        </div>
+                    </div>
+                `;
+                const line = wrapper.firstElementChild as HTMLElement;
+                for (const parameter of line.querySelectorAll('.test-parameter'))
+                    parameter.addEventListener('click', SuccessTest._chatToggleParameterDetails);
+                return line;
+            }
+
+            const detail = (line: HTMLElement, source: string) =>
+                line.querySelector<HTMLElement>(`.test-parameter-detail[data-source="${source}"]`);
+            const parameter = (line: HTMLElement, source: string) =>
+                line.querySelector<HTMLElement>(`.test-parameter[data-tooltip-source="${source}"]`);
+            it('opens the clicked parameter breakdown', () => {
+                const line = createParameters();
+
+                parameter(line, 'pool')?.click();
+
+                assert.isFalse(detail(line, 'pool')?.hidden);
+                assert.isTrue(detail(line, 'limit')?.hidden);
+                assert.equal(parameter(line, 'pool')?.getAttribute('aria-expanded'), 'true');
+            });
+
+            it('swaps to another parameter rather than opening both', () => {
+                const line = createParameters();
+
+                parameter(line, 'pool')?.click();
+                parameter(line, 'limit')?.click();
+
+                assert.isTrue(detail(line, 'pool')?.hidden);
+                assert.isFalse(detail(line, 'limit')?.hidden);
+                assert.equal(parameter(line, 'pool')?.getAttribute('aria-expanded'), 'false');
+                assert.equal(parameter(line, 'limit')?.getAttribute('aria-expanded'), 'true');
+            });
+
+            it('closes again when the open parameter is clicked twice', () => {
+                const line = createParameters();
+
+                parameter(line, 'pool')?.click();
+                parameter(line, 'pool')?.click();
+
+                assert.isTrue(detail(line, 'pool')?.hidden);
+                assert.isTrue(detail(line, 'limit')?.hidden);
+                assert.equal(parameter(line, 'pool')?.getAttribute('aria-expanded'), 'false');
+            });
         });
     });
 };
