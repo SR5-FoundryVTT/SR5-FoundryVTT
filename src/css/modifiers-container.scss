@@ -64,6 +64,25 @@
             }
         }
 
+        .modifier-source-link {
+            cursor: pointer;
+
+            label {
+                cursor: inherit;
+            }
+
+            &:hover .value-modifier-name > label,
+            &:focus-visible .value-modifier-name > label {
+                text-decoration: underline;
+                text-underline-offset: 0.15em;
+            }
+
+            &:focus-visible {
+                outline: 1px solid var(--sr5-theme-label);
+                outline-offset: -1px;
+            }
+        }
+
         .mod-change-disabled,
         .mod-change-invalidated,
         .value-modifiers-invalid-total {

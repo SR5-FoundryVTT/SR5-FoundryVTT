@@ -256,16 +256,6 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
 
             const button = event.currentTarget as HTMLButtonElement;
             const source = button.dataset.source;
-            if (!source) return;
-
-            if (LinksHelpers.isUuid(source)) {
-                const effect = await fromUuid(source);
-                if (effect instanceof ActiveEffect) {
-                    await effect.sheet?.render(true);
-                    return;
-                }
-            }
-
             await LinksHelpers.openSource(source);
         });
 

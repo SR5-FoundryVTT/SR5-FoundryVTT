@@ -23,6 +23,7 @@ import { SuccessTestEffectsFlow } from '../effect/flows/SuccessTestEffectsFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
+import { LinksHelpers } from '../utils/links';
 import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType, ResultActionType } from '../types/item/Action';
 import { ValueFieldType } from '../types/template/Base';
 import { DeepPartial } from "fvtt-types/utils";
@@ -2034,6 +2035,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             event.preventDefault();
             event.currentTarget.click();
         });
+        $(html).find('.modifier-source-link').on('click', this._chatOpenModifierSource.bind(this));
+        $(html).find('.modifier-source-link').on('keydown', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            event.currentTarget.click();
+        });
         $(html).find('.show-roll').on('click', this._chatToggleCardRolls.bind(this));
         $(html).find('.show-description').on('click', this._chatToggleCardDescription.bind(this));
         $(html).find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet.bind(Helpers));
@@ -2347,6 +2354,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         detail.hidden = !expand;
         parameter.setAttribute('aria-expanded', String(expand));
+    }
+
+    static async _chatOpenModifierSource(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const source = (event.currentTarget as HTMLElement).dataset.source;
+        await LinksHelpers.openSource(source);
     }
 
     /** Toggle hidden roll results. */
