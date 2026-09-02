@@ -175,7 +175,15 @@ export const ActionRollData = (
     }),
     alt_mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     dice_pool_mod: ChangeList(),
-    roll_mode: new StringField({ blank: true, required: true }),
+    roll_mode: new StringField({
+        blank: true,
+        required: true,
+        choices: () => Object.entries(CONFIG.ChatMessage.modes)
+            .reduce<Record<string, string>>((choices, [mode, { label }]) => {
+                choices[mode] = label;
+                return choices;
+            }, {}),
+    }),
 });
 
 export const ActionPartData = (args: {
