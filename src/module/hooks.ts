@@ -90,7 +90,6 @@ import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
 import { IconAssign } from './apps/iconAssigner/IconAssign';
-import { RoutingLibIntegration } from './integrations/routingLibIntegration';
 import { initDiceSoNice } from './rolls/DiceSoNice';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
@@ -156,11 +155,7 @@ export class HooksManager {
             HooksManager.init();
 
             // Custom Module Integrations
-            // See src/module/integartions for more information.
-            if (game.modules.get('routinglib')?.active) {
-                RoutingLibIntegration.init();
-            }
-
+            // See src/module/integrations for more information.
             if (game.modules.get('dice-so-nice')?.active) {
                 initDiceSoNice();
             }
@@ -175,8 +170,6 @@ export class HooksManager {
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory.bind(HooksManager));
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));
         Hooks.on('moveToken', SR5TokenDocument.moveToken.bind(SR5Token));
-        Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
-        Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('createItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('updateItem', (item, data, options, userId) => { void HooksManager.updateIcConnectedToHostItem(item, data, options, userId); });
         Hooks.on('updateItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
