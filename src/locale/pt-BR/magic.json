@@ -1,0 +1,348 @@
+{
+    "SR5": {
+        "AdeptPower": {
+            "FIELDS": {
+                "drain": {
+                    "hint": "Se este Poder de Adepto causa Dreno após o uso",
+                    "label": "Dreno"
+                },
+                "level": {
+                    "hint": "Nível deste Poder de Adepto (se aplicável)",
+                    "label": "Nível"
+                },
+                "pp": {
+                    "hint": "Número de pontos de energia que este poder custa",
+                    "label": "Pontos de Poder"
+                },
+                "type": {
+                    "hint": "Tipo de Poder Adepto",
+                    "label": "Tipo de Poder"
+                }
+            },
+            "Labels": {
+                "Echo": "Eco",
+                "Echoes": "Ecos",
+                "Metamagic": "Metamagia",
+                "Metamagics": "Metamagias"
+            },
+            "Types": {
+                "Active": "Ativo",
+                "Passive": "Passivo"
+            }
+        },
+        "CritterPower": {
+            "Categories": {
+                "Drake": "Drake",
+                "Echoes": "Ecos",
+                "Emergent": "Emergente",
+                "FreeSpirit": "Espírito Livre",
+                "Mundane": "Mundano",
+                "Paranormal": "Paranormal",
+                "ParanormalInfected": "Paranormal/Infectado",
+                "Shapeshifter": "Metamorfo",
+                "Weakness": "Fraqueza"
+            },
+            "Category": "Categoria",
+            "Duration": "Duração",
+            "Durations": {
+                "Always": "Sempre",
+                "Instant": "Instantâneo",
+                "Permanent": "Permanente",
+                "Special": "Especial",
+                "Sustained": "Sustentado"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "Duração do poder da criatura",
+                    "label": "Duração"
+                },
+                "karma": {
+                    "hint": "Custo em Karma do poder de criatura",
+                    "label": "Karma"
+                },
+                "optional": {
+                    "hint": "Se o poder da criatura é opcional",
+                    "label": "Opcional"
+                },
+                "powerType": {
+                    "hint": "O tipo de poder da criatura",
+                    "label": "Tipo de Poder"
+                },
+                "range": {
+                    "hint": "O alcance do poder da criatura",
+                    "label": "Alcance"
+                }
+            },
+            "IsOptional": "Opcionalidade",
+            "Karma": "Karma",
+            "Optional": {
+                "DisabledOption": "Opcional, desabilitado",
+                "EnabledOption": "Opcional, habilitado",
+                "Standard": "Por padrão"
+            },
+            "OptionalSelectionCount": "Poderes Opcionais",
+            "Range": "Alcance",
+            "Ranges": {
+                "LineOfSight": "Linha de Visão",
+                "LineOfSightArea": "Linha de Visão (A)",
+                "Self": "Próprio",
+                "Special": "Especial",
+                "Touch": "Toque"
+            },
+            "Type": "Tipo",
+            "Types": {
+                "Mana": "Mana",
+                "Physical": "Físico"
+            }
+        },
+        "Magic": {
+            "Labels": {
+                "Awakened": "Desperto",
+                "Emerged": "Emergido",
+                "Mundane": "Mundano",
+                "PP": "PP",
+                "PowerType": "Tipo",
+                "Powers": "Poderes",
+                "SpiritType": "Tipo de Espírito"
+            }
+        },
+        "Ritual": {
+            "Anchored": "Ancorado",
+            "FIELDS": {
+                "descriptors": {
+                    "hint": "Descritores para o Ritual",
+                    "label": "Descritores"
+                },
+                "type": {
+                    "hint": "Tipo de Ritual para Realizar",
+                    "label": "Tipo de Ritual"
+                }
+            },
+            "MaterialLink": "Vínculo material",
+            "Minion": "Servo",
+            "Spell": "Feitiço",
+            "Spotter": "Observador"
+        },
+        "Spell": {
+            "Attack": "Ataque Mágico",
+            "Cast": "Lançar Magia",
+            "CatCombat": "Combate",
+            "CatDetection": "Detecção",
+            "CatHealth": "Saúde",
+            "CatIllusion": "Ilusão",
+            "CatManipulation": "Manipulação",
+            "CatRitual": "Ritual",
+            "Category": "Categoria",
+            "CombatDirect": "Direto",
+            "CombatIndirect": "Indireto",
+            "Defense": "Defesa de Magia",
+            "DefenseDirectMana": "Defesa de Magia (direta, mana)",
+            "DefenseDirectPhysical": "Defesa de Magia (direta, física)",
+            "DetectionArea": "Área",
+            "DetectionDirectional": "Direcional",
+            "DetectionPsychic": "Psíquico",
+            "FIELDS": {
+                "category": {
+                    "hint": "Categoria a que o feitiço pertence",
+                    "label": "Categoria"
+                },
+                "combat": {
+                    "type": {
+                        "hint": "Se o feitiço for direto ou indireto",
+                        "label": "Tipo de Magia de Combate"
+                    }
+                },
+                "detection": {
+                    "extended": {
+                        "hint": "Se o feitiço for estendido",
+                        "label": "Estendido"
+                    },
+                    "passive": {
+                        "hint": "Se o feitiço é passivo",
+                        "label": "Passivo"
+                    },
+                    "type": {
+                        "hint": "Como o feitiço afeta os alvos",
+                        "label": "Tipo de Feitiço de Detecção"
+                    }
+                },
+                "drain": {
+                    "hint": "Valor de Dreno do feitiço; ele é somado à Força do feitiço para resistir ao Dreno",
+                    "label": "Valor de Dreno"
+                },
+                "duration": {
+                    "hint": "Duração do feitiço",
+                    "label": "Duração"
+                },
+                "illusion": {
+                    "sense": {
+                        "hint": "O sentido que o feitiço afeta",
+                        "label": "Sentido"
+                    },
+                    "type": {
+                        "hint": "Tipo de Magia de Ilusão",
+                        "label": "Tipo de Magia Ilusão"
+                    }
+                },
+                "manipulation": {
+                    "damaging": {
+                        "hint": "Se o feitiço causar dano",
+                        "label": "Danoso"
+                    },
+                    "environmental": {
+                        "hint": "Esses feitiços realmente não têm um alvo, e eles realmente não afetam alvos diretamente. Eles apenas afetam uma área.",
+                        "label": "Ambiental"
+                    },
+                    "mental": {
+                        "hint": "Se o feitiço afetar os alvos mentalmente",
+                        "label": "Mental"
+                    },
+                    "physical": {
+                        "hint": "Estes feitiços afetam formas físicas e são geralmente defendidos contra",
+                        "label": "Físico"
+                    }
+                },
+                "range": {
+                    "hint": "O alcance do feitiço",
+                    "label": "Alcance"
+                },
+                "ritual": {
+                    "type": {
+                        "hint": "Tipo de Ritual para realizar",
+                        "label": "Tipo de Ritual"
+                    }
+                },
+                "type": {
+                    "hint": "Se o feitiço for físico ou baseado em Mana",
+                    "label": "Tipo de Feitiço"
+                }
+            },
+            "IllusionMultiSense": "Multi-Sentido",
+            "IllusionObvious": "Óbvio",
+            "IllusionRealistic": "Realista",
+            "IllusionSingleSense": "Sentido Único",
+            "Labels": {
+                "DetectionSpellExtended": "Estendido",
+                "NormalSpellButton": "Normal",
+                "RecklessSpellButton": "Imprudente"
+            },
+            "ManipulationDamaging": "Danoso",
+            "ManipulationEnvironmental": "Ambiental",
+            "ManipulationMental": "Mental",
+            "ManipulationPhysical": "Físico",
+            "QuickInfo": {
+                "DrainForce": "Drenar F{sign}{drain}"
+            },
+            "Range": "Alcance",
+            "RangeLos": "LDV",
+            "RangeLosA": "LDV (A)",
+            "RangeTouch": "Toque",
+            "Spell": "Feitiço",
+            "Spells": "Feitiços",
+            "Type": "Tipo",
+            "TypeMana": "Mana",
+            "TypePhysical": "Físico"
+        },
+        "Spirit": {
+            "Bound": "Vinculado",
+            "Force": "Força",
+            "ForceAppliesSetting": "Força se Aplica a",
+            "ForceAppliesSettingHint": "Controla quais atributos do espírito recebem o bônus de Força.",
+            "HalfValueSkill": "Perícia em Meio Valor",
+            "HalfValueSkillHint": "Perícias ativas ligadas usam ⌈Força/2⌉.",
+            "InitiativeFormulaAstral": "Fórmula de Iniciativa Astral",
+            "InitiativeFormulaAstralHint": "Escolha os termos da iniciativa astral.",
+            "InitiativeFormulaMeatspace": "Fórmula de Iniciativa no Espaço Real",
+            "InitiativeFormulaMeatspaceHint": "Escolha os termos da iniciativa no espaço real.",
+            "MissingSummoner": "Sem invocador ativo",
+            "Services": "Serviços",
+            "Summoner": "Invocador",
+            "Type": "Tipo",
+            "Types": {
+                "Abomination": "Abominação",
+                "Air": "Ar",
+                "Aircraft": "Aeronave",
+                "Airwave": "Onda de Ar",
+                "Ally": "Aliado",
+                "Anansi": "Anansi",
+                "Anarch": "Anarquista",
+                "Arboreal": "Arbóreo",
+                "Automotive": "Automotivo",
+                "Barren": "Estéril",
+                "Beasts": "Feras",
+                "Blackjack": "Blackjack",
+                "BladeSummoned": "Lâmina Invocada",
+                "Blood": "Sangue",
+                "BloodShade": "Blood Shade",
+                "Boggle": "Boggle",
+                "Bone": "Osso",
+                "Bugul": "Bugul",
+                "Carcass": "Carcaça",
+                "Caretaker": "Cuidador de Insetos",
+                "Ceramic": "Cerâmica",
+                "Chindi": "Chindi",
+                "CorpsCadavre": "Corps Cadavre",
+                "Corpse": "Cadáver",
+                "Crawler": "Rastejador (Demônio)",
+                "Croki": "Croki",
+                "Detritus": "Detritos",
+                "Duende": "Duende",
+                "Earth": "Terra",
+                "Ejerian": "Ejerian",
+                "Elvar": "Elvar",
+                "Energy": "Energia",
+                "Erinyes": "Eríneas",
+                "Fire": "Fogo",
+                "Ghasts": "Ghasts (Demônio)",
+                "GreenMan": "Homem Verde",
+                "Gremlin": "Gremlin",
+                "Guardian": "Guardião",
+                "Guidance": "Orientação",
+                "GumToad": "Sapo de Goma (Demônio)",
+                "Homunculus": "Homúnculo",
+                "Hopper": "Saltador",
+                "HorrorShow": "Show de Horrores",
+                "Imp": "Imp",
+                "Jarl": "Jarl",
+                "Kappa": "Kappa",
+                "Kokopelli": "Kokopelli",
+                "Man": "Homem",
+                "MasterShedim": "MestreShedim",
+                "Metal": "Metal",
+                "Morbi": "Morbi",
+                "Muse": "Musa",
+                "Nightmare": "Pesadelo",
+                "Nocnitsa": "Nocnitsa",
+                "Noxious": "Nocivo",
+                "Nuclear": "Nuclear",
+                "Nymph": "Ninfa de Inseto",
+                "Palefire": "Fogo Pálido",
+                "Phantom": "Fantasma",
+                "Plague": "Praga",
+                "Plant": "Planta",
+                "Preta": "Preta",
+                "Queen": "Rainha de Inseto",
+                "Rot": "Podridão",
+                "Scout": "Espião de Inseto",
+                "Shade": "Sombra",
+                "Shedim": "Shedim",
+                "Ship": "Navio",
+                "Sludge": "Lodo",
+                "Soldier": "Soldado de Inseto",
+                "Stabber": "Estocador",
+                "Succubus": "Sucubo",
+                "Task": "Tarefa",
+                "Train": "Trem",
+                "TsuchigumoWarrior": "Guerreiro Tsuchigumo",
+                "Tungak": "Tungak",
+                "Unbreakable": "Inquebrável",
+                "Vrygoths": "Vrygoths",
+                "VucubCaquix": "Vucub Caquix",
+                "Watcher": "Observador",
+                "Water": "Água",
+                "Worker": "Inseto Trabalhador",
+                "Wraith": "Espectro"
+            }
+        }
+    }
+}

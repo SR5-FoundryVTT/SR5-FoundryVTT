@@ -247,12 +247,12 @@ export class Migrator {
         const migratedVersion = game.settings.get(game.system.id, FLAGS.KEY_DATA_VERSION);
         if (this.compareVersion(migratedVersion, game.system.version) >= 0) return;
 
-        const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
-        const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
-        const localizedWarningRequired = game.i18n.localize('SR5.MIGRATION.WarningRequired');
-        const localizedWarningDescription = game.i18n.localize('SR5.MIGRATION.WarningDescription');
-        const localizedWarningBackup = game.i18n.localize('SR5.MIGRATION.WarningBackup');
-        const localizedWarningBegin = game.i18n.localize('SR5.MIGRATION.BeginMigration');
+        const localizedWarningTitle = game.i18n.localize('SR5.Migration.WarningTitle');
+        const localizedWarningHeader = game.i18n.localize('SR5.Migration.WarningHeader');
+        const localizedWarningRequired = game.i18n.localize('SR5.Migration.WarningRequired');
+        const localizedWarningDescription = game.i18n.localize('SR5.Migration.WarningDescription');
+        const localizedWarningBackup = game.i18n.localize('SR5.Migration.WarningBackup');
+        const localizedWarningBegin = game.i18n.localize('SR5.Migration.BeginMigration');
 
         const d = new foundry.appv1.api.Dialog({
             title: localizedWarningTitle,

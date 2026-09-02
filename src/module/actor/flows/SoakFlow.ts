@@ -28,7 +28,7 @@ export class SoakFlow {
                 if (item) {
                     return item.items
                         .filter(mod => mod.getTechnologyData()?.equipped)
-                        .filter(tech => tech.name === game.i18n.localize("SR5.AmmoGelRounds")).length > 0;
+                        .filter(tech => tech.name === game.i18n.localize("SR5.Ammo.Labels.AmmoGelRounds")).length > 0;
                 }
             }
         }

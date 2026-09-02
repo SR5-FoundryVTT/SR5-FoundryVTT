@@ -20,7 +20,7 @@
                         disabled=(or @root.isPlayMode (not @root.canEditSkillAttribute)) }}
         </span>
         <label data-tooltip="{{systemFields.skill.fields.defaulting.hint}}">
-            {{localize "SR5.CanDefault"}}
+            {{localize "SR5.Tests.Labels.CanDefault"}}
             {{formInput systemFields.skill.fields.defaulting value=source.system.skill.defaulting
                         rootId=@root.rootId disabled=@root.isPlayMode}}
         </label>

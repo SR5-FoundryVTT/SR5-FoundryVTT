@@ -1,13 +1,13 @@
 {{#if test.hasTargets}}
     <div class="form-group">
-        <label>{{localize 'SR5.Target'}}</label>
+        <label>{{localize 'SR5.Tests.Target.Label'}}</label>
         <select name="test.data.targetRangesSelected">
             {{selectOptions test.targetRangeOptions selected=test.data.targetRangesSelected}}
         </select>
     </div>
 {{/if}}
 <div class="form-group range-select-row">
-    <label>{{localize 'SR5.Range'}}</label>
+    <label>{{localize 'SR5.Weapon.Labels.Range'}}</label>
     <select name="test.data.range" {{#if test.hasTargets}}disabled{{/if}}>
         {{selectOptions test.rangeOptions selected=test.data.range}}
     </select>

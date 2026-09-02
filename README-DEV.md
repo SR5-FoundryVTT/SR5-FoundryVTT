@@ -130,11 +130,12 @@ Source code
 
 
 ## Translations
-The FoundryVTT language config files used by Foundry are at `/dist/locale/<language>/config.json`. The `/dist` directory
-is generated, so translation changes belong in `/public/locale/<language>/config.json`. Application build and watch
-commands copy those files into `/dist/locale`.
+Translation sources are split by feature under `/src/locale/<language>`. Every language must contain the same domain
+files and keys as English. The build and watch commands validate and assemble them into the single
+`/dist/locale/<language>/config.json` file loaded by FoundryVTT.
 
-To include translation changes to `/public` language files in the system, create a GitHub pull request targeting `master`.
+Run `npm run locale:check` before submitting translation changes. See `/utils/README-LOCALIZATION.md` for module
+ownership and validation details, then create a GitHub pull request targeting `master`.
 
 ## Separation
 More and more parts of the system move to separate modules organized into these broad layers:

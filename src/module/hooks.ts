@@ -491,27 +491,27 @@ ___________________
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
         foundry.documents.collections.Actors.unregisterSheet('core', foundry.appv1.sheets.ActorSheet);
         foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5CharacterSheet, {
-            label: "SR5.SheetActor",
+            label: "SR5.Actor.Labels.SheetActor",
             makeDefault: true,
             types: ['character']
         });
         foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5ICActorSheet, {
-            label: "SR5.SheetActor",
+            label: "SR5.Actor.Labels.SheetActor",
             makeDefault: true,
             types: ['ic']
         });
         foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5VehicleActorSheet, {
-            label: "SR5.SheetActor",
+            label: "SR5.Actor.Labels.SheetActor",
             makeDefault: true,
             types: ['vehicle']
         });
         foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5SpiritActorSheet, {
-            label: "SR5.SheetActor",
+            label: "SR5.Actor.Labels.SheetActor",
             makeDefault: true,
             types: ['spirit']
         });
         foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5SpriteActorSheet, {
-            label: "SR5.SheetActor",
+            label: "SR5.Actor.Labels.SheetActor",
             makeDefault: true,
             types: ['sprite']
         });

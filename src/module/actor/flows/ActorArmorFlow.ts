@@ -47,7 +47,7 @@ export const ActorArmorFlow = {
             }
 
             if (immunityArmor > 0) {
-                ModifiableValue.addUnique(armor.hardened, 'SR5.Immunity', immunityArmor);
+                ModifiableValue.addUnique(armor.hardened, 'SR5.Armor.Labels.Immunity', immunityArmor);
             }
         }
 

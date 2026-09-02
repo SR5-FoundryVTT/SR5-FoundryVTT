@@ -1,0 +1,189 @@
+{
+    "SR5": {
+        "ComplexForm": {
+            "Durations": {
+                "Immediate": "즉각적",
+                "Permanent": "지속적",
+                "Sustained": "영구적"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "즉각적 (지속 효과 없이 즉시 발생), 지속적 (지속 가능), 영구적 (전투 턴 수만큼 지속 시, 지속 중단 후에도 효과 유지).",
+                    "label": "지속력"
+                },
+                "fade": {
+                    "hint": "페이드 수치는 스레딩 시 선택한 레벨에 더해져 저항해야 할 피해량을 결정함",
+                    "label": "페이드"
+                },
+                "target": {
+                    "hint": "컴플렉스 폼에 대한 유효한 대상 유형",
+                    "label": "목표"
+                }
+            }
+        },
+        "Grid": {
+            "FIELDS": {
+                "category": {
+                    "hint": "퍼블릭 그리드에 연결되어 있는 동안에는 음수 수정치가 적용되고, 로컬과 글로벌 그리드에는 수정치가 없음",
+                    "label": "그리드 유형"
+                }
+            }
+        },
+        "Host": {
+            "CustomAttributes": "커스텀 특성치",
+            "Rating": "호스트 등급"
+        },
+        "IC": {
+            "FIELDS": {
+                "host": {
+                    "hint": "IC 유형",
+                    "label": "호스트",
+                    "rating": {
+                        "hint": "실행 중인 호스트의 등급",
+                        "label": "등급"
+                    }
+                },
+                "icType": {
+                    "hint": "IC 유형",
+                    "label": "IC 유형"
+                }
+            },
+            "MissingHost": "호스트 물품 끌어서 놓기",
+            "Type": "유형",
+            "Types": {
+                "Acid": "애시드",
+                "Binder": "바인더",
+                "BlackIC": "블랙 IC",
+                "Blaster": "블래스터",
+                "Bloodhound": "블러드하운드",
+                "BlueGoo": "블라워 슐레임",
+                "Catapult": "캐터펄트",
+                "Crash": "크래쉬",
+                "Flicker": "플리커",
+                "Jammer": "재머",
+                "Killer": "킬러",
+                "Marker": "마커",
+                "Patrol": "패트롤",
+                "Probe": "프로브",
+                "Scramble": "스크램블",
+                "Shocker": "쇼커",
+                "Sleuther": "슬리우서",
+                "Sparky": "스파키",
+                "TarBaby": "탈 베이비",
+                "Track": "트랙"
+            }
+        },
+        "Matrix": {
+            "Attributes": {
+                "Attack": "공격",
+                "DataProcessing": "데이터 처리",
+                "Firewall": "방화벽",
+                "Sleaze": "슬리즈"
+            },
+            "Labels": {
+                "Agent": "에이전트",
+                "CommonProgram": "일반 프로그램",
+                "DirectConnection": "직접 연결",
+                "Grids": "그리드",
+                "Hosts": "호스트",
+                "HotSim": "핫 심",
+                "LivingPersona": "리빙 페르소나",
+                "Marks": "마커",
+                "MatrixDefense": "매트릭스 방어",
+                "Network": "네트워크",
+                "OverwatchScore": "감시 점수",
+                "OverwatchScoreTrackerTitle": "존슨 씨의 육아 모니터",
+                "PublicGrid": "공공 그리드",
+                "RunningSilent": "정숙 실행",
+                "Wireless": "무선",
+                "WirelessOffline": "오프라인",
+                "WirelessOnline": "온라인",
+                "WirelessUnavailable": "이용 불가능"
+            }
+        },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "매트릭스 장치 생성"
+        },
+        "NetworkManager": {
+            "AvailableNetworks": "이용 가능한 네트워크",
+            "BruteForce": "브루트 포스",
+            "ConnectedTo": "다음 대상에게 연결",
+            "HackOnTheFly": "즉석 해킹",
+            "InviteMark": "마크 초대 요청",
+            "NetworkType": "유형",
+            "Title": "네트워크 관리자"
+        },
+        "RebootConfirmationDialog": {
+            "Cancel": "취소",
+            "Confirm": "재부팅",
+            "Description": "해당 장치를 정말 재부팅 하시겠습니까?",
+            "Title": "재부팅 확인"
+        },
+        "Sprite": {
+            "FIELDS": {
+                "level": {
+                    "hint": "스프라이트의 레벨",
+                    "label": "레벨"
+                },
+                "registered": {
+                    "hint": "스프라이트의 레지스트 여부",
+                    "label": "레지스트"
+                },
+                "services": {
+                    "hint": "스프라이트의 남은 봉사 횟수",
+                    "label": "봉사"
+                },
+                "spriteType": {
+                    "hint": "스프라이트의 유형",
+                    "label": "스프라이트 유형"
+                },
+                "technomancerUuid": {
+                    "hint": "해당 영혼을 컴파일 한 테크노맨서",
+                    "label": "테크노맨서"
+                }
+            },
+            "Level": "단계",
+            "LevelAppliesSettingHint": "어떤 스프라이트 속성에 레벨 보너스를 적용할지 설정합니다.",
+            "MissingTechnomancer": "유효한 테크노맨서 없음",
+            "Registered": "레지스트",
+            "Services": "봉사",
+            "Technomancer": "테크노맨서",
+            "Type": "유형",
+            "Types": {
+                "Companion": "컴패니언",
+                "Courier": "쿠리어",
+                "Crack": "크랙",
+                "Data": "데이터",
+                "Fault": "폴트",
+                "Generalist": "제네럴리스트",
+                "Machine": "머신"
+            }
+        },
+        "SpritePower": {
+            "Durations": {
+                "Always": "항시적",
+                "Instant": "즉각적",
+                "Permanent": "영구적",
+                "Special": "특수",
+                "Sustained": "지속적"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "해당 스프라이트 능력의 지속력",
+                    "label": "지속력"
+                },
+                "optional": {
+                    "hint": "해당 스프라이트 능력의 선택 사항 여부",
+                    "label": "선택 사항"
+                }
+            },
+            "IsOptional": "능력 설정",
+            "Optional": {
+                "DisabledOption": "추가 능력, 사용 불가능",
+                "EnabledOption": "추가 능력, 사용 가능",
+                "Standard": "기본"
+            },
+            "Type": "유형"
+        }
+    }
+}

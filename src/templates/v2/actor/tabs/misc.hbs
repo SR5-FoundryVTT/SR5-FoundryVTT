@@ -98,8 +98,8 @@
                     {{#if system.is_npc }}
                         <div class="list-item">
                             <div class="list-item-start">
-                                <label data-tooltip="{{localize 'SR5.IsGruntHint'}}">
-                                    {{localize "SR5.IsGrunt"}}
+                                <label data-tooltip="{{localize 'SR5.Actor.Labels.IsGruntHint'}}">
+                                    {{localize "SR5.Actor.Labels.IsGrunt"}}
                                 </label>
                             </div>
                             <div class="list-item-col">
@@ -136,7 +136,7 @@
                         {{#with (objValue @root.source.system.initiative mode.id) as |modeInitiative|}}
                             <div class="list-item spirit-initiative-formula-item">
                                 <div class="list-item-start spirit-initiative-formula-label">
-                                    <label>{{localize mode.label}} {{localize "SR5.Initiative"}}</label>
+                                    <label>{{localize mode.label}} {{localize "SR5.Actor.Labels.Initiative"}}</label>
                                 </div>
                                 <div class="list-item-col spirit-initiative-formula-col">
                                     <div class="spirit-initiative-formula-line">

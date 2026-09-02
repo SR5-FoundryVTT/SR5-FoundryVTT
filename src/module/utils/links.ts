@@ -58,7 +58,7 @@ export class LinksHelpers {
      */
     static openSourceURL(source: string | undefined) {
         if (!source) {
-            ui.notifications.error('SR5.SourceFieldEmptyError', { localize: true });
+            ui.notifications.error('SR5.Errors.SourceFieldEmpty', { localize: true });
             return;
         }
 
@@ -71,12 +71,12 @@ export class LinksHelpers {
     static openSourcePDF(source: string | undefined) {
         // Check for pdfpager module hook: https://github.com/farling42/fvtt-pdf-pager
         if (!ui.pdfpager) {
-            ui.notifications.warn('SR5.DIALOG.MissingModuleContent', { localize: true });
+            ui.notifications.warn('SR5.Warnings.MissingPdfPager', { localize: true });
             return;
         }
 
         if (!source) {
-            ui.notifications.error('SR5.SourceFieldEmptyError', { localize: true });
+            ui.notifications.error('SR5.Errors.SourceFieldEmpty', { localize: true });
             return;
         }
 
@@ -101,7 +101,7 @@ export class LinksHelpers {
         const document = await fromUuid(uuid) as docType | null;
 
         if (!document) {
-            ui.notifications.error('SR5.SourceFieldEmptyError', { localize: true });
+            ui.notifications.error('SR5.Errors.SourceFieldEmpty', { localize: true });
             return;
         }
 

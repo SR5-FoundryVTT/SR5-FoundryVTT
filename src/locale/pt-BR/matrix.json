@@ -1,0 +1,189 @@
+{
+    "SR5": {
+        "ComplexForm": {
+            "Durations": {
+                "Immediate": "Imediata",
+                "Permanent": "Permanente",
+                "Sustained": "Sustentado"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "Imediata (isso acontece instantaneamente sem efeitos duradouros), Sustentada (você pode sustentá-la) ou Permanente (se você sustentá-la por seu Nível em Viradas de Combate, seus efeitos permanecem depois que você parar de sustentá-la).",
+                    "label": "Duração"
+                },
+                "fade": {
+                    "hint": "O Valor de Enfraquecimento é somado ao Nível escolhido ao tecer a forma complexa para determinar a quantidade de dano a ser resistida",
+                    "label": "Enfraquecimento"
+                },
+                "target": {
+                    "hint": "Tipos de alvo válidos para a forma complexa",
+                    "label": "Alvo"
+                }
+            }
+        },
+        "Grid": {
+            "FIELDS": {
+                "category": {
+                    "hint": "As redes públicas aplicam um modificador negativo enquanto conectadas, as redes locais e globais não têm modificadores",
+                    "label": "Tipo de grade"
+                }
+            }
+        },
+        "Host": {
+            "CustomAttributes": "Atributos Personalizados",
+            "Rating": "Nível do Host"
+        },
+        "IC": {
+            "FIELDS": {
+                "host": {
+                    "hint": "Em qual host este GELO está sendo executado",
+                    "label": "Host",
+                    "rating": {
+                        "hint": "Nível do Host em que estamos operando",
+                        "label": "Nível"
+                    }
+                },
+                "icType": {
+                    "hint": "Tipo de IC",
+                    "label": "Tipo IC"
+                }
+            },
+            "MissingHost": "Arraste e solte um item de Host",
+            "Type": "Tipo",
+            "Types": {
+                "Acid": "Ácido",
+                "Binder": "Cimentador",
+                "BlackIC": "Gelo Negro",
+                "Blaster": "Disruptor",
+                "Bloodhound": "Bloodhound",
+                "BlueGoo": "Gosma Azul",
+                "Catapult": "Catapulta",
+                "Crash": "Travamento",
+                "Flicker": "Cintilador",
+                "Jammer": "Perturbador",
+                "Killer": "Assassino",
+                "Marker": "Marcador",
+                "Patrol": "Patrulha",
+                "Probe": "Sonda",
+                "Scramble": "Embaralhador",
+                "Shocker": "Chocante",
+                "Sleuther": "Investigador",
+                "Sparky": "Matador",
+                "TarBaby": "Piche",
+                "Track": "Rastreador"
+            }
+        },
+        "Matrix": {
+            "Attributes": {
+                "Attack": "Ataque",
+                "DataProcessing": "Datagrama",
+                "Firewall": "Firewall",
+                "Sleaze": "Subversão"
+            },
+            "Labels": {
+                "Agent": "Agente",
+                "CommonProgram": "Programa Comum",
+                "DirectConnection": "Conexão Direta",
+                "Grids": "Grades",
+                "Hosts": "Hosts",
+                "HotSim": "Sim Quente",
+                "LivingPersona": "Persona Viva",
+                "Marks": "Marcas",
+                "MatrixDefense": "Defesa da Matriz",
+                "Network": "Rede",
+                "OverwatchScore": "Valor de Vigilância",
+                "OverwatchScoreTrackerTitle": "Monitor de Bebê do Sr. Johnson",
+                "PublicGrid": "Grade Pública",
+                "RunningSilent": "Silenciosamente",
+                "Wireless": "Conexão Sem Fio",
+                "WirelessOffline": "Offline",
+                "WirelessOnline": "Online",
+                "WirelessUnavailable": "Indisponível"
+            }
+        },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Criar Dispositivo de Matriz"
+        },
+        "NetworkManager": {
+            "AvailableNetworks": "Redes Disponíveis",
+            "BruteForce": "Força Bruta",
+            "ConnectedTo": "Conectado a",
+            "HackOnTheFly": "Hackear na Hora",
+            "InviteMark": "Pedir um convite de marca",
+            "NetworkType": "Tipo",
+            "Title": "Gerenciador de Rede"
+        },
+        "RebootConfirmationDialog": {
+            "Cancel": "Cancelar",
+            "Confirm": "Reiniciar",
+            "Description": "Tem certeza que deseja reiniciar este dispositivo?",
+            "Title": "Confirmar Reboot"
+        },
+        "Sprite": {
+            "FIELDS": {
+                "level": {
+                    "hint": "Nível do Sprite",
+                    "label": "Nível"
+                },
+                "registered": {
+                    "hint": "Se o Sprite está registrado",
+                    "label": "Registrado"
+                },
+                "services": {
+                    "hint": "Número de serviços que o Sprite tem",
+                    "label": "Serviços"
+                },
+                "spriteType": {
+                    "hint": "Tipo de Sprite",
+                    "label": "Tipo de Sprite"
+                },
+                "technomancerUuid": {
+                    "hint": "Tecnomante que compilou este Sprite",
+                    "label": "Tecnomante"
+                }
+            },
+            "Level": "Nível",
+            "LevelAppliesSettingHint": "Controla quais atributos de sprite recebem o bônus de Nível.",
+            "MissingTechnomancer": "Sem tecnomante ativo",
+            "Registered": "Registrada",
+            "Services": "Serviços",
+            "Technomancer": "Tecnomante",
+            "Type": "Tipo",
+            "Types": {
+                "Companion": "Companheiro",
+                "Courier": "Mensageiro",
+                "Crack": "Invasor",
+                "Data": "Dados",
+                "Fault": "Defeito",
+                "Generalist": "Generalista",
+                "Machine": "Máquina"
+            }
+        },
+        "SpritePower": {
+            "Durations": {
+                "Always": "Sempre",
+                "Instant": "Instantâneo",
+                "Permanent": "Permanente",
+                "Special": "Especial",
+                "Sustained": "Sustentado"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "Duração do poder Sprite",
+                    "label": "Duração"
+                },
+                "optional": {
+                    "hint": "Se o poder de sprite é opcional",
+                    "label": "Opcional"
+                }
+            },
+            "IsOptional": "Opcionalidade",
+            "Optional": {
+                "DisabledOption": "Opcional, desativado",
+                "EnabledOption": "Opcional, ativado",
+                "Standard": "Por padrão"
+            },
+            "Type": "Tipo"
+        }
+    }
+}

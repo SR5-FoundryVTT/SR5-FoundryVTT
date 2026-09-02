@@ -1,0 +1,232 @@
+{
+    "SR5": {
+        "ChangelogApplication": {
+            "Changelog": "Für neue Funktionen und behobene Fehler",
+            "IssuesOverview": "Anfragenübersicht",
+            "LatestChangelog": "Aktueller Changelog",
+            "Reason": "Du hast die aktuellste Version installiert!",
+            "ReportIssues": "Bitte Fehler und gewünschte Funktionen hier melden",
+            "Title": "Shadowrun5e Update"
+        },
+        "CompendiumBrowser": {
+            "Filters": {
+                "ClearSearch": "Suche löschen",
+                "SearchPlaceholder": "Suche",
+                "System": "System",
+                "World": "Welt"
+            },
+            "Tabs": {
+                "Actors": "Akteure",
+                "Items": "Gegenstände",
+                "Settings": "Einstellungen"
+            },
+            "Title": "Kompendium Browser"
+        },
+        "CompendiumSettings": {
+            "ActionsPacksSection": "Handlungskompendien",
+            "Description": "Diese Kompendien werden vom System verwendet. Du kannst sie mit eigenen Kompendien überschreiben, solltest sie aber nicht entfernen.",
+            "GeneralActionsPack": {
+                "hint": "Dieses Kompendium wird für alle allgemeinen, attributbasierte Proben verwendet.",
+                "label": "Allgemeine Handlungen"
+            },
+            "ICActionsPack": {
+                "hint": "Dieses Kompendium wird für IC-Proben verwendet, gefiltert nach IC-Typ",
+                "label": "IC Handlungen"
+            },
+            "Label": "Kompendien",
+            "MatrixActionsPack": {
+                "hint": "Dieses Kompendium wird für alle Matrix-Handlungen verwendet.",
+                "label": "Matrix Handlungen"
+            },
+            "SkillGroupsPack": {
+                "hint": "Dieses Kompendium wird für Fertigkeitsgruppen verwendet.",
+                "label": "Fertigkeitsgruppen"
+            },
+            "SkillSetsPack": {
+                "hint": "Dieses Kompendium wird für Fertigkeitssets verwendet.",
+                "label": "Fertigkeitssets"
+            },
+            "SkillsPack": {
+                "hint": "Dieses Kompendium wird für Fertigkeiten verwendet.",
+                "label": "Fertigkeiten"
+            },
+            "SkillsPacksSection": "Fertigkeitskompendien",
+            "Title": "System Kompendien"
+        },
+        "Compendiums": {
+            "Folders": {
+                "Root": "SR5e Importe"
+            },
+            "sr5critter": "Critter & Geister & Sprites",
+            "sr5drone": "Drohnen & Fahrzeuge",
+            "sr5gear": "Rüstungen & Ausrüstungen",
+            "sr5magic": "Zauber & Komplexe Formen",
+            "sr5misc": "Verschiedenes",
+            "sr5modification": "Modifikationen",
+            "sr5trait": "Qualitäten & Kräfte",
+            "sr5ware": "Bioware & Cyberware",
+            "sr5weapon": "Waffen"
+        },
+        "DeleteConfirmationApplication": {
+            "Cancel": "Nein",
+            "Consent": "Bist du sicher?",
+            "Delete": "Ja",
+            "Description": "Das Löschen eines Eintrags kann nicht rückgängig gemacht werden!",
+            "Title": "Eintrag löschen"
+        },
+        "EnvModifiersApplication": {
+            "ClearModifiers": "Entferne eigene Modifikatoren",
+            "Extreme": "Zwei oder mehr Modifikatoren der Stufe Schwer",
+            "LightGlare": {
+                "Good": "Gute Beleuchtung/Keine Blendung",
+                "Heavy": "Völlige Dunkelheit/Starke Blendung",
+                "Light": "Teilbeleuchtung/Schwache Blendung",
+                "Moderate": "Schwache Beleuchtung/Mittlere Blendung",
+                "Title": "Beleuchtung"
+            },
+            "Modifier": {
+                "Title": "Modifikator"
+            },
+            "Range": {
+                "Good": "Kurz",
+                "Heavy": "Maximal",
+                "Light": "Mittel",
+                "Moderate": "Lang",
+                "Title": "Entfernung"
+            },
+            "Total": "Ergebnis",
+            "Visibility": {
+                "Good": "Freie Sicht",
+                "Heavy": "Starker Regen/Nebel/Rauch",
+                "Light": "Leichter Regen/Nebel/Rauch",
+                "Moderate": "Mittlerer Regen/Nebel/Rauch",
+                "Title": "Sichtverhältnisse"
+            },
+            "Wind": {
+                "Good": "Windstille oder leichte Brise",
+                "Heavy": "Sturm",
+                "Light": "Leichter Wind",
+                "Moderate": "Steife Brise",
+                "Title": "Wind"
+            }
+        },
+        "GMRequest": {
+            "General": "Dein SL möchte, dass du folgende Probe machst:",
+            "RollAttribute": "Attributsprobe",
+            "RollSkill": "Fertigkeitsprobe",
+            "Teamwork": "Teamwork-Probe",
+            "Threshold": "mit einem Mindestwurf von"
+        },
+        "Import": {
+            "ActorImporter": {
+                "Title": "Akteur Import"
+            },
+            "BulkImporter": {
+                "Title": "Massen Import"
+            }
+        },
+        "KarmaManager": {
+            "CareerKarma": "Gesamtes durch den Charakter angesammeltes Karma",
+            "CurrentKarma": "Aktuell verfügbares Karma",
+            "FinalCareerKarma": "Zukünftiges Gesamtkarma",
+            "FinalCurrentKarma": "Zukünftiges verfügbares Karma",
+            "FinalKarma": "Karma",
+            "StartingKarma": "Start Karma",
+            "Title": "Karma-Verwaltung"
+        },
+        "Migration": {
+            "BeginMigration": "Starte Migration",
+            "WarningBackup": "Erstelle ein Backup deiner Welt, bevor du die Migration startest!",
+            "WarningDescription": "Nur die SL kann die Aktualisierung durchführen. Während der Aktualisierung darf der Browser nicht geschlossen oder der Server heruntergefahren werden, sonst können irreparablen Schäden in dieser Welt entstehen.",
+            "WarningHeader": "Migrationswarnung",
+            "WarningRequired": "Das Shadowrun 5E System muss eine notwendige Aktualisierung ausführen.",
+            "WarningTitle": "Alarm"
+        },
+        "NuyenManager": {
+            "Cancel": "Abbrechen",
+            "CurrentNuyen": "Aktuell verfügbares Nuyen",
+            "FinalNuyen": "Zukünftiges verfügbares Nuyen",
+            "Submit": "Bestätigen",
+            "Title": "Nuyen-Verwaltung"
+        },
+        "OverwatchScoreTracker": {
+            "AddSelect": "Füge den verbundenen Actor des ausgewählten und Tokens hinzu",
+            "CantDeleteUserCharacter": "Spielercharakter können nicht aus dem Tracker entfernt werden",
+            "DeleteScore": "Lösche Wert aus dem Tracker",
+            "GMOnly": "GOD ist auf dem Weg zu deinem Standort...",
+            "NotifyNoSelectedTokens": "Mindestens ein verbundenes Token muss ausgewählt werden.",
+            "OnlyLinkedActorsSupported": "Nur verbundene Akteure werden unterstützt. Tokens mit unverbundenen Akteuren werden ignoriert.",
+            "ResetScore": "Setze Overwatch-Wert zurück"
+        },
+        "ReputationManager": {
+            "Cancel": "Abbrechen",
+            "Submit": "Bestätigen",
+            "Title": "Rufmanager"
+        },
+        "SituationalModifiersApplication": {
+            "Category": {
+                "Magic": "Magie",
+                "Matrix": "Matrix",
+                "Physical": "Körperlich"
+            },
+            "ClearLocalAll": "Entferne lokale Modifikatoren",
+            "ClearLocalAllTokens": "Entferne alle Tokenmodifikatoren der Szene",
+            "Magic": {
+                "BackgroundCount": "Hintergrundstrahlung"
+            },
+            "Matrix": {
+                "Noise": "Rauschen"
+            },
+            "Title": "Situationsmodifikatoren"
+        },
+        "TimeControl": {
+            "Advance": "Vorstellen",
+            "Amount": "Menge",
+            "Apply": "Anwenden",
+            "CustomAmount": "Eigener Wert",
+            "CustomMinutes": "Min",
+            "CustomMinutesTooltip": "Die Weltzeit um eine eigene Anzahl Minuten vorstellen",
+            "Day": "Tag",
+            "GmOnly": "Nur Spielleiter dürfen die Weltzeit ändern.",
+            "Hour": "Stunde",
+            "Minute": "Minute",
+            "Month": "Monat",
+            "Presets": {
+                "CombatTurn": "Kampfrunde",
+                "Day": "1 Tag",
+                "Header": "Schnell vorstellen",
+                "Hour": "1 Stunde",
+                "Minute": "1 Minute",
+                "TenMinutes": "10 Minuten",
+                "Week": "1 Woche"
+            },
+            "Preview": "Vorschau",
+            "Rewind": "Zurückstellen",
+            "Second": "Sekunde",
+            "SetTime": "Datum & Uhrzeit setzen",
+            "Title": "Zeitsteuerung",
+            "Unit": "Einheit",
+            "Year": "Jahr"
+        },
+        "Tours": {
+            "CharacterImport": {
+                "Description": "Diese Tour gibt dir einen Überblick darüber, wie du einen Chummer-Charakter importieren kannst. Für Details schau unter https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/Chummer-Character-Import",
+                "GeneralContent": "Um einen Charakter zu importieren, benötigst du das Export-json von Chummer 5e.",
+                "GeneralTitle": "Charakter importieren",
+                "Title": "Charakter-Import"
+            },
+            "ConditionMonitor": {
+                "ApplyDamageContent": "Klick mit der linken Maustaste auf ein Kästchen, um Schaden anzuwenden. Alle Kästchen bis zu diesem einschließlich werden gefüllt. Wenn mehr Kästchen gefüllt wurden, werden alle Kästchen rechts davon nicht mehr gefüllt. Wenn du mit der rechten Maustaste auf ein beliebiges Kästchen klickst, wird der gesamte Schaden vom Monitor entfernt.",
+                "ApplyDamageTitle": "Anwenden und entfernen von Schaden",
+                "Description": "Diese Tour gibt Ihnen einen Überblick über die Funktionsweise des Zustandsmonitors.",
+                "GeneralContent": "Dies sind deine Zustandsmonitore. Sie bestehen aus mehreren Kästchen. In bestimmten Kästchen ist eine Zahl angegeben. Wenn diese Kästchen gefüllt sind, wird dein Wundmodifikator auf diese Zahl erhöht. Die Wundmodifikatoren aller Monitore werden addiert.",
+                "GeneralTitle": "Zustandsmonitor",
+                "RecoveryContent": "Wenn Sie auf das Label eines Zustandsmonitors klicken, wird eine natürliche Regenerierungsprobe durchgeführt. Das Ergebnis der Probe wird automatisch auf den Monitor angewendet.",
+                "RecoveryTitle": "Regenerierungsprobe",
+                "Title": "Zustandsmonitor-Tour",
+                "WoundModifierContent": "Dieses Kästchen zeigt an, dass das Ausfüllen den Wundmodifikator um die im Kästchen angegebene Zahl erhöht.",
+                "WoundModifierTitle": "Wundmodifikator"
+            }
+        }
+    }
+}

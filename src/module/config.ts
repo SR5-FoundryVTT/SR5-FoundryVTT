@@ -6,18 +6,18 @@
 
 export const SR5 = {
     compendiums: {
-        root: 'SR5.Compendiums.Root',
+        root: 'SR5.Compendiums.Folders.Root',
 
         // Actors
-        critter: 'SR5.Compendiums.Critter',
-        drone: 'SR5.Compendiums.Drone',
+        critter: 'SR5.Compendiums.sr5critter',
+        drone: 'SR5.Compendiums.sr5drone',
 
         //Items
-        gear: 'SR5.Compendiums.Gear',
-        trait: 'SR5.Compendiums.Trait',
-        magic: 'SR5.Compendiums.Magic',
-        modification: 'SR5.Compendiums.Modification',
-        weapon: 'SR5.Compendiums.Weapon',
+        gear: 'SR5.Compendiums.sr5gear',
+        trait: 'SR5.Compendiums.sr5trait',
+        magic: 'SR5.Compendiums.sr5magic',
+        modification: 'SR5.Compendiums.sr5modification',
+        weapon: 'SR5.Compendiums.sr5weapon',
     },
 
     actorTypes: {
@@ -57,26 +57,26 @@ export const SR5 = {
 
     // All available attributes. These are available as testable attributes across all actor types.
     attributes: {
-        agility: 'SR5.AttrAgility',
-        attack: 'SR5.MatrixAttrAttack',
-        body: 'SR5.AttrBody',
-        charisma: 'SR5.AttrCharisma',
-        data_processing: 'SR5.MatrixAttrDataProc',
-        edge: 'SR5.AttrEdge',
-        essence: 'SR5.AttrEssence',
-        firewall: 'SR5.MatrixAttrFirewall',
-        intuition: 'SR5.AttrIntuition',
-        logic: 'SR5.AttrLogic',
-        magic: 'SR5.AttrMagic',
-        reaction: 'SR5.AttrReaction',
-        resonance: 'SR5.AttrResonance',
-        sleaze: 'SR5.MatrixAttrSleaze',
-        strength: 'SR5.AttrStrength',
-        willpower: 'SR5.AttrWillpower',
+        agility: 'SR5.Actor.Attributes.Agility',
+        attack: 'SR5.Matrix.Attributes.Attack',
+        body: 'SR5.Actor.Attributes.Body',
+        charisma: 'SR5.Actor.Attributes.Charisma',
+        data_processing: 'SR5.Matrix.Attributes.DataProcessing',
+        edge: 'SR5.Actor.Attributes.Edge',
+        essence: 'SR5.Actor.Attributes.Essence',
+        firewall: 'SR5.Matrix.Attributes.Firewall',
+        intuition: 'SR5.Actor.Attributes.Intuition',
+        logic: 'SR5.Actor.Attributes.Logic',
+        magic: 'SR5.Actor.Attributes.Magic',
+        reaction: 'SR5.Actor.Attributes.Reaction',
+        resonance: 'SR5.Actor.Attributes.Resonance',
+        sleaze: 'SR5.Matrix.Attributes.Sleaze',
+        strength: 'SR5.Actor.Attributes.Strength',
+        willpower: 'SR5.Actor.Attributes.Willpower',
         pilot: 'SR5.Vehicle.Stats.Pilot',
         force: 'SR5.Force',
         level: 'SR5.Level',
-        initiation: 'SR5.Initiation',
+        initiation: 'SR5.Actor.Labels.Initiation',
         submersion: 'SR5.Submersion',
         rating: 'SR5.Rating',
     },
@@ -88,36 +88,36 @@ export const SR5 = {
      * All labels for all limits used across all actor and item types.
      */
     limits: {
-        physical: 'SR5.LimitPhysical',
-        social: 'SR5.LimitSocial',
-        mental: 'SR5.LimitMental',
-        astral: 'SR5.LimitAstral',
-        attack: 'SR5.MatrixAttrAttack',
-        sleaze: 'SR5.MatrixAttrSleaze',
-        data_processing: 'SR5.MatrixAttrDataProc',
-        firewall: 'SR5.MatrixAttrFirewall',
+        physical: 'SR5.Tests.Limit.Types.Physical',
+        social: 'SR5.Tests.Limit.Types.Social',
+        mental: 'SR5.Tests.Limit.Types.Mental',
+        astral: 'SR5.Tests.Limit.Types.Astral',
+        attack: 'SR5.Matrix.Attributes.Attack',
+        sleaze: 'SR5.Matrix.Attributes.Sleaze',
+        data_processing: 'SR5.Matrix.Attributes.DataProcessing',
+        firewall: 'SR5.Matrix.Attributes.Firewall',
         speed: 'SR5.Vehicle.Stats.Speed',
         sensor: 'SR5.Vehicle.Stats.Sensor',
         handling: 'SR5.Vehicle.Stats.Handling',
-        magic: 'SR5.AttrMagic',
-        initiation: 'SR5.Initiation'
+        magic: 'SR5.Actor.Attributes.Magic',
+        initiation: 'SR5.Actor.Labels.Initiation'
     },
 
     specialTypes: {
-        mundane: 'SR5.Mundane',
-        magic: 'SR5.Awakened',
-        resonance: 'SR5.Emerged',
+        mundane: 'SR5.Magic.Labels.Mundane',
+        magic: 'SR5.Magic.Labels.Awakened',
+        resonance: 'SR5.Magic.Labels.Emerged',
     },
 
     damageTypes: {
-        physical: 'SR5.DmgTypePhysical',
-        stun: 'SR5.DmgTypeStun',
-        matrix: 'SR5.DmgTypeMatrix'
+        physical: 'SR5.Damage.Types.Physical',
+        stun: 'SR5.Damage.Types.Stun',
+        matrix: 'SR5.Damage.Types.Matrix'
     },
 
     biofeedbackOptions: {
-        physical: 'SR5.DmgTypePhysical',
-        stun: 'SR5.DmgTypeStun',
+        physical: 'SR5.Damage.Types.Physical',
+        stun: 'SR5.Damage.Types.Stun',
     },
 
     weaponRangeCategories: {
@@ -493,24 +493,24 @@ export const SR5 = {
     },
 
     attributeRolls: {
-        composure: 'SR5.RollComposure',
-        lift_carry: 'SR5.RollLiftCarry',
-        judge_intentions: 'SR5.RollJudgeIntentions',
-        memory: 'SR5.RollMemory',
+        composure: 'SR5.Tests.Labels.RollComposure',
+        lift_carry: 'SR5.Tests.Labels.RollLiftCarry',
+        judge_intentions: 'SR5.Tests.Labels.RollJudgeIntentions',
+        memory: 'SR5.Tests.Labels.RollMemory',
     },
 
     /**
      * Used for complex form targeting options.
      */
     matrixTargets: {
-        persona: 'SR5.TargetPersona',
-        device: 'SR5.TargetDevice',
-        file: 'SR5.TargetFile',
-        self: 'SR5.TargetSelf',
-        sprite: 'SR5.TargetSprite',
+        persona: 'SR5.Tests.Target.Types.Persona',
+        device: 'SR5.Tests.Target.Types.Device',
+        file: 'SR5.Tests.Target.Types.File',
+        self: 'SR5.Tests.Target.Types.Self',
+        sprite: 'SR5.Tests.Target.Types.Sprite',
         host: 'TYPES.Item.host',
         ic: 'TYPES.Actor.ic',
-        other: 'SR5.TargetOther',
+        other: 'SR5.Tests.Target.Types.Other',
     },
 
     gridCategories: {
@@ -520,9 +520,9 @@ export const SR5 = {
     },
 
     durations: {
-        instant: 'SR5.DurationInstant',
-        sustained: 'SR5.DurationSustained',
-        permanent: 'SR5.DurationPermanent',
+        instant: 'SR5.Tests.Duration.Types.Instant',
+        sustained: 'SR5.Tests.Duration.Types.Sustained',
+        permanent: 'SR5.Tests.Duration.Types.Permanent',
     },
 
     weaponCategories: {
@@ -550,9 +550,9 @@ export const SR5 = {
     },
 
     qualityTypes: {
-        positive: 'SR5.QualityTypePositive',
-        negative: 'SR5.QualityTypeNegative',
-        lifemodule: 'SR5.QualityTypeLifeModule'
+        positive: 'SR5.Quality.Types.Positive',
+        negative: 'SR5.Quality.Types.Negative',
+        lifemodule: 'SR5.Quality.Types.LifeModule'
     },
 
     adeptPower: {
@@ -564,21 +564,21 @@ export const SR5 = {
 
     deviceCategories: {
         device: 'SR5.ItemTypes.Device',
-        commlink: 'SR5.DeviceCatCommlink',
-        cyberdeck: 'SR5.DeviceCatCyberdeck',
-        rcc: 'SR5.DeviceCatRCC',
-        living_persona: 'SR5.LivingPersona',
+        commlink: 'SR5.Device.Categories.Commlink',
+        cyberdeck: 'SR5.Device.Categories.Cyberdeck',
+        rcc: 'SR5.Device.Categories.RCC',
+        living_persona: 'SR5.Matrix.Labels.LivingPersona',
         host: 'SR5.ItemTypes.Host',
     },
 
     cyberwareGrades: {
-        standard: 'SR5.CyberwareGradeStandard',
-        alpha: 'SR5.CyberwareGradeAlpha',
-        beta: 'SR5.CyberwareGradeBeta',
-        delta: 'SR5.CyberwareGradeDelta',
-        gamma: 'SR5.CyberwareGradeGamma',
-        grey: 'SR5.CyberwareGradeGrey',
-        used: 'SR5.CyberwareGradeUsed',
+        standard: 'SR5.Item.Cyberware.Grades.Standard',
+        alpha: 'SR5.Item.Cyberware.Grades.Alpha',
+        beta: 'SR5.Item.Cyberware.Grades.Beta',
+        delta: 'SR5.Item.Cyberware.Grades.Delta',
+        gamma: 'SR5.Item.Cyberware.Grades.Gamma',
+        grey: 'SR5.Item.Cyberware.Grades.Grey',
+        used: 'SR5.Item.Cyberware.Grades.Used',
     },
 
     skillTypes: {
@@ -609,10 +609,10 @@ export const SR5 = {
     },
 
     knowledgeSkillCategories: {
-        street: 'SR5.KnowledgeSkillStreet',
-        academic: 'SR5.KnowledgeSkillAcademic',
-        professional: 'SR5.KnowledgeSkillProfessional',
-        interests: 'SR5.KnowledgeSkillInterests',
+        street: 'SR5.Skill.KnowledgeTypes.Street',
+        academic: 'SR5.Skill.KnowledgeTypes.Academic',
+        professional: 'SR5.Skill.KnowledgeTypes.Professional',
+        interests: 'SR5.Skill.KnowledgeTypes.Interests',
     },
 
     activeSkills: {
@@ -776,16 +776,16 @@ export const SR5 = {
     },
 
     matrixAttributes: {
-        attack: 'SR5.MatrixAttrAttack',
-        sleaze: 'SR5.MatrixAttrSleaze',
-        data_processing: 'SR5.MatrixAttrDataProc',
-        firewall: 'SR5.MatrixAttrFirewall'
+        attack: 'SR5.Matrix.Attributes.Attack',
+        sleaze: 'SR5.Matrix.Attributes.Sleaze',
+        data_processing: 'SR5.Matrix.Attributes.DataProcessing',
+        firewall: 'SR5.Matrix.Attributes.Firewall'
     },
 
     initiativeCategories: {
-        meatspace: 'SR5.InitCatMeatspace',
-        astral: 'SR5.InitCatAstral',
-        matrix: 'SR5.InitCatMatrix',
+        meatspace: 'SR5.Actor.Initiative.Categories.Meatspace',
+        astral: 'SR5.Actor.Initiative.Categories.Astral',
+        matrix: 'SR5.Actor.Initiative.Categories.Matrix',
     },
 
     // Gear modification types. :) Not modifiers.
@@ -798,9 +798,9 @@ export const SR5 = {
     },
 
     mountPoints: {
-        barrel: 'SR5.Barrel',
-        under: 'SR5.UnderBarrel',
-        stock: 'SR5.Stock',
+        barrel: 'SR5.Weapon.Labels.Barrel',
+        under: 'SR5.Item.Labels.UnderBarrel',
+        stock: 'SR5.Item.Labels.Stock',
         top: 'SR5.Top',
         side: 'SR5.Side',
         internal: 'SR5.Internal',
@@ -816,13 +816,13 @@ export const SR5 = {
     },
 
     lifestyleTypes: {
-        street: 'SR5.LifestyleStreet',
-        squatter: 'SR5.LifestyleSquatter',
-        low: 'SR5.LifestyleLow',
-        medium: 'SR5.LifestyleMiddle',
-        high: 'SR5.LifestyleHigh',
-        luxury: 'SR5.LifestyleLuxury',
-        other: 'SR5.LifestyleOther',
+        street: 'SR5.Lifestyle.Types.Street',
+        squatter: 'SR5.Lifestyle.Types.Squatter',
+        low: 'SR5.Lifestyle.Types.Low',
+        medium: 'SR5.Lifestyle.Types.Middle',
+        high: 'SR5.Lifestyle.Types.High',
+        luxury: 'SR5.Lifestyle.Types.Luxury',
+        other: 'SR5.Lifestyle.Types.Other',
     },
 
     /**
@@ -924,9 +924,9 @@ export const SR5 = {
     },
 
     programTypes: {
-        common_program: 'SR5.CommonProgram',
+        common_program: 'SR5.Matrix.Labels.CommonProgram',
         hacking_program: 'SR5.HackingProgram',
-        agent: 'SR5.Agent',
+        agent: 'SR5.Matrix.Labels.Agent',
     },
 
     icTypes: {
@@ -1219,10 +1219,10 @@ export const SR5 = {
     },
 
     wirelessModes: {
-        'online': 'SR5.WirelessOnline',
-        'silent': 'SR5.RunningSilent',
-        'offline': 'SR5.WirelessOffline',
-        'none': 'SR5.WirelessUnavailable'
+        'online': 'SR5.Matrix.Labels.WirelessOnline',
+        'silent': 'SR5.Matrix.Labels.RunningSilent',
+        'offline': 'SR5.Matrix.Labels.WirelessOffline',
+        'none': 'SR5.Matrix.Labels.WirelessUnavailable'
     },
 
     /**
@@ -1313,8 +1313,8 @@ export const SR5 = {
      * actor is the default Foundry apply to type of ActiveEffects and will be affect actor data.
      */
     effectApplyTo: {
-        'actor': 'SR5.FOUNDRY.Actor',
-        // 'item': 'SR5.FOUNDRY.Item', // Disabled, as systems nested item approach brings issues.
+        'actor': 'SR5.Labels.Documents.Actor',
+        // 'item': 'SR5.Labels.Documents.Item', // Disabled, as systems nested item approach brings issues.
         'targeted_actor': 'SR5.ActiveEffect.ApplyTos.TargetedActor',
         'test_all': 'SR5.Test',
         'test_item': 'SR5.ActiveEffect.ApplyTos.TestItem',

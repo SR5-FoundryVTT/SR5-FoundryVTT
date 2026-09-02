@@ -1,0 +1,802 @@
+{
+    "SR5": {
+        "Ammo": {
+            "FIELDS": {
+                "accuracy": {
+                    "hint": "Genauigkeitsmodifikator der Munition",
+                    "label": "Genauigkeit"
+                },
+                "ap": {
+                    "hint": "Durchschlagskraft der Munition. Diese Wert ergänzt oder ersetzt den DK-Wert der Waffe.",
+                    "label": "DK"
+                },
+                "blast": {
+                    "dropoff": {
+                        "hint": "Abnahme des Schadens mit Entfernung pro Meter",
+                        "label": "Sprengwirkung"
+                    },
+                    "radius": {
+                        "hint": "Radius der Sprengwirkung in Metern",
+                        "label": "Radius"
+                    }
+                },
+                "damage": {
+                    "hint": "Schadensmodifikator der Munition",
+                    "label": "Schaden"
+                },
+                "damageType": {
+                    "hint": "Art des Schadens der Munition",
+                    "label": "Schadensart"
+                },
+                "element": {
+                    "hint": "Elements des Schadens der Munition",
+                    "label": "Element"
+                },
+                "replaceAP": {
+                    "hint": "Ersetze Waffen DK-Wert",
+                    "label": "Ersetze"
+                },
+                "replaceDamage": {
+                    "hint": "Ersetze Waffen Schadenswerte",
+                    "label": "Ersetze"
+                }
+            },
+            "Labels": {
+                "AmmoFull": "Vollgeladen",
+                "AmmoGelRounds": "Gelmunition",
+                "Bullet": "Kugel",
+                "BulletCount": "Kugeln",
+                "Bullets": "Kugeln",
+                "SpareClips": "Ersatzmagazine"
+            },
+            "label": "Munition"
+        },
+        "Armor": {
+            "FIELDS": {
+                "armor": {
+                    "accessory": {
+                        "hint": "Ist diese Panzerung nur Zubehör?",
+                        "label": "Zubehör"
+                    },
+                    "acid": {
+                        "hint": "Extra Panzerung gegen Säureschaden",
+                        "label": "Säureresistenz"
+                    },
+                    "cold": {
+                        "hint": "Extra Panzerung gegen Kälteschaden",
+                        "label": "Kälteresistenz"
+                    },
+                    "electricity": {
+                        "hint": "Extra Panzerung gegen Elektrizitätsschaden",
+                        "label": "Elektrizitätsresistenz"
+                    },
+                    "fire": {
+                        "hint": "Extra Panzerung gegen Feuerschaden",
+                        "label": "Feuerresistenz"
+                    },
+                    "hardened": {
+                        "hint": "Verstärkte Panzerung",
+                        "label": "Verstärkt"
+                    },
+                    "immunities": {
+                        "hint": "Schadensquellen, gegen die diese Rüstung Immunität gewährt",
+                        "label": "Immunitäten"
+                    },
+                    "is_hardened": {
+                        "hint": "Wenn diese Panzerung verstärkten Schutz gewährt",
+                        "label": "Verstärkt Aktiv"
+                    },
+                    "pollutant": {
+                        "hint": "Zusätzliche Rüstung gegen Angriffe mit Schadstoff",
+                        "label": "Chemischer Schutz"
+                    },
+                    "radiation": {
+                        "hint": "Extra Panzerung gegen Strahlenschaden",
+                        "label": "Strahlenresistenz"
+                    },
+                    "value": {
+                        "hint": "Panzerungswert",
+                        "label": "Panzerung"
+                    },
+                    "water": {
+                        "hint": "Zusätzliche Rüstung gegen Angriffe mit Wasser",
+                        "label": "Wasserschutz"
+                    }
+                }
+            },
+            "Immunity": {
+                "NormalWeapons": "Normale Waffen"
+            },
+            "Labels": {
+                "Accessory": "Zubehör",
+                "ArmorHardened": "Verstärkt",
+                "ArmorHardenedFull": "Verstärkte Panzerung",
+                "ArmorValue": "Panzerungswert",
+                "HardenedArmor": "Verstärkte Panzerung",
+                "Immunity": "Immunität",
+                "ImmunityToNormalWeapons": "Immunität gegen normale Waffen"
+            },
+            "Resistances": "Resistenzen",
+            "label": "Panzerung"
+        },
+        "Device": {
+            "Categories": {
+                "Commlink": "Kommlink",
+                "Cyberdeck": "Cyberdeck",
+                "RCC": "Riggerkonsole"
+            },
+            "FIELDS": {
+                "category": {
+                    "hint": "Kategorie des Geräts",
+                    "label": "Kategorie"
+                }
+            },
+            "label": "Gerät"
+        },
+        "Element": {
+            "Acid": "Säure",
+            "Cold": "Kälte",
+            "Electricity": "Elektrizität",
+            "Fire": "Feuer",
+            "Label": "Element",
+            "Pollutant": "Schadstoffe",
+            "Radiation": "Strahlung",
+            "Water": "Wasser"
+        },
+        "Item": {
+            "Cyberware": {
+                "Grades": {
+                    "Alpha": "Alphaware",
+                    "Beta": "Betaware",
+                    "Delta": "Deltaware",
+                    "Gamma": "Gammaware",
+                    "Grey": "Greyware",
+                    "Label": "Kategorie",
+                    "Standard": "Standard",
+                    "Used": "Gebraucht"
+                }
+            },
+            "FIELDS": {
+                "action": {
+                    "armor": {
+                        "hint": "Soll Panzerung des Akteurs auf die Probe angerechnet werden?",
+                        "label": "Panzerung"
+                    },
+                    "attribute": {
+                        "hint": "Attribut für die Probe",
+                        "label": "Attribut"
+                    },
+                    "attribute2": {
+                        "hint": "Zweites Attribut für die Probe",
+                        "label": "Attribut (2)"
+                    },
+                    "categories": {
+                        "hint": "Kategorien für die Aktion. Diese können durch Effekte referenziert werden.",
+                        "label": "Kategorien"
+                    },
+                    "damage": {
+                        "ap": {
+                            "attribute": {
+                                "hint": "Attribut für die DK Berechnung",
+                                "label": "DK Attribut"
+                            },
+                            "base": {
+                                "hint": "Durschlagskraft des Schadens",
+                                "label": "DK"
+                            },
+                            "base_formula_operator": {
+                                "hint": "Wie soll der DK-Wert das Attribut beeinflussen?",
+                                "label": "Operator"
+                            }
+                        },
+                        "attribute": {
+                            "hint": "Attribut für die Schadenskalkulation",
+                            "label": "Schadensattribut"
+                        },
+                        "base": {
+                            "hint": "Basis Schaden dieser Aktion",
+                            "label": "Basis Schaden"
+                        },
+                        "base_formula_operator": {
+                            "hint": "Wie soll der Basis Schaden das Attribut beeinflussen?",
+                            "label": "Operator"
+                        },
+                        "biofeedback": {
+                            "hint": "Soll diese Aktion auch Biofeedback Schaden erzeugen?",
+                            "label": "Biofeedback"
+                        },
+                        "element": {
+                            "base": {
+                                "hint": "Element des Schadens. Leer für elementlos.",
+                                "label": "Element"
+                            }
+                        },
+                        "normal_weapon": {
+                            "hint": "Wenn dieser Schaden als normaler (nicht magischer) Waffenangriff angesehen wird",
+                            "label": "Normale Waffe"
+                        },
+                        "type": {
+                            "base": {
+                                "hint": "Art des Schadens dieser Aktion",
+                                "label": "Schadensart"
+                            }
+                        }
+                    },
+                    "extended": {
+                        "hint": "Spielzeit zwischen den Würfen dieser ausgedehnten Aktion. Null würfelt sie als normale Probe.",
+                        "label": "Ausgedehnte Probe",
+                        "unit": {
+                            "hint": "Zeiteinheit des Intervalls der ausgedehnten Probe.",
+                            "label": "Intervall-Einheit"
+                        },
+                        "value": {
+                            "hint": "Spielzeit zwischen den Würfen. Null würfelt dies als normale, nicht ausgedehnte Probe.",
+                            "label": "Intervall"
+                        }
+                    },
+                    "initiative_mod": {
+                        "hint": "Initiativmodifikator, der beim Ausführen dieser Aktion angewendet wird",
+                        "label": "Initiativmodifikator"
+                    },
+                    "limit": {
+                        "attribute": {
+                            "hint": "Attribut für das Limit dieser Aktion",
+                            "label": "Limit Attribut"
+                        },
+                        "base": {
+                            "hint": "Limitswert für diese Aktion. Wird angerechnet, wenn ein Limitattribut ausgewählt ist.",
+                            "label": "Limit"
+                        }
+                    },
+                    "mod": {
+                        "hint": "Modifikator für diese Aktion",
+                        "label": "Modifikator"
+                    },
+                    "modifiers": {
+                        "hint": "Modifikatoren die auf diese Aktion angewendet werden sollen",
+                        "label": "Modifikatoren"
+                    },
+                    "opposed": {
+                        "armor": {
+                            "hint": "Soll die Panzerung des Akteurs der Verteidigungsprobe darauf angerechnet werden?",
+                            "label": "Panzerung"
+                        },
+                        "attribute": {
+                            "hint": "Attribut für die Verteidigungsprobe",
+                            "label": "Attribut"
+                        },
+                        "attribute2": {
+                            "hint": "Zweite Attribut für die Verteidigungsprobe",
+                            "label": "Attribut (2)"
+                        },
+                        "mod": {
+                            "hint": "Modifikator für die Verteidigungsprobe",
+                            "label": "Modifikator"
+                        },
+                        "resist": {
+                            "armor": {
+                                "hint": "Soll die Panzerung des Akteurs auf die Widerstandsprobe angerechnet werden?",
+                                "label": "Panzerung"
+                            },
+                            "attribute": {
+                                "hint": "Attribut für die Widerstandsprobe",
+                                "label": "Attribut"
+                            },
+                            "attribute2": {
+                                "hint": "Zweite Attribut für die Widerstandsprobe",
+                                "label": "Attribut (2)"
+                            },
+                            "test": {
+                                "hint": "Zu verwendender Test um dem Schaden aus der Verteidigungsprobe zu widerstehen",
+                                "label": "Widerstandstest"
+                            }
+                        },
+                        "skill": {
+                            "hint": "Fertigkeit für die Verteidigungsprobe",
+                            "label": "Fertigkeit"
+                        },
+                        "test": {
+                            "hint": "Zu verwendender Test für die Verteidigungsprobe",
+                            "label": "Verteidigungstest"
+                        }
+                    },
+                    "roll_mode": {
+                        "hint": "Wurfmodus für die Probe. Leer lassen, um den im Chat ausgewählten Modus zu verwenden",
+                        "label": "Wurfmodus"
+                    },
+                    "skill": {
+                        "hint": "Fertigkeit für die Aktion",
+                        "label": "Fertigkeit"
+                    },
+                    "spec": {
+                        "hint": "Ist die Fertigkeit dieser Aktion eine Spezialisierung?",
+                        "label": "Spezialisierung"
+                    },
+                    "test": {
+                        "hint": "Zu verwendender Test für diese Aktion",
+                        "label": "Test"
+                    },
+                    "threshold": {
+                        "base": {
+                            "hint": "Der Schwellenwert dieser Aktion",
+                            "label": "Schwellenwert"
+                        }
+                    },
+                    "type": {
+                        "hint": "Art der Handlung dieser Aktion",
+                        "label": "Handlung"
+                    }
+                },
+                "ammo": {
+                    "clip_type": {
+                        "hint": "Wie wird diese Waffe nachgeladen?",
+                        "label": "Nachladetyp"
+                    },
+                    "spare_clips": {
+                        "max": {
+                            "hint": "Maximale Anzahl an Ersatzmagazinen",
+                            "label": "Maximale Ersatzmagazine"
+                        },
+                        "value": {
+                            "hint": "Aktuelle Anzahl an Ersatzmagazinen",
+                            "label": "Ersatzmagazine"
+                        }
+                    }
+                },
+                "capacity": {
+                    "hint": "Kapazität der Cyberware/Bioware",
+                    "label": "Kapazität"
+                },
+                "description": {
+                    "base": {
+                        "hint": "Beschreibung",
+                        "label": "Beschreibung"
+                    },
+                    "source": {
+                        "hint": "Referenz als PDF#Page, URL oder Journal Eintrag ",
+                        "label": "Referenz"
+                    }
+                },
+                "essence": {
+                    "hint": "Essenzkosten der Cyberware/Bioware",
+                    "label": "Essenz"
+                },
+                "grade": {
+                    "hint": "Kategorie der Cyberware/Bioware",
+                    "label": "Kategorie"
+                },
+                "technology": {
+                    "availability": {
+                        "hint": "Verfügbarkeit des Gegenstands beim Einkauf",
+                        "label": "Verfügbarkeit"
+                    },
+                    "conceal": {
+                        "base": {
+                            "hint": "Tarnbarkeit des Gegenstands",
+                            "label": "Tarnbarkeit"
+                        }
+                    },
+                    "condition_monitor": {
+                        "value": {
+                            "hint": "Aktuelle auf den Zustandsmonitor angewendeter Schaden",
+                            "label": "Zustandsmonitor Schaden"
+                        }
+                    },
+                    "cost": {
+                        "hint": "Kosten des Gegenstands",
+                        "label": "Kosten"
+                    },
+                    "equipped": {
+                        "hint": "Ausgerüstet",
+                        "label": "Ausgerüstet"
+                    },
+                    "master": {
+                        "hint": "Master zu dem dieses Gerät als Teil eines PAN/WAN geslaved ist.",
+                        "label": "Master"
+                    },
+                    "quantity": {
+                        "hint": "Welche Anzahl dieses Gegenstands ist im Inventar?",
+                        "label": "Anzahl"
+                    },
+                    "rating": {
+                        "hint": "Stufe des Geräts",
+                        "label": "Stufe"
+                    },
+                    "show_quantity": {
+                        "hint": "Soll die Anzahl des Gegenstands im Inventar angezeigt werden?",
+                        "label": "Anzahl anzeigen"
+                    },
+                    "wireless": {
+                        "hint": "Kabelloser Zusstand des Geräts",
+                        "label": "Kabellos"
+                    }
+                }
+            },
+            "Labels": {
+                "Availability": "Verf.",
+                "Capacity": "Kapazität",
+                "Conceal": "Tarnbarkeit",
+                "Cost": "Kosten",
+                "Equipment": "Ausrüstung",
+                "Gear": "Ausrüstung",
+                "ItemMod": "Gegenstands-Mod",
+                "ItemName": "Gegenstandsname",
+                "License": "Lizenz",
+                "Licenses": "Lizenzen",
+                "Load": "Laden",
+                "Loaded": "Geladen",
+                "ModPoints": "Upgradepunkte",
+                "MountPoint": "Halterung",
+                "Rtg": "Stufe",
+                "RtgAboveZero": "Stf > 0",
+                "Stock": "Schulterstütze",
+                "UnderBarrel": "Unterlaufmontiert"
+            }
+        },
+        "ItemTypes": {
+            "Action": "Aktion",
+            "AdeptPower": "Adeptenkraft",
+            "Ammo": "Munition",
+            "Armor": "Panzerung",
+            "Bioware": "Bioware",
+            "ComplexForm": "Komplexe Form",
+            "Contact": "Kontakt",
+            "CritterPower": "Critterkraft",
+            "Cyberware": "Cyberware",
+            "Device": "Gerät",
+            "Echo": "Echo",
+            "Equipment": "Ausrüstung",
+            "Gear": "Ausrüstung",
+            "Grid": "Gitter",
+            "Host": "Host",
+            "License": "Lizenz",
+            "Lifestyle": "Lebensstil",
+            "Metamagic": "Metamagie",
+            "Modification": "Modifikation",
+            "Program": "Programm",
+            "Quality": "Vor-/Nachteil",
+            "Ritual": "Ritual",
+            "Sin": "SIN",
+            "Spell": "Zauberspruch",
+            "SpritePower": "Spritekraft",
+            "Weapon": "Waffe"
+        },
+        "Lifestyle": {
+            "Attributes": {
+                "Comforts": "Komfort & Grundversorgung",
+                "Guests": "Gäste",
+                "Neighborhood": "Wohngegend",
+                "Security": "Sicherheit"
+            },
+            "FIELDS": {
+                "comforts": {
+                    "hint": "Komfort des Lebensstils",
+                    "label": "Komfort"
+                },
+                "cost": {
+                    "hint": "Kosten des Lebensstils",
+                    "label": "Kosten"
+                },
+                "guests": {
+                    "hint": "Anzahl der Gäste als Teil des Lebensstils",
+                    "label": "Gäste"
+                },
+                "neighborhood": {
+                    "hint": "Nachbarschaftsart des Lebensstils",
+                    "label": "Nachbarschaft"
+                },
+                "permanent": {
+                    "hint": "Ist dieser Lebensstil permanent?",
+                    "label": "Dauerhaft"
+                },
+                "security": {
+                    "hint": "Sicherheitsstufe des Lebensstils",
+                    "label": "Sicherheit"
+                },
+                "type": {
+                    "hint": "Art des Lebensstils",
+                    "label": "Art"
+                }
+            },
+            "Types": {
+                "High": "Oberschicht",
+                "Label": "Typ",
+                "Low": "Unterschicht",
+                "Luxury": "Luxus",
+                "Middle": "Mittelschicht",
+                "Other": "Anderer",
+                "Squatter": "Squatter",
+                "Street": "Auf der Straße"
+            },
+            "label": "Lebensstil"
+        },
+        "Modification": {
+            "FIELDS": {
+                "accuracy": {
+                    "hint": "Präzision/Limit der Modifikation",
+                    "label": "Präzision"
+                },
+                "conceal": {
+                    "hint": "Tarnbarkeitsmodifikator der Modifikation",
+                    "label": "Tarnbarkeit"
+                },
+                "dice_pool": {
+                    "hint": "Würfelpoolmodifikator der Modifikation",
+                    "label": "Würfelpool"
+                },
+                "modification_category": {
+                    "hint": "Kategorie der Modifikation",
+                    "label": "Kategorie"
+                },
+                "mount_point": {
+                    "hint": "Halterung der Modifikation an der Waffe",
+                    "label": "Halterung"
+                },
+                "rc": {
+                    "hint": "Rückstoßkompensationsmodifikator der Modifikation",
+                    "label": "RK"
+                },
+                "slots": {
+                    "hint": "Anzahl der Slots für Fahrzeuge oder Drohnen.",
+                    "label": "Slots"
+                },
+                "type": {
+                    "hint": "Art der Modifikation",
+                    "label": "Art"
+                }
+            }
+        },
+        "ModificationTypes": {
+            "Ware": "Implantat"
+        },
+        "MoveInventoryDialog": {
+            "Cancel": "Abbrechen",
+            "Move": "Verschieben",
+            "Title": "Inventar auswählen"
+        },
+        "Program": {
+            "FIELDS": {
+                "type": {
+                    "hint": "Art des Programms",
+                    "label": "Art"
+                }
+            },
+            "label": "Programm"
+        },
+        "Quality": {
+            "FIELDS": {
+                "karma": {
+                    "hint": "Karma-Kosten der Qualität",
+                    "label": "Karma"
+                },
+                "rating": {
+                    "hint": "Stufe der Qualität",
+                    "label": "Stufe"
+                },
+                "type": {
+                    "hint": "Art der Qualität",
+                    "label": "Art"
+                }
+            },
+            "Types": {
+                "Label": "Typ",
+                "LifeModule": "Lebensmodul",
+                "Negative": "Nachteil",
+                "Positive": "Vorteil"
+            },
+            "label": "Qualität"
+        },
+        "Weapon": {
+            "AmmoCount": "Munition",
+            "Category": {
+                "Melee": "Nahkampf",
+                "Range": "Fernkampf",
+                "Thrown": "Geworfen"
+            },
+            "Cliptype": {
+                "BeltFed": "Gurtmunition",
+                "Bow": "Bogen",
+                "BreakAction": "Klapplademechanismus",
+                "Cylinder": "Aufklappbare Trommel",
+                "Drum": "Große Trommel",
+                "InternalMagazin": "Internes Magazin",
+                "MuzzleLoader": "Vorderlader",
+                "RemovableClip": "Ladestreifen"
+            },
+            "FIELDS": {
+                "category": {
+                    "hint": "Art der Waffe. Beeinfluss angezeigte Konfigurationen.",
+                    "label": "Art"
+                },
+                "melee": {
+                    "reach": {
+                        "hint": "Reichweite der Waffe, dienst als Modifikator bei Nahkampfproben",
+                        "label": "Reichweite"
+                    }
+                },
+                "range": {
+                    "modes": {
+                        "burst_fire": {
+                            "hint": "Feuert die Waffe im Salvenmodus (SM)",
+                            "label": "SM"
+                        },
+                        "full_auto": {
+                            "hint": "Feuert die Waffe im Vollautomatischen Modus(AM)",
+                            "label": "AM"
+                        },
+                        "semi_auto": {
+                            "hint": "Feuert die Waffe im Halbautomatischen Modus (HM)",
+                            "label": "HM"
+                        },
+                        "single_shot": {
+                            "hint": "Feuert die Waffe im Einzelschussmodus (EM)",
+                            "label": "EM"
+                        }
+                    },
+                    "ranges": {
+                        "attribute": {
+                            "hint": "Attribut um das die Reichweite multipliziert wird",
+                            "label": "Reichweitenattribut"
+                        },
+                        "category": {
+                            "hint": "Bestimmt Art der Reichweitenbestimmung. Nutze 'Manuell' um eigene Werte einzutagen",
+                            "label": "Art"
+                        },
+                        "extreme": {
+                            "hint": "Maximale Reichweite in Metern",
+                            "label": "Maximal"
+                        },
+                        "long": {
+                            "hint": "Lange Reichweite in Metern",
+                            "label": "Lang"
+                        },
+                        "medium": {
+                            "hint": "Mittlere Reichweite in Metern",
+                            "label": "Mittel"
+                        },
+                        "short": {
+                            "hint": "Kurze Reichweite in Metern",
+                            "label": "Kurz"
+                        }
+                    },
+                    "rc": {
+                        "base": {
+                            "hint": "Rückstoßkompensation der Waffe",
+                            "label": "RK"
+                        }
+                    }
+                },
+                "thrown": {
+                    "blast": {
+                        "dropoff": {
+                            "hint": "Schadensreduktion pro Meter Distanz zur Explosion",
+                            "label": "Reduktion (pro m)"
+                        },
+                        "radius": {
+                            "hint": "Radius der Explosion in Metern",
+                            "label": "Radius (m)"
+                        }
+                    },
+                    "ranges": {
+                        "attribute": {
+                            "hint": "Attribut um das die Reichweite multipliziert wird",
+                            "label": "Reichweitenattribut"
+                        },
+                        "category": {
+                            "hint": "Bestimmt Art der Reichweitenbestimmung. Nutze 'Manuell' um eigene Werte einzutagen",
+                            "label": "Art"
+                        },
+                        "extreme": {
+                            "hint": "Maximale Reichweite in Metern",
+                            "label": "Maximal"
+                        },
+                        "long": {
+                            "hint": "Lange Reichweite in Metern",
+                            "label": "Lang"
+                        },
+                        "medium": {
+                            "hint": "Mittlere Reichweite in Metern",
+                            "label": "Mittel"
+                        },
+                        "short": {
+                            "hint": "Kurze Reichweite in Metern",
+                            "label": "Kurz"
+                        }
+                    }
+                }
+            },
+            "FullReload": "Komplett",
+            "Labels": {
+                "Accuracy": "Präz.",
+                "Barrel": "Laufmontiert",
+                "FireMode": "Feuermodus",
+                "Range": "Reichweite",
+                "Reach": "Reichweite",
+                "Recoil": "Rückstoß",
+                "RecoilCompensation": "Rückstoßkomp."
+            },
+            "Mod": "Mod",
+            "Mode": {
+                "Full": {
+                    "BurstFire": "Salvenmodus",
+                    "BurstFireLong": "Lange Salve",
+                    "FullAuto": "Automatisches Feuer",
+                    "FullAutoLong": "Automatisches Feuer (Komplex)",
+                    "FullAutoShort": "Automatisches Feuer (Einfach)",
+                    "SemiAuto": "Halbautomatisch",
+                    "SemiAutoBurst": "Halbautomatische Salve",
+                    "SemiAutoShort": "Halbautomatisch",
+                    "SingleShot": "Einzelschuss",
+                    "Suppressing": "Unterdrückungsfeuer"
+                },
+                "Mode": "Modus",
+                "Short": {
+                    "BurstFire": "SM",
+                    "BurstFireLong": "SM-LS",
+                    "BurstFireShort": "SM",
+                    "FullAuto": "AM",
+                    "FullAutoLong": "AM-L",
+                    "FullAutoShort": "AM",
+                    "SemiAuto": "HM",
+                    "SemiAutoBurst": "HM-HS",
+                    "SemiAutoShort": "HM",
+                    "SingleShot": "EM",
+                    "SingleShotShort": "EM"
+                }
+            },
+            "Mods": "Mods",
+            "PartialReload": "Teilweise",
+            "Range": {
+                "Category": {
+                    "AerodynamicThrownGrenade": "Aerodynamische Granate",
+                    "AssaultCannon": "Sturmkanone",
+                    "AssaultRifle": "Sturmgewehr",
+                    "Bow": "Bogen",
+                    "Carbine": "Karabiner",
+                    "Flamethrower": "Flammenwerfer",
+                    "GrenadeLauncher": "Granatwerfer",
+                    "HarpoonGun": "Harpunengewehr",
+                    "HarpoonGunUnderwater": "Harpunengewehr (Untwerwasser)",
+                    "HeavyCrossbow": "Schwere Armbrust",
+                    "HeavyPistol": "Schwere Pistole",
+                    "HoldOutPistol": "Holdout-Pistole",
+                    "LightCrossbow": "Leichte Armbrust",
+                    "LightMachinegun": "Leichtes Maschinengewehr",
+                    "LightPistol": "Leichte Pistole",
+                    "MachinePistol": "Automatikpistole",
+                    "Manual": "Manuell",
+                    "MediumCrossbow": "Mittlere Armbrust",
+                    "MediumHeavyMachinegun": "Mittleres/Schweres Maschinengewehr",
+                    "MissileLauncher": "Raketenwerfer",
+                    "Net": "Netz",
+                    "SMG": "Maschinenpistole",
+                    "ShotgunFlechette": "Schrotflinte (Flechette)",
+                    "ShotgunSlug": "Schrotflinte (Massivgeschoss)",
+                    "Shuriken": "Shuriken",
+                    "SniperRifle": "Scharfschützengewehr",
+                    "SportingRifle": "Sportgewehr",
+                    "SprayPen": "Sprühstift",
+                    "StandardThrownGrenade": "Standard-Granate",
+                    "Taser": "Taser",
+                    "ThrownKnife": "Wurfmesser"
+                },
+                "Extreme": "Weit",
+                "Long": "Lang",
+                "Medium": "Mittel",
+                "Modes": "Modi",
+                "Range": "Reichweite",
+                "Ranges": "Reichweiten",
+                "Short": "Kurz"
+            },
+            "Reach": "Reichweite",
+            "Reload": "Nachladen",
+            "ResetSpareReloads": "Ersatzmagazine zurücksetzen",
+            "SpareReloads": "Verfügbares Nachladen",
+            "Thrown": {
+                "Range": "Wurfwaffenreichweite"
+            },
+            "Type": "Typ",
+            "Weapon": "Waffen"
+        }
+    }
+}

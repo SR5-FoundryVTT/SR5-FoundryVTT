@@ -1,0 +1,95 @@
+{
+    "SR5": {
+        "ChangelogApplication": {
+            "Changelog": "Vérifier notre GitHub pour vous tenir informer des dernières fonctionnalités et corrections",
+            "IssuesOverview": "Rapport des problèmes",
+            "LatestChangelog": "Dernier Changelog",
+            "Reason": "La dernière version a été mis à jour!",
+            "ReportIssues": "Rapporter les bugs et proposer des changements",
+            "Title": "Mise à jour Shadowrun5e"
+        },
+        "DeleteConfirmationApplication": {
+            "Cancel": "Non",
+            "Consent": "Etes-vous sûr?",
+            "Delete": "Oui",
+            "Description": "La suppression d'un objet ne peut pas être annulée !",
+            "Title": "Supprimer l'objet   "
+        },
+        "EnvModifiersApplication": {
+            "ClearModifiers": "Effacer les modificateurs personnels",
+            "Extreme": "Combinaison de plusieurs conditions à -6",
+            "LightGlare": {
+                "Good": "Pleine lumière/pas d'éblouissement",
+                "Heavy": "Obscurité totale/éblouissement aveuglant",
+                "Light": "Lumière partielle/éblouissement faible",
+                "Moderate": "Lumière faible/éblouissement moderé",
+                "Title": "Lumière/Éblouissement"
+            },
+            "Modifier": {
+                "Title": "Modificateur"
+            },
+            "Range": {
+                "Good": "Courte",
+                "Heavy": "Extrème",
+                "Light": "Moyenne",
+                "Moderate": "Longue",
+                "Title": "Portée"
+            },
+            "Total": "Résultat",
+            "Visibility": {
+                "Good": "Claire",
+                "Heavy": "Pluie/Brouillard/Fumée importante",
+                "Light": "Pluie/Brouillard/Fumée légère",
+                "Moderate": "Pluie/Brouillard/Fumée modérée",
+                "Title": "Visibilité"
+            },
+            "Wind": {
+                "Good": "Pas de vent ou brise légère",
+                "Heavy": "Vent fort",
+                "Light": "Vent léger",
+                "Moderate": "Vent modéré",
+                "Title": "Vent"
+            }
+        },
+        "Migration": {
+            "BeginMigration": "Commencer la migration",
+            "WarningBackup": "Attention, nous vous conseillons de faire une copie de votre monde avant de cliquer sur le bouton 'Commencer la migration' ci dessous",
+            "WarningDescription": "Seul le MJ peut effectuer la mise à jour. Fermer votre navigateur peut causer des problèmes au monde",
+            "WarningHeader": "Attention migration en cours",
+            "WarningRequired": "Le système Shadowrun 5e doit être mis à jour",
+            "WarningTitle": "Alerte"
+        },
+        "OverwatchScoreTracker": {
+            "ResetScore": "Réinitialiser Score de Surveillance"
+        },
+        "TimeControl": {
+            "Advance": "Avancer",
+            "Amount": "Quantité",
+            "Apply": "Appliquer",
+            "CustomAmount": "Valeur personnalisée",
+            "CustomMinutes": "min",
+            "CustomMinutesTooltip": "Avancer le temps du monde d'un nombre de minutes personnalisé",
+            "Day": "Jour",
+            "GmOnly": "Seuls les MJ peuvent modifier le temps du monde.",
+            "Hour": "Heure",
+            "Minute": "Minute",
+            "Month": "Mois",
+            "Presets": {
+                "CombatTurn": "Tour de combat",
+                "Day": "1 jour",
+                "Header": "Avance rapide",
+                "Hour": "1 heure",
+                "Minute": "1 minute",
+                "TenMinutes": "10 minutes",
+                "Week": "1 semaine"
+            },
+            "Preview": "Aperçu",
+            "Rewind": "Reculer",
+            "Second": "Seconde",
+            "SetTime": "Définir la date et l'heure",
+            "Title": "Contrôle du temps",
+            "Unit": "Unité",
+            "Year": "Année"
+        }
+    }
+}

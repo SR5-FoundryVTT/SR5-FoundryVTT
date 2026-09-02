@@ -1,0 +1,466 @@
+{
+    "SR5": {
+        "Actor": {
+            "Attributes": {
+                "Agility": "Agilidade",
+                "Body": "Corpo",
+                "Charisma": "Carisma",
+                "Edge": "Trunfo",
+                "Essence": "Essência",
+                "Intuition": "Intuição",
+                "Logic": "Lógica",
+                "Magic": "Magia",
+                "Reaction": "Reação",
+                "Resonance": "Ressonância",
+                "Strength": "Força",
+                "Willpower": "Vontade"
+            },
+            "FIELDS": {
+                "attributes": {
+                    "edge": {
+                        "base": {
+                            "hint": "Edge é a sorte de um personagem, o favor dos deuses, esse fator inexplicável que lhe permite vencer as probabilidades.",
+                            "label": "Trunfo"
+                        }
+                    }
+                },
+                "category_visibility": {
+                    "default": {
+                        "hint": "Se as abas vazias e as categorias de inventário devem ser visíveis",
+                        "label": "Mostrar Categorias Vazias"
+                    }
+                },
+                "full_defense_attribute": {
+                    "hint": "Atributo a usar ao usar a ação de interrupção de Defesa Completa",
+                    "label": "Atributo de Defesa Total"
+                },
+                "magic": {
+                    "attribute": {
+                        "hint": "Atributo que o Mago/Adepto usa ao resistir ao Dreno",
+                        "label": "Atributo de Dreno"
+                    },
+                    "label": "Magia"
+                },
+                "modifiers": {
+                    "armor": {
+                        "hint": "Modifica o valor total da armadura",
+                        "label": "Armadura"
+                    },
+                    "astral_initiative": {
+                        "hint": "Modifica a base de iniciativa astral",
+                        "label": "Iniciativa Astral"
+                    },
+                    "astral_initiative_dice": {
+                        "hint": "Modifica dados da iniciativa astral",
+                        "label": "Dados da Iniciativa Astral"
+                    },
+                    "astral_limit": {
+                        "hint": "Modifica o limite astral",
+                        "label": "Limite Astral"
+                    },
+                    "composure": {
+                        "hint": "Modifica a parada de dados dos testes de compostura",
+                        "label": "Compostura"
+                    },
+                    "defense": {
+                        "hint": "Modifica a parada de dados dos testes de defesa",
+                        "label": "Defesa"
+                    },
+                    "defense_block": {
+                        "hint": "Adiciona ao modificador de defesa para bloqueio ativo",
+                        "label": "Defesa (Bloqueio)"
+                    },
+                    "defense_dodge": {
+                        "hint": "Adiciona ao modificador de defesa para esquiva ativa",
+                        "label": "Defesa (Esquiva)"
+                    },
+                    "defense_melee": {
+                        "hint": "Adiciona ao modificador de defesa para defesa corpo a corpo",
+                        "label": "Defesa (Corpo-a-Corpo)"
+                    },
+                    "defense_parry": {
+                        "hint": "Adiciona ao modificador de defesa para aparar ativamente",
+                        "label": "Defesa (Aparar)"
+                    },
+                    "defense_ranged": {
+                        "hint": "Adiciona ao modificador de defesa contra ataques à distância",
+                        "label": "Defesa (Distância)"
+                    },
+                    "drain": {
+                        "hint": "Modifica a parada de dados dos testes de dreno",
+                        "label": "Dreno"
+                    },
+                    "essence": {
+                        "hint": "Modifica atributo essência",
+                        "label": "Essência"
+                    },
+                    "fade": {
+                        "hint": "Modifica a parada de dados dos testes de enfraquecimento",
+                        "label": "Enfraquecimento"
+                    },
+                    "global": {
+                        "hint": "Modifica todas as paradas de dados, exceto as dos testes de resistência a dano",
+                        "label": "Global"
+                    },
+                    "judge_intentions": {
+                        "hint": "Modifica a parada de dados dos testes para julgar intenções",
+                        "label": "Avaliar Intenções"
+                    },
+                    "lift_carry": {
+                        "hint": "Modifica a parada de dados dos testes de levantar e carregar",
+                        "label": "Levantar/Carregar"
+                    },
+                    "mark_damage": {
+                        "hint": "Modifica a quantidade de dano recebido por MARK feito a você",
+                        "label": "Dano por Marca"
+                    },
+                    "matrix_initiative": {
+                        "hint": "Modifica a base de iniciativa da Matriz",
+                        "label": "Iniciativa da Matriz"
+                    },
+                    "matrix_initiative_dice": {
+                        "hint": "Modifica os dados de iniciativa da Matriz",
+                        "label": "Dados de Iniciativa da Matriz"
+                    },
+                    "matrix_track": {
+                        "hint": "Modifica a trilha de dano da matriz",
+                        "label": "Monitor da Matriz"
+                    },
+                    "meat_initiative": {
+                        "hint": "Modifica a base de iniciativa física",
+                        "label": "Iniciativa Física"
+                    },
+                    "meat_initiative_dice": {
+                        "hint": "Modifica dados de iniciativa física",
+                        "label": "Dados de Iniciativa Física"
+                    },
+                    "memory": {
+                        "hint": "Modifica a parada de dados dos testes de memória",
+                        "label": "Memória"
+                    },
+                    "mental_limit": {
+                        "hint": "Modifica limite mental",
+                        "label": "Limite Mental"
+                    },
+                    "multi_defense": {
+                        "hint": "Modifica a parada de dados dos testes de defesa após várias defesas no mesmo turno de combate",
+                        "label": "Multi-Defesa"
+                    },
+                    "pain_tolerance_physical": {
+                        "hint": "Modifica danos a serem ignorados antes do primeiro modificador de ferida",
+                        "label": "Tolerância à Dor (Física)"
+                    },
+                    "pain_tolerance_stun": {
+                        "hint": "Modifica danos a serem ignorados antes do primeiro modificador de ferida",
+                        "label": "Tolerância à Dor (Stun)"
+                    },
+                    "physical_limit": {
+                        "hint": "Modifica limite físico",
+                        "label": "Limite Físico"
+                    },
+                    "physical_overflow_track": {
+                        "hint": "Modifica a trilha de dano físico do transbordamento",
+                        "label": "Monitor de Excesso de Dano"
+                    },
+                    "physical_track": {
+                        "hint": "Modifica a trilha de danos físicos",
+                        "label": "Monitor Físico"
+                    },
+                    "place_three_marks": {
+                        "hint": "Modifica o modificador para colocar três marcas ao mesmo tempo",
+                        "label": "Colocar Três Marcas"
+                    },
+                    "place_two_marks": {
+                        "hint": "Modifica o modificador para colocar duas marcas ao mesmo tempo",
+                        "label": "Colocar Duas Marcas"
+                    },
+                    "public_grid": {
+                        "hint": "Modifica o modificador da Rede Pública quando conectado a ele",
+                        "label": "Grade Pública"
+                    },
+                    "reach": {
+                        "hint": "Modifica o alcance dos ataques corpo a corpo",
+                        "label": "Alcance"
+                    },
+                    "recoil": {
+                        "hint": "Modifica a parada de dados dos testes de recuo",
+                        "label": "Recuo"
+                    },
+                    "run": {
+                        "hint": "Modifica a distância de corrida por múltiplos do atributo agilidade",
+                        "label": "Correr"
+                    },
+                    "soak": {
+                        "hint": "Modifica a parada de dados dos testes de resistência a dano físico",
+                        "label": "Absorção"
+                    },
+                    "social_limit": {
+                        "hint": "Modifica o limite social",
+                        "label": "Limite Social"
+                    },
+                    "stun_track": {
+                        "hint": "Modifica a trilha de dano de atordoamento",
+                        "label": "Monitor de Atordoamento"
+                    },
+                    "walk": {
+                        "hint": "Modifica a distância a pé por múltiplos do atributo agilidade",
+                        "label": "Caminhar"
+                    },
+                    "wound_tolerance": {
+                        "hint": "Modifica dano por modificador de ferida",
+                        "label": "Tolerância à Ferida"
+                    }
+                },
+                "special": {
+                    "hint": "Selecione se o personagem é Desperto (mago/adepto) ou Emergido (tecnomante)",
+                    "label": "Desperto/Emergido"
+                },
+                "technomancer": {
+                    "attribute": {
+                        "hint": "Atributo usado pelo tecnomante para resistir ao enfraquecimento",
+                        "label": "Atributo de Enfraq"
+                    },
+                    "label": "Tecnomante"
+                }
+            },
+            "Initiative": {
+                "Categories": {
+                    "Astral": "Astral",
+                    "Matrix": "Matriz",
+                    "Meatspace": "Espaço Real"
+                }
+            },
+            "Labels": {
+                "Attribute": "Atributo",
+                "Attributes": "Atributos",
+                "Biography": "Bio",
+                "DefaultCategoryVisibility": "Mostrar categorias vazias",
+                "Initiation": "Iniciação",
+                "Initiative": "Iniciativa",
+                "InitiativeMod": "Modificador de Iniciativa",
+                "IsCritter": "Criatura",
+                "IsFreshImport": "Este item foi importado do Chummer e precisa de revisão manual.",
+                "IsGrunt": "Soldado",
+                "IsGruntHint": "Usa as regras de monitor de condição para soldados (SR5 p.378).",
+                "IsNPC": "NPC",
+                "Metatype": "Metatipo",
+                "Movement": "Movimento",
+                "RunningSpeed": "Correndo",
+                "SheetActor": "Ficha de ator",
+                "SpecialAttributes": "Atributos Especiais",
+                "SprintingBonus": "Bônus de corrida",
+                "WalkingSpeed": "Caminhando"
+            },
+            "NoFavoritesSelected": "Nenhum favorito foi selecionado"
+        },
+        "ActorTypes": {
+            "Character": "Personagem",
+            "IC": "GELO",
+            "Spirit": "Espírito",
+            "Sprite": "Sprite",
+            "Vehicle": "Veículo"
+        },
+        "Character": {
+            "FIELDS": {
+                "is_critter": {
+                    "hint": "Permitir o uso de poderes de criatura",
+                    "label": "É Critter"
+                },
+                "is_npc": {
+                    "hint": "Marque o ator como NPC para obter recursos adicionais",
+                    "label": "É NPC"
+                },
+                "karma": {
+                    "max": {
+                        "hint": "A quantidade de Karma que este personagem acumulou",
+                        "label": "Karma de Carreira"
+                    },
+                    "value": {
+                        "hint": "A quantidade de Karma que este personagem tem disponível",
+                        "label": "Karma Atual"
+                    }
+                },
+                "matrix_full_defense_attribute": {
+                    "hint": "Atributo a adicionar ao fazer uma Ação de Defesa Total na Matriz",
+                    "label": "Atributo de Defesa Total na Matriz"
+                },
+                "metatype": {
+                    "hint": "Metatipo do personagem. Se um NPC, isso irá ajustar atributos",
+                    "label": "Metatipo"
+                },
+                "notoriety": {
+                    "hint": "O lado negativo da reputação do personagem",
+                    "label": "Notoriedade"
+                },
+                "npc": {
+                    "is_grunt": {
+                        "hint": "Aplique regras de grunt a este ator",
+                        "label": "É Grunt"
+                    }
+                },
+                "nuyen": {
+                    "hint": "Quantidade de Nuyen que este personagem tem",
+                    "label": "Nuyen"
+                },
+                "public_awareness": {
+                    "hint": "Quão bem o personagem é conhecido entre a mídia, autoridades e público em geral",
+                    "label": "Consciência Pública"
+                },
+                "street_cred": {
+                    "hint": "As realizações de um personagem ao longo da vida",
+                    "label": "Crédito de Rua"
+                }
+            },
+            "Labels": {
+                "CareerKarma": "Karma de Carreira",
+                "Notoriety": "Notoriedade",
+                "Nuyen": "Nuyen",
+                "PublicAwareness": "Consciência Pública",
+                "StreetCred": "Crédito de Rua"
+            },
+            "Modifiers": {
+                "NPCMetatypeAttribute": "Atributo de Metatipo de NPC"
+            },
+            "Types": {
+                "Dwarf": "Anão",
+                "Elf": "Elfo",
+                "Human": "Humano",
+                "Ork": "Ork",
+                "Troll": "Troll"
+            }
+        },
+        "Contact": {
+            "Blackmail": "Chantagem",
+            "Connection": "Conexão",
+            "DropActor": "Arraste e solte um ator para vinculá-lo a este contato",
+            "FIELDS": {
+                "blackmail": {
+                    "hint": "Você tem algo que pode ser mantido sobre o contato para levá-los a fazer negócios.",
+                    "label": "Chantagem"
+                },
+                "connection": {
+                    "hint": "Isto mede a influência do contato em uma escala de 1 a 12. Quanto maior a Classificação de Conexão, mais suco o contato tem.",
+                    "label": "Conexão"
+                },
+                "family": {
+                    "hint": "O sangue é sempre mais espesso que a água, isso é verdade para ter a família como contatos.",
+                    "label": "Família"
+                },
+                "group": {
+                    "hint": "O contato é um grupo; pode ser uma gangue, um corpo ou alguns nerds",
+                    "label": "Grupo"
+                },
+                "linkedActor": {
+                    "hint": "Ator que este contato representa",
+                    "label": "Ator"
+                },
+                "loyalty": {
+                    "hint": "Isso mostra o quanto você pode confiar no contato, medido em uma escala de 1 a 6. Quanto maior a classificação de fidelidade, mais o contato está disposto a fazer por você",
+                    "label": "Lealdade"
+                },
+                "type": {
+                    "hint": "O tipo de contato determina que tipo de acesso eles têm para equipamentos, empregos, informações, etc.",
+                    "label": "Tipo"
+                }
+            },
+            "Family": "Família",
+            "Group": "Grupo",
+            "Labels": {
+                "Connection": "Conexão",
+                "ContactType": "Tipo",
+                "Contacts": "Contatos",
+                "Loyalty": "Lealdade"
+            },
+            "LinkedActor": "Ator",
+            "Loyalty": "Lealdade",
+            "LoyaltyConnectionHelp": "Lealdade / Conexão",
+            "LoyaltyConnectionLabel": "L / C",
+            "Type": "Tipo"
+        },
+        "InventoryRename": {
+            "Cancel": "Cancelar",
+            "NewName": "Novo Nome",
+            "Submit": "Enviar",
+            "Title": "Renomear Inventário"
+        },
+        "MovementTypes": {
+            "Run": "Correr",
+            "Sprint": "Arrancar"
+        },
+        "Vehicle": {
+            "Categories": {
+                "Anthro": "Anthromórfico",
+                "Huge": "Enorme",
+                "Large": "Grande",
+                "Medium": "Médio",
+                "Micro": "Micro",
+                "Mini": "Mini",
+                "Missile": "Míssil",
+                "Small": "Pequeno"
+            },
+            "Category": "Categoria",
+            "ChaseEnvironment": "Ambiente de Perseguição",
+            "Clearsight": "Visão Clara",
+            "ControlMode": "Modo de Controle",
+            "ControlModes": {
+                "Autopilot": "Piloto Automático",
+                "Manual": "Manual",
+                "Remote": "Remoto",
+                "Rigger": "Rigger"
+            },
+            "DamagedVehicle": "Veículo Danificado",
+            "Driver": "Motorista",
+            "Drone": "Drone",
+            "Environments": {
+                "Handling": "Manuseio",
+                "Speed": "Velocidade"
+            },
+            "IsDrone": "É Drone",
+            "IsOffRoad": "Está Fora da Estrada",
+            "Labels": {
+                "ControlRig": "Control Rig",
+                "VehicleStunImmunity": "Imunidade de veículos a dano de atordoamento"
+            },
+            "Maneuvering": "Manobrando",
+            "MissingDriver": "Arraste e solte um ator como motorista",
+            "ModificationCategoryTypes": {
+                "body": "Corpo",
+                "cosmetic": "Cosmético",
+                "electromagnetic": "Eletromagnético",
+                "powertrain": "Trem de Força",
+                "protection": "Proteção",
+                "weapons": "Armas"
+            },
+            "OffRoad": "Fora da Estrada",
+            "OnRoad": "Na Estrada",
+            "Stats": {
+                "Acceleration": "Aceleração",
+                "Handling": "Manuseio",
+                "OffRoadAcceleration": "Aceleração (Fora de Estrada)",
+                "OffRoadHandling": "Manuseio (Fora de Estrada)",
+                "OffRoadSpeed": "Velocidade (Fora de Estrada)",
+                "Pilot": "Piloto",
+                "Seats": "Assentos",
+                "Sensor": "Sensor",
+                "Speed": "Velocidade"
+            },
+            "Stealth": "Furtividade",
+            "Type": "Tipo",
+            "Types": {
+                "Aerospace": "Nave Espacial",
+                "Air": "Aeronave",
+                "Exotic": "Veículo Exótico",
+                "Ground": "Veículo Terrestre",
+                "Walker": "Andador",
+                "Water": "Embarcação"
+            },
+            "Vehicle": "Veículo"
+        },
+        "Vision": {
+            "AstralPerception": "Percepção Astral",
+            "AugmentedReality": "Realidade Aumentada",
+            "LowLight": "Visão de Pouca Luz",
+            "ThermographicVision": "Visão Termográfica"
+        }
+    }
+}

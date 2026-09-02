@@ -121,7 +121,7 @@
                     <div class="etm-progress">
                         <div class="etm-progress-text">
                             {{this.record.accumulatedHits}}{{#if this.threshold}} / {{this.threshold}}{{/if}}
-                            {{localize "SR5.Hits"}}
+                            {{localize "SR5.Tests.Labels.Hits"}}
                         </div>
                         {{! Always rendered, hidden without a threshold, to keep row heights equal. }}
                         <progress max="100" value="{{#if this.threshold}}{{this.progress}}{{else}}0{{/if}}"
@@ -211,7 +211,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>{{localize "SR5.Hits"}}</th>
+                            <th>{{localize "SR5.Tests.Labels.Hits"}}</th>
                             <th>{{localize "SR5.ExtendedTestManager.PoolUsed"}}</th>
                             <th>{{localize "SR5.Glitch"}}</th>
                             <th>{{localize "SR5.ExtendedTestManager.GameTime"}}</th>

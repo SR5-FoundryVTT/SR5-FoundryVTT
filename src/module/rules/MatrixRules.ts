@@ -323,8 +323,8 @@ export class MatrixRules {
 
         // add net hits as separate parts
         const mod = new ModifiableValue(modified);
-        mod.addUnique('SR5.Attacker',  attackerHits);
-        mod.addUnique('SR5.Defender', -defenderHits);
+        mod.addUnique('SR5.Tests.Labels.Attacker',  attackerHits);
+        mod.addUnique('SR5.Tests.Labels.Defender', -defenderHits);
         mod.calcTotal({ min: 0 });
 
         return modified;
@@ -339,7 +339,7 @@ export class MatrixRules {
         // General purpose active defenses. ()
         const activeDefenses: Shadowrun.ActiveDefenseData = {
             full_defense: {
-                label: 'SR5.FullMatrixDefense',
+                label: 'SR5.Tests.Labels.FullMatrixDefense',
                 value: actor.getMatrixFullDefenseAttribute()?.value,
                 initMod: -10,
             },

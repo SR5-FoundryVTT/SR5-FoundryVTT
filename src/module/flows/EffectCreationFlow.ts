@@ -30,7 +30,7 @@ export const EffectCreationFlow = {
         }
 
         const effectData = {
-            name: `${skillField.label} ${game.i18n.localize('SR5.Effect')}`,
+            name: `${skillField.label} ${game.i18n.localize('SR5.ActiveEffect.Labels.Effect')}`,
             system: {
                 applyTo: 'actor' as const,
                 changes: [ { key: path, type: 'add' } ]

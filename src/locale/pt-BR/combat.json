@@ -1,0 +1,43 @@
+{
+    "SR5": {
+        "Combat": {
+            "CannotSeizeAgain": "Voce nao pode tomar a iniciativa novamente ate o inicio do seu proximo turno.",
+            "ModeAstral": "Astral",
+            "ModeChangeNewInitiative": "Nova iniciativa",
+            "ModeChangePreviousInitiative": "Iniciativa anterior",
+            "ModeChangedLabel": "Modo de Iniciativa Alterado",
+            "ModeMatrix": "Matriz",
+            "ModeMeatspace": "Mundo fisico",
+            "ModeTitle": "Modo: {mode}",
+            "ModeUnknown": "Desconhecido",
+            "NextPass": "Proxima Passagem",
+            "NextPhase": "Proxima Fase",
+            "NextTurn": "Proximo Turno",
+            "NoHistoryAvailable": "Nenhum snapshot de historico de combate esta disponivel.",
+            "PreviousPass": "Passagem Anterior",
+            "PreviousPhase": "Fase Anterior",
+            "PreviousTurn": "Turno Anterior",
+            "ReduceInitByFive": "Iniciativa -5",
+            "ReduceInitByOne": "Iniciativa -1",
+            "ReduceInitByTen": "Iniciativa -10",
+            "SeizeInitiative": "Tomar a Iniciativa",
+            "SeizedInitiative": "Iniciativa Tomada",
+            "ToggleActedStatusGMOnly": "Alternar status de Ja Agiu (Somente GM)",
+            "TrackerTitle": "Turno {round} (Passagem {pass})"
+        },
+        "Damage": {
+            "Label": "Dano",
+            "Type": "Tipo",
+            "Types": {
+                "Matrix": "Matriz",
+                "Physical": "Físico",
+                "Stun": "Atord."
+            },
+            "Value": "Valor do Dano"
+        },
+        "DamageApplication": {
+            "ApplyDamage": "Aplicar Dano",
+            "Title": "Aplicação de Dano"
+        }
+    }
+}

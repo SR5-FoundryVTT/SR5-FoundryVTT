@@ -74,8 +74,8 @@ export const ResistTestDataFlow = {
 
             previousMessageId,
 
-            pool: DataDefaults.createData('value_field', {label: 'SR5.DicePool'}),
-            limit: DataDefaults.createData('value_field', {label: 'SR5.Limit'}),
+            pool: DataDefaults.createData('value_field', {label: 'SR5.Tests.Labels.DicePool'}),
+            limit: DataDefaults.createData('value_field', {label: 'SR5.Tests.Limit.Label'}),
             threshold: DataDefaults.createData('value_field', {label: 'SR5.Threshold'}),
             //@ts-expect-error SuccessTest.prepareData is adding missing values, however these aren't actually optional.
             values: {},

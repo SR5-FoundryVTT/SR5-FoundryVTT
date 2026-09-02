@@ -1,0 +1,47 @@
+{
+    "SR5": {
+        "Matrix": {
+            "Attributes": {
+                "Attack": "Attaque",
+                "DataProcessing": "Trait. Données",
+                "Firewall": "Firewall",
+                "Sleaze": "Corruption"
+            },
+            "Labels": {
+                "Agent": "Agent",
+                "CommonProgram": "Programme courant",
+                "HotSim": "Hot Sim",
+                "OverwatchScore": "Score de Surveillance",
+                "OverwatchScoreTrackerTitle": "Le moniteur pour bébé de Mr. Johnson",
+                "RunningSilent": "Mode silencieux",
+                "Wireless": "Sans fil"
+            }
+        },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Créer un appareil matriciel"
+        },
+        "Sprite": {
+            "Level": "Niveau",
+            "LevelAppliesSettingHint": "Contrôle quels attributs de sprite reçoivent le bonus de Niveau.",
+            "Registered": "Inscrit",
+            "Services": "Tâches",
+            "Type": "Type",
+            "Types": {
+                "Courier": "Coursier",
+                "Crack": "Cracker",
+                "Data": "Données",
+                "Fault": "Erreur",
+                "Machine": "Machine"
+            }
+        },
+        "SpritePower": {
+            "IsOptional": "Optionel",
+            "Optional": {
+                "DisabledOption": "Optionel, disabled",
+                "EnabledOption": "Optionel, enabled",
+                "Standard": "Par défaut"
+            },
+            "Type": "Type"
+        }
+    }
+}

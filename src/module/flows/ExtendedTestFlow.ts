@@ -340,13 +340,13 @@ export const ExtendedTestFlow = {
         // A zero value removes the change, so the first roll shows no modifier at all.
         const priorRolls = record.cumulativeModifier ? record.cumulativeRollCount : 0;
         const pool = new ModifiableValue(data.pool);
-        pool.setUnique('SR5.ExtendedTest', TestRules.extendedModifierValue * priorRolls);
+        pool.setUnique('SR5.Tests.Labels.ExtendedTest', TestRules.extendedModifierValue * priorRolls);
         pool.calcTotal({ min: 0 });
 
         // Seed accumulated hits from the record, keeping it the source of truth.
-        data.values.extendedHits = DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
+        data.values.extendedHits = DataDefaults.createData('value_field', { label: 'SR5.Tests.Labels.ExtendedHits' });
         if (record.accumulatedHits > 0) {
-            ModifiableValue.addBase(data.values.extendedHits, 'SR5.Hits', record.accumulatedHits);
+            ModifiableValue.addBase(data.values.extendedHits, 'SR5.Tests.Labels.Hits', record.accumulatedHits);
         }
         ModifiableValue.calcTotal(data.values.extendedHits, { min: 0 });
 

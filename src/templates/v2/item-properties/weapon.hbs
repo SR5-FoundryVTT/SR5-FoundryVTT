@@ -8,7 +8,7 @@
         {{#if item.system.range.modes.single_shot}}{{localize "SR5.Weapon.Mode.Short.SingleShot"}}{{#if (or item.system.range.modes.semi_auto item.system.range.modes.burst_fire item.system.range.modes.full_auto)}}/{{/if}}{{/if}}{{#if item.system.range.modes.semi_auto}}{{localize "SR5.Weapon.Mode.Short.SemiAuto"}}{{#if (or item.system.range.modes.burst_fire item.system.range.modes.full_auto)}}/{{/if}}{{/if}}{{#if item.system.range.modes.burst_fire}}{{localize "SR5.Weapon.Mode.Short.BurstFire"}}{{#if item.system.range.modes.full_auto}}/{{/if}}{{/if}}{{#if item.system.range.modes.full_auto}}{{localize "SR5.Weapon.Mode.Short.FullAuto"}}{{/if}}
     </label>
     <label>
-        {{localize "SR5.RecoilCompensation"}}&nbsp;{{item.system.range.rc.value}}
+        {{localize "SR5.Weapon.Labels.RecoilCompensation"}}&nbsp;{{item.system.range.rc.value}}
         {{#if item.actor}}
             <span data-tooltip="SR5.Total">({{item.totalRecoilCompensation}})</span>
         {{/if}}
@@ -19,7 +19,7 @@
         {{item.system.thrown.ranges.short}}/{{item.system.thrown.ranges.medium}}/{{system.thrown.ranges.long}}/{{system.thrown.ranges.extreme}}m
     </label>
 {{else if (eq item.system.category 'melee')}}
-    <label>{{localize "SR5.Reach"}}&nbsp;{{item.system.melee.reach}}</label>
+    <label>{{localize "SR5.Weapon.Labels.Reach"}}&nbsp;{{item.system.melee.reach}}</label>
 {{/if}}
 
 {{#if (and (usesAmmo item) (hasAmmo item) (equippedAmmo item))}}

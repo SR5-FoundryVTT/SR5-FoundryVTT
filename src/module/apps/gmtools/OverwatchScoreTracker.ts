@@ -59,7 +59,7 @@ export class OverwatchScoreTracker extends HandlebarsApplicationMixin(Applicatio
     actors: SR5Actor[] = [];
 
     override get title() {
-        return game.i18n.localize('SR5.OverwatchScoreTrackerTitle');
+        return game.i18n.localize('SR5.Matrix.Labels.OverwatchScoreTrackerTitle');
     }
 
     override async _prepareContext(options: Parameters<ApplicationV2['_prepareContext']>[0]) {

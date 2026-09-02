@@ -130,10 +130,10 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
     }
 
     applyPoolActiveDefenseModifier() {
-        const defense = this.data.activeDefenses[this.data.activeDefense] || {label: 'SR5.ActiveDefense', value: 0, init: 0};
+        const defense = this.data.activeDefenses[this.data.activeDefense] || {label: 'SR5.Tests.Labels.ActiveDefense', value: 0, init: 0};
 
         // Apply zero modifier also, to sync pool.mod and modifiers.mod
-        ModifiableValue.setUnique(this.data.pool, 'SR5.ActiveDefense', defense.value);
+        ModifiableValue.setUnique(this.data.pool, 'SR5.Tests.Labels.ActiveDefense', defense.value);
     }
 
     applyPoolMeleeReachModifier() {

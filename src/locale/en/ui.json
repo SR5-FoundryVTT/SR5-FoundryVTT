@@ -1,0 +1,313 @@
+{
+    "SR5": {
+        "Content": {
+            "Actions": {
+                "Armor": "Armor",
+                "BiofeedbackResist": "Biofeedback Resist",
+                "BruteForce": "Brute Force",
+                "ChangeConfiguration": "Change Configuration",
+                "ChangeIcon": "Change Icon",
+                "CheckOverwatchScore": "Check Overwatch Score",
+                "Composure": "Composure",
+                "ControlDevice": "Control Device",
+                "CrackFile": "Crack File",
+                "CrashProgram": "Crash Program",
+                "DataSpike": "Data Spike",
+                "DisarmDataBomb": "Disarm Databomb",
+                "Drain": "Drain",
+                "DroneInfiltration": "Drone Infiltration",
+                "DronePerception": "Drone Perception",
+                "DronePilotVehicle": "Drone Pilot Vehicle",
+                "EditFile": "Edit File",
+                "EnterExitHost": "Enter/Exit Host",
+                "EraseMark": "Erase Mark",
+                "EraseMatrixSignature": "Erase Matrix Signature",
+                "Fade": "Fade",
+                "FormatDevice": "Format Device",
+                "FullMatrixDefense": "Full Matrix Defense",
+                "GridHop": "Grid Hop",
+                "HackOnTheFly": "Hack On The Fly",
+                "Hide": "Hide",
+                "InviteMark": "Invite Mark",
+                "JackOut": "Jack Out",
+                "JamSignals": "Jam Signals",
+                "JudgeIntentions": "Judge Intentions",
+                "JumpIntoRiggedDevice": "Jump Into Rigged Device",
+                "LiftCarry": "Lift Carry",
+                "MatrixDamageResist": "Matrix Damage Resist",
+                "MatrixDefenseTest": "Matrix Defense Test",
+                "MatrixPerception": "Matrix Perception",
+                "MatrixSearch": "Matrix Search",
+                "Memory": "Memory",
+                "NaturalRecoveryPhysical": "Natural Recovery Physical",
+                "NaturalRecoveryStun": "Natural Recovery Stun",
+                "PhysicalDamageResist": "Physical Damage Resist",
+                "PhysicalDefense": "Physical Defense",
+                "RebootDevice": "Reboot Device",
+                "SendMessage": "Send Message",
+                "SetDataBomb": "Set Databomb",
+                "Snoop": "Snoop",
+                "SpoofCommand": "Spoof Command",
+                "SwitchInterfaceMode": "Switch Interface Mode",
+                "TraceIcon": "Trace Icon"
+            }
+        },
+        "ContextOptions": {
+            "AddAttributeEffect": "Add Effect for Attribute",
+            "AddSkillEffect": "Add Effect for Skill",
+            "DeleteEffect": "Delete Effect",
+            "DeleteItem": "Delete Item",
+            "DeleteSkill": "Delete Skill",
+            "EditEffect": "Edit Effect",
+            "EditItem": "Edit Item",
+            "EditSkill": "Edit Skill",
+            "MoveItem": "Move Item",
+            "Source": "Open Reference",
+            "ViewItem": "View Item"
+        },
+        "Keybindings": {
+            "AddRemoveManyQty": {
+                "Hint": "Add/Remove 20 Qty at a time",
+                "Label": "Add/Remove 20"
+            },
+            "AddRemoveSomeQty": {
+                "Hint": "Add/Remove 5 Qty at a time",
+                "Label": "Add/Remove 5"
+            },
+            "HideTestDialog": {
+                "Hint": "Skip dialog when rolling tests from any button",
+                "Label": "Hide Test Dialog"
+            },
+            "OverwatchScoreTracker": {
+                "Hint": "Open overwatch score tracker",
+                "Label": "Overwatch Score Tracker"
+            },
+            "ShowItemCard": {
+                "Hint": "Only show item card in chat instead of rolling test",
+                "Label": "Show Item Card"
+            },
+            "ShowSituationModifiers": {
+                "Hint": "Open situation modifiers for selection",
+                "Label": "Situation Modifiers"
+            },
+            "SuccessTestPrompt": {
+                "Hint": "Prompt to make a standard Success Test",
+                "Label": "Prompt Success Test"
+            }
+        },
+        "Labels": {
+            "Action": {
+                "ForceReboot": "Force Reboot",
+                "MatrixAction": "Matrix Action",
+                "Modifiers": "Modifiers",
+                "OpposedTest": "Opposed Test"
+            },
+            "ActorSheet": {
+                "AddOneMark": "Add One Mark",
+                "ColdSim": "Cold Sim",
+                "Compilations": "Compilations",
+                "ConnectToDriver": "Connect To Driver",
+                "ConnectedTo": "Connected To",
+                "CreateInventory": "Create inventory place",
+                "CritterPowers": "Critter Powers",
+                "DeviceRating": "Device Rating",
+                "DisabledOptionCritterPowers": "Optional Critter Powers - Disabled",
+                "DisabledOptionSpritePowers": "Optional Sprite Powers - Disabled",
+                "DisplayingPersona": "Displaying Persona",
+                "EnabledOptionCritterPowers": "Optional Critter Powers - Enabled",
+                "EnabledOptionSpritePowers": "Optional Sprite Powers - Enabled",
+                "Icons": "Icons",
+                "Matrix": "Matrix",
+                "MatrixActions": "Matrix Actions",
+                "Network": "Network",
+                "Networks": "Networks",
+                "NoNetwork": "No Network",
+                "NotorietyShort": "N",
+                "Offline": "Offline",
+                "OwnedIcons": "Owned Icons",
+                "Persona": "Persona",
+                "PhysicalTrack": "Physical Track",
+                "PublicAwarenessShort": "PA",
+                "RemoveOneMark": "Remove One Mark",
+                "ResetActorForNewRun": "New Run Reset",
+                "Rituals": "Rituals",
+                "SetMonitor": "Monitor must be set manually.",
+                "SpritePowers": "Sprite Powers",
+                "StreetCredShort": "SC",
+                "StunTrack": "Stun Track",
+                "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description."
+            },
+            "Documents": {
+                "Actor": "Actor",
+                "Item": "Item",
+                "Scene": "Scene"
+            },
+            "Inventory": {
+                "All": "All",
+                "Carried": "Carried",
+                "OpenInventory": "Inventory"
+            },
+            "Item": {
+                "AvailabilityAdjustment": "Scale Availability w/ Rating",
+                "CostAdjustment": "Scale Cost w/ Rating",
+                "Network": "Network"
+            },
+            "Matrix": {
+                "AttackShort": "A",
+                "DataProcessingShort": "D",
+                "FirewallShort": "F",
+                "Global": "Global",
+                "Local": "Local",
+                "Public": "Public",
+                "SleazeShort": "S",
+                "TargetDevice": "Target Device",
+                "TargetMainIcon": "Target Main Icon"
+            },
+            "Message": {
+                "ClickToSelect": "Click to select on scene",
+                "FailedAttackAction": "Failed a Matrix Attack Action",
+                "OverwatchConvergence": "Overwatch Convergence",
+                "TargetedIcon": "Targeted Icon",
+                "TestEffects": "Applied effects"
+            },
+            "Sheet": {
+                "ClearNetwork": "Clear network from all devices",
+                "ItemEffects": "Item Effects",
+                "MissingNetworkDevices": "Drag&Drop a network device to add it",
+                "NotVisible": "Not Visible",
+                "RebootDevice": "Reboot",
+                "RemoveImprovisedDevices": "Remove improvised devices",
+                "Type": "Type",
+                "Visible": "Visible"
+            },
+            "Sidebar": {
+                "Changelog": "Changelog",
+                "Issues": "Issues",
+                "Wiki": "Wiki"
+            }
+        },
+        "Tabs": {
+            "Actor": {
+                "Actions": "Actions",
+                "Ammo": "Ammo",
+                "Bio": "Bio",
+                "Character": "Character",
+                "Compilations": "Compilations",
+                "ComplexForms": "Complex Forms",
+                "CritterPowers": "Powers",
+                "Details": "Details",
+                "Effects": "Effects",
+                "IC": "IC",
+                "Inventory": "Inventory",
+                "Licenses": "Licenses",
+                "Magic": "Magic",
+                "MarkedIcons": "Marked",
+                "Matrix": "Matrix",
+                "MatrixActions": "Actions",
+                "Mods": "Mods",
+                "Network": "Network",
+                "NetworkIcons": "Icons",
+                "Networks": "Networks",
+                "OwnedIcons": "Owned",
+                "Social": "Social",
+                "Spirit": "Spirit",
+                "Sprite": "Sprite",
+                "SpritePowers": "Powers",
+                "Vehicle": "Vehicle"
+            },
+            "Item": {
+                "Description": "Description",
+                "Details": "Details",
+                "Effects": "Effects",
+                "Mods": "Mods",
+                "Network": "Network",
+                "SinLicenses": "Licenses",
+                "SinNetworks": "Networks",
+                "WeaponAmmo": "Ammo"
+            }
+        },
+        "Tooltips": {
+            "Actor": {
+                "AddOneService": "Add One Service",
+                "Blitz": "Use a point of Edge to roll the Maximum (5) number of dice for initiative",
+                "Description": "Description of this Actor",
+                "DisconnectNetwork": "Leave this host/grid",
+                "MatrixRunningSilentToggle": "Change your matrix device between Running Silent and Displaying your Persona",
+                "MiscConfig": "Miscellaneous Settings & Modifiers",
+                "NoCombatant": "Initiative Roll (Must be in an Encounter)",
+                "PickControlledTokenAsDriver": "Pick the currently Controlled Token Actor as the Driver",
+                "PickControlledTokenAsSummoner": "Pick the currently Controlled Token Actor as the Summoner",
+                "PickControlledTokenAsTechnomancer": "Pick the currently Controlled Token Actor as the Compiler (Technomancer)",
+                "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed",
+                "RemoveAllNetworks": "Remove all networks",
+                "RemoveFavorite": "Remove this from your favorites bar",
+                "RemoveNetwork": "Remove network",
+                "RemoveOneService": "Remove One Service",
+                "RemoveSkillSet": "Remove the current skill set as well as all skills and skill groups sourced from it",
+                "RollInitiative": "Roll Initiative"
+            },
+            "CallInAction": {
+                "LinkActor": "Drag&Drop an Actor to Call In"
+            },
+            "CompilationTest": {
+                "Level": "Level of the compiled sprite"
+            },
+            "Contact": {
+                "LinkActor": "Drag&Drop an Actor to link this Contact"
+            },
+            "Effect": {
+                "ApplyValueEditor": "Apply value edit",
+                "CancelValueEditor": "Cancel value edit",
+                "CreateEffect": "Create Effect",
+                "DeleteEffect": "Delete Effect",
+                "EditEffect": "Edit Effect",
+                "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "OpenValueEditor": "Open value editor",
+                "PriorityFieldDisabled": "Custom priority is not supported at this time"
+            },
+            "Item": {
+                "AddQuantity": "Add 1 Qty. {qtySome}: Add 5 Qty. {qtyMany}: Add 20 Qty.",
+                "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
+                "CostAdjustment": "Adjust actual cost based on the item rating",
+                "DisabledForPreparedActor": "Disabled because the prepared actor cannot be edited by your current user",
+                "RemoveQuantity": "Remove 1 Qty. {qtySome}: Remove 5 Qty. {qtyMany}: Remove 20 Qty.",
+                "ToggleFavorite": "Favorite this and display it in the Favorites Bar",
+                "ToggleVisibility": "Toggle the Visibility of this during Play Mode"
+            },
+            "MatrixTest": {
+                "SameGridDisabled": "As active and target icon both use grids, this is automatically determined"
+            },
+            "RangedAttack": {
+                "Recoil": "Progressive Recoil",
+                "RecoilBeforeAttack": "Progressive Recoil now, before attacking",
+                "RecoilCompensation": "Total RC, including actor and item RC",
+                "ResetRecoil": "Reset progressive recoil to none"
+            },
+            "Ritual": {
+                "Force": "Force of the ritual",
+                "ReagentDrams": "Drams of reagents used for altering drain"
+            },
+            "SituationalModifier": {
+                "Recoil": "Amount of bullets fired"
+            },
+            "SummoningTest": {
+                "DragOnCanvas": "Drag spirit on canvas",
+                "Force": "Force of the summoned spirit",
+                "OptionalPowerCount": "Informational count for optional spirit powers (floor(force / 3)).",
+                "ReagentDrams": "Drams of reagents used for altering summoning limit"
+            },
+            "Test": {
+                "BuyHits": "Do not roll dice. Buy hits using ⌊dice pool / 4⌋.",
+                "Extended": "Test will be thrown as an extended test until threshold is reached. Set the interval to zero to roll it as a normal test.",
+                "ExtendedInterval": "Game time between rolls. Zero rolls this as a normal, non extended test.",
+                "Limit": "Calculated limit value",
+                "LimitIgnored": "Limit is currently ignored for this test",
+                "Pool": "Amount of dice to roll",
+                "PushTheLimit": "Apply push the limit edge rules",
+                "RollMode": "FoundryVTT chat message roll visibility",
+                "Threshold": "Calculated threshold value"
+            },
+            "ToggleEditMode": "Toggle Edit Mode"
+        }
+    }
+}

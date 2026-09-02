@@ -1,0 +1,232 @@
+{
+    "SR5": {
+        "ChangelogApplication": {
+            "Changelog": "Confira nosso GitHub para novos recursos e correções",
+            "IssuesOverview": "Visão Geral de Problemas",
+            "LatestChangelog": "Último Changelog",
+            "Reason": "Você atualizou para a versão mais recente!",
+            "ReportIssues": "Por favor, reporte bugs e solicitações de recursos",
+            "Title": "Atualização Shadowrun5e"
+        },
+        "CompendiumBrowser": {
+            "Filters": {
+                "ClearSearch": "Limpar Pesquisa",
+                "SearchPlaceholder": "Pesquisar por...",
+                "System": "Sistema",
+                "World": "Mundo"
+            },
+            "Tabs": {
+                "Actors": "Atores",
+                "Items": "Itens",
+                "Settings": "Configurações"
+            },
+            "Title": "Navegador de Compêndio"
+        },
+        "CompendiumSettings": {
+            "ActionsPacksSection": "Compêndios de Ações",
+            "Description": "Estes pacotes serão usados para o sistema. Você pode substituí-los com seus próprios pacotes, mas você não deve removê-los.",
+            "GeneralActionsPack": {
+                "hint": "Este compêndio será usado para todas as ações gerais, apenas de atributos.",
+                "label": "Ações Gerais"
+            },
+            "ICActionsPack": {
+                "hint": "Este compêndio será usado para ações IC, filtrado para cada tipo IC",
+                "label": "Ações IC"
+            },
+            "Label": "Pacotes de Compêndio",
+            "MatrixActionsPack": {
+                "hint": "Este compêndio será usado para todas as ações matriciais.",
+                "label": "Ações da Matriz"
+            },
+            "SkillGroupsPack": {
+                "hint": "Este compêndio será usado para grupos de perícias.",
+                "label": "Grupos de Perícias"
+            },
+            "SkillSetsPack": {
+                "hint": "Este compêndio será usado para conjuntos de perícias.",
+                "label": "Conjuntos de Perícias"
+            },
+            "SkillsPack": {
+                "hint": "Este compêndio será usado para todas as perícias.",
+                "label": "Perícias"
+            },
+            "SkillsPacksSection": "Compêndios de Perícias",
+            "Title": "Compêndios do sistema"
+        },
+        "Compendiums": {
+            "Folders": {
+                "Root": "Importações SR5e"
+            },
+            "sr5critter": "Criaturas & Espíritos & Sprites",
+            "sr5drone": "Drones & Veículos",
+            "sr5gear": "Armaduras & Equipamentos",
+            "sr5magic": "Magia & Formas Complexas",
+            "sr5misc": "Diversos",
+            "sr5modification": "Modificações",
+            "sr5trait": "Qualidades & Poderes",
+            "sr5ware": "Biônicos & Cibernéticos",
+            "sr5weapon": "Armas"
+        },
+        "DeleteConfirmationApplication": {
+            "Cancel": "Não",
+            "Consent": "Tem certeza?",
+            "Delete": "Sim",
+            "Description": "Excluir um item não pode ser revertido!",
+            "Title": "Excluir item   "
+        },
+        "EnvModifiersApplication": {
+            "ClearModifiers": "Limpar modificadores pessoais",
+            "Extreme": "Combinação de duas ou mais condições no nível pesado",
+            "LightGlare": {
+                "Good": "Luz Total/Sem Clarão",
+                "Heavy": "Escuridão Total/Clarão Cegante",
+                "Light": "Luz Parcial/Clarão Fraco",
+                "Moderate": "Luz Fraca/Clarão Moderado",
+                "Title": "Luz/Clarão"
+            },
+            "Modifier": {
+                "Title": "Modificador"
+            },
+            "Range": {
+                "Good": "Curto",
+                "Heavy": "Extremo",
+                "Light": "Médio",
+                "Moderate": "Longo",
+                "Title": "Alcance"
+            },
+            "Total": "Resultado",
+            "Visibility": {
+                "Good": "Claro",
+                "Heavy": "Chuva/Neblina/Fumaça Pesada",
+                "Light": "Chuva/Neblina/Fumaça Leve",
+                "Moderate": "Chuva/Neblina/Fumaça Moderada",
+                "Title": "Visibilidade"
+            },
+            "Wind": {
+                "Good": "Nada ou Brisa Leve",
+                "Heavy": "Ventos Fortes",
+                "Light": "Ventos Leves",
+                "Moderate": "Ventos Moderados",
+                "Title": "Vento"
+            }
+        },
+        "GMRequest": {
+            "General": "Seu/Sua GM quer que você faça um",
+            "RollAttribute": "Teste de Atributo",
+            "RollSkill": "Teste de Perícia",
+            "Teamwork": "Teste de Trabalho em Equipe",
+            "Threshold": " com um limite de "
+        },
+        "Import": {
+            "ActorImporter": {
+                "Title": "Importador de Ator"
+            },
+            "BulkImporter": {
+                "Title": "Importador em Massa"
+            }
+        },
+        "KarmaManager": {
+            "CareerKarma": "Karma de Carreira acumulado pelo personagem",
+            "CurrentKarma": "A quantidade de Karma que o personagem tem atualmente",
+            "FinalCareerKarma": "Karma de Carreira que o personagem terá ao confirmar",
+            "FinalCurrentKarma": "Karma que este personagem terá ao confirmar",
+            "FinalKarma": "Karma Final",
+            "StartingKarma": "Karma Inicial",
+            "Title": "Gerenciador de Karma"
+        },
+        "Migration": {
+            "BeginMigration": "Iniciar Migração",
+            "WarningBackup": "Se você não fez backup do seu mundo, faça isso antes de pressionar o botão 'Iniciar Migração' abaixo.",
+            "WarningDescription": "Apenas o GM pode realizar a atualização e desligar o servidor ou fechar o navegador enquanto a atualização estiver em andamento pode causar danos irreparáveis ao seu mundo.",
+            "WarningHeader": "Aviso de Migração",
+            "WarningRequired": "O sistema Shadowrun 5E deve iniciar uma atualização obrigatória.",
+            "WarningTitle": "Alerta"
+        },
+        "NuyenManager": {
+            "Cancel": "Cancelar",
+            "CurrentNuyen": "A quantidade de Nuyen que o personagem tem atualmente",
+            "FinalNuyen": "Quantidade final de Nuyen após confirmar",
+            "Submit": "Enviar",
+            "Title": "Gerenciador de Nuyen"
+        },
+        "OverwatchScoreTracker": {
+            "AddSelect": "Adicionar tokens selecionados ao ator vinculado",
+            "CantDeleteUserCharacter": "Personagem do jogador não pode ser removido do monitor",
+            "DeleteScore": "Excluir valor do monitor",
+            "GMOnly": "DEUS está rastreando sua localização...",
+            "NotifyNoSelectedTokens": "Pelo menos um token vinculado deve ser selecionado.",
+            "OnlyLinkedActorsSupported": "Apenas atores vinculados são suportados. Tokens selecionados com atores não vinculados serão ignorados.",
+            "ResetScore": "Redefinir Valor de Vigilância"
+        },
+        "ReputationManager": {
+            "Cancel": "Cancelar",
+            "Submit": "Enviar",
+            "Title": "Gerenciador de Reputação"
+        },
+        "SituationalModifiersApplication": {
+            "Category": {
+                "Magic": "Magia",
+                "Matrix": "Matriz",
+                "Physical": "Físico"
+            },
+            "ClearLocalAll": "Remover modificadores locais",
+            "ClearLocalAllTokens": "Remover todos os modificadores de token na cena",
+            "Magic": {
+                "BackgroundCount": "Contagem de Fundo"
+            },
+            "Matrix": {
+                "Noise": "Ruído"
+            },
+            "Title": "Modificadores Situacionais"
+        },
+        "TimeControl": {
+            "Advance": "Avançar",
+            "Amount": "Quantidade",
+            "Apply": "Aplicar",
+            "CustomAmount": "Valor Personalizado",
+            "CustomMinutes": "min",
+            "CustomMinutesTooltip": "Avançar o tempo do mundo por uma quantidade personalizada de minutos",
+            "Day": "Dia",
+            "GmOnly": "Somente Mestres podem alterar o tempo do mundo.",
+            "Hour": "Hora",
+            "Minute": "Minuto",
+            "Month": "Mês",
+            "Presets": {
+                "CombatTurn": "Turno de Combate",
+                "Day": "1 Dia",
+                "Header": "Avanço Rápido",
+                "Hour": "1 Hora",
+                "Minute": "1 Minuto",
+                "TenMinutes": "10 Minutos",
+                "Week": "1 Semana"
+            },
+            "Preview": "Prévia",
+            "Rewind": "Retroceder",
+            "Second": "Segundo",
+            "SetTime": "Definir Data e Hora",
+            "Title": "Controle de Tempo",
+            "Unit": "Unidade",
+            "Year": "Ano"
+        },
+        "Tours": {
+            "CharacterImport": {
+                "Description": "Este Excursão lhe dará uma visão geral de como importar um personagem chummer. Para detalhes, consulte https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/Chummer-Character-Import",
+                "GeneralContent": "Para importar um personagem, você precisa do json de exportação do chummer 5e.",
+                "GeneralTitle": "Importando um personagem",
+                "Title": "Importação de Personagem"
+            },
+            "ConditionMonitor": {
+                "ApplyDamageContent": "Para aplicar dano, clique com o botão esquerdo em uma célula. Todas as células até esta célula, inclusive, serão preenchidas. Se mais células estavam preenchidas, todas as células à direita não serão mais preenchidas. Clicar com o botão direito em qualquer célula removerá todo o dano do monitor.",
+                "ApplyDamageTitle": "Aplicando e removendo Dano",
+                "Description": "Este excursão lhe dará uma visão geral de como funciona o monitor de condição.",
+                "GeneralContent": "Estes são seus monitores de condição. Eles consistem em várias células. Em certas células, você pode ver um número escrito. Se essas células estiverem preenchidas, seu modificador de ferida aumentará para este número. Os modificadores de ferida de todos os monitores são adicionados",
+                "GeneralTitle": "Monitor de Condição",
+                "RecoveryContent": "Clicar no rótulo de um monitor de condição solicitará um teste de recuperação estendido. O resultado do teste de recuperação será aplicado automaticamente ao monitor.",
+                "RecoveryTitle": "Testes de Recuperação",
+                "Title": "Excursão do Monitor de Condição",
+                "WoundModifierContent": "Esta célula indica que preenchê-la aumenta o seu modificador de ferimento pelo número escrito na célula",
+                "WoundModifierTitle": "Modificador de Ferimento"
+            }
+        }
+    }
+}

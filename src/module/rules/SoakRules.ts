@@ -25,10 +25,10 @@ export class SoakRules {
         // will be converted to stun damage and then reduced to 0. This does not work with drones wearing armor
         // but we do not support this.
         if (damageData.type.value === 'stun' && actor.isType('vehicle')) {
-            return Helpers.reduceDamageByHits(damageData, damageData.value, 'SR5.VehicleStunImmunity');
+            return Helpers.reduceDamageByHits(damageData, damageData.value, 'SR5.Vehicle.Labels.VehicleStunImmunity');
         }
 
-        return Helpers.reduceDamageByHits(damageData, hits, 'SR5.SoakTest');
+        return Helpers.reduceDamageByHits(damageData, hits, 'SR5.Tests.Labels.SoakTest');
     }
 
     /**

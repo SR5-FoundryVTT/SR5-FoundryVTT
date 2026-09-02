@@ -116,7 +116,7 @@ export const ExtendedTestRules = {
         const next = record.cumulativeModifier
             ? TestRules.extendedModifierValue * record.cumulativeRollCount
             : 0;
-        modifier.setUnique('SR5.ExtendedTest', next);
+        modifier.setUnique('SR5.Tests.Labels.ExtendedTest', next);
         return modifier.calcTotal({ min: 0 });
     },
 

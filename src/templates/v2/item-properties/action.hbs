@@ -15,10 +15,10 @@
             {{localizeOb item.system.action.attribute @root.config.attributes}}
         {{/if}}
         {{#if item.system.action.mod}}
-            <span data-tooltip="SR5.ItemMod">{{numberFormat item.system.action.mod sign=true}}</span>
+            <span data-tooltip="SR5.Item.Labels.ItemMod">{{numberFormat item.system.action.mod sign=true}}</span>
         {{/if}}
         {{#if (or item.system.action.limit.value item.system.action.limit.attribute)}}
-            <span data-tooltip="{{#if (eq item.type 'weapon')}}{{localize "SR5.Accuracy"}}{{else}}{{localize "SR5.Limit"}}{{/if}}">
+            <span data-tooltip="{{#if (eq item.type 'weapon')}}{{localize "SR5.Weapon.Labels.Accuracy"}}{{else}}{{localize "SR5.Tests.Limit.Label"}}{{/if}}">
                 [
                 {{#if item.system.action.limit.attribute}}{{localizeOb item.system.action.limit.attribute @root.config.limits}}{{/if}}
                 {{#if (and item.system.action.limit.value item.system.action.limit.attribute)}}+{{/if}}

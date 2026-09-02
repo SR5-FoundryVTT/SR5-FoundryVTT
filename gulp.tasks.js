@@ -10,6 +10,7 @@ const gulpsass = require('gulp-sass')(require('sass'));
 const gulp = require('gulp');
 const cp = require('child_process');
 const esbuild = require('esbuild');
+const localization = require('./utils/localization.cjs');
 
 // Config
 const distName = 'dist';
@@ -92,6 +93,13 @@ async function copyAssets() {
 }
 
 /**
+ * Assemble the modular locale sources into the files loaded by Foundry.
+ */
+async function buildLocales() {
+    localization.buildLocales(path.resolve(destFolder, 'locale'));
+}
+
+/**
  * WATCH
  * @param {string} env - 'prod' or 'dev' to set the environment variable for the build
  */
@@ -123,6 +131,12 @@ async function watch(env) {
     watchCopy('public/**/*', 'public', '');
     watchCopy('src/templates/**/*', 'src/templates', 'templates');
     watchCopy('src/module/tours/jsons/**/*', 'src/module/tours/jsons', 'tours');
+
+    const localeWatcher = gulp.watch('src/locale/**/*.json');
+    const rebuildLocales = () => buildLocales().catch((error) => console.error(error));
+    localeWatcher.on('add', rebuildLocales);
+    localeWatcher.on('change', rebuildLocales);
+    localeWatcher.on('unlink', rebuildLocales);
 
     const sassWatcher = gulp.watch('src/**/*.scss');
     const rebuildSass = () => buildSass().catch((error) => console.error(error));
@@ -166,10 +180,11 @@ async function buildSass() {
 exports.clean = cleanDist;
 exports.sass = buildSass;
 exports.assets = copyAssets;
-exports.build = gulp.series(cleanDist, copyAssets, buildSass, buildJSProd);
-exports.buildDev = gulp.series(cleanDist, copyAssets, buildSass, buildJSDev);
-exports.buildProd = gulp.series(cleanDist, copyAssets, buildSass, buildJSProd);
-exports.watch = gulp.series(copyAssets, buildSass, watchDev);
-exports.watchProd = gulp.series(copyAssets, buildSass, watchProd);
-exports.watchDev = gulp.series(copyAssets, buildSass, watchDev);
+exports.locales = buildLocales;
+exports.build = gulp.series(cleanDist, gulp.parallel(copyAssets, buildLocales), buildSass, buildJSProd);
+exports.buildDev = gulp.series(cleanDist, gulp.parallel(copyAssets, buildLocales), buildSass, buildJSDev);
+exports.buildProd = gulp.series(cleanDist, gulp.parallel(copyAssets, buildLocales), buildSass, buildJSProd);
+exports.watch = gulp.series(gulp.parallel(copyAssets, buildLocales), buildSass, watchDev);
+exports.watchProd = gulp.series(gulp.parallel(copyAssets, buildLocales), buildSass, watchProd);
+exports.watchDev = gulp.series(gulp.parallel(copyAssets, buildLocales), buildSass, watchDev);
 exports.rebuild = exports.build;

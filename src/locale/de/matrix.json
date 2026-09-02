@@ -1,0 +1,189 @@
+{
+    "SR5": {
+        "ComplexForm": {
+            "Durations": {
+                "Immediate": "Sofort",
+                "Permanent": "Permanent",
+                "Sustained": "Aufrechterhalten"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "Sofort (es passiert sofort, ohne anhaltende Effekte), Aufrechterhalten (temporär), Permanent (Effekt wird permanent, wenn lang genug aufrechterhalten)",
+                    "label": "Dauer"
+                },
+                "fade": {
+                    "hint": "Der Schwundwert wird auf die Stufe angerechnet, um den widerstandenen Schaden zu berechnen.",
+                    "label": "Schwund"
+                },
+                "target": {
+                    "hint": "Valide Ziele der komplexen Form",
+                    "label": "Ziel"
+                }
+            }
+        },
+        "Grid": {
+            "FIELDS": {
+                "category": {
+                    "hint": "Öffentliche Gitter wenden einen negativen Modifikator an, locale und globale Gitter nicht.",
+                    "label": "Kategorie"
+                }
+            }
+        },
+        "Host": {
+            "CustomAttributes": "Eigene Attributsaufteilung",
+            "Rating": "Host-Stufe"
+        },
+        "IC": {
+            "FIELDS": {
+                "host": {
+                    "hint": "Auf welchem Host läuft dieses IC?",
+                    "label": "Host",
+                    "rating": {
+                        "hint": "Stufe des Hosts",
+                        "label": "Stufe"
+                    }
+                },
+                "icType": {
+                    "hint": "Art des IC",
+                    "label": "Art"
+                }
+            },
+            "MissingHost": "Drag&Drop Host",
+            "Type": "Art",
+            "Types": {
+                "Acid": "Säure",
+                "Binder": "Bremse",
+                "BlackIC": "Schwarzes IC",
+                "Blaster": "Blaster",
+                "Bloodhound": "Bluthund",
+                "BlueGoo": "Blauer Schleim",
+                "Catapult": "Katapult",
+                "Crash": "Absturz",
+                "Flicker": "Flackern",
+                "Jammer": "Störer",
+                "Killer": "Killer",
+                "Marker": "Leuchtspur",
+                "Patrol": "Patrouille",
+                "Probe": "Marker",
+                "Scramble": "Wirbel",
+                "Shocker": "Schocker",
+                "Sleuther": "Spürhund",
+                "Sparky": "Sparky",
+                "TarBaby": "Teerbaby",
+                "Track": "Aufspüren"
+            }
+        },
+        "Matrix": {
+            "Attributes": {
+                "Attack": "Angriff",
+                "DataProcessing": "Datenverarb.",
+                "Firewall": "Firewall",
+                "Sleaze": "Schleicher"
+            },
+            "Labels": {
+                "Agent": "Agent",
+                "CommonProgram": "Standardprogramm",
+                "DirectConnection": "Direkte Verbindung",
+                "Grids": "Gitter",
+                "Hosts": "Hosts",
+                "HotSim": "Heißes Sim",
+                "LivingPersona": "Lebende Persona",
+                "Marks": "Marken",
+                "MatrixDefense": "Matrix Verteidigung",
+                "Network": "Netzwerk",
+                "OverwatchScore": "Overwatch-Wert",
+                "OverwatchScoreTrackerTitle": "Mr. Johnsons Baby-Monitor",
+                "PublicGrid": "Öffentliches Gitter",
+                "RunningSilent": "Auf Schleichfahrt",
+                "Wireless": "WiFi",
+                "WirelessOffline": "Offline",
+                "WirelessOnline": "Online",
+                "WirelessUnavailable": "Kabel"
+            }
+        },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Matrixgerät erstellen"
+        },
+        "NetworkManager": {
+            "AvailableNetworks": "Verfügbare Netzwerke",
+            "BruteForce": "Brute Force",
+            "ConnectedTo": "Verbunden mit",
+            "HackOnTheFly": "Eiliges Hacken",
+            "InviteMark": "Marke einladen",
+            "NetworkType": "Netzwerktyp",
+            "Title": "Netzwerkmanager"
+        },
+        "RebootConfirmationDialog": {
+            "Cancel": "Abbrechen",
+            "Confirm": "Neustart",
+            "Description": "Sind Sie sicher, dass Sie dieses Gerät neu starten möchten?",
+            "Title": "Neustart bestätigen"
+        },
+        "Sprite": {
+            "FIELDS": {
+                "level": {
+                    "hint": "Stufe des Sprites",
+                    "label": "Stufe"
+                },
+                "registered": {
+                    "hint": "Ob das Sprite registriert ist",
+                    "label": "Registriert"
+                },
+                "services": {
+                    "hint": "Anzahl der verfügbaren Dienste gegenüber des Sprites",
+                    "label": "Dienste"
+                },
+                "spriteType": {
+                    "hint": "Art des Sprites",
+                    "label": "Art"
+                },
+                "technomancerUuid": {
+                    "hint": "Technomancer dieses Sprites",
+                    "label": "Technomancer"
+                }
+            },
+            "Level": "Stufe",
+            "LevelAppliesSettingHint": "Steuert, welche Sprite-Attribute den Stufenbonus erhalten.",
+            "MissingTechnomancer": "Kein aktiver Technomancer",
+            "Registered": "Registriert",
+            "Services": "Aufgaben",
+            "Technomancer": "Technomancer",
+            "Type": "Art",
+            "Types": {
+                "Companion": "Begleiter",
+                "Courier": "Kurier",
+                "Crack": "Infiltrator",
+                "Data": "Daten",
+                "Fault": "Stör",
+                "Generalist": "Generalist",
+                "Machine": "Maschinen"
+            }
+        },
+        "SpritePower": {
+            "Durations": {
+                "Always": "Immer",
+                "Instant": "Sofort",
+                "Permanent": "Permanent",
+                "Special": "Speziell",
+                "Sustained": "Aufrechterhalten"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "Dauer der Kraft",
+                    "label": "Dauer"
+                },
+                "optional": {
+                    "hint": "Ob die Kraft optional ist",
+                    "label": "Optional"
+                }
+            },
+            "IsOptional": "Optional",
+            "Optional": {
+                "DisabledOption": "Optional, inaktiv",
+                "EnabledOption": "Optional, aktiv",
+                "Standard": "Standard"
+            },
+            "Type": "Typ"
+        }
+    }
+}

@@ -4,15 +4,15 @@
     {{#if combat.round}}
     <div class="combat-extra-menu hidden" data-time="previous">
         <button type="button" class="combat-control" data-action="previousTurn">
-            <i class="fa-solid fa-backward-fast"></i> {{ localize 'SR5.COMBAT.PreviousTurn' }}
+            <i class="fa-solid fa-backward-fast"></i> {{ localize 'SR5.Combat.PreviousTurn' }}
         </button>
         <button type="button" class="combat-control" data-action="previousPass">
-            <i class="fa-solid fa-backward-step"></i> {{ localize 'SR5.COMBAT.PreviousPass' }}
+            <i class="fa-solid fa-backward-step"></i> {{ localize 'SR5.Combat.PreviousPass' }}
         </button>
     </div>
 
     <button type="button" class="inline-control combat-control icon fa-solid fa-arrow-left"
-        data-action="previousPhase" data-tooltip aria-label="{{ localize 'SR5.COMBAT.PreviousPhase' }}"></button>
+        data-action="previousPhase" data-tooltip aria-label="{{ localize 'SR5.Combat.PreviousPhase' }}"></button>
 
     <button type="button" class="combat-control combat-control-lg" data-action="endCombat">
         <i class="fa-solid fa-xmark" inert></i>
@@ -20,14 +20,14 @@
     </button>
 
     <button type="button" class="inline-control combat-control icon fa-solid fa-arrow-right"
-        data-action="nextPhase" data-tooltip aria-label="{{ localize 'SR5.COMBAT.NextPhase' }}"></button>
+        data-action="nextPhase" data-tooltip aria-label="{{ localize 'SR5.Combat.NextPhase' }}"></button>
 
     <div class="combat-extra-menu hidden" data-time="next">
         <button type="button" class="combat-control" data-action="nextTurn">
-            <i class="fa-solid fa-forward-fast"></i> {{ localize 'SR5.COMBAT.NextTurn' }}
+            <i class="fa-solid fa-forward-fast"></i> {{ localize 'SR5.Combat.NextTurn' }}
         </button>
         <button type="button" class="combat-control" data-action="nextPass">
-            <i class="fa-solid fa-forward-step"></i> {{ localize 'SR5.COMBAT.NextPass' }}
+            <i class="fa-solid fa-forward-step"></i> {{ localize 'SR5.Combat.NextPass' }}
         </button>
     </div>
     {{else}}
@@ -39,15 +39,15 @@
 
     {{else if control}}
     <button type="button" class="inline-control combat-control icon fa-solid fa-arrow-left"
-        data-action="previousPhase" data-tooltip aria-label="{{ localize 'SR5.COMBAT.PreviousPhase' }}"></button>
+        data-action="previousPhase" data-tooltip aria-label="{{ localize 'SR5.Combat.PreviousPhase' }}"></button>
 
     <button type="button" class="combat-control combat-control-lg" data-action="nextPhase">
         <i class="fa-solid fa-check"></i>
-        <span>{{ localize 'SR5.COMBAT.NextPhase' }}</span>
+        <span>{{ localize 'SR5.Combat.NextPhase' }}</span>
     </button>
 
     <button type="button" class="inline-control combat-control icon fa-solid fa-arrow-right"
-        data-action="nextPhase" data-tooltip aria-label="{{ localize 'SR5.COMBAT.NextPhase' }}"></button>
+        data-action="nextPhase" data-tooltip aria-label="{{ localize 'SR5.Combat.NextPhase' }}"></button>
     {{/if}}
     {{/if}}
 </nav>

@@ -301,7 +301,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
         it('marks manual-priority changes as manual modifiers', () => {
             const valueField = DataDefaults.createData('value_field', {
-                label: 'SR5.DicePool',
+                label: 'SR5.Tests.Labels.DicePool',
                 base: 10,
             });
 
@@ -320,7 +320,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
         it('applies subtract changes when calculating totals', () => {
             const valueField = DataDefaults.createData('value_field', {
-                label: 'SR5.DicePool',
+                label: 'SR5.Tests.Labels.DicePool',
                 base: 10,
             });
 

@@ -38,6 +38,9 @@ jobs:
             - name: Lint error-level findings
               run: npm run lint:errors
 
+            - name: Validate localization sources
+              run: npm run locale:check
+
             - name: Build application assets
               run: npm run build:prod
 

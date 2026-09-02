@@ -1,0 +1,48 @@
+{
+    "SR5": {
+        "Labels": {
+            "ActorSheet": {
+                "ConnectToDriver": "Se connecter au pilote",
+                "CritterPowers": "Pouvoirs",
+                "DeviceRating": "Indice d'appareil",
+                "DisabledOptionCritterPowers": "Pouvoirs Optionels - Désactivés",
+                "DisabledOptionSpritePowers": "Pouvoirs Optionels - Désactivés",
+                "EnabledOptionCritterPowers": "Pouvoirs Optionels - Activés",
+                "EnabledOptionSpritePowers": "Pouvoirs Optionels - Activés",
+                "Rituals": "Rituels",
+                "SetMonitor": "Moniteur doit être installé manuellement",
+                "SpritePowers": "Pouvoirs"
+            },
+            "Item": {
+                "Network": "Réseau"
+            },
+            "Sheet": {
+                "RemoveImprovisedDevices": "Supprimer les appareils improvisés"
+            }
+        },
+        "Tabs": {
+            "Item": {
+                "Mods": "Mods"
+            }
+        },
+        "Tooltips": {
+            "Actor": {
+                "RemoveAllNetworks": "Supprimer tous les réseaux",
+                "RemoveNetwork": "Supprimer le réseau"
+            },
+            "Effect": {
+                "ApplyValueEditor": "Appliquer la modification de valeur",
+                "CancelValueEditor": "Annuler la modification de valeur",
+                "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "OpenValueEditor": "Ouvrir l'éditeur de valeur"
+            },
+            "SummoningTest": {
+                "OptionalPowerCount": "Compteur informatif des pouvoirs optionnels de l'esprit (plancher(force / 3))."
+            },
+            "Test": {
+                "BuyHits": "Ne lance pas de dés. Achète des succès avec ⌊réserve de dés / 4⌋.",
+                "ExtendedInterval": "Temps de jeu entre les lancers. Zéro lance le test comme un test normal, non étendu."
+            }
+        }
+    }
+}

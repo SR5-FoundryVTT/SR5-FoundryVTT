@@ -177,8 +177,8 @@ export const registerSystemSettings = () => {
      * and other ressources.
      */
     game.settings.register(SYSTEM_NAME, FLAGS.MustHaveRessourcesOnTest, {
-        name: 'SETTINGS.MustHaveRessourcesOnTest',
-        hint: 'SETTINGS.MustHaveRessourcesOnTestDescription',
+        name: 'SETTINGS.MustHaveResourcesOnTest',
+        hint: 'SETTINGS.MustHaveResourcesOnTestDescription',
         scope: 'world',
         config: true,
         type: Boolean,
@@ -370,9 +370,9 @@ export const registerSystemSettings = () => {
      * Select compendia to use for system porpuses like different action packs
      */
     game.settings.registerMenu(SYSTEM_NAME, FLAGS.CompendiaSettingsMenu, {
-        name: 'SR5.CompendiaSettings.Title',
-        hint: 'SR5.CompendiaSettings.Description',
-        label: 'SR5.CompendiaSettings.Label',
+        name: 'SR5.CompendiumSettings.Title',
+        hint: 'SR5.CompendiumSettings.Description',
+        label: 'SR5.CompendiumSettings.Label',
         icon: 'fas fa-book',
         type: SR5CompendiaSettings,
         restricted: true, // Don't show to non GMs
@@ -382,8 +382,8 @@ export const registerSystemSettings = () => {
      * Override the default general actions pack
      */
     game.settings.register(SYSTEM_NAME, FLAGS.GeneralActionsPack, {
-        name: 'SR5.CompendiaSettings.GeneralActionsPack.label',
-        hint: 'SR5.CompendiaSettings.GeneralActionsPack.hint',
+        name: 'SR5.CompendiumSettings.GeneralActionsPack.label',
+        hint: 'SR5.CompendiumSettings.GeneralActionsPack.hint',
         scope: 'world',
         config: false,
         type: String,
@@ -393,8 +393,8 @@ export const registerSystemSettings = () => {
      * Override the default matrix actions pack
      */
     game.settings.register(SYSTEM_NAME, FLAGS.MatrixActionsPack, {
-        name: 'SR5.CompendiaSettings.MatrixActionsPack.label',
-        hint: 'SR5.CompendiaSettings.MatrixActionsPack.hint',
+        name: 'SR5.CompendiumSettings.MatrixActionsPack.label',
+        hint: 'SR5.CompendiumSettings.MatrixActionsPack.hint',
         scope: 'world',
         config: false,
         type: String
@@ -404,8 +404,8 @@ export const registerSystemSettings = () => {
      * Override the default IC actions pack
      */
     game.settings.register(SYSTEM_NAME, FLAGS.ICActionsPack, {
-        name: 'SR5.CompendiaSettings.ICActionsPack.label',
-        hint: 'SR5.CompendiaSettings.ICActionsPack.hint',
+        name: 'SR5.CompendiumSettings.ICActionsPack.label',
+        hint: 'SR5.CompendiumSettings.ICActionsPack.hint',
         scope: 'world',
         config: false,
         type: String
@@ -415,8 +415,8 @@ export const registerSystemSettings = () => {
      * Override the default skills pack
      */
     game.settings.register(SYSTEM_NAME, FLAGS.SkillsPack, {
-        name: 'SR5.CompendiaSettings.SkillsPack.label',
-        hint: 'SR5.CompendiaSettings.SkillsPack.hint',
+        name: 'SR5.CompendiumSettings.SkillsPack.label',
+        hint: 'SR5.CompendiumSettings.SkillsPack.hint',
         scope: 'world',
         config: false,
         type: String
@@ -426,8 +426,8 @@ export const registerSystemSettings = () => {
      * Override the default skill groups pack
      */
     game.settings.register(SYSTEM_NAME, FLAGS.SkillGroupsPack, {
-        name: 'SR5.CompendiaSettings.SkillGroupsPack.label',
-        hint: 'SR5.CompendiaSettings.SkillGroupsPack.hint',
+        name: 'SR5.CompendiumSettings.SkillGroupsPack.label',
+        hint: 'SR5.CompendiumSettings.SkillGroupsPack.hint',
         scope: 'world',
         config: false,
         type: String
@@ -437,8 +437,8 @@ export const registerSystemSettings = () => {
      * Override the default skill sets pack
      */
     game.settings.register(SYSTEM_NAME, FLAGS.SkillSetsPack, {
-        name: 'SR5.CompendiaSettings.SkillSetsPack.label',
-        hint: 'SR5.CompendiaSettings.SkillSetsPack.hint',
+        name: 'SR5.CompendiumSettings.SkillSetsPack.label',
+        hint: 'SR5.CompendiumSettings.SkillSetsPack.hint',
         scope: 'world',
         config: false,
         type: String

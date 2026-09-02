@@ -21,7 +21,7 @@
                 <label>{{localize "SR5.Labels.Action.MatrixAction"}}</label>
                 {{#if @root.isEditMode}}
                     <div class="basic-row">
-                        <label>{{localize "SR5.Marks"}}</label>
+                        <label>{{localize "SR5.Matrix.Labels.Marks"}}</label>
                         <span>
                             {{formInput systemFields.action.fields.category.fields.matrix.fields.marks
                                         value=source.system.action.category.matrix.marks
@@ -29,7 +29,7 @@
                         </span>
                     </div>
                 {{else}}
-                    <label>{{localize "SR5.Marks"}}&nbsp;{{system.action.category.matrix.marks}}</label>
+                    <label>{{localize "SR5.Matrix.Labels.Marks"}}&nbsp;{{system.action.category.matrix.marks}}</label>
                 {{/if}}
 
                 {{#if @root.isEditMode}}
@@ -169,14 +169,14 @@
 
                 {{#if @root.isEditMode}}
                     <div class="basic-row">
-                        <label>{{localize "SR5.Rtg"}}</label>
+                        <label>{{localize "SR5.Item.Labels.Rtg"}}</label>
                         <span data-tooltip="{{systemFields.technology.fields.rating.label}}:&nbsp;{{systemFields.technology.fields.rating.hint}}">
                             {{formInput systemFields.technology.fields.rating value=source.system.technology.rating
                                         classes="short skinny" rootId=rootId disabled=@root.isPlayMode}}
                         </span>
                     </div>
                 {{else if system.technology.rating}}
-                    <label>{{localize "SR5.Rtg"}}&nbsp;{{system.technology.rating}}</label>
+                    <label>{{localize "SR5.Item.Labels.Rtg"}}&nbsp;{{system.technology.rating}}</label>
                 {{/if}}
 
                 {{#if (isType item 'bioware' 'cyberware')}}
@@ -197,12 +197,12 @@
 
                 {{#if @root.isEditMode}}
                     <div class="basic-row">
-                        <label>{{localize "SR5.Availability"}}</label>
+                        <label>{{localize "SR5.Item.Labels.Availability"}}</label>
                         {{formInput systemFields.technology.fields.availability value=source.system.technology.availability
                                     classes="short skinny" rootId=rootId disabled=@root.isPlayMode}}
                     </div>
                 {{else if system.technology.calculated.availability.value}}
-                    <label>{{localize "SR5.Availability"}}&nbsp;{{system.technology.calculated.availability.value}}</label>
+                    <label>{{localize "SR5.Item.Labels.Availability"}}&nbsp;{{system.technology.calculated.availability.value}}</label>
                 {{/if}}
                 {{#if @root.isEditMode}}
                     <div class="basic-row">
@@ -427,14 +427,14 @@
 
                 {{#if @root.isEditMode}}
                     <span class="basic-row">
-                        <label>{{localize "SR5.Rtg"}}</label>
+                        <label>{{localize "SR5.Item.Labels.Rtg"}}</label>
                         <span>
                             {{formInput systemFields.rating value=source.system.rating
                                         classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </span>
                     </span>
                 {{else if system.rating}}
-                    <label>{{localize "SR5.Rtg"}}&nbsp;{{system.rating}}</label>
+                    <label>{{localize "SR5.Item.Labels.Rtg"}}&nbsp;{{system.rating}}</label>
                 {{/if}}
 
                 {{#if @root.isEditMode}}
@@ -494,14 +494,14 @@
 
                 {{#if @root.isEditMode}}
                     <div class="basic-row">
-                        <label>{{localize "SR5.Rtg"}}</label>
+                        <label>{{localize "SR5.Item.Labels.Rtg"}}</label>
                         <span data-tooltip="{{systemFields.rating.label}}:&nbsp;{{systemFields.rating.hint}}">
                             {{formInput systemFields.rating value=source.system.rating
                                         classes="short skinny" rootId=rootId disabled=@root.isPlayMode}}
                         </span>
                     </div>
                 {{else if system.rating}}
-                    <label>{{localize "SR5.Rtg"}}&nbsp;{{system.rating}}</label>
+                    <label>{{localize "SR5.Item.Labels.Rtg"}}&nbsp;{{system.rating}}</label>
                 {{/if}}
 
                 {{#if @root.isEditMode}}

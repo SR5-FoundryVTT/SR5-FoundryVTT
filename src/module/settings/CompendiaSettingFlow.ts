@@ -66,8 +66,8 @@ export const CompendiaSettingFlow = {
         return {
             id,
             field: {
-                label: `SR5.CompendiaSettings.${id}.label` as Translation,
-                hint: `SR5.CompendiaSettings.${id}.hint` as Translation,
+                label: `SR5.CompendiumSettings.${id}.label` as Translation,
+                hint: `SR5.CompendiumSettings.${id}.hint` as Translation,
             },
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             value: packName,

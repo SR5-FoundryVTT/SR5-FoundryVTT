@@ -28,7 +28,7 @@ export default abstract class AbstractCompendiaSettings extends HandlebarsApplic
         },
         window: {
             contentClasses: ['standard-form'],
-            title: 'SR5.CompendiaSettings.Title',
+            title: 'SR5.CompendiumSettings.Title',
         },
         form: {
             // we utilize a button for submission so we want to close on submit
@@ -44,7 +44,7 @@ export default abstract class AbstractCompendiaSettings extends HandlebarsApplic
     abstract getPacks(): PackConfigOrSeparator[];
 
     override get title() {
-        return game.i18n.localize('SR5.CompendiaSettings.Title');
+        return game.i18n.localize('SR5.CompendiumSettings.Title');
     }
 
     static override PARTS = {

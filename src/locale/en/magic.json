@@ -1,0 +1,348 @@
+{
+    "SR5": {
+        "AdeptPower": {
+            "FIELDS": {
+                "drain": {
+                    "hint": "If this Adept Power incurs Drain after use",
+                    "label": "Drain"
+                },
+                "level": {
+                    "hint": "Level of this Adept Power (if applicable)",
+                    "label": "Level"
+                },
+                "pp": {
+                    "hint": "Number of Power Points this Power Costs",
+                    "label": "Power Points"
+                },
+                "type": {
+                    "hint": "Type of Adept Power",
+                    "label": "Power Type"
+                }
+            },
+            "Labels": {
+                "Echo": "Echo",
+                "Echoes": "Echoes",
+                "Metamagic": "Metamagic",
+                "Metamagics": "Metamagics"
+            },
+            "Types": {
+                "Active": "Active",
+                "Passive": "Passive"
+            }
+        },
+        "CritterPower": {
+            "Categories": {
+                "Drake": "Drake",
+                "Echoes": "Echoes",
+                "Emergent": "Emergent",
+                "FreeSpirit": "Free Spirit",
+                "Mundane": "Mundane",
+                "Paranormal": "Paranormal",
+                "ParanormalInfected": "Paranormal/Infected",
+                "Shapeshifter": "Shapeshifter",
+                "Weakness": "Weakness"
+            },
+            "Category": "Category",
+            "Duration": "Duration",
+            "Durations": {
+                "Always": "Always",
+                "Instant": "Instant",
+                "Permanent": "Permanent",
+                "Special": "Special",
+                "Sustained": "Sustained"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "Duration of the Critter Power",
+                    "label": "Duration"
+                },
+                "karma": {
+                    "hint": "Karma cost of the Critter Power",
+                    "label": "Karma"
+                },
+                "optional": {
+                    "hint": "If the Critter Power is Optional",
+                    "label": "Optional"
+                },
+                "powerType": {
+                    "hint": "The Type of Critter Power",
+                    "label": "Power Type"
+                },
+                "range": {
+                    "hint": "Range of the Critter Power",
+                    "label": "Range"
+                }
+            },
+            "IsOptional": "Optionality",
+            "Karma": "Karma",
+            "Optional": {
+                "DisabledOption": "Optional, disabled",
+                "EnabledOption": "Optional, enabled",
+                "Standard": "By default"
+            },
+            "OptionalSelectionCount": "Optional Powers",
+            "Range": "Range",
+            "Ranges": {
+                "LineOfSight": "Line Of Sight",
+                "LineOfSightArea": "Line Of Sight (A)",
+                "Self": "Self",
+                "Special": "Special",
+                "Touch": "Touch"
+            },
+            "Type": "Type",
+            "Types": {
+                "Mana": "Mana",
+                "Physical": "Physical"
+            }
+        },
+        "Magic": {
+            "Labels": {
+                "Awakened": "Awakened",
+                "Emerged": "Emerged",
+                "Mundane": "Mundane",
+                "PP": "PP",
+                "PowerType": "Type",
+                "Powers": "Powers",
+                "SpiritType": "Spirit Type"
+            }
+        },
+        "Ritual": {
+            "Anchored": "Anchored",
+            "FIELDS": {
+                "descriptors": {
+                    "hint": "Descriptors for the Ritual",
+                    "label": "Descriptors"
+                },
+                "type": {
+                    "hint": "Type of Ritual to Perform",
+                    "label": "Ritual Type"
+                }
+            },
+            "MaterialLink": "Material Link",
+            "Minion": "Minion",
+            "Spell": "Spell",
+            "Spotter": "Spotter"
+        },
+        "Spell": {
+            "Attack": "Spell Attack",
+            "Cast": "Spell Cast",
+            "CatCombat": "Combat",
+            "CatDetection": "Detection",
+            "CatHealth": "Health",
+            "CatIllusion": "Illusion",
+            "CatManipulation": "Manipulation",
+            "CatRitual": "Ritual",
+            "Category": "Category",
+            "CombatDirect": "Direct",
+            "CombatIndirect": "Indirect",
+            "Defense": "Spell Defense",
+            "DefenseDirectMana": "Spell Defense (direct, mana)",
+            "DefenseDirectPhysical": "Spell Defense (direct, physical)",
+            "DetectionArea": "Area",
+            "DetectionDirectional": "Directional",
+            "DetectionPsychic": "Psychic",
+            "FIELDS": {
+                "category": {
+                    "hint": "Category that the Spell belongs to",
+                    "label": "Category"
+                },
+                "combat": {
+                    "type": {
+                        "hint": "If the Spell is Direct or Indirect",
+                        "label": "Combat Spell Type"
+                    }
+                },
+                "detection": {
+                    "extended": {
+                        "hint": "If the Spell is Extended",
+                        "label": "Extended"
+                    },
+                    "passive": {
+                        "hint": "If the Spell is Passive",
+                        "label": "Passive"
+                    },
+                    "type": {
+                        "hint": "How the Spell affects targets",
+                        "label": "Detection Spell Type"
+                    }
+                },
+                "drain": {
+                    "hint": "Drain Value of the spell, this is is added to the Force of the spell to Resist Drain",
+                    "label": "Drain Value"
+                },
+                "duration": {
+                    "hint": "Duration of the Spell",
+                    "label": "Duration"
+                },
+                "illusion": {
+                    "sense": {
+                        "hint": "The Sense that the Spell affects",
+                        "label": "Sense"
+                    },
+                    "type": {
+                        "hint": "Type of Illusion Spell",
+                        "label": "Illusion Spell Type"
+                    }
+                },
+                "manipulation": {
+                    "damaging": {
+                        "hint": "If the Spell deals Damage",
+                        "label": "Damaging"
+                    },
+                    "environmental": {
+                        "hint": "These spells don’t really have a target, and they don’t really affect targets directly. They just affect an area.",
+                        "label": "Environmental"
+                    },
+                    "mental": {
+                        "hint": "If the Spell affects targets Mentally",
+                        "label": "Mental"
+                    },
+                    "physical": {
+                        "hint": "These spells affect physical forms and are usually defended against",
+                        "label": "Physical"
+                    }
+                },
+                "range": {
+                    "hint": "Range of the Spell",
+                    "label": "Range"
+                },
+                "ritual": {
+                    "type": {
+                        "hint": "Type of Ritual to perform",
+                        "label": "Ritual Type"
+                    }
+                },
+                "type": {
+                    "hint": "If the Spell is Physical or Mana based",
+                    "label": "Spell Type"
+                }
+            },
+            "IllusionMultiSense": "Multi-Sense",
+            "IllusionObvious": "Obvious",
+            "IllusionRealistic": "Realistic",
+            "IllusionSingleSense": "Single-Sense",
+            "Labels": {
+                "DetectionSpellExtended": "Extended",
+                "NormalSpellButton": "Normal",
+                "RecklessSpellButton": "Reckless"
+            },
+            "ManipulationDamaging": "Damaging",
+            "ManipulationEnvironmental": "Environmental",
+            "ManipulationMental": "Mental",
+            "ManipulationPhysical": "Physical",
+            "QuickInfo": {
+                "DrainForce": "Drain F{sign}{drain}"
+            },
+            "Range": "Range",
+            "RangeLos": "LOS",
+            "RangeLosA": "LOS (A)",
+            "RangeTouch": "Touch",
+            "Spell": "Spell",
+            "Spells": "Spells",
+            "Type": "Type",
+            "TypeMana": "Mana",
+            "TypePhysical": "Physical"
+        },
+        "Spirit": {
+            "Bound": "Bound",
+            "Force": "Force",
+            "ForceAppliesSetting": "Force Applies To",
+            "ForceAppliesSettingHint": "Control which spirit attributes receive the Force bonus.",
+            "HalfValueSkill": "Half Value Skill",
+            "HalfValueSkillHint": "ON skills use ⌈Force/2⌉.",
+            "InitiativeFormulaAstral": "Astral Initiative Formula",
+            "InitiativeFormulaAstralHint": "Choose the terms for astral initiative.",
+            "InitiativeFormulaMeatspace": "Meatspace Initiative Formula",
+            "InitiativeFormulaMeatspaceHint": "Choose the terms for meatspace initiative.",
+            "MissingSummoner": "Missing Summoner",
+            "Services": "Services",
+            "Summoner": "Summoner",
+            "Type": "Type",
+            "Types": {
+                "Abomination": "Abomination",
+                "Air": "Air",
+                "Aircraft": "Aircraft",
+                "Airwave": "Airwave",
+                "Ally": "Ally",
+                "Anansi": "Anansi",
+                "Anarch": "Anarch",
+                "Arboreal": "Arboreal",
+                "Automotive": "Automotive",
+                "Barren": "Barren",
+                "Beasts": "Beasts",
+                "Blackjack": "Blackjack",
+                "BladeSummoned": "Blade-Summoned",
+                "Blood": "Blood",
+                "BloodShade": "Blood Shade",
+                "Boggle": "Boggle",
+                "Bone": "Bone",
+                "Bugul": "Bugul",
+                "Carcass": "Carcass",
+                "Caretaker": "Insect Caretaker",
+                "Ceramic": "Ceramic",
+                "Chindi": "Chindi",
+                "CorpsCadavre": "Corps Cadavre",
+                "Corpse": "Corpse",
+                "Crawler": "Crawler (Demon)",
+                "Croki": "Croki",
+                "Detritus": "Detritus",
+                "Duende": "Duende",
+                "Earth": "Earth",
+                "Ejerian": "Ejerian",
+                "Elvar": "Elvar",
+                "Energy": "Energy",
+                "Erinyes": "Erinyes",
+                "Fire": "Fire",
+                "Ghasts": "Ghasts (Demon)",
+                "GreenMan": "Green Man",
+                "Gremlin": "Gremlin",
+                "Guardian": "Guardian",
+                "Guidance": "Guidance",
+                "GumToad": "Gum Toad (Demon)",
+                "Homunculus": "Homunculus",
+                "Hopper": "Hopper",
+                "HorrorShow": "Horror Show",
+                "Imp": "Imp",
+                "Jarl": "Jarl",
+                "Kappa": "Kappa",
+                "Kokopelli": "Kokopelli",
+                "Man": "Man",
+                "MasterShedim": "MasterShedim",
+                "Metal": "Metal",
+                "Morbi": "Morbi",
+                "Muse": "Muse",
+                "Nightmare": "Nightmare",
+                "Nocnitsa": "Nocnitsa",
+                "Noxious": "Noxious",
+                "Nuclear": "Nuclear",
+                "Nymph": "Insect Nymph",
+                "Palefire": "Palefire",
+                "Phantom": "Phantom",
+                "Plague": "Plague",
+                "Plant": "Plant",
+                "Preta": "Preta",
+                "Queen": "Insect Queen",
+                "Rot": "Rot",
+                "Scout": "Insect Scout",
+                "Shade": "Shade",
+                "Shedim": "Shedim",
+                "Ship": "Ship",
+                "Sludge": "Sludge",
+                "Soldier": "Insect Soldier",
+                "Stabber": "Stabber",
+                "Succubus": "Succubus",
+                "Task": "Task",
+                "Train": "Train",
+                "TsuchigumoWarrior": "Tsuchigumo Warrior",
+                "Tungak": "Tungak",
+                "Unbreakable": "Unbreakable",
+                "Vrygoths": "Vrygoths",
+                "VucubCaquix": "Vucub Caquix",
+                "Watcher": "Watcher",
+                "Water": "Water",
+                "Worker": "Insect Worker",
+                "Wraith": "Wraith"
+            }
+        }
+    }
+}

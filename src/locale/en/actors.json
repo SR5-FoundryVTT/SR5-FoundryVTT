@@ -1,0 +1,466 @@
+{
+    "SR5": {
+        "Actor": {
+            "Attributes": {
+                "Agility": "Agility",
+                "Body": "Body",
+                "Charisma": "Charisma",
+                "Edge": "Edge",
+                "Essence": "Essence",
+                "Intuition": "Intuition",
+                "Logic": "Logic",
+                "Magic": "Magic",
+                "Reaction": "Reaction",
+                "Resonance": "Resonance",
+                "Strength": "Strength",
+                "Willpower": "Willpower"
+            },
+            "FIELDS": {
+                "attributes": {
+                    "edge": {
+                        "base": {
+                            "hint": "Edge is a character’s luck, the favor of the gods, that unexplainable factor that allows her to beat the odds.",
+                            "label": "Edge"
+                        }
+                    }
+                },
+                "category_visibility": {
+                    "default": {
+                        "hint": "If empty Tabs and Inventory Categories should be visible",
+                        "label": "Show Empty Categories"
+                    }
+                },
+                "full_defense_attribute": {
+                    "hint": "Attribute to use when using the Full Defense interrupt action",
+                    "label": "Full Defense Attribute"
+                },
+                "magic": {
+                    "attribute": {
+                        "hint": "Attribute the Mage/Adept uses when resisting Drain",
+                        "label": "Drain Attribute"
+                    },
+                    "label": "Magic"
+                },
+                "modifiers": {
+                    "armor": {
+                        "hint": "Modifies total armor value",
+                        "label": "Armor"
+                    },
+                    "astral_initiative": {
+                        "hint": "Modifies astral initiative base",
+                        "label": "Astral Initiative"
+                    },
+                    "astral_initiative_dice": {
+                        "hint": "Modifies astral initiative dice",
+                        "label": "Astral Initiative Dice"
+                    },
+                    "astral_limit": {
+                        "hint": "Modifies astral limit",
+                        "label": "Astral Limit"
+                    },
+                    "composure": {
+                        "hint": "Modifies composure tests pool",
+                        "label": "Composure"
+                    },
+                    "defense": {
+                        "hint": "Modifies defense tests pool",
+                        "label": "Defense"
+                    },
+                    "defense_block": {
+                        "hint": "Adds to the defense modifier for active blocking",
+                        "label": "Defense (Block)"
+                    },
+                    "defense_dodge": {
+                        "hint": "Adds to the defense modifier for active dodging",
+                        "label": "Defense (Dodge)"
+                    },
+                    "defense_melee": {
+                        "hint": "Adds to the defense modifier for melee defense",
+                        "label": "Defense (Melee)"
+                    },
+                    "defense_parry": {
+                        "hint": "Adds to the defense modifier for active parrying",
+                        "label": "Defense (Parry)"
+                    },
+                    "defense_ranged": {
+                        "hint": "Adds to the defense modifier for ranged attack",
+                        "label": "Defense (Ranged)"
+                    },
+                    "drain": {
+                        "hint": "Modifies drain tests pool",
+                        "label": "Drain"
+                    },
+                    "essence": {
+                        "hint": "Modifies essence attribute",
+                        "label": "Essence"
+                    },
+                    "fade": {
+                        "hint": "Modifies fade tests pool",
+                        "label": "Fade"
+                    },
+                    "global": {
+                        "hint": "Modifies all tests pool, excluding damage reducing tests",
+                        "label": "Global"
+                    },
+                    "judge_intentions": {
+                        "hint": "Modifies judge intentions tests pool",
+                        "label": "Judge Intentions"
+                    },
+                    "lift_carry": {
+                        "hint": "Modifies lift&carry tests pool",
+                        "label": "Lift/Carry"
+                    },
+                    "mark_damage": {
+                        "hint": "Modifies the amount of damage taken per MARK done to you",
+                        "label": "Mark Damage"
+                    },
+                    "matrix_initiative": {
+                        "hint": "Modifies matrix initiative base",
+                        "label": "Matrix Initiative"
+                    },
+                    "matrix_initiative_dice": {
+                        "hint": "Modifies matrix initiative dice",
+                        "label": "Matrix Initiative Dice"
+                    },
+                    "matrix_track": {
+                        "hint": "Modifies matrix damage track",
+                        "label": "Matrix Track"
+                    },
+                    "meat_initiative": {
+                        "hint": "Modifies physical initiative base",
+                        "label": "Meatspace Initiative"
+                    },
+                    "meat_initiative_dice": {
+                        "hint": "Modifies physical initiative dice",
+                        "label": "Meatspace Initiative Dice"
+                    },
+                    "memory": {
+                        "hint": "Modifies memory tests pool",
+                        "label": "Memory"
+                    },
+                    "mental_limit": {
+                        "hint": "Modifies mental limit",
+                        "label": "Mental Limit"
+                    },
+                    "multi_defense": {
+                        "hint": "Modifies defense tests pool for multiple defenses per combat turn",
+                        "label": "Multi-Defense"
+                    },
+                    "pain_tolerance_physical": {
+                        "hint": "Modifies damage to be ignored before first wound modifier",
+                        "label": "Pain Tolerance (Physical)"
+                    },
+                    "pain_tolerance_stun": {
+                        "hint": "Modifies damage to be ignored before first wound modifier",
+                        "label": "Pain Tolerance (Stun)"
+                    },
+                    "physical_limit": {
+                        "hint": "Modifies physical limit",
+                        "label": "Physical Limit"
+                    },
+                    "physical_overflow_track": {
+                        "hint": "Modifies physical overflow damage track",
+                        "label": "Physical Overflow Track"
+                    },
+                    "physical_track": {
+                        "hint": "Modifies physical damage track",
+                        "label": "Physical Track"
+                    },
+                    "place_three_marks": {
+                        "hint": "Modifies the modifier to place three marks at the same time",
+                        "label": "Place Three Marks"
+                    },
+                    "place_two_marks": {
+                        "hint": "Modifies the modifier to place two marks at the same time",
+                        "label": "Place Two Marks"
+                    },
+                    "public_grid": {
+                        "hint": "Modifies the Public Grid modifier when connected to it",
+                        "label": "Public Grid"
+                    },
+                    "reach": {
+                        "hint": "Modifies reach of melee attacks",
+                        "label": "Reach"
+                    },
+                    "recoil": {
+                        "hint": "Modifies recoil tests pool",
+                        "label": "Recoil"
+                    },
+                    "run": {
+                        "hint": "Modifies running distance by multiples of the agility attribute",
+                        "label": "Run"
+                    },
+                    "soak": {
+                        "hint": "Modifies physical damage resist tests pool",
+                        "label": "Soak"
+                    },
+                    "social_limit": {
+                        "hint": "Modifies social limit",
+                        "label": "Social Limit"
+                    },
+                    "stun_track": {
+                        "hint": "Modifies stun damage track",
+                        "label": "Stun Track"
+                    },
+                    "walk": {
+                        "hint": "Modifies walking distance by multiples of the agility attribute",
+                        "label": "Walk"
+                    },
+                    "wound_tolerance": {
+                        "hint": "Modifies damage per wound modifier",
+                        "label": "Wound Tolerance"
+                    }
+                },
+                "special": {
+                    "hint": "Select if the character is Awakened (mage/adept) or Emerged (technomancer)",
+                    "label": "Awakened/Emerged"
+                },
+                "technomancer": {
+                    "attribute": {
+                        "hint": "Attribute the Technomancer uses when resisting Fade",
+                        "label": "Fade Attribute"
+                    },
+                    "label": "Technomancer"
+                }
+            },
+            "Initiative": {
+                "Categories": {
+                    "Astral": "Astral",
+                    "Matrix": "Matrix",
+                    "Meatspace": "Meatspace"
+                }
+            },
+            "Labels": {
+                "Attribute": "Attribute",
+                "Attributes": "Attributes",
+                "Biography": "Bio",
+                "DefaultCategoryVisibility": "Show empty categories",
+                "Initiation": "Initiation",
+                "Initiative": "Initiative",
+                "InitiativeMod": "Initiative Modifier",
+                "IsCritter": "Critter",
+                "IsFreshImport": "This item was imported from Chummer and needs manual review.",
+                "IsGrunt": "Grunt",
+                "IsGruntHint": "Use grunt condition monitor rules (SR5 p.378).",
+                "IsNPC": "NPC",
+                "Metatype": "Metatype",
+                "Movement": "Movement",
+                "RunningSpeed": "Running",
+                "SheetActor": "Actor sheet",
+                "SpecialAttributes": "Special Attributes",
+                "SprintingBonus": "Sprinting Bonus",
+                "WalkingSpeed": "Walking"
+            },
+            "NoFavoritesSelected": "No favorites have been selected"
+        },
+        "ActorTypes": {
+            "Character": "Character",
+            "IC": "IC",
+            "Spirit": "Spirit",
+            "Sprite": "Sprite",
+            "Vehicle": "Vehicle"
+        },
+        "Character": {
+            "FIELDS": {
+                "is_critter": {
+                    "hint": "Allow the use of critter powers",
+                    "label": "Is Critter"
+                },
+                "is_npc": {
+                    "hint": "Mark actor as NPC to get additional features",
+                    "label": "Is NPC"
+                },
+                "karma": {
+                    "max": {
+                        "hint": "Amount of Karma this Character has accumulated",
+                        "label": "Career Karma"
+                    },
+                    "value": {
+                        "hint": "Amount of Karma this Character has available",
+                        "label": "Current Karma"
+                    }
+                },
+                "matrix_full_defense_attribute": {
+                    "hint": "Attribute to add when making a Matrix Full Defense Action",
+                    "label": "Matrix Full Defense Attribute"
+                },
+                "metatype": {
+                    "hint": "Metatype of the Character. If an NPC, this will adjust attributes",
+                    "label": "Metatype"
+                },
+                "notoriety": {
+                    "hint": "The negative side of the character’s reputation",
+                    "label": "Notoriety"
+                },
+                "npc": {
+                    "is_grunt": {
+                        "hint": "Apply grunt rules to this actor",
+                        "label": "Is Grunt"
+                    }
+                },
+                "nuyen": {
+                    "hint": "Amount of Nuyen this Character has",
+                    "label": "Nuyen"
+                },
+                "public_awareness": {
+                    "hint": "How well the character is known among the media, authorities, and public at large",
+                    "label": "Public Awareness"
+                },
+                "street_cred": {
+                    "hint": "A character’s lifetime accomplishments",
+                    "label": "Street Cred"
+                }
+            },
+            "Labels": {
+                "CareerKarma": "Career Karma",
+                "Notoriety": "Notoriety",
+                "Nuyen": "Nuyen",
+                "PublicAwareness": "Public Awareness",
+                "StreetCred": "Street Cred"
+            },
+            "Modifiers": {
+                "NPCMetatypeAttribute": "NPC Metatype Attribute"
+            },
+            "Types": {
+                "Dwarf": "Dwarf",
+                "Elf": "Elf",
+                "Human": "Human",
+                "Ork": "Ork",
+                "Troll": "Troll"
+            }
+        },
+        "Contact": {
+            "Blackmail": "Blackmail",
+            "Connection": "Connection",
+            "DropActor": "Drag&Drop an actor to link it to this contact",
+            "FIELDS": {
+                "blackmail": {
+                    "hint": "You have something that can be held over the contact to get them to do business.",
+                    "label": "Blackmail"
+                },
+                "connection": {
+                    "hint": "This measures the contact’s influence on a scale of 1 to 12. The higher the Connection Rating, the more juice the contact has.",
+                    "label": "Connection"
+                },
+                "family": {
+                    "hint": "Blood is always thicker than water, this is true for having family as contacts.",
+                    "label": "Family"
+                },
+                "group": {
+                    "hint": "Contact is a Group; could be a gang, corp, or some nerds",
+                    "label": "Group"
+                },
+                "linkedActor": {
+                    "hint": "Actor that this Contact represents",
+                    "label": "Actor"
+                },
+                "loyalty": {
+                    "hint": "This shows you how much you can trust the contact, measured on a scale of 1 to 6. The higher the Loyalty Rating, the more the contact is willing to do for you",
+                    "label": "Loyalty"
+                },
+                "type": {
+                    "hint": "Contact Type determines what kind of access they have for gear, jobs, info, etc.",
+                    "label": "Type"
+                }
+            },
+            "Family": "Family",
+            "Group": "Group",
+            "Labels": {
+                "Connection": "Connection",
+                "ContactType": "Type",
+                "Contacts": "Contacts",
+                "Loyalty": "Loyalty"
+            },
+            "LinkedActor": "Actor",
+            "Loyalty": "Loyalty",
+            "LoyaltyConnectionHelp": "Loyalty / Connection",
+            "LoyaltyConnectionLabel": "L / C",
+            "Type": "Type"
+        },
+        "InventoryRename": {
+            "Cancel": "Cancel",
+            "NewName": "New Name",
+            "Submit": "Submit",
+            "Title": "Rename Inventory"
+        },
+        "MovementTypes": {
+            "Run": "Run",
+            "Sprint": "Sprint"
+        },
+        "Vehicle": {
+            "Categories": {
+                "Anthro": "Anthromorphic",
+                "Huge": "Huge",
+                "Large": "Large",
+                "Medium": "Medium",
+                "Micro": "Micro",
+                "Mini": "Mini",
+                "Missile": "Missile",
+                "Small": "Small"
+            },
+            "Category": "Category",
+            "ChaseEnvironment": "Chase Environment",
+            "Clearsight": "Clearsight",
+            "ControlMode": "Control Mode",
+            "ControlModes": {
+                "Autopilot": "Autopilot",
+                "Manual": "Manual",
+                "Remote": "Remote",
+                "Rigger": "Rigger"
+            },
+            "DamagedVehicle": "Damaged Vehicle",
+            "Driver": "Driver",
+            "Drone": "Drone",
+            "Environments": {
+                "Handling": "Handling",
+                "Speed": "Speed"
+            },
+            "IsDrone": "Is Drone",
+            "IsOffRoad": "Is Off Road",
+            "Labels": {
+                "ControlRig": "Control Rig",
+                "VehicleStunImmunity": "Vehicle Immunity to Stun Damage"
+            },
+            "Maneuvering": "Maneuvering",
+            "MissingDriver": "Missing Driver",
+            "ModificationCategoryTypes": {
+                "body": "Body",
+                "cosmetic": "Cosmetic",
+                "electromagnetic": "Electromagnetic",
+                "powertrain": "Powertrain",
+                "protection": "Protection",
+                "weapons": "Weapons"
+            },
+            "OffRoad": "Off Road",
+            "OnRoad": "On Road",
+            "Stats": {
+                "Acceleration": "Acceleration",
+                "Handling": "Handling",
+                "OffRoadAcceleration": "Acceleration (Off Road)",
+                "OffRoadHandling": "Handling (Off Road)",
+                "OffRoadSpeed": "Speed (Off Road)",
+                "Pilot": "Pilot",
+                "Seats": "Seats",
+                "Sensor": "Sensor",
+                "Speed": "Speed"
+            },
+            "Stealth": "Stealth",
+            "Type": "Type",
+            "Types": {
+                "Aerospace": "Space Craft",
+                "Air": "Aircraft",
+                "Exotic": "Exotic Craft",
+                "Ground": "Ground Craft",
+                "Walker": "Walker",
+                "Water": "Watercraft"
+            },
+            "Vehicle": "Vehicle"
+        },
+        "Vision": {
+            "AstralPerception": "Astral Perception",
+            "AugmentedReality": "Augmented Reality",
+            "LowLight": "Low-Light Vision",
+            "ThermographicVision": "Thermographic Vision"
+        }
+    }
+}

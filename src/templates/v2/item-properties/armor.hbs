@@ -6,7 +6,7 @@
 {{/if}}
 {{#if item.system.armor.hardened}}
     <label>
-        <i data-tooltip="SR5.ArmorHardenedFull" class="fas fa-shield"></i>
+        <i data-tooltip="SR5.Armor.Labels.ArmorHardenedFull" class="fas fa-shield"></i>
         {{item.system.armor.hardened}}
     </label>
 {{/if}}
@@ -53,7 +53,7 @@
     </label>
 {{/if}}
 {{#each item.system.armor.immunities.value as |immunity|}}
-    <label data-tooltip="{{localize 'SR5.Immunity'}}: {{localize (objValue @root.config.armorImmunityTypes immunity)}}">
+    <label data-tooltip="{{localize 'SR5.Armor.Labels.Immunity'}}: {{localize (objValue @root.config.armorImmunityTypes immunity)}}">
         <i class="fas fa-shield-virus"></i>
         {{localize (objValue @root.config.armorImmunityTypes immunity)}}
     </label>

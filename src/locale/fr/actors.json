@@ -1,0 +1,140 @@
+{
+    "SR5": {
+        "Actor": {
+            "Attributes": {
+                "Agility": "Agilité",
+                "Body": "Constitution",
+                "Charisma": "Charisme",
+                "Edge": "Chance",
+                "Essence": "Essence",
+                "Intuition": "Intuition",
+                "Logic": "Logique",
+                "Magic": "Magie",
+                "Reaction": "Réaction",
+                "Resonance": "Résonance",
+                "Strength": "Force",
+                "Willpower": "Volonté"
+            },
+            "Initiative": {
+                "Categories": {
+                    "Astral": "Astral",
+                    "Matrix": "Matrice",
+                    "Meatspace": "Terrestre"
+                }
+            },
+            "Labels": {
+                "Attribute": "Attribut",
+                "Attributes": "Attributs",
+                "Biography": "Bio",
+                "DefaultCategoryVisibility": "Montrer les catégories vides",
+                "Initiative": "Initiative",
+                "InitiativeMod": "Modificateur d'Initiative",
+                "IsCritter": "Créature",
+                "IsGrunt": "Brute",
+                "IsGruntHint": "Utilise les règles de moniteur de condition des brutes (SR5 p.378).",
+                "IsNPC": "PNJ",
+                "Metatype": "Métatype",
+                "Movement": "Mouvement",
+                "SheetActor": "Fiche de personnage",
+                "SpecialAttributes": "Attributs spéciaux",
+                "SprintingBonus": "Bonus de sprint"
+            }
+        },
+        "ActorTypes": {
+            "Character": "Personnage",
+            "Spirit": "Esprit",
+            "Sprite": "Sprite",
+            "Vehicle": "Vehicule"
+        },
+        "Character": {
+            "Labels": {
+                "CareerKarma": "Karma de carrière",
+                "Notoriety": "Rumeur",
+                "Nuyen": "Nuyen",
+                "PublicAwareness": "Renommée",
+                "StreetCred": "Réputation"
+            },
+            "Modifiers": {
+                "NPCMetatypeAttribute": "Attributs Métatype du PNJ"
+            },
+            "Types": {
+                "Dwarf": "Nain",
+                "Elf": "Elfe",
+                "Human": "Humain",
+                "Ork": "Ork",
+                "Troll": "Troll"
+            }
+        },
+        "Contact": {
+            "Blackmail": "Chantage",
+            "Connection": "Connection",
+            "Family": "Famille",
+            "Labels": {
+                "Contacts": "Contacts"
+            },
+            "Loyalty": "Loyauté",
+            "Type": "Type"
+        },
+        "Vehicle": {
+            "ChaseEnvironment": "Environnement de poursuite",
+            "Clearsight": "Vue dégagée",
+            "ControlMode": "Mode Commande",
+            "ControlModes": {
+                "Autopilot": "Autopilote",
+                "Manual": "Manuel",
+                "Remote": "A distance",
+                "Rigger": "Plongé"
+            },
+            "DamagedVehicle": "Véhicule Endommagé",
+            "Driver": "Conducteur",
+            "Environments": {
+                "Handling": "Maniabilité",
+                "Speed": "Vitesse"
+            },
+            "IsDrone": "Est un drone",
+            "IsOffRoad": "Est hors route",
+            "Labels": {
+                "VehicleStunImmunity": "Immunité des véhicules aux dégâts étourdissants"
+            },
+            "Maneuvering": "Manoeuvre",
+            "MissingDriver": "Glisser-déposer un personnage comme conducteur",
+            "ModificationCategoryTypes": {
+                "body": "Structure",
+                "cosmetic": "Apparence",
+                "electromagnetic": "Électronique",
+                "powertrain": "Groupe motopropulseur",
+                "protection": "Blindage",
+                "weapons": "Armes"
+            },
+            "OffRoad": "Hors route",
+            "OnRoad": "Route",
+            "Stats": {
+                "Acceleration": "Accelération",
+                "Handling": "Maniabilité",
+                "OffRoadAcceleration": "Accélération (hors route)",
+                "OffRoadHandling": "Maniabilité (hors route)",
+                "OffRoadSpeed": "Vitesse (hors route)",
+                "Pilot": "Autopilote",
+                "Sensor": "Senseur",
+                "Speed": "Vitesse"
+            },
+            "Stealth": "Furtif",
+            "Type": "Type",
+            "Types": {
+                "Aerospace": "Appareil spatial",
+                "Air": "Appareil volant",
+                "Exotic": "Véhicule exotique",
+                "Ground": "Véhicule terrestre",
+                "Walker": "Marcheur",
+                "Water": "Véhicule nautique"
+            },
+            "Vehicle": "Vehicle"
+        },
+        "Vision": {
+            "AstralPerception": "Perception astrale",
+            "AugmentedReality": "Réalité Augmentée",
+            "LowLight": "Vision dans l'obsucrité",
+            "ThermographicVision": "Vision thermographique"
+        }
+    }
+}

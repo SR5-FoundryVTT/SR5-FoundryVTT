@@ -214,7 +214,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         if (fireMode.value === 0) return true;
 
         if (!this.item.hasAmmo(1)) {
-            ui.notifications?.error('SR5.MissingRessource.Ammo', {localize: true});
+            ui.notifications?.error('SR5.MissingResources.Ammo', {localize: true});
             return false;
         }
 
@@ -243,7 +243,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
 
         // Notify user about some but not no ammo. Still fire though.
         if (!this.item.hasAmmo(fireMode.value)) {
-            ui.notifications?.warn('SR5.MissingRessource.SomeAmmo', {localize: true});
+            ui.notifications?.warn('SR5.MissingResources.SomeAmmo', {localize: true});
         }
 
         await this.item.useAmmo(fireMode.value);

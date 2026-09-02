@@ -1,0 +1,25 @@
+{
+    "SR5": {
+        "Dialogs": {
+            "Common": {
+                "Cancel": "Annuler",
+                "Ok": "OK"
+            }
+        },
+        "Errors": {
+            "LinkLockedReboot": "Un acteur verrouillé par lien ne peut pas être redémarré",
+            "SourceFieldEmpty": "Le champ source est vide, merci d'entrer un texte valide pour la source"
+        },
+        "Warnings": {
+            "CantCombineBuyHitsWithEdge": "Acheter des succès ne peut pas être combiné avec Seconde chance.",
+            "MissingPdfPager": "Pour que les PDFs soient affichés, le module 'pdfpager' doit être installé et un PDF doit être lié à la fiche",
+            "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs.",
+            "NoSelectableToken": "Le personnage n'a pas de jeton sélectionnable sur la page",
+            "RitualNotConcluded": "Le Rituel a échoué. En attente du jeu du rituel pour déterminer le drain.",
+            "RitualNotEnoughReagents": "Pas assez de réactifs offerts.",
+            "SkillAlreadyExists": "La compétence {name} existe déjà sur l'acteur {actorName} ({actorUuid}). Utilisez chaque nom de compétence une seule fois par catégorie.",
+            "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
+            "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés"
+        }
+    }
+}

@@ -1,0 +1,89 @@
+{
+    "SR5": {
+        "Dialogs": {
+            "Common": {
+                "Cancel": "Abbrechen",
+                "Ok": "OK"
+            }
+        },
+        "Errors": {
+            "CantConnectICToGrid": "IC-Akteure können nicht mit einem Gitter-Netzwerk verbunden werden.",
+            "CantConnectToPAN": "Das ausgewählte Dokument kann nicht zu einem PAN-Netzwerk hinzugefügt werden.",
+            "CantConnectToWAN": "Das ausgewählte Dokument kann nicht zu einem WAN-Netzwerk hinzugefügt werden.",
+            "CantExecuteTest": "Du kannst diesen Test nicht ausführen. Dies könnte damit zusammenhängen, dass du ein Spieler bist oder nicht ausreichend Berechtigungen hast.",
+            "DefaultInventoryCantBeRemoved": "Das Standardinventar kann nicht entfernt werden.",
+            "InventoryAlreadyExists": "Es existiert bereits ein Inventar mit diesem Namen",
+            "LinkLockedReboot": "Ein verbindungsgesperrter Akteur kann nicht neu gestartet werden",
+            "MarksCantBePlacedBy": "Der aktive Akteur kann keine Marken platzieren.",
+            "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen.",
+            "MarksCantBePlacedWithoutPersona": "Der ausgewählte Akteur hat keine aktive Persona.",
+            "MasterDeviceIsMissing": "Das Mastergerät fehlt. Es werden lokale Gerätewerte verwendet.",
+            "NoAvailableActorFound": "Es wurde kein verfügbarer Akteur für diese Aktion gefunden",
+            "SourceFieldEmpty": "Das Quelle-Feld ist leer, bitte gib einen gültigen Text für die Quelle ein.",
+            "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug-Akteur geworfen werden",
+            "TooManyActionsWithCategory": "Es darf nur eine Aktion mit der Kategorie {category} pro Akteur geben."
+        },
+        "Messages": {
+            "MarkInvitation": {
+                "AcceptInvite": "Annehmen",
+                "AskForInvite": "Fragt nach einer Markeneinladung für:",
+                "InviteAccepted": "Willkommen im Netzwerk {networkName}, {userName}!"
+            }
+        },
+        "MissingResources": {
+            "Ammo": "Nicht genug Munition zum Feuern",
+            "Edge": "Kein Edge übrig",
+            "Initiative": "Zu geringer Initiative-Wert",
+            "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, Feuermodus-Modifikatoren werden reduziert",
+            "SomeAmmoMelee": "Nicht genug Munition übrig, um zu zuschlagen"
+        },
+        "Notifications": {
+            "AddDevicesToPAN": {
+                "Adding": "Hinzufügen",
+                "FinishedAddingItems": "Geräte wurden erfolgreich zum PAN hinzugefügt. Bitte schließen und öffnen Sie alle betroffenen Items erneut.",
+                "Starting": "Beginne mit dem Hinzufügen der ausgestatteten Geräte zum PAN"
+            },
+            "CantModifyHostContent": "Hostdaten können nicht von einem IC-Akteur aus verändert werden",
+            "DeletingStorageReferences": {
+                "Finished": "Referenzen wurden erfolgreich gelöscht.",
+                "Item": "Lösche Referenzen zu Item",
+                "Start": "Lösche Netzwerk und Marken Referenzen"
+            },
+            "VehicleCannotBeOwnDriver": "Ein Fahrzeug kann nicht der Fahrer von sich selbst sein (dafür ist der Pilot da)"
+        },
+        "Warnings": {
+            "ActorMissingRequirements": "Der Akteur muss die Voraussetzung der Fertigkeit erfüllen: erwacht oder emergiert",
+            "AlreadyJoinedNetwork": "bereits mit dem Netzwerk {name} verbunden",
+            "BulkImportPerformanceWarning": "Wenn du eine große Anzahl von Items importiert hast, kann Foundry langsam laufen, bis du deinen Browser aktualisierst. Es wird empfohlen, jetzt zu aktualisieren.",
+            "CantCombineBuyHitsWithEdge": "Erfolge kaufen kann nicht mit zweiter Chance kombiniert werden.",
+            "CantEditDefaultInventory": "Das Hauptinventar kann nicht umbenannt werden",
+            "CantExtendTest": "Probenart kann nicht ausgedehnt werden.",
+            "CantExtendTestFurther": "Probe kann nicht weiter ausgedehnt werden. Zu wenige Würfel übrig oder Schwellenwert erreicht",
+            "CantRecoverPhysicalWithStunDamage": "Solange geistiger Schaden ungeheilt bleibt kann kein physischer Schaden kuriert werden",
+            "CantReloadAtAllDueToAmmo": "Ausgerüstete Munition hat nicht genug Kugeln!",
+            "CantReloadFullyDueToAmmo": "Nicht genug Munition um vollständig nachzuladen!",
+            "CantReloadPartialDueToAmmo": "Du hast nicht genügend Munition für eine komplexe Nachlade-Handlung",
+            "CantReloadWithoutSpareClip": "Dir sind die Ersatzmagazine ausgegangen!",
+            "CantSecondChanceAGlitch": "Kann zweite Chance nicht anwenden. Testergebnis ist ein Patzer.",
+            "CantSecondChanceWithoutNoneHits": "Kann zweite Chance nicht anwenden. Keine Würfel ohne Erfolg übrig.",
+            "CantSpendMultiplePointsOfEdge": "Es kann nur ein Punkt Edge für eine Probe oder Handlung gleichzeitig ausgegeben werden.",
+            "CompilationNotConcluded": "Kompilieren unvollständig. Warte auf Gegenprobe des Sprites, um Schwund zu bestimmen",
+            "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge-Punkte können nicht auf Proben ohne Akteur angewendet werden.",
+            "InvalidCompilationLevel": "Resonanz-Attribut zu niedrig für Sprite-Stufe",
+            "InvalidSummoningForce": "Gewählte Kraft hält sich nicht an die Regeln",
+            "MissingPdfPager": "Um das Quell-PDF anzuzeigen, muss das Modul pdfpager installiert sein und ein PDF mit passendem Code erstellt werden.",
+            "NoActorCreatePermission": "Du hast keine Berechtigung, Akteure zu erstellen.",
+            "NoFireModeConfigured": "Fernwaffe hat keinen Feuermodus konfiguriert. Verwende Einzelfeuer.",
+            "NoSelectableToken": "Charakter hat kein auswählbares Token auf der Karte",
+            "OnlyGMCanDoThis": "Nur ein GM-Benutzer kann dies tun",
+            "RitualInvalidForce": "Ritual-Kraft ist zu klein oder größer als die des Refugiums",
+            "RitualNotConcluded": "Ritual unvollständig. Warte auf Gegenprobe des Rituals, um Entzug zu bestimmen.",
+            "RitualNotEnoughReagents": "nicht genug Reagenzien geopfert.",
+            "SkillAlreadyExists": "Fertigkeit {name} existiert bereits beim Akteur {actorName} ({actorUuid}). Stelle sicher, dass du einen Fertigkeitsnamen nur einmal pro Fertigkeitskategorie verwendest.",
+            "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
+            "SkillSetDefaultTypeOutsideCompendium": "Nur Skillsets im konfigurierten Skillset Kompendium beeinflussen neue Akteure.",
+            "SummoningNotConcluded": "Herbeirufung unvollständig. Warte auf Gegenprobe des Geists, um Entzug zu bestimmen.",
+            "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein"
+        }
+    }
+}

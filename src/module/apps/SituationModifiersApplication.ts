@@ -462,10 +462,10 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
 
     get _targetTypeLabel(): string {
         if (this.target instanceof Scene) {
-            return game.i18n.localize('SR5.FOUNDRY.Scene');
+            return game.i18n.localize('SR5.Labels.Documents.Scene');
         }
         if (this.target instanceof SR5Actor) {
-            return game.i18n.localize('SR5.FOUNDRY.Actor');
+            return game.i18n.localize('SR5.Labels.Documents.Actor');
         }
 
         return '';

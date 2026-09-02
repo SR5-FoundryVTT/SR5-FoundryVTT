@@ -1194,8 +1194,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
             // Apply general matrix modifiers based on commlink/cyberdeck status.
             const matrix = this.system.matrix;
-            if (matrix.hot_sim) parts.addUnique('SR5.HotSim', 2);
-            if (matrix.running_silent) parts.addUnique('SR5.RunningSilent', -2);
+            if (matrix.hot_sim) parts.addUnique('SR5.Matrix.Labels.HotSim', 2);
+            if (matrix.running_silent) parts.addUnique('SR5.Matrix.Labels.RunningSilent', -2);
         }
     }
 
@@ -1205,7 +1205,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param parts A Value.mod field as a PartsList
      */
     _removeMatrixParts(parts: ModifiableValue) {
-        ['SR5.HotSim', 'SR5.RunningSilent'].forEach(part => parts.remove(part));
+        ['SR5.Matrix.Labels.HotSim', 'SR5.Matrix.Labels.RunningSilent'].forEach(part => parts.remove(part));
     }
 
     /**
@@ -1561,7 +1561,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // While not prohibiting, inform user about missing resource.
         if (combatant.initiative + modifier < 0) {
-            ui.notifications?.warn('SR5.MissingRessource.Initiative', { localize: true });
+            ui.notifications?.warn('SR5.MissingResources.Initiative', { localize: true });
         }
 
         await combatant.adjustInitiative(modifier);
