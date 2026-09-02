@@ -261,7 +261,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             for (const change of changes) {
                 const altered = { ...change } as unknown as ActiveEffect.ChangeData;
                 SR5ActiveEffect.alterChange(this, altered);
-                const value = SR5ActiveEffect.getModifiableValue(this, altered.key);
+                const value = SR5ActiveEffect.getModifiableValue(this, altered.key ?? '');
                 if (value) ModifiableValue.removeFromSource(value, source);
             }
 
