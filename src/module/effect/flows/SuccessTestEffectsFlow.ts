@@ -175,7 +175,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             collect(effect);
         }
 
-        for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['targeted_actor'], nestedItems: false })) {
+        for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
             collect(effect);
         }
 

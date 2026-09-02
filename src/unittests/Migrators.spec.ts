@@ -7,6 +7,7 @@ import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 import { Version0_36_0 } from 'src/module/migrator/versions/Version0_36_0';
 import { Version0_37_0 } from 'src/module/migrator/versions/Version0_37_0';
 import { Version0_38_0 } from 'src/module/migrator/versions/Version0_38_0';
+import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -30,6 +31,12 @@ export const Migrators = (context: QuenchBatchContext) => {
         ) {
             this.migrateEffectChanges(effect, keyMap);
         }
+    }
+
+    class TestForcedMigration extends VersionMigration {
+        readonly TargetVersion = '0.0.1' as const;
+
+        override async MigrateWorld(): Promise<void> {}
     }
 
     after(async () => {
@@ -349,6 +356,12 @@ export const Migrators = (context: QuenchBatchContext) => {
     });
 
     describe('VersionMigration active effect remap helper', () => {
+        it('detects forced world migrations independently from document migrations', () => {
+            assert.isFalse(new TestMigration().handlesWorldMigration());
+            assert.isTrue(new TestForcedMigration().handlesWorldMigration());
+            assert.isTrue(new Version0_38_0().handlesWorldMigration());
+        });
+
         it('rewrites mapped keys and formula string value paths without evaluating math', () => {
             const migrator = new TestMigration();
             const keyMap = {
@@ -807,6 +820,158 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
     });
 
+    describe('Version0_38_0 nested item migration', () => {
+        it('normalizes missing item parentId to null', () => {
+            const migrator = new Version0_38_0();
+            const item: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Old Gear',
+                type: 'equipment',
+                system: DataDefaults.baseSystemData('equipment'),
+            };
+            delete item.system.parentId;
+
+            migrator.migrateItem(item);
+
+            assert.isNull(item.system.parentId);
+        });
+
+        it('lifts actor-owned nested container items into sibling actor items', () => {
+            const migrator = new Version0_38_0();
+            const container: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Backpack',
+                type: 'container',
+                system: DataDefaults.baseSystemData('container'),
+                flags: {
+                    [SYSTEM_NAME]: {
+                        [FLAGS.EmbeddedItems]: [{
+                            _id: foundry.utils.randomID(16),
+                            name: 'Rope',
+                            type: 'equipment',
+                            system: DataDefaults.baseSystemData('equipment'),
+                        }],
+                    },
+                },
+            };
+            const actor: any = { items: [container] };
+
+            migrator.migrateActor(actor);
+
+            assert.lengthOf(actor.items, 2);
+            assert.isUndefined(container.flags[SYSTEM_NAME][FLAGS.EmbeddedItems]);
+
+            const lifted = actor.items.find((item: any) => item.name === 'Rope');
+            assert.exists(lifted);
+            assert.strictEqual(lifted.system.parentId, container._id);
+            assert.notStrictEqual(lifted._id, container._id);
+        });
+
+        it('lifts actor-owned weapon ammo and mods into sibling actor items', () => {
+            const migrator = new Version0_38_0();
+            const weapon: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Ares Alpha',
+                type: 'weapon',
+                system: DataDefaults.baseSystemData('weapon'),
+                flags: {
+                    [SYSTEM_NAME]: {
+                        [FLAGS.EmbeddedItems]: [
+                            {
+                                _id: foundry.utils.randomID(16),
+                                name: 'APDS',
+                                type: 'ammo',
+                                system: DataDefaults.baseSystemData('ammo'),
+                            },
+                            {
+                                _id: foundry.utils.randomID(16),
+                                name: 'Gas Vent',
+                                type: 'modification',
+                                system: DataDefaults.baseSystemData('modification'),
+                            },
+                        ],
+                    },
+                },
+            };
+            const actor: any = { items: [weapon] };
+
+            migrator.migrateActor(actor);
+
+            assert.lengthOf(actor.items, 3);
+            assert.isUndefined(weapon.flags[SYSTEM_NAME][FLAGS.EmbeddedItems]);
+
+            const ammo = actor.items.find((item: any) => item.name === 'APDS');
+            const mod = actor.items.find((item: any) => item.name === 'Gas Vent');
+
+            assert.exists(ammo);
+            assert.strictEqual(ammo.system.parentId, weapon._id);
+
+            assert.exists(mod);
+            assert.strictEqual(mod.system.parentId, weapon._id);
+            assert.strictEqual(mod.system.type, 'weapon');
+        });
+
+        it('lifts actor-owned ware mods as ware modifications rather than the parent item type', () => {
+            const migrator = new Version0_38_0();
+            const cyberware: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Cyberarm',
+                type: 'cyberware',
+                system: DataDefaults.baseSystemData('cyberware'),
+                flags: {
+                    [SYSTEM_NAME]: {
+                        [FLAGS.EmbeddedItems]: [{
+                            _id: foundry.utils.randomID(16),
+                            name: 'Armor Enhancement',
+                            type: 'modification',
+                            system: DataDefaults.baseSystemData('modification'),
+                        }],
+                    },
+                },
+            };
+            const actor: any = { items: [cyberware] };
+
+            migrator.migrateActor(actor);
+
+            const mod = actor.items.find((item: any) => item.name === 'Armor Enhancement');
+            assert.exists(mod);
+            assert.strictEqual(mod.system.parentId, cyberware._id);
+            // 'cyberware' is not a valid modification type, getEquippedMods filters on 'ware'.
+            assert.strictEqual(mod.system.type, 'ware');
+        });
+
+        it('lifts actor-owned armor mods into sibling actor items', () => {
+            const migrator = new Version0_38_0();
+            const armor: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Armor Jacket',
+                type: 'armor',
+                system: DataDefaults.baseSystemData('armor'),
+                flags: {
+                    [SYSTEM_NAME]: {
+                        [FLAGS.EmbeddedItems]: [{
+                            _id: foundry.utils.randomID(16),
+                            name: 'Chemical Seal',
+                            type: 'modification',
+                            system: DataDefaults.baseSystemData('modification'),
+                        }],
+                    },
+                },
+            };
+            const actor: any = { items: [armor] };
+
+            migrator.migrateActor(actor);
+
+            assert.lengthOf(actor.items, 2);
+            assert.isUndefined(armor.flags[SYSTEM_NAME][FLAGS.EmbeddedItems]);
+
+            const mod = actor.items.find((item: any) => item.name === 'Chemical Seal');
+            assert.exists(mod);
+            assert.strictEqual(mod.system.parentId, armor._id);
+            assert.strictEqual(mod.system.type, 'armor');
+        });
+    });
+
     describe('Version0_37_0 active effect targets migration', () => {
         it('migrates flat selection fields into a single target of conditions', () => {
             const migrator = new Version0_37_0();
@@ -862,9 +1027,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(effect.system.targets[0].applyTo, 'actor');
             assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id);
         });
-    });
 
-    describe('Version0_38_0 item-sheet migration', () => {
         it('adds missing ids to nested item effects stored in flags', () => {
             const migrator = new Version0_38_0();
             const item: any = {
@@ -926,8 +1089,8 @@ export const Migrators = (context: QuenchBatchContext) => {
                 restriction: 'restricted',
                 label: '6R',
             });
-            assert.deepEqual(item.system.technology.essence, { base: 0, value: 0 });
             assert.notProperty(item.system.technology, 'calculated');
+            assert.deepEqual(item.system.technology.essence, { base: 0, value: 0 });
         });
 
         it('migrates draft technology cost and availability objects into base/value fields', () => {

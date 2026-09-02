@@ -119,7 +119,7 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
 
         context.primaryTabs = this._prepareTabs('primary');
 
-        const actor = this.document.actor || undefined;
+        const actor = this.document.actor;
         context.skills = await SkillSelectionFlow.getSkillSelection(actor);
         context.activeSkills = await SkillSelectionFlow.getSkillSelection(actor, {
             categories: ['active'],

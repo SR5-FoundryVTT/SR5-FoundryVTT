@@ -46,7 +46,6 @@ export interface SR5BaseItemSheetData extends ItemSheet.RenderContext, SR5Applic
     slaves?: (SR5Item | SR5Actor)[];
 
     // State flags
-    isNestedItem: boolean;
     isUsingRangeCategory: boolean;
 
     // Tests
@@ -71,13 +70,14 @@ export interface SR5BaseItemSheetData extends ItemSheet.RenderContext, SR5Applic
  * Template fields for item sheet
  */
 interface SR5ItemSheetData extends SR5BaseItemSheetData {
-    // Nested item typing for different sheets
+    // Child item typing for different sheets
     ammunition: SR5Item<'ammo'>[]
     wareMods: SR5Item<'modification'>[]
     weaponMods: SR5Item<'modification'>[]
     armorMods: SR5Item<'modification'>[]
     vehicleMods: SR5Item<'modification'>[]
     droneMods: SR5Item<'modification'>[]
+    containerContents: ContainerContentRow[]
 
     // Sorted lists for usage in select elements.
     activeSkills: Record<string, string> // skill id: label
@@ -109,6 +109,14 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     isUsingRangeCategory: boolean
 }
 
+interface ContainerContentRow {
+    item: SR5Item
+    typeLabel: string
+    primaryValue: string
+    secondaryValue: string
+    tertiaryValue: string
+}
+
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
@@ -126,6 +134,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             deleteItem: SR5ItemSheet.#deleteItem,
             addItemQty: SR5ItemSheet.#addItemQty,
             removeItemQty: SR5ItemSheet.#removeItemQty,
+            editContainerItem: SR5ItemSheet.#editContainerItem,
+            removeContainerItem: SR5ItemSheet.#removeContainerItem,
+            deleteContainerItem: SR5ItemSheet.#deleteContainerItem,
 
             addLicense: SR5ItemSheet.#addLicense,
             removeLicense: SR5ItemSheet.#removeLicense,
@@ -222,6 +233,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             templates: SheetFlow.templateListItem('item-modification'),
             scrollable: ['.scrollable']
         },
+        containerContents: {
+            template: SheetFlow.templateBase('item/tabs/container-contents'),
+            scrollable: ['.scrollable']
+        },
         effects: {
             template: SheetFlow.templateBase('item/tabs/effects'),
             templates: SheetFlow.templateListItem('effect'),
@@ -245,6 +260,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'weaponModifications', label: 'SR5.Tabs.Item.Mods', cssClass: '' },
                 { id: 'armorModifications', label: 'SR5.Tabs.Item.Mods', cssClass: '' },
                 { id: 'itemModifications', label: 'SR5.Tabs.Item.Mods', cssClass: '' },
+                { id: 'containerContents', label: 'SR5.Tabs.Item.ContainerContents', cssClass: '' },
                 { id: 'licenses', label: 'SR5.Tabs.Item.SinLicenses', cssClass: '' },
                 { id: 'effects', label: 'SR5.Tabs.Item.Effects', cssClass: '' },
             ]
@@ -318,6 +334,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!item.isType('armor')) {
             delete parts.armorModifications;
         }
+        if (!item.isType('container')) {
+            delete parts.containerContents;
+        }
         if (!item.isType('bioware', 'cyberware')) {
             delete parts.itemModifications;
         }
@@ -325,7 +344,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             delete parts.licenses;
             delete parts.sinNetworks;
         }
-        if (item.isType('echo')) {
+        if (item.isType('echo', 'container')) {
             delete parts.details;
         }
         return parts;
@@ -338,9 +357,13 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * The prepared data object contains both the actor data as well as additional sheet options
      */
     override async _prepareContext(options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions> & { isFirstRender: boolean }) {
+        if (this.item.pack && !this.item.isEmbedded) {
+            await this.item.refreshLinkedData({ render: false });
+        }
+
         const data = await super._prepareContext(options) as T;
         const itemData = this.item.toObject(false).system as SR5Item['system'];
-        data.actor = this.item.actorOwner;
+        data.actor = this.item.actor ?? undefined;
 
         if ('action' in itemData && itemData.action) {
             try {
@@ -381,18 +404,18 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
 
         /**
-         * Groups nested items by their type for rendering on the item sheet.
+         * Groups child items by their type for rendering on the item sheet.
          * - Ammo items are grouped under 'ammo'.
          * - Modification items are grouped by their specific system type (e.g., 'weapon', 'armor', etc.).
          * - All other items are grouped under 'other'.
          */
-        const grouped = Object.groupBy(this.item.items, item => {
+        const grouped = Object.groupBy(this.item.childItems, item => {
             if (item.isType('ammo')) return 'ammo';
             if (item.isType('modification')) return item.system.type;
             return 'other';
         });
 
-        // Sort nested items by name before assigning to template data
+        // Sort child items by name before assigning to template data
         const sortByName = <T extends { name: string }>(arr: T[]) =>
             arr.toSorted((a, b) => a.name.localeCompare(b.name, game.i18n.lang));
 
@@ -402,6 +425,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data['wareMods'] = sortByName((grouped.ware ?? []) as SR5Item<'modification'>[]);
         data['vehicleMods'] = sortByName((grouped.vehicle ?? []) as SR5Item<'modification'>[]);
         data['droneMods'] = sortByName((grouped.drone ?? []) as SR5Item<'modification'>[]);
+
+        if (this.item.isType('container')) {
+            const contents = await this.item.loadContents();
+            data['containerContents'] = this._prepareContainerContents(sortByName(Array.from(contents.values()) as SR5Item[]));
+        }
 
         data['activeSkills'] = await this._getSortedActiveSkillsForSelect();
         data['attributes'] = this._getSortedAttributesForSelect();
@@ -460,10 +488,65 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         data.item = this.item;
 
-        data.isNestedItem = this.item._isNestedItem;
         data.bindings = this._prepareKeybindings();
 
         return data;
+    }
+
+    private _prepareContainerContents(items: SR5Item[]): ContainerContentRow[] {
+        return items.map(item => {
+            const [primaryValue = '', secondaryValue = '', tertiaryValue = ''] = this._getContainerItemValues(item);
+
+            return {
+                item,
+                typeLabel: this._getContainerItemTypeLabel(item),
+                primaryValue,
+                secondaryValue,
+                tertiaryValue,
+            };
+        });
+    }
+
+    private _getContainerItemTypeLabel(item: SR5Item): string {
+        const key = `TYPES.Item.${item.type}`;
+        return game.i18n.has(key) ? game.i18n.localize(key) : item.type;
+    }
+
+    private _getContainerItemValues(item: SR5Item): string[] {
+        const values: string[] = [];
+
+        if (item.isType('weapon')) {
+            const { value, max } = item.system.ammo.current;
+            if (max > 0) values.push(`${value}/${max}`);
+        } else if (item.isType('armor')) {
+            // ArmorPrep keeps value and hardened mutually exclusive.
+            const { value, hardened } = item.system.armor;
+            values.push(hardened > 0 ? `${hardened}H` : `${value}`);
+        } else if (item.isType('contact')) {
+            values.push(`C/L ${item.system.connection}/${item.system.loyalty}`);
+        } else if (item.isType('lifestyle')) {
+            if (item.system.cost > 0) values.push(`¥${item.system.cost.toLocaleString(game.i18n.lang)}`);
+        } else if (item.isType('complex_form')) {
+            if (item.system.fade > 0) values.push(`Fade ${item.system.fade}`);
+        } else if (item.isType('spell')) {
+            if (item.system.drain > 0) values.push(`Drain ${item.system.drain}`);
+        } else if (item.isType('adept_power')) {
+            if (item.system.level > 0) values.push(`Lvl ${item.system.level}`);
+        }
+
+        const technology = item.getTechnologyData();
+
+        // Types without technology carry their own rating, critter powers, hosts and qualities.
+        const rating = technology?.rating ?? item.system.rating ?? 0;
+        if (rating > 0) values.push(`Rtg ${rating}`);
+
+        const quantity = technology?.quantity ?? 0;
+        if (quantity > 0) values.push(`Qty ${quantity}`);
+
+        const availability = technology?.availability.label;
+        if (availability) values.push(`Avail ${availability}`);
+
+        return values.slice(0, 3);
     }
 
     /**
@@ -487,8 +570,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const selectedSkills = [this.document.system.action?.skill, this.document.system.action?.opposed?.skill]
             .filter((selectedSkill): selectedSkill is string => !!selectedSkill);
 
-        // Instead of item.parent, use the actorOwner as NestedItems have an actor grand parent.
-        return await SkillSelectionFlow.getSkillSelection(this.item.actorOwner, {
+        return await SkillSelectionFlow.getSkillSelection(this.item.actor, {
             categories: ['active'],
             selectedSkills,
             valueType: 'key',
@@ -525,7 +607,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         html.find('select[name="change-ammo"]').on('change', this._onAmmoSelect.bind(this));
         html.find('select[name="change-clip-type"]').on('change', (event) => { void this._onClipSelect((event.target as HTMLSelectElement).value) });
 
-        // Inline change handlers for nested list items (qty inputs in edit mode)
+        // Inline change handlers for child list items (qty inputs in edit mode)
         html.find('input[data-system-action="changeItemQty"]').on('change', this._onListItemChangeQuantity.bind(this));
 
         // Marks handling
@@ -643,7 +725,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #addItemQty(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const id = SheetFlow.closestItemId(event.target);
-        const item = this.item.getOwnedItem(id);
+        const item = this.item.getChildItem(id);
         if (item) {
             await SheetFlow.addToQuantity(item, event);
         }
@@ -652,7 +734,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #removeItemQty(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const id = SheetFlow.closestItemId(event.target);
-        const item = this.item.getOwnedItem(id);
+        const item = this.item.getChildItem(id);
         if (item) {
             await SheetFlow.removeFromQuantity(item, event);
         }
@@ -661,7 +743,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #equipItem(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const id = SheetFlow.closestItemId(event.target);
-        const item = this.item.getOwnedItem(id);
+        const item = this.item.getChildItem(id);
         if (id && item) {
             if (item.type === 'modification') {
                 await this.item.equipModification(id);
@@ -674,7 +756,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #editItem(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const id = SheetFlow.closestItemId(event.target);
-        const item = this.item.getOwnedItem(id);
+        const item = this.item.getChildItem(id);
         if (item) {
             await item.sheet?.render(true);
         }
@@ -687,10 +769,37 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!userConsented) return;
 
         const id = SheetFlow.closestItemId(event.target);
-        const item = this.item.getOwnedItem(id);
+        const item = this.item.getChildItem(id);
         if (id && item) {
-            await this.item.deleteOwnedItem(id);
+            await this.item.deleteChildItem(id);
         }
+    }
+
+    static async #editContainerItem(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+
+        const id = SheetFlow.closestItemId(event.target);
+        const item = await this.item.getContainedItem(id) as SR5Item | undefined;
+        await item?.sheet?.render(true);
+    }
+
+    static async #removeContainerItem(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+
+        const id = SheetFlow.closestItemId(event.target);
+        const item = await this.item.getContainedItem(id) as SR5Item | undefined;
+        await item?.update({ system: { parentId: null } });
+    }
+
+    static async #deleteContainerItem(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        const id = SheetFlow.closestItemId(event.target);
+        const item = await this.item.getContainedItem(id) as SR5Item | undefined;
+        await item?.delete();
     }
 
     static async #addItem(this: SR5ItemSheet, event: Event) {
@@ -706,11 +815,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             SR5ItemSheet.addModificationItem(this.item, itemData as Item.CreateData<'modification'>);
 
         const item = new SR5Item(itemData);
-        await this.item.createNestedItem(item._source);
+        await this.item.createChildItems(item._source);
     }
 
     /**
-     * Set nested modification type to match the parent item.
+     * Set child modification type to match the parent item.
      */
     static addModificationItem(parentItem: SR5Item, itemData: Item.CreateData<'modification'>) {
         const type = parentItem.modificationType();
@@ -804,12 +913,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     }
 
     /**
-     * Change the quantity on a nested item shown within this item sheet's list.
+     * Change the quantity on a child item shown within this item sheet's list.
      * @param event A DOM event
      */
     async _onListItemChangeQuantity(event: Event) {
         const iid = SheetFlow.closestItemId(event.currentTarget);
-        const item = this.item.getOwnedItem(iid);
+        const item = this.item.getChildItem(iid);
         const quantity = parseInt((event.currentTarget as HTMLInputElement).value);
 
         if (!quantity || !item?.system?.technology) {
@@ -908,13 +1017,19 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (this.item.isType('device') && this.item.parent instanceof SR5Actor) {
             await this.item.parent.equipOnlyOneItemOfType(this.item);
             void this.render();
-        } else if (this.item.isType('ammo') && this.item.parent instanceof SR5Item) {
-            await (this.item.parent as SR5Item).equipAmmo(this.item.id!);
-            void this.render();
-        } else if (this.item.isType('modification') && this.item.parent instanceof SR5Item) {
-            await (this.item.parent as SR5Item).equipModification(this.item.id, this.item.system.type);
-            void this.render();
         } else {
+            const parent = await this.item.parentItem as SR5Item | undefined;
+            if (this.item.isType('ammo') && parent?.isType('weapon')) {
+                await parent.equipAmmo(this.item.id!);
+                void this.render();
+                return;
+            }
+            if (this.item.isType('modification') && parent) {
+                await parent.equipModification(this.item.id, this.item.system.type);
+                void this.render();
+                return;
+            }
+
             const equipped = this.item.isEquipped();
             if (this.item.isType('critter_power', 'sprite_power')) {
                 await this.item.update({ system: { optional: equipped ? 'disabled_option' : 'enabled_option' } });
@@ -948,14 +1063,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const effect = [{
             name: game.i18n.localize("SR5.ActiveEffect.New"),
         }];
-
-        if (this.item._isNestedItem) {
-            effect[0]['_id'] = foundry.utils.randomID();
-            const sr5Effect = new SR5ActiveEffect(effect[0], { parent: this.item }) as ActiveEffect.Stored;
-            await this.item.createNestedActiveEffect(sr5Effect);
-        } else {
-            await this.item.createEmbeddedDocuments('ActiveEffect', effect);
-        }
+        await this.item.createEmbeddedDocuments('ActiveEffect', effect);
     }
 
     static async #editEffect(this: SR5ItemSheet, event: MouseEvent) {
@@ -991,19 +1099,14 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!userConsented) return;
 
         const effectId = SheetFlow.closestEffectId(event.target);
-        if (this.item._isNestedItem) {
-            this.item.effects.delete(effectId);
-            await this.render(true);
-        } else {
-            await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
-        }
+        await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
     }
 
     override async _onFirstRender(context, options) {
         await super._onFirstRender(context, options);
 
-        this._createContextMenu(this._getNestedItemContextOptions.bind(this), "[data-item-id]", {
-            hookName: "getNestedItemContextOptions",
+        this._createContextMenu(this._getChildItemContextOptions.bind(this), "[data-item-id]", {
+            hookName: "getChildItemContextOptions",
             jQuery: false,
             fixed: true,
         });
@@ -1014,7 +1117,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         });
     }
 
-    _getNestedItemContextOptions() {
+    _getChildItemContextOptions() {
         return [
             SheetFlow._getSourceContextOption(),
             {
@@ -1022,7 +1125,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 icon: "<i class='fas fa-pen-to-square'></i>",
                 callback: async (target: HTMLElement) => {
                     const id = SheetFlow.closestItemId(target);
-                    const item = this.item.getOwnedItem(id);
+                    const item = this.item.getChildItem(id);
                     if (item) {
                         await item.sheet?.render(true)
                     }
@@ -1035,9 +1138,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                     const userConsented = await Helpers.confirmDeletion();
                     if (!userConsented) return;
                     const id = SheetFlow.closestItemId(target);
-                    const item = this.item.getOwnedItem(id);
+                    const item = this.item.getChildItem(id);
                     if (item?.id) {
-                        await this.item.deleteOwnedItem(item.id);
+                        await this.item.deleteChildItem(item.id);
                     }
                 }
             }
@@ -1078,27 +1181,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                     if (!userConsented) return;
                     const effectId = SheetFlow.closestEffectId(target);
                     if (effectId) {
-                        if (this.item._isNestedItem) {
-                            this.item.effects.delete(effectId);
-                            await this.render(true);
-                        } else {
-                            await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
-                        }
+                        await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
                     }
                 }
             }
         ]
-    }
-
-    override async _processSubmitData(
-        ...[event, form, submitData, options]: Parameters<ItemSheet['_processSubmitData']>
-    ) {
-        if (this.item._isNestedItem) {
-            await this.item.update(submitData, options);
-            return undefined as any;
-        }
-
-        return await super._processSubmitData(event, form, submitData, options);
     }
 
     static async #toggleActionSpecialization(this: SR5ItemSheet) {
@@ -1232,18 +1319,15 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @protected
      */
     protected async _onDropItem(event: DragEvent, item: SR5Item) {
-        // dropped ammo and matching mods get added as nested items for compatible parents
+        if (this.item.isType('container')) {
+            return this._onDropContainerItem(item);
+        }
+
         if (this.item.isType('weapon') && item.isType('ammo', 'modification')) {
-            const nested = item.toObject();
-            if (item.isType('modification')) {
-                foundry.utils.setProperty(nested, 'system.type', 'weapon');
-            }
-            return this.item.createNestedItem(nested);
+            return this._onDropAttachmentItem(item);
         }
         if (this.item.isType('armor', 'bioware', 'cyberware') && item.isType('modification')) {
-            const nested = item.toObject();
-            foundry.utils.setProperty(nested, 'system.type', this.item.modificationType());
-            return this.item.createNestedItem(nested);
+            return this._onDropAttachmentItem(item);
         }
         // dropped Grid and Hosts on SIN allows for adding the SIN as a network option
         if (this.item.isType('sin') && item.isNetwork()) {
@@ -1260,6 +1344,109 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (this.item.canBeSlave && item.canBeMaster) {
             return item.addSlave(this.item);
         }
+    }
+
+    protected async _onDropContainerItem(item: SR5Item) {
+        const container = this.item.asType('container');
+        if (!container?.isOwner || !container.id) return null;
+
+        if (item.system.parentId === container.id) return item;
+
+        if (!await container.canContainItem(item)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Container.CannotContain'));
+            return null;
+        }
+
+        if (this._sameItemCollection(item)) {
+            return item.update({ system: { parentId: container.id } });
+        }
+
+        const itemData = await SR5Item.createWithLinkedItems([item], { parentId: container.id });
+        if (itemData.length === 0) return null;
+
+        if (container.isEmbedded && container.actor) {
+            const created = await container.actor.createEmbeddedDocuments('Item', itemData, { keepId: true });
+            return created?.[0] ?? null;
+        }
+
+        if (container.pack) {
+            const created = await Item.implementation.createDocuments(itemData, { pack: container.pack, keepId: true });
+            return created?.[0] ?? null;
+        }
+
+        if (container.folder) {
+            for (const data of itemData) data.folder = container.folder.id;
+        }
+        const created = await Item.implementation.createDocuments(itemData, { keepId: true });
+        return created?.[0] ?? null;
+    }
+
+    protected async _onDropAttachmentItem(item: SR5Item) {
+        if (!this.item.isOwner || !this.item.id) return null;
+        if (item.id === this.item.id) return null;
+        if (await this._isAttachmentAncestor(item)) return null;
+
+        const modType = this.item.modificationType();
+        if (item.isType('modification') && !modType) return null;
+
+        if (this._sameItemCollection(item)) {
+            if (item.isType('modification')) {
+                return item.update({ system: { parentId: this.item.id, type: modType } });
+            }
+
+            return item.update({ system: { parentId: this.item.id } });
+        }
+
+        const itemData = await SR5Item.createWithLinkedItems([item], { parentId: this.item.id });
+        if (itemData.length === 0) return null;
+
+        if (item.isType('modification')) {
+            // CreateData.system is a per subtype union, which a direct write can't satisfy.
+            foundry.utils.setProperty(itemData[0], 'system.type', modType);
+        }
+
+        if (this.item.isEmbedded && this.item.actor) {
+            const created = await this.item.actor.createEmbeddedDocuments('Item', itemData, { keepId: true });
+            return created?.[0] ?? null;
+        }
+
+        if (this.item.pack) {
+            const created = await Item.implementation.createDocuments(itemData, { pack: this.item.pack, keepId: true });
+            return created?.[0] ?? null;
+        }
+
+        if (this.item.folder) {
+            for (const data of itemData) data.folder = this.item.folder.id;
+        }
+        const created = await Item.implementation.createDocuments(itemData, { keepId: true });
+        return created?.[0] ?? null;
+    }
+
+    private async _isAttachmentAncestor(item: SR5Item) {
+        let current: SR5Item | undefined = this.item;
+        const visited = new Set<string>();
+
+        while (current) {
+            const parent = await current.parentItem as SR5Item | undefined;
+            if (!parent?.id || visited.has(parent.id)) return false;
+            if (parent.id === item.id) {
+                ui.notifications?.warn(game.i18n.localize('SR5.Container.CannotContain'));
+                return true;
+            }
+
+            visited.add(parent.id);
+            current = parent;
+        }
+
+        return false;
+    }
+
+    private _sameItemCollection(item: SR5Item) {
+        const target = this.item;
+        const sameActor = target.isEmbedded && item.isEmbedded && target.actor === item.actor;
+        const samePack = !target.isEmbedded && !item.isEmbedded && !!target.pack && target.pack === item.pack;
+        const sameWorld = !target.isEmbedded && !item.isEmbedded && !target.pack && !item.pack;
+        return sameActor || samePack || sameWorld;
     }
 
     /* -------------------------------------------- */
@@ -1290,7 +1477,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         // Owned Items
         if (target.dataset.itemId) {
-            const item = this.item.getOwnedItem(target.dataset.itemId);
+            const item = this.item.getChildItem(target.dataset.itemId);
             if (item) {
                 dragData = item.toDragData();
             }

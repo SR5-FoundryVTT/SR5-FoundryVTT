@@ -214,6 +214,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // This will apply ActiveEffects, which is okay for modify (custom) effects, however add/multiply on .value will be
         // overwritten.
         super.prepareEmbeddedDocuments();
+        this.prepareLinkedItemRelationships();
 
         // NOTE: Hello there! Should you ever be in need of calling the grand parents methods, maybe to avoid applyActiveEffects,
         //       look at this beautiful piece of software and shiver in it's glory.
@@ -280,11 +281,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Collect item effects.
         for (const item of this.items) {
             effects = effects.concat(item.effects.filter(showEffectIcon));
-
-            // Collect nested item effects.
-            for (const nestedItem of item.items) {
-                effects = effects.concat(nestedItem.effects.filter(showEffectIcon));
-            }
         }
 
         return effects;
@@ -331,6 +327,34 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             items.push(item);
             this.itemsForType.set(item.type, items);
         }
+    }
+
+    prepareLinkedItemRelationships() {
+        const items = this.items as unknown as SR5Item[];
+        const prepared = [...items].sort((left, right) => this._attachmentDepth(right) - this._attachmentDepth(left));
+        for (const item of prepared) {
+            item.prepareRelationshipData();
+        }
+    }
+
+    private _attachmentDepth(item: SR5Item): number {
+        let depth = 0;
+        let current: SR5Item | undefined = item;
+        const visited = new Set<string>();
+
+        while (current && depth < SR5Item.MAX_ATTACHMENT_DEPTH) {
+            const parentId = foundry.utils.getProperty(current.system, 'parentId') as string | null | undefined;
+            if (!parentId || visited.has(parentId)) break;
+
+            const parent = this.items.get(parentId) as SR5Item | undefined;
+            if (!parent) break;
+
+            visited.add(parentId);
+            current = parent;
+            depth += 1;
+        }
+
+        return depth;
     }
 
     /**
@@ -1970,7 +1994,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // CASE - Vehicle marks are stored on their master actor.
         if (this.isType('vehicle')) {
             const master = this.master;
-            return master?.actorOwner;
+            return master?.actor;
         }
 
         // DEFAULT CASE
