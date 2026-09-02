@@ -101,10 +101,17 @@ export class SR5Combatant extends Combatant<"base"> {
         await this.actor?.removeDefenseMultiModifier();
     }
 
-    /** Adjusts the combatant's initiative score by a given amount. */
+    /** Adjusts the combatant's initiative score by a given amount and reports it to the chat log. */
     async adjustInitiative(adjustment: number): Promise<this | undefined> {
-        if (this.initiative === null) return this;
-        return this.update({ initiative: this.initiative + adjustment });
+        if (this.initiative === null || adjustment === 0) return this;
+
+        const previousInit = this.initiative;
+        const currentInit = previousInit + adjustment;
+
+        const updated = await this.update({ initiative: currentInit });
+        if (updated) await this._postInitiativeChangeCard(previousInit, currentInit);
+
+        return updated;
     }
 
     /**
@@ -220,7 +227,6 @@ export class SR5Combatant extends Combatant<"base"> {
     }
 
     private async _postModeCard(data: ChangeModeMessageData): Promise<void> {
-        const name = this.name ?? game.i18n.localize('COMBAT.UnknownCombatant');
         const prevConfig = this._getModeConfig(data.fromMode);
         const currConfig = this._getModeConfig(data.toMode);
         const hasDiceRoll = data.diceRolls.length > 0;
@@ -235,10 +241,7 @@ export class SR5Combatant extends Combatant<"base"> {
         const content = await foundry.applications.handlebars.renderTemplate(
             'systems/shadowrun5e/dist/templates/chat/initiative-mode-change-message.hbs',
             {
-                tokenId: this.token?.id ?? null,
-                documentUuid: this.actor?.uuid ?? this.token?.uuid ?? null,
-                name,
-                combatantImage: this.token?.texture?.src ?? this.actor?.img ?? null,
+                ...this._cardCombatantData(),
                 previousModeClass: prevConfig.cls,
                 previousModeIcon: prevConfig.icon,
                 previousModeTitle: game.i18n.format('SR5.COMBAT.ModeTitle', { mode: game.i18n.localize(prevConfig.label) }),
@@ -266,7 +269,11 @@ export class SR5Combatant extends Combatant<"base"> {
         } as ChatMessage.CreateData;
 
         const rollMode = this.hidden ? 'gm' : 'public';
-        ChatMessage.applyMode(messageData, rollMode);
+        if (this.hidden) {
+            messageData.whisper = this._hiddenCardWhisperTargets();
+        } else {
+            ChatMessage.applyMode(messageData, 'public');
+        }
 
         const message = await foundry.documents.ChatMessage.implementation.create(messageData);
         if (message && hasDiceRoll && data.diceRoll)
@@ -298,6 +305,60 @@ export class SR5Combatant extends Combatant<"base"> {
             message.id,
             message.speaker,
         );
+    }
+
+    /** Posts a chat card showing an initiative score adjustment. */
+    async _postInitiativeChangeCard(previousInit: number, currentInit: number): Promise<void> {
+        const adjustment = currentInit - previousInit;
+        const increased = adjustment > 0;
+
+        const content = await foundry.applications.handlebars.renderTemplate(
+            'systems/shadowrun5e/dist/templates/chat/initiative-change-message.hbs',
+            {
+                ...this._cardCombatantData(),
+                previousInitiativeTitle: game.i18n.localize('SR5.COMBAT.ModeChangePreviousInitiative'),
+                currentInitiativeTitle: game.i18n.localize('SR5.COMBAT.ModeChangeNewInitiative'),
+                previousInitiative: previousInit,
+                currentInitiative: currentInit,
+                adjustment: this._formatSigned(adjustment),
+                adjustmentClass: increased ? 'is-positive' : 'is-negative',
+                adjustmentIcon: increased ? 'fa-solid fa-angles-up' : 'fa-solid fa-angles-down',
+                adjustmentTitle: game.i18n.localize(increased ? 'SR5.COMBAT.InitiativeIncreased' : 'SR5.COMBAT.InitiativeDecreased'),
+            }
+        );
+
+        const messageData = {
+            content,
+            speaker: foundry.documents.ChatMessage.implementation.getSpeaker({
+                alias: game.i18n.localize('SR5.COMBAT.InitiativeChangedLabel'),
+            }),
+            flags: { core: { initiativeRoll: true } },
+        } as ChatMessage.CreateData;
+
+        if (this.hidden) {
+            messageData.whisper = this._hiddenCardWhisperTargets();
+        } else {
+            ChatMessage.applyMode(messageData, 'public');
+        }
+
+        await foundry.documents.ChatMessage.implementation.create(messageData);
+    }
+
+    /** Whisper targets for hidden cards: GMs plus non-GM owners (`applyMode(..., 'gm')` skips owners). */
+    private _hiddenCardWhisperTargets(): string[] {
+        const gmIds = game.users.filter(user => user.isGM).map(user => user.id);
+        const ownerIds = this.players.map(user => user.id);
+        return [...new Set([...gmIds, ...ownerIds])];
+    }
+
+    /** Shared identification data (name, image and links) used by this combatant's chat cards. */
+    private _cardCombatantData() {
+        return {
+            tokenId: this.token?.id ?? null,
+            documentUuid: this.actor?.uuid ?? this.token?.uuid ?? null,
+            name: this.name ?? game.i18n.localize('COMBAT.UnknownCombatant'),
+            combatantImage: this.token?.texture?.src ?? this.actor?.img ?? null,
+        };
     }
 
     private _getModeConfig(mode: InitiativeModeOptions) {
