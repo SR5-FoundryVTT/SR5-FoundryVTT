@@ -135,7 +135,7 @@ export interface SuccessTestData extends TestData {
 export interface TestOptions {
     showDialog: boolean
     showMessage: boolean
-    rollMode: ChatMessage.MessageMode
+    rollMode: ChatMessage.Mode
 }
 
 export interface SuccessTestMessageData {
@@ -290,10 +290,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * The tests roll mode can be given by specific option, action setting or global configuration.
      * @param options The test options for the whole test
      */
-    _prepareRollMode(data: DeepPartial<T>, options: Partial<TestOptions>): ChatMessage.MessageMode {
+    _prepareRollMode(data: DeepPartial<T>, options: Partial<TestOptions>): ChatMessage.Mode {
         if (options.rollMode != null) return options.rollMode;
-        if (data?.action?.roll_mode) return data.action.roll_mode as ChatMessage.MessageMode;
-        else return game.settings.get(CORE_NAME, 'messageMode');
+        if (data?.action?.roll_mode) return data.action.roll_mode as ChatMessage.Mode;
+        else return game.settings.get(CORE_NAME, 'messageMode') as ChatMessage.Mode;
     }
 
     /**
@@ -1786,10 +1786,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const content = await renderTemplate(this._chatMessageTemplate, templateData);
         // Prepare the actual message.
         const messageData = await this._prepareMessageData(content);
-        const options = { rollMode: this._rollMode };
 
-        //@ts-expect-error // TODO: foundry-vtt-types v10
-        const message = await ChatMessage.create(messageData, options);
+        // Let Foundry apply the message visibility mode, instead of applying whisper ids manually.
+        const message = await ChatMessage.create(messageData, { messageMode: this._rollMode });
 
         if (!message) return;
 
@@ -1946,8 +1945,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * What ChatMessage rollMode is this test supposed to use?
      */
-    get _rollMode() {
-        return this.data.options?.rollMode ?? game.settings.get('core', 'messageMode');
+    get _rollMode(): ChatMessage.Mode {
+        return this.data.options?.rollMode ?? game.settings.get(CORE_NAME, 'messageMode') as ChatMessage.Mode;
     }
 
     /**
@@ -1988,9 +1987,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             },
             sound: CONFIG.sounds.dice,
         }
-
-        // Instead of manually applying whisper ids, let Foundry do it.
-        ChatMessage.applyMode(messageData, this._rollMode);
 
         return messageData;
     }

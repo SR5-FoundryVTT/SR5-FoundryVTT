@@ -1018,7 +1018,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         return [
             SheetFlow._getSourceContextOption(),
             {
-                name: "SR5.ContextOptions.EditItem",
+                label: "SR5.ContextOptions.EditItem",
                 icon: "<i class='fas fa-pen-to-square'></i>",
                 callback: async (target: HTMLElement) => {
                     const id = SheetFlow.closestItemId(target);
@@ -1029,7 +1029,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 }
             },
             {
-                name: "SR5.ContextOptions.DeleteItem",
+                label: "SR5.ContextOptions.DeleteItem",
                 icon: "<i class='fas fa-trash'></i>",
                 callback: async (target: HTMLElement) => {
                     const userConsented = await Helpers.confirmDeletion();
@@ -1048,7 +1048,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         return [
             SheetFlow._getSourceContextOption(),
             {
-                name: "SR5.ContextOptions.EditEffect",
+                label: "SR5.ContextOptions.EditEffect",
                 icon: "<i class='fas fa-pen-to-square'></i>",
                 callback: async (target: HTMLElement) => {
                     const id = SheetFlow.closestEffectId(target);
@@ -1065,7 +1065,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 }
             },
             {
-                name: "SR5.ContextOptions.DeleteEffect",
+                label: "SR5.ContextOptions.DeleteEffect",
                 icon: "<i class='fas fa-trash'></i>",
                 condition: (target: HTMLElement) => {
                     const id = SheetFlow.closestEffectId(target);
@@ -1094,10 +1094,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         ...[event, form, submitData, options]: Parameters<ItemSheet['_processSubmitData']>
     ) {
         if (this.item._isNestedItem) {
-            await this.item.update(submitData as any, options as any);
-        } else {
-            await super._processSubmitData(event, form, submitData, options);
+            await this.item.update(submitData, options);
+            return undefined as any;
         }
+
+        return await super._processSubmitData(event, form, submitData, options);
     }
 
     static async #toggleActionSpecialization(this: SR5ItemSheet) {
@@ -1167,7 +1168,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      *                                    or null in case of failure or no action being taken
      * @protected
      */
-    protected async _onDropDocument(event, document) {
+    protected override async _onDropDocument(event, document): Promise<any> {
         switch (document.documentName) {
             case "ActiveEffect":
                 return (await this._onDropActiveEffect(event, document)) ?? null;
@@ -1193,7 +1194,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      *                                                 created, or otherwise a nullish value
      * @protected
      */
-    async _onDropActiveEffect(event, effect) {
+    override async _onDropActiveEffect(event, effect): Promise<any> {
         if (!this.item.isOwner) return null;
         const keepId = !this.item.effects.has(effect.id);
         const result = await SR5ActiveEffect.create(effect.toObject(), { parent: this.item, keepId });
@@ -1281,7 +1282,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @returns {Promise<void>}
      * @protected
      */
-    override _onDragStart(event: DragEvent) {
+    override async _onDragStart(event: DragEvent) {
         const target = event.currentTarget as HTMLElement;
         const targetElement = event.target as HTMLElement;
         if (targetElement?.dataset && 'link' in targetElement.dataset) return;

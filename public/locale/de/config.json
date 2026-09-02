@@ -68,7 +68,6 @@
         "TokenRulerColorWalkingDescription": "Die Farbe für Distanzen innerhalb der Gehrate.",
         "TokenRulerOpacity": "Token-Bewegung: Deckkraft",
         "TokenRulerOpacityDescription": "Wie transparent die Token-Messungen angezeigt werden. (0 = vollständig transparent, 1 = vollständig undurchsichtig)",
-        "TokenUseRoutingLib": "Verwende RoutingLib Modul",
         "UseDamageConditionDescription": "Das System markiert die Token entsprechend ihrem Zustandsmonitor",
         "UseDamageConditionName": "Systembehandlung für Token-Statuseffekte verwenden",
         "UseImportIconOverridesDescription": "Beim Importieren von Items die gleichen Symbole für verschiedene Itemtypen verwenden, wenn dies sinnvoll ist. Deaktivieren wenn benutzerdefinierte Symbole verwendet werden.",
