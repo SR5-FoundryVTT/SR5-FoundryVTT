@@ -1,10 +1,17 @@
-<label>{{localizeOb item.system.category @root.config.spellCategories}}</label>
-<label>{{localizeOb item.system.type @root.config.spellTypes}}</label>
+{{#unless (empty item.system.category)}}
+    <label>{{localizeOb item.system.category @root.config.spellCategories}}</label>
+{{/unless}}
 {{#if (eq item.system.category 'combat')}}
-    <label>{{localizeOb item.system.combat.type @root.config.combatSpellTypes}}</label>
+    {{#unless (empty item.system.combat.type)}}
+        <label>{{localizeOb item.system.combat.type @root.config.combatSpellTypes}}</label>
+    {{/unless}}
 {{else if (eq item.system.category 'illusion')}}
-    <label>{{localizeOb item.system.illusion.type @root.config.illusionSpellTypes}}</label>
-    <label>{{localizeOb item.system.illusion.sense @root.config.illusionSpellSense}}</label>
+    {{#unless (empty item.system.illusion.type)}}
+        <label>{{localizeOb item.system.illusion.type @root.config.illusionSpellTypes}}</label>
+    {{/unless}}
+    {{#unless (empty item.system.illusion.sense)}}
+        <label>{{localizeOb item.system.illusion.sense @root.config.illusionSpellSense}}</label>
+    {{/unless}}
 {{else if (eq item.system.category 'manipulation')}}
     {{#if item.system.manipulation.damaging}}
         <label>{{localize "SR5.Spell.ManipulationDamaging"}}</label>
@@ -19,7 +26,9 @@
         <label>{{localize "SR5.Spell.ManipulationPhysical"}}</label>
     {{/if}}
 {{else if (eq item.system.category 'detection')}}
-    <label>{{localizeOb item.system.detection.type @root.config.detectionSpellTypes}}</label>
+    {{#unless (empty item.system.detection.type)}}
+        <label>{{localizeOb item.system.detection.type @root.config.detectionSpellTypes}}</label>
+    {{/unless}}
     {{#if item.system.detection.passive}}
         <label>{{localize "SR5.Passive"}}</label>
     {{else}}
@@ -29,6 +38,19 @@
         <label>{{localize "SR5.DetectionSpellExtended"}}</label>
     {{/if}}
 {{/if}}
-<label>{{localizeOb item.system.range @root.config.spellRanges}}</label>
-<label>{{localizeOb item.system.duration @root.config.durations}}</label>
+{{#if item.system.action.damage.element.value}}
+    <label data-tooltip="{{localizeOb item.system.action.damage.element.value @root.config.elementTypes}}">
+        <i class="{{elementIcon item.system.action.damage.element.value}}"></i>
+        {{localizeOb item.system.action.damage.element.value @root.config.elementTypes}}
+    </label>
+{{/if}}
+{{#unless (empty item.system.type)}}
+    <label>{{localizeOb item.system.type @root.config.spellTypes}}</label>
+{{/unless}}
+{{#unless (empty item.system.range)}}
+    <label>{{localizeOb item.system.range @root.config.spellRanges}}</label>
+{{/unless}}
+{{#unless (empty item.system.duration)}}
+    <label>{{localizeOb item.system.duration @root.config.durations}}</label>
+{{/unless}}
 <label>{{localize "SR5.Drain"}}&nbsp;{{localize "SR5.Force"}}{{#if item.system.drain}}{{numberFormat item.system.drain sign=true}}{{/if}}</label>

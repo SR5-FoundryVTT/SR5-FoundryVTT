@@ -292,7 +292,7 @@
                     },
                     "is_hardened": {
                         "hint": "Se esta armadura concede proteção endurecida",
-                        "label": "Endurecida Ativa"
+                        "label": "Endurecida"
                     },
                     "pollutant": {
                         "hint": "Armadura extra contra ataques com Poluentes",
@@ -339,7 +339,18 @@
         "AttrWillpower": "Vontade",
         "Attribute": "Atributo",
         "Attributes": "Atributos",
-        "Availability": "Dispon.",
+        "Availability": "Disponibilidade",
+        "AvailabilityRestriction": "Restrição de disponibilidade",
+        "AvailabilityRestrictions": {
+            "Forbidden": "Proibido",
+            "None": "Nenhuma",
+            "Restricted": "Restrito"
+        },
+        "AvailabilityRestrictionSuffixes": {
+            "Forbidden": "F",
+            "None": "",
+            "Restricted": "R"
+        },
         "Awakened": "Desperto",
         "AwakenedEmerged": "Desperto/Emergido",
         "Barrel": "Cano",
@@ -1073,6 +1084,56 @@
                         "hint": "Tipo de ação que esta perícia utiliza",
                         "label": "Tipo de Ação"
                     }
+                },
+                "technology": {
+                    "availability": {
+                        "hint": "O atributo de Disponibilidade do item, que determina o quão fácil é consegui-lo",
+                        "label": "Disponibilidade"
+                    },
+                    "conceal": {
+                        "base": {
+                            "hint": "O quanto este dispositivo fica escondido das outras pessoas",
+                            "label": "Ocultar"
+                        }
+                    },
+                    "condition_monitor": {
+                        "value": {
+                            "hint": "Dano atual causado ao Monitor de Condição do item",
+                            "label": "Dano no Monitor de Condição"
+                        }
+                    },
+                    "cost": {
+                        "hint": "Quantia em dinheiro que este item custa",
+                        "label": "Custo"
+                    },
+                    "equipped": {
+                        "hint": "Se o item está equipado",
+                        "label": "Equipado"
+                    },
+                    "master": {
+                        "hint": "Dispositivo Mestre ao qual este item está subordinado, formando uma RAP ou RAA",
+                        "label": "Dispositivo Mestre"
+                    },
+                    "max_rating": {
+                        "hint": "O maior Nível pelo qual este item pode ser comprado. Zero significa que o item não tem limite de nível.",
+                        "label": "Nível Máximo"
+                    },
+                    "quantity": {
+                        "hint": "A quantidade de itens que este Item representa",
+                        "label": "Quantidade"
+                    },
+                    "rating": {
+                        "hint": "O Nível de Dispositivo do item, que influencia as ações de matriz.",
+                        "label": "Nível"
+                    },
+                    "show_quantity": {
+                        "hint": "Se a Quantidade deste Item deve ser exibida na ficha do Ator e no cabeçalho da ficha do Item",
+                        "label": "Mostrar Quantidade"
+                    },
+                    "wireless": {
+                        "hint": "O estado de conexão sem fio do item",
+                        "label": "Conexão Sem Fio"
+                    }
                 }
             }
         },
@@ -1169,7 +1230,8 @@
                 "OpenInventory": "Inventário"
             },
             "Item": {
-                "Network": "Rede"
+                "Network": "Rede",
+                "Properties": "Propriedades do item"
             },
             "Message": {
                 "ClickToSelect": "Clique para selecionar na cena",
@@ -1375,6 +1437,7 @@
         "OpposedType": "Tipo",
         "OpposingHits": "Acertos de Oposição",
         "OpposingNetHits": "Acertos Excedentes de Oposição",
+        "Options": "Opções",
         "OriginalDicePool": "Grupo Original de Dados",
         "OutOfRange": "Fora de Alcance",
         "Overflow": "Excesso de Dano",
@@ -1601,6 +1664,8 @@
             "DetectionArea": "Área",
             "DetectionDirectional": "Direcional",
             "DetectionPsychic": "Psíquico",
+            "Elemental": "Elemental",
+            "HealthEssence": "Essência",
             "IllusionMultiSense": "Multi-Sentido",
             "IllusionObvious": "Óbvio",
             "IllusionRealistic": "Realista",
@@ -1896,10 +1961,8 @@
                 "ActionCategories": "Selecione categorias de ação para usar em vez das categorias padrão do teste. Usando Efeitos Ativos, você pode usar categorias para modificar valores de teste",
                 "ActionModifier": "Selecione modificadores de reserva de dados para usar em vez dos modificadores padrão do teste",
                 "ActionRollMode": "Modo de rolagem padrão ao lançar esta ação. Substituirá a configuração global do chat",
-                "AvailabilityAdjustment": "Ajuste a disponibilidade real com base no nível do item",
                 "AmmoReplaceDamage": "Defina para substituir o dano da arma em vez de modificá-lo",
-                "DisabledForPreparedActor": "Desativado devido ao uso de ator preparado",
-                "CostAdjustment": "Ajuste o custo real com base na nível do item"
+                "DisabledForPreparedActor": "Desativado devido ao uso de ator preparado"
             },
             "Modifiers": {
                 "armor": "Modifica o valor total da armadura",

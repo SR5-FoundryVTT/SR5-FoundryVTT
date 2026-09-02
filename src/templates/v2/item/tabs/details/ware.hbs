@@ -1,0 +1,30 @@
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{localize (objValue @root.config.itemTypes item.type)}}</label>
+    </div>
+</div>
+
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.grade.hint}}">{{systemFields.grade.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.grade value=source.system.grade localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="SR5.EssenceCost">{{localize "SR5.EssenceCost"}}</label>
+    </div>
+    <div class="list-item-col">
+        {{#if @root.isEditMode}}
+            {{formInput systemFields.essence value=source.system.essence classes="short"
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+        {{else}}
+            {{formInput systemFields.essence value=system.technology.essence.value classes="short"
+                        rootId=@root.rootId disabled=true}}
+        {{/if}}
+    </div>
+</div>

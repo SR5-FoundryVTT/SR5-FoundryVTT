@@ -597,7 +597,7 @@
                     },
                     "is_hardened": {
                         "hint": "Wenn diese Panzerung verstärkten Schutz gewährt",
-                        "label": "Verstärkt Aktiv"
+                        "label": "Verstärkt"
                     },
                     "immunities": {
                         "hint": "Damage sources this armor grants Immunity against",
@@ -649,7 +649,18 @@
         "AttrWillpower": "Willenskraft",
         "Attribute": "Attribut",
         "Attributes": "Attribute",
-        "Availability": "Verf.",
+        "Availability": "Verfügbarkeit",
+        "AvailabilityRestriction": "Verfügbarkeitsbeschränkung",
+        "AvailabilityRestrictions": {
+            "Forbidden": "Verboten",
+            "None": "Keine",
+            "Restricted": "Eingeschränkt"
+        },
+        "AvailabilityRestrictionSuffixes": {
+            "Forbidden": "F",
+            "None": "",
+            "Restricted": "R"
+        },
         "Awakened": "Erwacht",
         "AwakenedEmerged": "Magie/Resonanz",
         "Barrel": "Laufmontiert",
@@ -1759,6 +1770,10 @@
                         "hint": "Master zu dem dieses Gerät als Teil eines PAN/WAN geslaved ist.",
                         "label": "Master"
                     },
+                    "max_rating": {
+                        "hint": "Die höchste Stufe, auf die dieser Gegenstand gekauft werden kann. Null bedeutet, dass der Gegenstand keine Stufenobergrenze hat.",
+                        "label": "Maximale Stufe"
+                    },
                     "quantity": {
                         "hint": "Welche Anzahl dieses Gegenstands ist im Inventar?",
                         "label": "Anzahl"
@@ -1933,7 +1948,8 @@
                 "AvailabilityAdjustment": "Skaliere Verfügbarkeit mit Stufe",
                 "CostAdjustment": "Skaliere Kosten mit Stufe",
                 "EssenceAdjustment": "Skaliere Essenz mit Stufe",
-                "Network": "Netzwerk"
+                "Network": "Netzwerk",
+                "Properties": "Gegenstandseigenschaften"
             },
             "MarkPlacement": {
                 "PlaceOnDevice": "Platziere auf Gerät",
@@ -2283,6 +2299,7 @@
         "OpposedType": "Typ",
         "OpposingHits": "Gegn. Erfolge",
         "OpposingNetHits": "Gegn. Nettoerfolge",
+        "Options": "Optionen",
         "OriginalDicePool": "Originaler Würfelpool",
         "OutOfRange": "Außer Reichweite",
         "Overflow": "Überschuss",
@@ -2688,6 +2705,7 @@
             "DetectionArea": "Ungerichtet",
             "DetectionDirectional": "Gerichtet",
             "DetectionPsychic": "Übersinnlich",
+            "Elemental": "Elementar",
             "FIELDS": {
                 "category": {
                     "hint": "Zauberkategorie",
@@ -2764,6 +2782,7 @@
                     "label": "Zauberart"
                 }
             },
+            "HealthEssence": "Essenz",
             "IllusionMultiSense": "Vollsensorisch",
             "IllusionObvious": "Offensichtlich",
             "IllusionRealistic": "Realistisch",
@@ -3184,8 +3203,6 @@
                 "ActionRollMode": "Standard Würfelmodus für diese Aktion. Überschreibt globale Chat Einstellung",
                 "AddQuantity": "Füge zu 1. {qtySome}: Füge zu 5. {qtyMany}: Füge zu 20.",
                 "AmmoReplaceDamage": "Setzen um Waffenschaden zu ersetzen anstatt zu modifizieren",
-                "AvailabilityAdjustment": "Berechne Verfügbarkeit abhängig von der Stufe.",
-                "CostAdjustment": "Berechne die tatsächlichen Kosten basierend auf der Stufe",
                 "DisabledForPreparedActor": "Deaktiviert da ein vorbereiteter Akteur verwendet wird",
                 "EssenceAdjustment": "Berechne die tatsächlichen Essenzkosten basierend auf der Stufe",
                 "RemoveQuantity": "Entferne 1. {qtySome}: Entferne 5. {qtyMany}: Entferne 20.",
