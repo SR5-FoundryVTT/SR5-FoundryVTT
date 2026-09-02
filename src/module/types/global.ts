@@ -110,6 +110,13 @@ declare module "fvtt-types/configuration" {
         name: "shadowrun5e";
     }
 
+    namespace CONFIG.ActiveEffect {
+        interface ExpiryEvents {
+            sr5MyActionStart: string;
+            sr5MyActionEnd: string;
+        }
+    }
+
     namespace CONFIG.Canvas {
         interface DetectionModes {
             astralPerception: AstralPerceptionDetectionMode;
