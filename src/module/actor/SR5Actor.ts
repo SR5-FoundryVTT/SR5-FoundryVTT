@@ -136,9 +136,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /** Share skill pack reads across a creation. */
-    static override async createDocuments<Temporary extends boolean | undefined = undefined>(
+    static override async createDocuments(
         data: Actor.CreateInput[],
-        operation?: Actor.Database.CreateDocumentsOperation<Temporary>,
+        operation?: Actor.Database.CreateDocumentsOperation,
     ) {
         return PackItemFlow.withSkillPackCache(async () => await super.createDocuments(data, operation));
     }
@@ -226,10 +226,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param {string} phase The application phase under which changes are to be applied.
      * @override
      */
-    override applyActiveEffects(...args) {
+    override applyActiveEffects(phase?: ActiveEffect.ChangePhase) {
+        phase ??= 'initial';
+
         // Errors during change application will stop that process and cause a broken sheet.
         try {
-            super.applyActiveEffects(...args);
+            super.applyActiveEffects(phase);
         } catch (error) {
             console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
             console.error(error);
@@ -1128,7 +1130,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-    async startTeamworkTest(skillId: string, options?: ChatMessage.Database.CreateOperation<undefined>) {
+    async startTeamworkTest(skillId: string, options?: ChatMessage.Database.CreateOperation) {
         console.info(`Shadowrun5e | Starting teamwork test for ${skillId}`);
 
         // Prepare message content.
@@ -1596,7 +1598,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         const currentPerception = this.system.initiative.perception;
         const fromMode = currentPerception !== 'matrix' ? currentPerception
-            : (this.system.matrix?.hot_sim ? 'hot_sim' : 'cold_sim');
+            : (this.isUsingHotSim ? 'hot_sim' : 'cold_sim');
 
         if (fromMode === mode) return;
 
@@ -1604,9 +1606,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const updateData = {
             system: {
                 initiative: { perception: isMatrixMode ? 'matrix' : mode },
-                // Setting hot-sim to false is necessary even if new ini mode is non-matrix.
-                // Otherwise matrix modifiers will still apply when in non-matrix mode.
-                ...(this.system.matrix && { matrix: { hot_sim: mode === 'hot_sim' } }),
+                // Matrix initiative uses VR. Clear both flags when leaving it so its
+                // modifiers do not continue to apply in meatspace or astral mode.
+                ...(this.system.matrix && {
+                    matrix: {
+                        vr: isMatrixMode,
+                        hot_sim: mode === 'hot_sim',
+                    },
+                }),
             },
         } as const;
 

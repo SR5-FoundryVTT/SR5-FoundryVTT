@@ -16,7 +16,7 @@ interface CompendiumItemEntry {
  * also present in the same pack.
  */
 export class SR5ItemCompendium extends foundry.applications.sidebar.apps.Compendium<typeof SR5Item> {
-    protected async _createDroppedEntry(entry: SR5Item, updates: Record<string, unknown> = {}) {
+    protected override async _createDroppedEntry(entry: SR5Item, updates: Record<string, unknown> = {}) {
         const collection = (this as any).collection as foundry.documents.collections.CompendiumCollection<'Item'>;
         const root = entry.clone(updates, { keepId: true });
         root.updateSource({ system: { parentId: null } });

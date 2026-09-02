@@ -24,7 +24,7 @@ type InitiativeSummaryRow = {
     document: TokenDocument | SR5Actor | null;
 
     // Dice So Nice animation support
-    roll: Roll;
+    roll: Roll.Implementation;
     combatant: SR5Combatant;
 };
 
@@ -128,7 +128,6 @@ export class SR5Combat extends Combat<"base"> {
 
     // Foundry's Combat interface defines nextCombatant as a getter, but SR5's initiative flow
     // doesn't have a single "next" combatant due to initiative passes.
-    // @ts-expect-error it will be correctly typed later
     override get nextCombatant(): undefined { return undefined; }
 
 
@@ -421,7 +420,7 @@ export class SR5Combat extends Combat<"base"> {
         const messageGroups = {
             public: [] as InitiativeSummaryRow[],
             gm: [] as InitiativeSummaryRow[],
-        } satisfies Partial<Record<ChatMessage.MessageMode, InitiativeSummaryRow[]>>;
+        } satisfies Partial<Record<ChatMessage.Mode, InitiativeSummaryRow[]>>;
 
         for (const id of combatantIds) {
             const combatant = this.combatants.get(id) as SR5Combatant | undefined;
@@ -596,7 +595,7 @@ export class SR5Combat extends Combat<"base"> {
      * @param messageOptions - Base configuration options for the created ChatMessage documents.
      */
     private async _createInitiativeMessages(
-        messageGroups: Partial<Record<ChatMessage.MessageMode, InitiativeSummaryRow[]>>,
+        messageGroups: Partial<Record<ChatMessage.Mode, InitiativeSummaryRow[]>>,
         messageOptions: ChatMessage.CreateData,
     ) {
         let hasPlayedSound = false;
@@ -645,7 +644,7 @@ export class SR5Combat extends Combat<"base"> {
     private _buildInitiativeRow(
         combatant: SR5Combatant,
         initiative: number,
-        roll: Roll,
+        roll: Roll.Implementation,
     ): InitiativeSummaryRow {
         const { actor, token, name } = combatant;
         const initiativeData = actor?.system?.initiative;
@@ -686,7 +685,7 @@ export class SR5Combat extends Combat<"base"> {
         };
     }
 
-    private _extractRollResults(roll: Roll): number[] {
+    private _extractRollResults(roll: Roll.Implementation): number[] {
         return roll.dice.flatMap(d => d.results.filter(r => r.active).map(r => r.result));
     }
 
@@ -699,7 +698,7 @@ export class SR5Combat extends Combat<"base"> {
      * @param base - The combatant's base initiative score.
      * @returns A formatted HTML string representing the tooltip.
      */
-    private _buildInitiativeTooltipHtml(actor: SR5Actor | null, roll: Roll, base: number): string {
+    private _buildInitiativeTooltipHtml(actor: SR5Actor | null, roll: Roll.Implementation, base: number): string {
         const wounds = actor?.system.wounds?.value;
         const penalty = Math.abs((this.pass - SR.combat.FIRST_PASS) * SR.combat.PASS_PENALTY);
 

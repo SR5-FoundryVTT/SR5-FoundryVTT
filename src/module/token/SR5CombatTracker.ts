@@ -69,7 +69,7 @@ export class SR5CombatTracker extends CombatTracker {
         const options = super._getEntryContextOptions();
 
         options.splice(1, 0, {
-            name: game.i18n.localize('SR5.COMBAT.SeizeInitiative'),
+            label: game.i18n.localize('SR5.COMBAT.SeizeInitiative'),
             icon: '<i class="fa-solid fa-angles-up"></i>',
             condition: li => {
                 const combatant = this._getCombatant(li);

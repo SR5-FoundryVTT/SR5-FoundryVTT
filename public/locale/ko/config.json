@@ -70,7 +70,6 @@
         "TokenRulerColorWalkingDescription": "걷기 범위 내에서의 색상.",
         "TokenRulerOpacity": "토큰 이동 투명도",
         "TokenRulerOpacityDescription": "토큰 눈금 자 표시의 불투명도. (0 = 완전 투명, 1 = 완전 불투명)",
-        "TokenUseRoutingLib": "RoutingLib 사용",
         "UseDamageConditionDescription": "시스템이 상태 측정기에 따라 토큰을 표시",
         "UseDamageConditionName": "토큰 상태 효과에 시스템 처리 사용",
         "UseImportIconOverridesDescription": "물품 불러오기 시 서로 다른 물품 유형에 동일한 아이콘을 사용하는 것이 합리적일 경우 사용. 사용자 지정 아이콘을 사용하는 경우 체크 해제.",

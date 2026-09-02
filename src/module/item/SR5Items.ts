@@ -1,5 +1,4 @@
 import { SR5Item } from './SR5Item';
-import { DeepPartial } from 'fvtt-types/utils';
 
 /**
  * World Item collection with support for dnd5e-style container references.
@@ -13,14 +12,14 @@ export class SR5Items extends foundry.documents.collections.Items {
         });
     }
 
-    override async importFromCompendium<Temporary extends boolean | undefined = undefined>(
+    override async importFromCompendium(
         pack: foundry.documents.collections.CompendiumCollection<'Item'>,
         id: string,
-        updateData: DeepPartial<Item.CreateData> = {},
-        options: foundry.documents.abstract.WorldCollection.ImportFromCompendiumOptions<'Item', Temporary> = {}
-    ): Promise<Item.TemporaryIf<Temporary>> {
+        updateData: Item.UpdateData = {},
+        options: foundry.documents.abstract.WorldCollection.ImportDocumentOptions<'Item'> = {}
+    ): Promise<Item.Stored | undefined> {
         const created = await super.importFromCompendium(pack, id, updateData, options);
-        if (options.temporary) return created;
+        if (!created) return created;
 
         const source = await pack.getDocument(id) as SR5Item | undefined;
         if (!source) return created;

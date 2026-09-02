@@ -197,7 +197,8 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
         await this._finishPlacement(event);
         const destination = canvas.grid!.getSnappedPoint({x: this.document.x, y: this.document.y}, {mode: CONST.GRID_SNAPPING_MODES.CENTER});
         this.document.updateSource(destination);
-        this.#events.resolve(canvas.scene!.createEmbeddedDocuments("MeasuredTemplate", [this.document.toObject()]));
+        const cls = CONFIG.MeasuredTemplate.documentClass;
+        this.#events.resolve(cls.createDocuments([this.document.toObject()], { parent: canvas.scene }));
     }
 
     /* -------------------------------------------- */
