@@ -274,8 +274,8 @@ export class SR5Combatant extends Combatant<"base"> {
     }
 
     async playDSNInitiativeAnimation(
-        roll: Roll,
-        rollMode: ChatMessage.MessageMode,
+        roll: Roll.Implementation,
+        rollMode: ChatMessage.Mode,
         message: Pick<ChatMessage, 'id' | 'speaker' | 'whisper'>,
     ): Promise<boolean> {
         if (!game.modules.get('dice-so-nice')?.active || !game.dice3d) return false;

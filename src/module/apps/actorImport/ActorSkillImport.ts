@@ -30,7 +30,7 @@ type ImportedActorWithSkills = Actor.CreateData & {
     type: string;
     items: Item.CreateData[];
     system: {
-        skillset?: string;
+        skillset?: string | null;
     };
 };
 

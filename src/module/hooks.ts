@@ -382,6 +382,7 @@ ___________________
         // Register document classes
         CONFIG.Actor.documentClass = SR5Actor;
         CONFIG.Item.documentClass = SR5Item;
+        // @ts-expect-error fvtt-types doesn't allow custom combatTracker yet
         CONFIG.ui.combat = SR5CombatTracker;
         CONFIG.Combat.documentClass = SR5Combat;
         CONFIG.Combatant.documentClass = SR5Combatant;
@@ -409,6 +410,7 @@ ___________________
 
         // Register general SR5Roll for JSON serialization support.
         CONFIG.Dice.terms[SR5Die.DENOMINATION] = SR5Die;
+        // @ts-expect-error // fvtt-types doesn't allow custom rolls yet
         CONFIG.Dice.rolls.push(SR5Roll);
         // @ts-expect-error // Register the SR5Roll dnd5e style.
         CONFIG.Roll = SR5Roll;
@@ -685,7 +687,7 @@ ___________________
      * @param data The update data given.
      * @param id The items id.
      */
-    static async updateIcConnectedToHostItem(item: SR5Item, data: Item.UpdateData, options: Item.Database.UpdateOptions, userId: string) {
+    static async updateIcConnectedToHostItem(item: SR5Item, data: Item.UpdateData, options: Item.Database.OnUpdateOptions, userId: string) {
         // Trigger type specific behaviour.
         if (item.isType('host'))
             await MatrixICFlow.handleUpdateItemHost(item);
