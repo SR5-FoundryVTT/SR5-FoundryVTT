@@ -1,8 +1,6 @@
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { Helpers } from '@/module/helpers';
-import { TestCreator } from '@/module/tests/TestCreator';
-import { SR5 } from '@/module/config';
-import { TokenLockHooks } from './TokenLockHooks';
+import { RiggerFlow } from '@/module/flows/RiggerFlow';
 
 const { TokenHUD } = foundry.applications.hud;
 
@@ -60,58 +58,7 @@ export class SR5TokenHUD extends TokenHUD {
             event.preventDefault();
             event.stopPropagation();
 
-            if (isJumpedIn) {
-                // Jump Out
-                const currentDriver = actor.getVehicleDriver() || driver;
-                await actor.update({ system: { controlMode: 'autopilot' } } as any);
-                if (currentDriver) {
-                    await TokenLockHooks.setJumpedInState(currentDriver, null, false);
-                }
-
-                ui.notifications?.info(game.i18n.format('SR5.Rigger.JumpedOutSuccess', { vehicle: actor.name }));
-            } else {
-                // Jump In
-                if (!driver) {
-                    ui.notifications?.error(game.i18n.localize('SR5.Errors.NoDriverSelectedForJumpIn'));
-                    return;
-                }
-
-                // If player does not own the vehicle, trigger a Jump In test first
-                if (!actor.isOwner && !game.user.isGM) {
-                    ui.notifications?.info(game.i18n.format('SR5.Rigger.JumpInTestRequired', { vehicle: actor.name }));
-                    const test = await TestCreator.fromPackAction(
-                        SR5.packNames.GeneralActionsPack,
-                        'drone_pilot_vehicle',
-                        actor,
-                        { showDialog: true }
-                    );
-                    if (test) {
-                        await test.execute();
-                    }
-                }
-
-                if (driver.uuid) {
-                    await actor.addVehicleDriver(driver.uuid);
-                }
-
-                await actor.update({ system: { controlMode: 'rigger' } } as any);
-                await driver.update({
-                    system: {
-                        matrix: {
-                            vr: true,
-                            hot_sim: true
-                        }
-                    }
-                } as any);
-
-                await TokenLockHooks.setJumpedInState(driver, actor, true);
-
-                ui.notifications?.info(game.i18n.format('SR5.Rigger.JumpedInSuccess', {
-                    rigger: driver.name,
-                    vehicle: actor.name
-                }));
-            }
-
+            await RiggerFlow.toggleJumpIn(driver, actor);
             this.render();
         });
 

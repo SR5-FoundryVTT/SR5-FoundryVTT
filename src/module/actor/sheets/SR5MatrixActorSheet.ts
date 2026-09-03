@@ -10,6 +10,7 @@ import { MatrixSheetFlow } from '@/module/flows/MatrixSheetFlow';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { NetworkManager } from '@/module/apps/NetworkManager';
+import { RiggerFlow } from '@/module/flows/RiggerFlow';
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import ActorAttribute = Shadowrun.ActorAttribute;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
@@ -73,6 +74,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             setupPAN: SR5MatrixActorSheet.#addAllEquippedWirelessDevicesToPAN,
             removeMarks: SR5MatrixActorSheet.#deleteMarks,
             clearAllMarks: SR5MatrixActorSheet.#clearAllMarks,
+            toggleJumpInIcon: SR5MatrixActorSheet.#toggleJumpInIcon,
         },
     };
 
@@ -307,6 +309,20 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     static async #togglePersonaRunningSilent(this: SR5MatrixActorSheet) {
         await MatrixSheetFlow.toggleRunningSilent(this.actor);
+    }
+
+    static async #toggleJumpInIcon(this: SR5MatrixActorSheet, event: PointerEvent) {
+        event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
+
+        const uuid = SheetFlow.closestUuid(event.target);
+        if (!uuid) return;
+
+        const vehicleActor = (await fromUuid(uuid)) as SR5Actor | null;
+        if (!vehicleActor || !(vehicleActor instanceof SR5Actor) || !vehicleActor.isType('vehicle')) return;
+
+        await RiggerFlow.toggleJumpIn(this.actor, vehicleActor);
+        void this.render();
     }
 
     /**

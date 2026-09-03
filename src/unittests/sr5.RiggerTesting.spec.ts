@@ -3,6 +3,7 @@ import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { SR5 } from '@/module/config';
 import { RiggingRules } from '@/module/rules/RiggingRules';
+import { RiggerFlow } from '@/module/flows/RiggerFlow';
 
 export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -325,6 +326,45 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
 
             // Dice pool should include Pilot (3) + Swarm Bonus (2) = 5
             assert.equal(test!.pool.value, 5);
+        });
+
+        it('RiggerFlow handles jumpIn, Active Effect skill transfer, and jumpOut correctly', async () => {
+            const driver = await createDriver();
+            const vehicle = await createVehicle();
+            await vehicle.update({ system: { vehicleType: 'air' } });
+
+            await RiggerFlow.jumpIn(driver, vehicle);
+
+            assert.equal(vehicle.system.controlMode, 'rigger');
+            assert.equal(vehicle.getVehicleDriver()?.uuid, driver.uuid);
+
+            const jumpedEffect = vehicle.effects.find(e => (e.flags as any)?.shadowrun5e?.isJumpedInEffect === true);
+            assert.notEqual(jumpedEffect, undefined);
+
+            const pilotAircraftChange = (jumpedEffect?.system as any)?.changes?.find((c: any) => c.key === 'system.skills.active.pilot_aircraft.value');
+            assert.notEqual(pilotAircraftChange, undefined);
+            assert.equal(pilotAircraftChange?.value, '5');
+
+            const gunneryChange = (jumpedEffect?.system as any)?.changes?.find((c: any) => c.key === 'system.skills.active.gunnery.value');
+            assert.notEqual(gunneryChange, undefined);
+            assert.equal(gunneryChange?.value, '5');
+
+            // Test jump out for non-drone vehicle (driver stays in seat)
+            await RiggerFlow.jumpOut(driver, vehicle);
+            assert.equal(vehicle.system.controlMode, 'autopilot');
+            assert.equal(vehicle.getVehicleDriver()?.uuid, driver.uuid);
+            const jumpedEffectAfter = vehicle.effects.find(e => (e.flags as any)?.shadowrun5e?.isJumpedInEffect === true);
+            assert.equal(jumpedEffectAfter, undefined);
+
+            // Test jump out for drone across different vehicle types (driver is unassigned for all drone types)
+            for (const vType of ['air', 'ground', 'water', 'walker'] as const) {
+                const testDrone = await createVehicle();
+                await testDrone.update({ system: { isDrone: true, vehicleType: vType } });
+                await RiggerFlow.jumpIn(driver, testDrone);
+                assert.equal(testDrone.getVehicleDriver()?.uuid, driver.uuid);
+                await RiggerFlow.jumpOut(driver, testDrone);
+                assert.equal(testDrone.hasDriver(), false);
+            }
         });
     });
 };

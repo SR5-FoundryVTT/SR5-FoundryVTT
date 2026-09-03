@@ -4,6 +4,7 @@ import { SYSTEM_NAME } from '@/module/constants';
 export const TokenLockHooks = {
     registerHooks: () => {
         Hooks.on('preUpdateToken', TokenLockHooks.onPreUpdateToken_LockJumpedInRigger);
+        Hooks.on('preUpdateToken', TokenLockHooks.onPreUpdateToken_NotifyDroneMovement);
     },
 
     /**
@@ -21,6 +22,10 @@ export const TokenLockHooks = {
                     await t.update({ locked: true });
                 }
             }
+            // Add lock status effect symbol to driver character
+            await driver.toggleStatusEffect('sr5jumpedIn', { active: true });
+            // Add steering wheel status effect symbol to vehicle actor
+            await vehicle.toggleStatusEffect('sr5riggedVehicle', { active: true });
         } else {
             await (driver as any).unsetFlag(SYSTEM_NAME, 'jumpedInVehicle');
             const charId = driver.id ? driver.id.split('.').pop()! : '';
@@ -29,6 +34,11 @@ export const TokenLockHooks = {
                 if (t.actor?.id && (t.actor.id === driver.id || t.actor.id.split('.').pop() === charId)) {
                     await t.update({ locked: false });
                 }
+            }
+            // Remove lock status effect symbol from driver character
+            await driver.toggleStatusEffect('sr5jumpedIn', { active: false });
+            if (vehicle) {
+                await vehicle.toggleStatusEffect('sr5riggedVehicle', { active: false });
             }
         }
     },
@@ -50,6 +60,37 @@ export const TokenLockHooks = {
                 vehicle: vehicleName
             }));
             return false; // Abort token position update in Foundry VTT!
+        }
+    },
+
+    /**
+     * Provide a visual movement indicator on canvas when a jumped-in drone/vehicle token is moved.
+     */
+    onPreUpdateToken_NotifyDroneMovement: (tokenDoc: TokenDocument, update: Record<string, any>): void => {
+        if (!('x' in update || 'y' in update)) return;
+
+        const actor = tokenDoc.actor as SR5Actor | null;
+        if (!actor || !actor.isType('vehicle')) return;
+
+        if (actor.system.controlMode === 'rigger') {
+            const driver = actor.getVehicleDriver();
+            const riggerName = driver?.name || 'Rigger';
+            const vehicleName = tokenDoc.name || actor.name;
+            const msg = game.i18n.format('SR5.Rigger.RiggerMovingVehicle', {
+                rigger: riggerName,
+                vehicle: vehicleName
+            });
+
+            if ((canvas as any).interface?.createScrollingText && (tokenDoc as any).object?.center) {
+                (canvas as any).interface.createScrollingText((tokenDoc as any).object.center, msg, {
+                    anchor: (CONST as any).TEXT_ANCHOR_POINTS.TOP,
+                    direction: (CONST as any).TEXT_ANCHOR_POINTS.TOP,
+                    fill: 0xffaa00,
+                    stroke: 0x000000,
+                    strokeThickness: 4,
+                    fontSize: 22
+                });
+            }
         }
     }
 };

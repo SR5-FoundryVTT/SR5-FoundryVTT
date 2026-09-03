@@ -25,6 +25,25 @@
 
         <div class="list-item-icons midd-icons">
             {{!-- Add Icons for what the Owner of an item can do --}}
+            {{#if (isType item.document 'vehicle')}}
+                {{#if (eq item.document.system.controlMode 'rigger')}}
+                    <button class="icon sr5-icon active"
+                            data-action="toggleJumpInIcon"
+                            data-uuid="{{item.document.uuid}}"
+                            data-tooltip="SR5.Rigger.JumpOut"
+                            title="{{localize 'SR5.Rigger.JumpOut'}}">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                {{else}}
+                    <button class="icon sr5-icon"
+                            data-action="toggleJumpInIcon"
+                            data-uuid="{{item.document.uuid}}"
+                            data-tooltip="SR5.Rigger.JumpIn"
+                            title="{{localize 'SR5.Rigger.JumpIn'}}">
+                        <i class="fas fa-steering-wheel"></i>
+                    </button>
+                {{/if}}
+            {{/if}}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item.document }}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/connected-icons-toggle.hbs' item }}
         </div>

@@ -828,7 +828,9 @@
             "JumpOut": "Jump Out",
             "JumpedInSuccess": "{rigger} jumped into {vehicle}",
             "JumpedOutSuccess": "Jumped out of {vehicle}",
-            "JumpInTestRequired": "Jumping into unowned vehicle {vehicle} requires a test."
+            "JumpInTestRequired": "Jumping into unowned vehicle {vehicle} requires a test.",
+            "JumpedInEffectName": "Jumped-In ({rigger})",
+            "RiggerMovingVehicle": "{rigger} is piloting {vehicle}"
         },
         "Swarm": {
             "Toggle": "Toggle Swarm",
@@ -2990,7 +2992,9 @@
         },
         "StatusEffects": {
             "Running": "Running",
-            "Sprinting": "Sprinting"
+            "Sprinting": "Sprinting",
+            "JumpedIn": "Jumped-In (Movement Locked)",
+            "RiggedVehicle": "Rigged Vehicle (Rigger Active)"
         },
         "Stock": "Stock",
         "StreetCred": "Street Cred",

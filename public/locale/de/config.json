@@ -830,7 +830,9 @@
             "JumpOut": "Hinausspringen",
             "JumpedInSuccess": "{rigger} ist in {vehicle} hineingesprungen",
             "JumpedOutSuccess": "Aus {vehicle} hinausgesprungen",
-            "JumpInTestRequired": "Das Hineinspringen in das fremde Fahrzeug {vehicle} erfordert eine Probe."
+            "JumpInTestRequired": "Das Hineinspringen in das fremde Fahrzeug {vehicle} erfordert eine Probe.",
+            "JumpedInEffectName": "Hineingesprungen ({rigger})",
+            "RiggerMovingVehicle": "{rigger} steuert {vehicle}"
         },
         "Swarm": {
             "Toggle": "Schwarm umschalten",
@@ -3663,7 +3665,9 @@
         "WirelessUnavailable": "Kabel",
         "StatusEffects": {
             "Running": "Laufen",
-            "Sprinting": "Sprint"
+            "Sprinting": "Sprint",
+            "JumpedIn": "Hineingesprungen (Bewegung gesperrt)",
+            "RiggedVehicle": "Geriggtes Fahrzeug (Rigger aktiv)"
         }
     },
     "TYPES": {
