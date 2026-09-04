@@ -122,9 +122,13 @@ export class PreparationCreationTest extends SuccessTest<PreparationCreationTest
         const reagents = Number(this.data.reagents);
 
         const label = SpellcastingRules.limitIsReagentInsteadOfForce(reagents) ? 'SR5.Reagent' : 'SR5.Force';
-        ModifiableValue.addUniqueBase(
-            this.data.limit, label, SpellcastingRules.calculateLimit(force, reagents)
-        );
+        const limit = new ModifiableValue(this.data.limit);
+
+        // Reagents replace Force as the limit. Remove both possible previous entries because this
+        // method runs before and after the dialog, where the selected source can change.
+        limit.remove('SR5.Force');
+        limit.remove('SR5.Reagent');
+        limit.addUniqueBase(label, SpellcastingRules.calculateLimit(force, reagents));
     }
 
     override calculateBaseValues() {

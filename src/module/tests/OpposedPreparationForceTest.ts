@@ -7,6 +7,7 @@ import { DeepPartial } from "fvtt-types/utils";
 import { PreparationCreationTest } from './PreparationCreationTest';
 import { Translation } from '../utils/strings';
 import { spellPartKeys } from '../types/template/SpellPart';
+import { AlchemyRules } from '../rules/AlchemyRules';
 
 const { fromUuid } = foundry.utils;
 
@@ -157,6 +158,21 @@ export class OpposedPreparationForceTest extends OpposedTest<OpposedPreparationF
             spellSnapshot[key] = foundry.utils.duplicate(spell.system[key]);
         }
 
+        // A preparation must retain the spell payload used by the defense/resistance chain. Do
+        // not copy the spell's casting pool, limit, or modifiers: activation supplies its own
+        // Force + Potency pool and Force limit.
+        const actionSnapshot = {
+            damage: foundry.utils.duplicate(spell.system.action.damage),
+            opposed: foundry.utils.duplicate(spell.system.action.opposed),
+        };
+
+        const triggerTime = this.against.data.trigger === 'time'
+            ? AlchemyRules.effectiveTriggerTime(
+                Number(this.against.data.triggerTime),
+                this.against.data.potency
+            )
+            : Math.max(Number(this.against.data.triggerTime), 0);
+
         const itemData = {
             name: `${spell.name} (${game.i18n.localize('SR5.ItemTypes.Preparation')})`,
             type: 'preparation' as const,
@@ -164,10 +180,13 @@ export class OpposedPreparationForceTest extends OpposedTest<OpposedPreparationF
             system: {
                 ...spellSnapshot,
                 description: foundry.utils.duplicate(spell.system.description),
+                action: actionSnapshot,
                 spellUuid: spell.uuid,
                 force: this.against.data.force,
                 trigger: this.against.data.trigger,
-                triggerTime: this.against.data.triggerTime,
+                // An overlong timer activates at the latest legal instant instead of silently
+                // remaining armed past the chosen trigger's rules limit. SR5#305.
+                triggerTime,
                 potency: { base: potency, value: potency },
                 created: { worldTime: game.time.worldTime },
                 inert: false,

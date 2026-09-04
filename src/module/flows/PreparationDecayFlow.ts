@@ -1,6 +1,8 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { AlchemyRules } from "../rules/AlchemyRules";
+import { TestCreator } from "../tests/TestCreator";
+import { PreparationTriggerTest } from "../tests/PreparationTriggerTest";
 
 /**
  * React to world time passing for alchemical preparations.
@@ -12,6 +14,10 @@ import { AlchemyRules } from "../rules/AlchemyRules";
  * See SR5#305 'The Finished Preparation'.
  */
 export const PreparationDecayFlow = {
+    // A burst of world-time updates must not start the same timed preparation twice while its
+    // asynchronous roll is still resolving.
+    triggering: new Set<string>(),
+
     /**
      * Every preparation item carried by an actor.
      *
@@ -44,6 +50,48 @@ export const PreparationDecayFlow = {
     },
 
     /**
+     * Whether a valid timed preparation has reached its scheduled activation instant.
+     */
+    isTimeTriggerDue(system: Item.SystemOfType<'preparation'>, worldTime: number): boolean {
+        if (system.inert || system.trigger !== 'time' || system.potency.base <= 0) return false;
+
+        const triggerWorldTime = system.created.worldTime + Math.max(system.triggerTime, 0);
+        if (triggerWorldTime > AlchemyRules.expiresAt(system.potency.base, system.created.worldTime)) return false;
+
+        return worldTime >= triggerWorldTime;
+    },
+
+    /**
+     * Release a timed preparation at its scheduled instant without borrowing the GM's selected
+     * targets. The resulting chat card can then be opposed by the actual affected actor(s).
+     */
+    async triggerTimedPreparation(
+        preparation: SR5Item<'preparation'>,
+        options: { showMessage?: boolean } = {}
+    ): Promise<PreparationTriggerTest | undefined> {
+        const owner = preparation.actor;
+        const uuid = preparation.uuid;
+        if (!owner || !uuid || preparation.system.inert || PreparationDecayFlow.triggering.has(uuid)) return;
+
+        PreparationDecayFlow.triggering.add(uuid);
+        try {
+            const test = await TestCreator.fromItem(preparation, owner, {
+                showDialog: false,
+                showMessage: options.showMessage ?? true,
+            });
+            if (!(test instanceof PreparationTriggerTest)) return;
+
+            test.data.triggeredWorldTime = preparation.system.created.worldTime
+                + Math.max(preparation.system.triggerTime, 0);
+            test.data.targetUuids = [];
+            await test.execute();
+            return test;
+        } finally {
+            PreparationDecayFlow.triggering.delete(uuid);
+        }
+    },
+
+    /**
      * Retire every preparation whose potency reached 0 and refresh anything showing one.
      *
      * The write runs on the active GM alone, so a second connected GM can't retire them twice.
@@ -57,6 +105,10 @@ export const PreparationDecayFlow = {
 
         if (game.users?.activeGM?.isSelf) {
             for (const preparation of preparations) {
+                if (PreparationDecayFlow.isTimeTriggerDue(preparation.system, worldTime)) {
+                    await PreparationDecayFlow.triggerTimedPreparation(preparation);
+                    continue;
+                }
                 if (!PreparationDecayFlow.hasExpired(preparation.system, worldTime)) continue;
 
                 await preparation.update({ system: { inert: true } });
@@ -96,6 +148,9 @@ export const PreparationDecayFlow = {
 
         for (const preparation of preparations) {
             preparation.reset();
+            // DataModel#reset only restores persisted source values. Run document preparation so
+            // PreparationPrep derives potency for the new world time before sheets or tests read it.
+            preparation.prepareData();
             preparation.render(false);
 
             const owner = preparation.actor;

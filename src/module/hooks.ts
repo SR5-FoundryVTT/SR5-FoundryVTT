@@ -564,6 +564,8 @@ ___________________
             Migrator.BeginMigration();
 
             await WorldTimeFlow.initialize();
+            // Resolve preparations that became due while no GM was connected.
+            await PreparationDecayFlow.onWorldTimeChange();
 
             if (ChangelogApplication.showApplication)
                 new ChangelogApplication().render(true);

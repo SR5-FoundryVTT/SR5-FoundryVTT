@@ -176,12 +176,13 @@ export const UpdateActionFlow = {
      * the alchemist already resisted it during creation. See SR5#306.
      */
     injectPreparationTestIntoChangeData(type: string, changeData: DeepPartial<{system: Item.SystemOfType<'preparation'>}>, applyData, preparation?: SR5Item<'preparation'>) {
-        // Reconfigure on category or direct/indirect changes, including partial item updates.
+        // Category, combat subtype and trigger can each alter the defense chain.
         const changed = changeData?.system;
-        if (changed?.category === undefined && changed?.combat?.type === undefined) return;
+        if (changed?.category === undefined && changed?.combat?.type === undefined && changed?.trigger === undefined) return;
 
         const category = changed?.category ?? preparation?.system.category;
         const combatType = changed?.combat?.type ?? preparation?.system.combat.type;
+        const trigger = changed?.trigger ?? preparation?.system.trigger;
         if (category === undefined) return;
 
         // Remove test when the stored spell has no category.
@@ -197,6 +198,20 @@ export const UpdateActionFlow = {
         foundry.utils.setProperty(applyData, 'system.action.opposed.test', opposedTest);
         foundry.utils.setProperty(applyData, 'system.action.opposed.resist.test', resistTest);
         foundry.utils.setProperty(applyData, 'system.action.followed.test', '');
+
+        // The defense test derives its attributes from the stored spell (direct) or its own
+        // defaults (indirect). Clear copied casting-time selectors so they can't override either.
+        if (category === 'combat') {
+            foundry.utils.setProperty(applyData, 'system.action.opposed.skill', '');
+            foundry.utils.setProperty(applyData, 'system.action.opposed.attribute', '');
+            foundry.utils.setProperty(applyData, 'system.action.opposed.attribute2', '');
+            foundry.utils.setProperty(applyData, 'system.action.opposed.armor', false);
+
+            // Contact-triggered indirect spells cannot be dodged. Their zero-dice defense test
+            // exists only to carry damage and net hits into the normal resistance test. SG#210.
+            if (trigger === 'contact' && combatType === 'indirect')
+                foundry.utils.setProperty(applyData, 'system.action.opposed.mod', 0);
+        }
     },
 
     /**

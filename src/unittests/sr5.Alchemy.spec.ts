@@ -6,6 +6,7 @@ import { TestCreator } from "../module/tests/TestCreator";
 import { PreparationCreationTest } from "../module/tests/PreparationCreationTest";
 import { PreparationTriggerTest } from "../module/tests/PreparationTriggerTest";
 import { OpposedPreparationForceTest } from "../module/tests/OpposedPreparationForceTest";
+import { PhysicalDefenseTest } from "../module/tests/PhysicalDefenseTest";
 import { SR5Actor } from "../module/actor/SR5Actor";
 import { SR5Item } from "../module/item/SR5Item";
 
@@ -55,6 +56,9 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
         it('bounds a time trigger by the resulting potency in hours', () => {
             assert.isTrue(AlchemyRules.validTriggerTime(6 * HOUR, 6));
             assert.isFalse(AlchemyRules.validTriggerTime(7 * HOUR, 6));
+            assert.isFalse(AlchemyRules.validTriggerTime(-1, 6));
+            assert.equal(AlchemyRules.effectiveTriggerTime(7 * HOUR, 6), 6 * HOUR);
+            assert.equal(AlchemyRules.effectiveTriggerTime(-1, 6), 0);
         });
     });
 
@@ -164,7 +168,11 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
                 system: {
                     alchemical: true, category: 'combat', type: 'physical',
                     range: 'los_a', duration: 'instant', drain: -1,
-                    combat: { type: 'indirect' }
+                    combat: { type: 'indirect' },
+                    action: {
+                        damage: { base: 6, type: { base: 'physical', value: 'physical' } },
+                        opposed: { attribute: 'reaction', attribute2: 'intuition' }
+                    }
                 }
             }]) as SR5Item[];
             return spell as SR5Item<'spell'>;
@@ -189,7 +197,8 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             const mundane = created as SR5Item<'spell'>;
 
             assert.equal(mundane.system.action.test, 'SpellCastingTest');
-            assert.equal(mundane.system.action.opposed.test, 'CombatSpellDefenseTest');
+            // Indirect combat spells are dodged like ranged attacks.
+            assert.equal(mundane.system.action.opposed.test, 'PhysicalDefenseTest');
         });
 
         it('switches the rolled skill when the flag is toggled on an existing spell', async () => {
@@ -231,6 +240,31 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.equal(test?.data.opposed.test, 'OpposedPreparationForceTest');
         });
 
+        it('replaces the force limit when reagents are selected after initial preparation', async () => {
+            const alchemist = await createAlchemist();
+            const spell = await createAlchemicalSpell(alchemist);
+            const creation = await TestCreator.fromItem(
+                spell, alchemist, { showDialog: false, showMessage: false }) as PreparationCreationTest;
+
+            creation.data.force = 5;
+            creation.data.reagents = 0;
+            creation.prepareLimitValue();
+            creation.calculateBaseValues();
+            assert.equal(creation.limit.value, 5);
+
+            creation.data.reagents = 8;
+            creation.prepareLimitValue();
+            creation.calculateBaseValues();
+            assert.equal(creation.limit.value, 8);
+            assert.isFalse(creation.limit.changes.some(change => change.name === 'SR5.Force'));
+
+            creation.data.reagents = 0;
+            creation.prepareLimitValue();
+            creation.calculateBaseValues();
+            assert.equal(creation.limit.value, 5);
+            assert.isFalse(creation.limit.changes.some(change => change.name === 'SR5.Reagent'));
+        });
+
         it('creates a preparation carrying the spell, force and potency', async () => {
             const alchemist = await createAlchemist();
             const spell = await createAlchemicalSpell(alchemist);
@@ -265,6 +299,13 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.equal(preparation.system.category, 'combat');
             assert.equal(preparation.system.combat.type, 'indirect');
             assert.equal(preparation.system.drain, -1);
+            assert.equal(preparation.system.action.damage.base, 6);
+            assert.equal(preparation.system.action.damage.type.base, 'physical');
+            // Copied casting selectors must not override the defense test's own attributes.
+            assert.equal(preparation.system.action.opposed.test, 'PhysicalDefenseTest');
+            assert.equal(preparation.system.action.opposed.attribute, '');
+            assert.equal(preparation.system.action.opposed.attribute2, '');
+            assert.isTrue(PhysicalDefenseTest.isUnavoidableContactPreparation(preparation));
         });
 
         it('creates nothing when the force wins, but still owes drain', async () => {
@@ -320,6 +361,91 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.isTrue(preparation.system.inert);
             assert.equal(preparation.system.potency.value, 0);
         });
+
+        it('does not allow an inert preparation to trigger again', async () => {
+            const alchemist = await createAlchemist();
+            const [created] = await alchemist.createEmbeddedDocuments('Item', [{
+                name: 'Spent Preparation', type: 'preparation',
+                system: {
+                    category: 'combat', combat: { type: 'indirect' },
+                    force: 4, trigger: 'contact', inert: true,
+                    potency: { base: 3, value: 0 },
+                    created: { worldTime: game.time.worldTime },
+                }
+            }]) as SR5Item[];
+            const preparation = created as SR5Item<'preparation'>;
+            const trigger = await TestCreator.fromItem(
+                preparation, alchemist, { showDialog: false, showMessage: false }) as PreparationTriggerTest;
+
+            await trigger.execute();
+
+            assert.isFalse(trigger.evaluated);
+            assert.isTrue(preparation.system.inert);
+        });
+
+        it('does not grant a dodge test against a contact-triggered indirect spell', async () => {
+            const alchemist = await createAlchemist();
+            const defender = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: {
+                        reaction: { base: 6 },
+                        intuition: { base: 6 },
+                    }
+                }
+            });
+            const [created] = await alchemist.createEmbeddedDocuments('Item', [{
+                name: 'Contact Fireball', type: 'preparation',
+                system: {
+                    category: 'combat', type: 'physical', combat: { type: 'indirect' },
+                    force: 4, trigger: 'contact', potency: { base: 3 },
+                    created: { worldTime: game.time.worldTime },
+                    action: { damage: { type: { base: 'physical', value: 'physical' } } },
+                }
+            }]) as SR5Item[];
+            const preparation = created as SR5Item<'preparation'>;
+            const trigger = await TestCreator.fromItem(
+                preparation, alchemist, { showDialog: false, showMessage: false }) as PreparationTriggerTest;
+            await trigger._prepareExecution();
+
+            const defenseData = await PhysicalDefenseTest._getOpposedActionTestData(
+                trigger.data, defender, '');
+            if (!defenseData) return assert.fail('Failed to create preparation defense test data');
+            const defense = new PhysicalDefenseTest(
+                defenseData,
+                { actor: defender, source: defender },
+                { showDialog: false, showMessage: false }
+            );
+            await defense._prepareExecution();
+
+            assert.equal(defense.pool.value, 0);
+            assert.isFalse(defense.success);
+            assert.isFalse(defense.pool.changes.some(change => change.name === 'SR5.MultiDefense'));
+        });
+
+        it('automatically resolves a due timed preparation at its scheduled potency', async () => {
+            const alchemist = await createAlchemist();
+            const [created] = await alchemist.createEmbeddedDocuments('Item', [{
+                name: 'Timed Preparation', type: 'preparation',
+                system: {
+                    category: 'combat', combat: { type: 'indirect' },
+                    force: 4, trigger: 'time', triggerTime: HOUR,
+                    potency: { base: 2, value: 2 },
+                    // Simulate Foundry advancing past both the trigger and expiration in one jump.
+                    created: { worldTime: game.time.worldTime - 10 * HOUR },
+                }
+            }]) as SR5Item[];
+            const preparation = created as SR5Item<'preparation'>;
+
+            assert.isTrue(PreparationDecayFlow.isTimeTriggerDue(preparation.system, game.time.worldTime));
+            const trigger = await PreparationDecayFlow.triggerTimedPreparation(
+                preparation, { showMessage: false });
+
+            assert.instanceOf(trigger, PreparationTriggerTest);
+            assert.isTrue(trigger?.evaluated);
+            assert.equal(trigger?.data.potency, 2);
+            assert.isTrue(preparation.system.inert);
+        });
     });
 
     describe('Preparation items', () => {
@@ -351,6 +477,44 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             });
 
             assert.equal(preparation.system.potency.value, 3);
+        });
+
+        it('re-prepares documents when preparation sheets refresh after time passes', () => {
+            let potency = 2;
+            let prepared = false;
+            let rendered = false;
+            const preparation = {
+                reset: () => { potency = 3; },
+                prepareData: () => { prepared = true; potency = 2; },
+                render: () => { rendered = true; },
+                actor: null,
+            } as unknown as SR5Item<'preparation'>;
+
+            PreparationDecayFlow.refreshSheets([preparation]);
+
+            assert.isTrue(prepared);
+            assert.isTrue(rendered);
+            assert.equal(potency, 2);
+        });
+
+        it('recognizes only due, live timed triggers', async () => {
+            const preparation = await factory.createItem({
+                type: 'preparation',
+                system: {
+                    trigger: 'time', triggerTime: HOUR,
+                    potency: { base: 2 },
+                    created: { worldTime: game.time.worldTime },
+                }
+            });
+
+            assert.isFalse(PreparationDecayFlow.isTimeTriggerDue(
+                preparation.system, game.time.worldTime + HOUR - 1));
+            assert.isTrue(PreparationDecayFlow.isTimeTriggerDue(
+                preparation.system, game.time.worldTime + HOUR));
+
+            await preparation.update({ system: { inert: true } });
+            assert.isFalse(PreparationDecayFlow.isTimeTriggerDue(
+                preparation.system, game.time.worldTime + HOUR));
         });
 
         it('reports an expired preparation as ready to retire', async () => {
@@ -416,7 +580,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             });
 
             assert.equal(preparation.system.action.test, 'PreparationTriggerTest');
-            assert.equal(preparation.system.action.opposed.test, 'CombatSpellDefenseTest');
+            assert.equal(preparation.system.action.opposed.test, 'PhysicalDefenseTest');
             assert.equal(preparation.system.action.opposed.resist.test, 'PhysicalResistTest');
             // Drain was already paid at creation. SR5#306.
             assert.equal(preparation.system.action.followed.test, '');

@@ -79,7 +79,14 @@ export const AlchemyRules = {
      * @param potency The potency the preparation ended up with.
      */
     validTriggerTime: (seconds: number, potency: number): boolean => {
-        return seconds <= potency * 3600;
+        return seconds >= 0 && seconds <= potency * 3600;
+    },
+
+    /**
+     * Clamp a timer to the preparation's final legal activation window.
+     */
+    effectiveTriggerTime: (seconds: number, potency: number): number => {
+        return Math.min(Math.max(seconds, 0), Math.max(potency, 0) * 3600);
     },
 
     /**

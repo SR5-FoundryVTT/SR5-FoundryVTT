@@ -12,6 +12,9 @@ import ModifierTypes = Shadowrun.ModifierTypes;
 export interface PreparationTriggerTestData extends SpellCastingTestData {
     // Potency at the moment of triggering, which stands in for the Spellcasting skill. SR5#306.
     potency: number
+    // Timed preparations resolve at their scheduled instant even when world time advances past it
+    // in one large step. Manual triggers leave this unset and use the current world time.
+    triggeredWorldTime?: number
 }
 
 /**
@@ -81,7 +84,23 @@ export class PreparationTriggerTest extends SpellCastingTest {
         if (!this.item) return;
 
         this.data.force = this.item.system.force;
-        this.data.potency = this.item.system.potency.value;
+        const worldTime = this.data.triggeredWorldTime ?? game.time.worldTime;
+        this.data.potency = AlchemyRules.currentPotency(
+            this.item.system.potency.base,
+            this.item.system.created.worldTime,
+            worldTime
+        );
+    }
+
+    /**
+     * A preparation whose magic has been released or faded cannot cast again.
+     */
+    override userCanExecute(): boolean {
+        if (!super.userCanExecute()) return false;
+        if (this.item && !this.item.system.inert && this.data.potency > 0) return true;
+
+        ui.notifications?.warn('SR5.Warnings.PreparationInert', { localize: true });
+        return false;
     }
 
     override prepareBaseValues() {
