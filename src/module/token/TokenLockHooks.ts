@@ -1,5 +1,6 @@
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SYSTEM_NAME } from '@/module/constants';
+import { RiggerFlow } from '@/module/flows/RiggerFlow';
 
 export const TokenLockHooks = {
     registerHooks: () => {
@@ -13,8 +14,16 @@ export const TokenLockHooks = {
     setJumpedInState: async (driver: SR5Actor, vehicle: SR5Actor | null, isJumpedIn: boolean) => {
         if (!driver) return;
 
+        const driverInstances = RiggerFlow.getActorInstances(driver);
+
         if (isJumpedIn && vehicle) {
-            await (driver as any).setFlag(SYSTEM_NAME, 'jumpedInVehicle', vehicle.name || 'Vehicle');
+            const vehicleInstances = RiggerFlow.getActorInstances(vehicle);
+
+            for (const d of driverInstances) {
+                await (d as any).setFlag(SYSTEM_NAME, 'jumpedInVehicle', vehicle.name || 'Vehicle');
+                await d.toggleStatusEffect('sr5jumpedIn', { active: true });
+            }
+
             const charId = driver.id ? driver.id.split('.').pop()! : '';
             const sceneTokens = canvas.scene?.tokens?.contents || [];
             for (const t of sceneTokens) {
@@ -22,12 +31,16 @@ export const TokenLockHooks = {
                     await t.update({ locked: true });
                 }
             }
-            // Add lock status effect symbol to driver character
-            await driver.toggleStatusEffect('sr5jumpedIn', { active: true });
-            // Add steering wheel status effect symbol to vehicle actor
-            await vehicle.toggleStatusEffect('sr5riggedVehicle', { active: true });
+
+            for (const v of vehicleInstances) {
+                await v.toggleStatusEffect('sr5riggedVehicle', { active: true });
+            }
         } else {
-            await (driver as any).unsetFlag(SYSTEM_NAME, 'jumpedInVehicle');
+            for (const d of driverInstances) {
+                await (d as any).unsetFlag(SYSTEM_NAME, 'jumpedInVehicle');
+                await d.toggleStatusEffect('sr5jumpedIn', { active: false });
+            }
+
             const charId = driver.id ? driver.id.split('.').pop()! : '';
             const sceneTokens = canvas.scene?.tokens?.contents || [];
             for (const t of sceneTokens) {
@@ -35,10 +48,12 @@ export const TokenLockHooks = {
                     await t.update({ locked: false });
                 }
             }
-            // Remove lock status effect symbol from driver character
-            await driver.toggleStatusEffect('sr5jumpedIn', { active: false });
+
             if (vehicle) {
-                await vehicle.toggleStatusEffect('sr5riggedVehicle', { active: false });
+                const vehicleInstances = RiggerFlow.getActorInstances(vehicle);
+                for (const v of vehicleInstances) {
+                    await v.toggleStatusEffect('sr5riggedVehicle', { active: false });
+                }
             }
         }
     },

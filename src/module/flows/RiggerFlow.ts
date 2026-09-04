@@ -126,6 +126,32 @@ export const RiggerFlow = {
     },
 
     /**
+     * Get all actor instances corresponding to the given actor (e.g. sidebar actor and canvas token actors).
+     */
+    getActorInstances(actor: SR5Actor | null): SR5Actor[] {
+        if (!actor) return [];
+        const instances = new Set<SR5Actor>([actor]);
+
+        const token = actor.getToken();
+        if (token?.actor) {
+            instances.add(token.actor as SR5Actor);
+        }
+
+        const actorId = actor.id ? actor.id.split('.').pop()! : '';
+        if (canvas.scene?.tokens) {
+            for (const t of canvas.scene.tokens) {
+                if (t.actor) {
+                    const tActorId = t.actor.id ? t.actor.id.split('.').pop()! : '';
+                    if (t.actor === actor || t.actor.uuid === actor.uuid || (actorId && tActorId === actorId)) {
+                        instances.add(t.actor as SR5Actor);
+                    }
+                }
+            }
+        }
+        return Array.from(instances);
+    },
+
+    /**
      * Create/apply temporary ActiveEffect on vehicle actor with driver's skills.
      */
     async _applyJumpedInActiveEffect(driver: SR5Actor, vehicle: SR5Actor) {
@@ -153,22 +179,25 @@ export const RiggerFlow = {
 
         const effectName = game.i18n.format('SR5.Rigger.JumpedInEffectName', { rigger: driver.name }) || `Jumped-In: ${driver.name}`;
 
-        const createdEffects = await vehicle.createEmbeddedDocuments('ActiveEffect', [{
-            name: effectName,
-            img: 'systems/shadowrun5e/dist/icons/status-effects/steering-wheel.svg',
-            flags: {
-                shadowrun5e: {
-                    isJumpedInEffect: true,
-                    driverUuid: driver.uuid
+        const instances = this.getActorInstances(vehicle);
+        for (const v of instances) {
+            const createdEffects = await v.createEmbeddedDocuments('ActiveEffect', [{
+                name: effectName,
+                img: 'systems/shadowrun5e/dist/icons/status-effects/steering-wheel.svg',
+                flags: {
+                    shadowrun5e: {
+                        isJumpedInEffect: true,
+                        driverUuid: driver.uuid
+                    }
+                },
+                system: {
+                    changes
                 }
-            },
-            system: {
-                changes
-            }
-        } as any]);
+            } as any]);
 
-        if (createdEffects && createdEffects.length > 0 && createdEffects[0].id) {
-            await (vehicle as any).setFlag(SYSTEM_NAME, 'jumpedInEffectId', createdEffects[0].id);
+            if (createdEffects && createdEffects.length > 0 && createdEffects[0].id) {
+                await (v as any).setFlag(SYSTEM_NAME, 'jumpedInEffectId', createdEffects[0].id);
+            }
         }
     },
 
@@ -178,26 +207,29 @@ export const RiggerFlow = {
     async _removeJumpedInActiveEffect(vehicle: SR5Actor) {
         if (!vehicle) return;
 
-        const idsToDelete = new Set<string>();
+        const instances = this.getActorInstances(vehicle);
+        for (const v of instances) {
+            const idsToDelete = new Set<string>();
 
-        const savedEffectId = (vehicle as any).getFlag(SYSTEM_NAME, 'jumpedInEffectId') as string | undefined;
-        if (savedEffectId) {
-            idsToDelete.add(savedEffectId);
-        }
-
-        for (const effect of vehicle.effects) {
-            const isJumpedInFlag = (effect.flags as any)?.shadowrun5e?.isJumpedInEffect === true;
-            const isRiggedStatus = effect.statuses?.has('sr5riggedVehicle') || (effect as any).statusId === 'sr5riggedVehicle';
-            if (isJumpedInFlag || isRiggedStatus) {
-                if (effect.id) idsToDelete.add(effect.id);
+            const savedEffectId = (v as any).getFlag(SYSTEM_NAME, 'jumpedInEffectId') as string | undefined;
+            if (savedEffectId) {
+                idsToDelete.add(savedEffectId);
             }
-        }
 
-        if (idsToDelete.size > 0) {
-            await vehicle.deleteEmbeddedDocuments('ActiveEffect', Array.from(idsToDelete));
-        }
+            for (const effect of v.effects) {
+                const isJumpedInFlag = (effect.flags as any)?.shadowrun5e?.isJumpedInEffect === true;
+                const isRiggedStatus = effect.statuses?.has('sr5riggedVehicle') || (effect as any).statusId === 'sr5riggedVehicle';
+                if (isJumpedInFlag || isRiggedStatus) {
+                    if (effect.id) idsToDelete.add(effect.id);
+                }
+            }
 
-        await (vehicle as any).unsetFlag(SYSTEM_NAME, 'jumpedInEffectId');
-        await vehicle.toggleStatusEffect('sr5riggedVehicle', { active: false });
+            if (idsToDelete.size > 0) {
+                await v.deleteEmbeddedDocuments('ActiveEffect', Array.from(idsToDelete));
+            }
+
+            await (v as any).unsetFlag(SYSTEM_NAME, 'jumpedInEffectId');
+            await v.toggleStatusEffect('sr5riggedVehicle', { active: false });
+        }
     }
 };
