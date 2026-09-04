@@ -127,7 +127,7 @@ const SRStatus = [
     {
         id: 'sr5riggedVehicle',
         name: 'SR5.StatusEffects.RiggedVehicle',
-        img: 'icons/importer/equipment/btls.svg',
+        img: 'systems/shadowrun5e/dist/icons/status-effects/steering-wheel.svg',
     },
 ];
 

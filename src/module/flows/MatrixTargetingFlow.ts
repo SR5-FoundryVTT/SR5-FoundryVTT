@@ -119,6 +119,8 @@ export const MatrixTargetingFlow = {
                 }
             }
         }
+        this._dedupeTargetsByDocumentUuid(targets);
+
         // add ourselves to the front so that our own Persona sits at the top
         const type = MatrixNetworkFlow.getDocumentType(actor);
         targets.unshift({

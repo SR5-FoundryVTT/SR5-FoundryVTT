@@ -4,6 +4,8 @@ import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { SR5 } from '@/module/config';
 import { RiggingRules } from '@/module/rules/RiggingRules';
 import { RiggerFlow } from '@/module/flows/RiggerFlow';
+import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
+import { MatrixTargetingFlow } from '@/module/flows/MatrixTargetingFlow';
 
 export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -365,6 +367,14 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
                 await RiggerFlow.jumpOut(driver, testDrone);
                 assert.equal(testDrone.hasDriver(), false);
             }
+        });
+
+        it('ActorOwnershipFlow and MatrixTargetingFlow include owned vehicles in prepareOwnIcons', async () => {
+            const driver = await createDriver();
+            const vehicle = await createVehicle();
+            assert.isTrue(ActorOwnershipFlow._isOwnerOfActor(driver, vehicle));
+            const ownIcons = MatrixTargetingFlow.prepareOwnIcons(driver);
+            assert.isTrue(ownIcons.some(t => t.document.uuid === vehicle.uuid));
         });
     });
 };

@@ -33,7 +33,7 @@ export const ActorOwnershipFlow = {
 
     _isOwnerOfActor(actor: SR5Actor, device: SR5Actor) {
         if (device === actor) return true;
-        // if it's a vehicle, check if we are the driver of it (this isn't perfect but will do for now)
+        if (device.isOwner) return true;
         const vehicle = device.asType('vehicle');
         if (vehicle) {
             return vehicle.getVehicleDriver() === actor;
