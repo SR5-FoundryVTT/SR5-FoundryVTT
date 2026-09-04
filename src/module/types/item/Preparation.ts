@@ -40,7 +40,11 @@ const PreparationData = () => ({
 
     created: new SchemaField({
         // game.time.worldTime at the moment of creation, the anchor for potency decay.
-        worldTime: new NumberField({ required: true, nullable: false, initial: 0 }),
+        worldTime: new NumberField({
+            required: true,
+            nullable: false,
+            initial: () => game.time.worldTime,
+        }),
     }),
 
     // Potency reached 0 or the lynchpin broke: the spell is lost but the object remains. SR5#305.

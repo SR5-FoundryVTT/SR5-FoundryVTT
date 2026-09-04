@@ -1,0 +1,50 @@
+<div class="time-control-app preparation-time-dialog-content">
+    <div class="time-control-current">
+        <i class="fas fa-flask" aria-hidden="true"></i>
+        <span>{{preparationName}}</span>
+    </div>
+
+    <div class="time-absolute-fields">
+        <label>{{localize "SR5.TimeControl.Year"}}
+            <input type="number" name="components.year" value="{{components.year}}" step="1" required/>
+        </label>
+        <label>{{localize "SR5.TimeControl.Month"}}
+            <input type="number" name="components.month" value="{{components.month}}" min="1" step="1" required/>
+        </label>
+        <label>{{localize "SR5.TimeControl.Day"}}
+            <input type="number" name="components.dayOfMonth" value="{{components.dayOfMonth}}" min="1" step="1" required/>
+        </label>
+        <label>{{localize "SR5.TimeControl.Hour"}}
+            <input type="number" name="components.hour" value="{{components.hour}}" min="0" step="1" required/>
+        </label>
+        <label>{{localize "SR5.TimeControl.Minute"}}
+            <input type="number" name="components.minute" value="{{components.minute}}" min="0" step="1" required/>
+        </label>
+        <label>{{localize "SR5.TimeControl.Second"}}
+            <input type="number" name="components.second" value="{{components.second}}" min="0" step="1" required/>
+        </label>
+    </div>
+
+    <div class="time-control-preview">
+        <span class="label">{{localize "SR5.TimeControl.Preview"}}:</span>
+        <span class="time-absolute-preview">{{preview}}</span>
+    </div>
+
+    <div class="time-control-buttons">
+        <button type="button" data-action="useCurrentTime">
+            <i class="fas fa-clock" aria-hidden="true"></i>
+            {{localize "SR5.Preparation.CreationTimeDialog.UseCurrent"}}
+        </button>
+    </div>
+
+    <div class="time-control-buttons">
+        <button type="submit">
+            <i class="fas fa-check" aria-hidden="true"></i>
+            {{localize "SR5.TimeControl.Apply"}}
+        </button>
+        <button type="button" data-action="cancel">
+            <i class="fas fa-times" aria-hidden="true"></i>
+            {{localize "SR5.Dialogs.Common.Cancel"}}
+        </button>
+    </div>
+</div>

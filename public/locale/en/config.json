@@ -3646,6 +3646,12 @@
             "Create": "Create Preparation",
             "CraftingTime": "Crafting Time",
             "CraftingTimeMinutes": "{minutes} minutes",
+            "CreationTimeDialog": {
+                "Edit": "Edit creation time",
+                "Invalid": "Enter a valid creation date and time.",
+                "Title": "Preparation Creation Time",
+                "UseCurrent": "Use Current Time"
+            },
             "Trigger": {
                 "Command": "Command",
                 "Contact": "Contact",

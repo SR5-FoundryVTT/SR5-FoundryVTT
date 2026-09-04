@@ -1,6 +1,7 @@
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { AlchemyRules } from "../module/rules/AlchemyRules";
 import { PreparationDecayFlow } from "../module/flows/PreparationDecayFlow";
+import { WorldTimeFlow } from "../module/flows/WorldTimeFlow";
 import { SR5TestFactory } from "./utils";
 import { TestCreator } from "../module/tests/TestCreator";
 import { PreparationCreationTest } from "../module/tests/PreparationCreationTest";
@@ -9,6 +10,7 @@ import { OpposedPreparationForceTest } from "../module/tests/OpposedPreparationF
 import { PhysicalDefenseTest } from "../module/tests/PhysicalDefenseTest";
 import { SR5Actor } from "../module/actor/SR5Actor";
 import { SR5Item } from "../module/item/SR5Item";
+import { PreparationTimeDialog } from "../module/apps/dialogs/PreparationTimeDialog";
 
 const HOUR = 3600;
 
@@ -449,6 +451,76 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
     });
 
     describe('Preparation items', () => {
+        it('defaults its creation time to the current world time', async () => {
+            const worldTime = game.time.worldTime;
+            const preparation = await factory.createItem({ type: 'preparation' });
+
+            assert.equal(preparation.system.created.worldTime, worldTime);
+        });
+
+        it('round-trips its creation time through calendar form components', () => {
+            const worldTime = game.time.worldTime - 5 * HOUR;
+            const components = PreparationTimeDialog.componentsForForm(worldTime);
+            const resolved = PreparationTimeDialog.worldTimeFromForm({
+                'components.year': components.year,
+                'components.month': components.month,
+                'components.dayOfMonth': components.dayOfMonth,
+                'components.hour': components.hour,
+                'components.minute': components.minute,
+                'components.second': components.second,
+            });
+
+            assert.equal(resolved, Math.floor(worldTime));
+        });
+
+        it('uses current world time components for the creation-time shortcut', () => {
+            const components = PreparationTimeDialog.componentsForForm(game.time.worldTime);
+            const shown = WorldTimeFlow.displayComponents(game.time.worldTime);
+
+            assert.equal(components.year, shown.year);
+            assert.equal(components.month, shown.month + 1);
+            assert.equal(components.dayOfMonth, shown.dayOfMonth + 1);
+            assert.equal(components.hour, shown.hour);
+            assert.equal(components.minute, shown.minute);
+            assert.equal(components.second, shown.second);
+        });
+
+        it('updates creation time, recalculates potency, and preserves inert state', async () => {
+            const preparation = await factory.createItem({
+                type: 'preparation',
+                system: {
+                    category: 'combat',
+                    force: 4,
+                    potency: { base: 3 },
+                    created: { worldTime: game.time.worldTime },
+                    inert: false,
+                }
+            }) as SR5Item<'preparation'>;
+
+            await PreparationTimeDialog.setCreationTime(preparation, game.time.worldTime - 8 * HOUR);
+
+            assert.equal(preparation.system.created.worldTime, game.time.worldTime - 8 * HOUR);
+            assert.equal(preparation.system.potency.value, 1);
+            assert.isFalse(preparation.system.inert);
+        });
+
+        it('does not revive an inert preparation when its creation time changes', async () => {
+            const preparation = await factory.createItem({
+                type: 'preparation',
+                system: {
+                    category: 'combat',
+                    potency: { base: 3 },
+                    created: { worldTime: game.time.worldTime - 10 * HOUR },
+                    inert: true,
+                }
+            }) as SR5Item<'preparation'>;
+
+            await PreparationTimeDialog.setCreationTime(preparation, game.time.worldTime);
+
+            assert.isTrue(preparation.system.inert);
+            assert.equal(preparation.system.potency.value, 0);
+        });
+
         it('derives the current potency during data preparation', async () => {
             const preparation = await factory.createItem({
                 type: 'preparation',

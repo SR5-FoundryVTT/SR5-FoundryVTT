@@ -50,6 +50,23 @@
 
 <div class="list-item">
     <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.created.fields.worldTime.hint}}">
+            {{systemFields.created.fields.worldTime.label}}
+        </label>
+    </div>
+    <div class="list-item-col preparation-created-time">
+        <span>{{preparationCreationTime}}</span>
+        {{#if @root.isEditMode}}
+            <button type="button" data-action="editPreparationCreationTime"
+                    data-tooltip="SR5.Preparation.CreationTimeDialog.Edit">
+                <i class="fas fa-calendar" aria-hidden="true"></i>
+            </button>
+        {{/if}}
+    </div>
+</div>
+
+<div class="list-item">
+    <div class="list-item-start skinny">
         <label data-tooltip="{{systemFields.inert.hint}}">{{systemFields.inert.label}}</label>
     </div>
     <div class="list-item-col">
