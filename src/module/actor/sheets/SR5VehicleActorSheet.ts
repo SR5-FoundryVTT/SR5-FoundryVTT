@@ -40,6 +40,7 @@ interface VehicleSheetDataFields extends MatrixActorSheetData {
         isOverSharingLimit: boolean;
         loadedAutosofts: SR5Item[];
     };
+    eligibleSwarmLeaders?: Array<{ uuid: string | null; name: string }>;
 }
 
 export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFields> {
@@ -118,6 +119,16 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         };
 
         data.swarmInfo = RiggingRules.getSwarmPilotInfo(this.actor);
+
+        if ((this.actor.system as any).isSwarm) {
+            const eligibleLeaders = game.actors.contents.filter(a => {
+                return a.isType('vehicle') && a.uuid !== this.actor.uuid && (a.system as any).isSwarm && (a.system as any).isSwarmLeader;
+            }) as SR5Actor[];
+            data.eligibleSwarmLeaders = eligibleLeaders.map(a => ({
+                uuid: a.uuid,
+                name: a.name || ''
+            }));
+        }
 
         if (data.vehicle.master && data.vehicle.master.system.category === 'rcc') {
             const info = RiggingRules.getRCCSharingInfo(data.vehicle.master);

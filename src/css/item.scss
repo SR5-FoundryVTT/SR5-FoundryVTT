@@ -69,13 +69,21 @@
         }
     }
 
+    .autosoft-play-target {
+        display: inline-flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.3rem;
+        white-space: nowrap;
+    }
+
     .target-weapon-icon {
         width: 18px;
         height: 18px;
-        vertical-align: middle;
         border: none;
-        margin-left: 4px;
+        margin-left: 2px;
         object-fit: contain;
+        display: inline-block;
     }
 
     .item-type-container {

@@ -847,6 +847,10 @@
             "RiggerMovingVehicle": "{rigger} is piloting {vehicle}"
         },
         "Swarm": {
+            "Label": "Swarm",
+            "Leader": "Swarm Leader",
+            "SelectLeader": "Swarm Leader Vehicle",
+            "Member": "Swarm Member",
             "Toggle": "Toggle Swarm",
             "Active": "Swarm Leader",
             "Form": "Form Swarm",

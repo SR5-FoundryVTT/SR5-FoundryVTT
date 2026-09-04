@@ -184,28 +184,28 @@
                 {{#if (or (eq system.type 'autosoft') (eq item.system.type 'autosoft'))}}
                     {{#if (or (eq system.autosoftType 'targeting') (eq item.system.autosoftType 'targeting'))}}
                         {{#if targetWeaponDoc}}
-                            <label data-tooltip="{{targetWeaponDoc.name}}">
+                            <label data-tooltip="{{targetWeaponDoc.name}}" class="autosoft-play-target">
                                 <i class="fa-solid fa-crosshairs"></i>
                                 <img src="{{targetWeaponDoc.img}}" class="target-weapon-icon"/>
                             </label>
                         {{else if targetWeaponLabel}}
-                            <label data-tooltip="{{targetWeaponLabel}}">
+                            <label data-tooltip="{{targetWeaponLabel}}" class="autosoft-play-target">
                                 <i class="fa-solid fa-crosshairs"></i>
                             </label>
                         {{else if (or system.targetWeapon item.system.targetWeapon)}}
-                            <label data-tooltip="{{or system.targetWeapon item.system.targetWeapon}}">
+                            <label data-tooltip="{{or system.targetWeapon item.system.targetWeapon}}" class="autosoft-play-target">
                                 <i class="fa-solid fa-crosshairs"></i>
                             </label>
                         {{else}}
-                            <label><i class="fa-solid fa-crosshairs"></i> {{localizeOb (or system.autosoftType item.system.autosoftType) @root.config.autosoftTypes}}</label>
+                            <label class="autosoft-play-target"><i class="fa-solid fa-crosshairs"></i> {{localizeOb (or system.autosoftType item.system.autosoftType) @root.config.autosoftTypes}}</label>
                         {{/if}}
                     {{else if (and (or (eq system.autosoftType 'maneuvering') (eq system.autosoftType 'stealth') (eq system.autosoftType 'evasion') (eq item.system.autosoftType 'maneuvering') (eq item.system.autosoftType 'stealth') (eq item.system.autosoftType 'evasion')) (or system.targetModel item.system.targetModel))}}
-                        <label data-tooltip="{{or system.targetModel item.system.targetModel}}">{{localizeOb (or system.autosoftType item.system.autosoftType) @root.config.autosoftTypes}}</label>
+                        <label data-tooltip="{{or system.targetModel item.system.targetModel}}" class="autosoft-play-target">{{localizeOb (or system.autosoftType item.system.autosoftType) @root.config.autosoftTypes}}</label>
                     {{else}}
-                        <label>{{localizeOb (or system.autosoftType item.system.autosoftType) @root.config.autosoftTypes}}</label>
+                        <label class="autosoft-play-target">{{localizeOb (or system.autosoftType item.system.autosoftType) @root.config.autosoftTypes}}</label>
                     {{/if}}
                 {{else}}
-                    <label>{{localizeOb (or system.type item.system.type) @root.config.programTypes}}</label>
+                    <label class="autosoft-play-target">{{localizeOb (or system.type item.system.type) @root.config.programTypes}}</label>
                 {{/if}}
             {{/if}}
         {{else if (isType item 'weapon')}}

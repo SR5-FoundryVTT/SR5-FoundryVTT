@@ -849,6 +849,10 @@
             "RiggerMovingVehicle": "{rigger} steuert {vehicle}"
         },
         "Swarm": {
+            "Label": "Schwarm",
+            "Leader": "Schwarmführer",
+            "SelectLeader": "Schwarmführer-Fahrzeug",
+            "Member": "Schwarm-Mitglied",
             "Toggle": "Schwarm umschalten",
             "Active": "Schwarmführer",
             "Form": "Schwarm bilden",

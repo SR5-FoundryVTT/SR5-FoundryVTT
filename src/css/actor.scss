@@ -117,6 +117,40 @@
                 }
             }
         }
+
+        .rigger-swarm-bar {
+            display: flex;
+            flex-flow: row wrap;
+            align-items: center;
+            gap: 0.5rem 1rem;
+            padding: 0.35rem 0.5rem;
+            margin-bottom: 0.35rem;
+            background: var(--sr5v2-bg-secondary, rgba(0, 0, 0, 0.25));
+            border: 1px solid var(--sr5v2-border-subtle, rgba(255, 255, 255, 0.15));
+            border-radius: 4px;
+
+            .swarm-info-badges {
+                display: flex;
+                flex-flow: row wrap;
+                align-items: center;
+                gap: 0.5rem;
+
+                .badge {
+                    padding: 2px 6px;
+                    border-radius: 3px;
+                    font-size: var(--font-size-12);
+                    font-weight: 600;
+                    background: rgba(255, 255, 255, 0.1);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+
+                    &.active {
+                        background: var(--sr5v2-accent, #c92a2a);
+                        color: #fff;
+                        border-color: var(--sr5v2-accent);
+                    }
+                }
+            }
+        }
     }
 
     .active-skills-header {

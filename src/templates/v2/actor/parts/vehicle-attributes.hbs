@@ -1,25 +1,53 @@
 {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/limits.hbs" }}
 
-<div class="list-item rigger-control-mode-bar">
-    <div class="list-item-start">
-        <label><strong>{{localize "SR5.ControlMode"}}:</strong></label>&nbsp;
+{{#if system.isSwarm}}
+    <div class="list-item rigger-swarm-bar">
         {{#if @root.isEditMode}}
-            {{formInput systemFields.controlMode value=source.system.controlMode localize=true rootId=@root.rootId}}
+            <div class="list-item-start">
+                <label><strong>{{localize "SR5.Swarm.Leader"}}:</strong></label>&nbsp;
+                {{formInput systemFields.isSwarmLeader value=source.system.isSwarmLeader rootId=@root.rootId}}
+            </div>
+            {{#unless system.isSwarmLeader}}
+                <div class="list-item-start">
+                    <label><strong>{{localize "SR5.Swarm.SelectLeader"}}:</strong></label>&nbsp;
+                    {{#if @root.eligibleSwarmLeaders}}
+                        <select name="system.swarmLeaderUuid">
+                            <option value="">—</option>
+                            {{#each @root.eligibleSwarmLeaders}}
+                                <option value="{{this.uuid}}" {{#if (eq this.uuid @root.source.system.swarmLeaderUuid)}}selected{{/if}}>{{this.name}}</option>
+                            {{/each}}
+                        </select>
+                    {{else}}
+                        {{formInput systemFields.swarmLeaderUuid value=source.system.swarmLeaderUuid classes="short" rootId=@root.rootId}}
+                    {{/if}}
+                </div>
+            {{/unless}}
         {{else}}
-            <span class="tag badge {{system.controlMode}}">{{localize (objValue @root.config.controlModes system.controlMode)}}</span>
+            <div class="list-item-start swarm-info-badges">
+                {{#if system.isSwarmLeader}}
+                    <span class="tag badge active" data-tooltip="SR5.Swarm.Leader">
+                        <i class="fas fa-network-wired"></i> {{localize "SR5.Swarm.Active"}}
+                    </span>
+                {{else if system.swarmLeaderUuid}}
+                    <span class="tag badge" data-tooltip="SR5.Swarm.Member">
+                        <i class="fas fa-sitemap"></i> {{localize "SR5.Swarm.Member"}}
+                    </span>
+                {{/if}}
+                <span class="tag badge" data-tooltip="SR5.Swarm.Drones">
+                    <i class="fas fa-robot"></i> {{swarmInfo.memberCount}} {{localize "SR5.Swarm.Drones"}}
+                </span>
+                <span class="tag badge" data-tooltip="SR5.Bonus">
+                    <i class="fas fa-plus"></i> {{swarmInfo.bonus}} {{localize "SR5.Bonus"}}
+                </span>
+                {{#if swarmInfo.swarmPilot}}
+                    <span class="tag badge" data-tooltip="SR5.Vehicle.Stats.Pilot">
+                        <i class="fas fa-brain"></i> {{localize "SR5.Vehicle.Stats.Pilot"}}: {{swarmInfo.swarmPilot}}
+                    </span>
+                {{/if}}
+            </div>
         {{/if}}
     </div>
-    <div class="list-item-icons">
-        <button class="icon sr5-icon {{#if system.isSwarm}}active{{/if}}" data-action="toggleSwarmLeader" data-tooltip="SR5.Swarm.Toggle">
-            <i class="fas fa-network-wired"></i>
-            {{#if system.isSwarm}}
-                <span>{{localize "SR5.Swarm.Active"}} ({{swarmInfo.memberCount}} {{localize "SR5.Swarm.Drones"}}, +{{swarmInfo.bonus}} {{localize "SR5.Bonus"}})</span>
-            {{else}}
-                <span>{{localize "SR5.Swarm.Form"}}</span>
-            {{/if}}
-        </button>
-    </div>
-</div>
+{{/if}}
 
 {{#if autosoftInfo.isOverSlots}}
     <div class="list-item warning-banner" style="background-color: rgba(255, 165, 0, 0.2); padding: 4px 8px; border: 1px solid orange; border-radius: 4px; margin-bottom: 4px;">
