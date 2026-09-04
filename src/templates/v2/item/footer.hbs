@@ -15,6 +15,73 @@
             </label>
         </div>
     {{/if}}
+    {{#if (and (isType item 'program') @root.isEditMode)}}
+        <div class="list-item autosoft-config-row">
+            <div class="basic-row">
+                <label data-tooltip="{{systemFields.type.hint}}">{{systemFields.type.label}}</label>
+                <span>
+                    {{formInput systemFields.type value=source.system.type localize=true
+                                classes="short" rootId=@root.rootId}}
+                </span>
+            </div>
+            {{#if (or (eq system.type 'autosoft') (eq item.system.type 'autosoft') (eq source.system.type 'autosoft'))}}
+                <div class="basic-row">
+                    <label data-tooltip="{{systemFields.autosoftType.hint}}">{{localize "SR5.AutosoftType"}}</label>
+                    <span>
+                        {{formInput systemFields.autosoftType value=source.system.autosoftType localize=true
+                                    classes="short" rootId=@root.rootId}}
+                    </span>
+                </div>
+                {{#if (or (eq system.autosoftType 'maneuvering') (eq system.autosoftType 'stealth') (eq system.autosoftType 'evasion') (eq item.system.autosoftType 'maneuvering') (eq item.system.autosoftType 'stealth') (eq item.system.autosoftType 'evasion') (eq source.system.autosoftType 'maneuvering') (eq source.system.autosoftType 'stealth') (eq source.system.autosoftType 'evasion'))}}
+                    <div class="basic-row">
+                        <label data-tooltip="{{systemFields.targetModel.hint}}">{{localize "SR5.TargetModel"}}</label>
+                        <span>
+                            {{#if @root.actorModels}}
+                                <select name="system.targetModel" {{#if @root.isPlayMode}}disabled{{/if}}>
+                                    {{#each @root.actorModels}}
+                                        <option value="{{this.value}}" {{#if (eq this.value @root.source.system.targetModel)}}selected{{/if}}>{{this.label}}</option>
+                                    {{/each}}
+                                </select>
+                            {{else}}
+                                {{formInput systemFields.targetModel value=source.system.targetModel
+                                            rootId=@root.rootId}}
+                            {{/if}}
+                        </span>
+                    </div>
+                {{/if}}
+                {{#if (or (eq system.autosoftType 'targeting') (eq item.system.autosoftType 'targeting') (eq source.system.autosoftType 'targeting'))}}
+                    <div class="basic-row">
+                        <label data-tooltip="{{systemFields.targetWeapon.hint}}">{{localize "SR5.TargetWeapon"}}</label>
+                        <span>
+                            {{#if (eq @root.autosoftTargetMode 'category')}}
+                                {{#if @root.weaponCategoryOptions}}
+                                    <select name="system.targetWeapon" {{#if @root.isPlayMode}}disabled{{/if}}>
+                                        {{#each @root.weaponCategoryOptions}}
+                                            <option value="{{this.value}}" {{#if (eq this.value @root.source.system.targetWeapon)}}selected{{/if}}>{{this.label}}</option>
+                                        {{/each}}
+                                    </select>
+                                {{else}}
+                                    {{formInput systemFields.targetWeapon value=source.system.targetWeapon
+                                                rootId=@root.rootId}}
+                                {{/if}}
+                            {{else}}
+                                {{#if @root.actorWeapons}}
+                                    <select name="system.targetWeapon" {{#if @root.isPlayMode}}disabled{{/if}}>
+                                        {{#each @root.actorWeapons}}
+                                            <option value="{{this.value}}" {{#if (eq this.value @root.source.system.targetWeapon)}}selected{{/if}}>{{this.label}}</option>
+                                        {{/each}}
+                                    </select>
+                                {{else}}
+                                    {{formInput systemFields.targetWeapon value=source.system.targetWeapon
+                                                rootId=@root.rootId}}
+                                {{/if}}
+                            {{/if}}
+                        </span>
+                    </div>
+                {{/if}}
+            {{/if}}
+        </div>
+    {{/if}}
     <div class="list-item">
         {{#if (isType item 'action')}}
             {{#if (isMatrixAction item)}}
@@ -113,16 +180,33 @@
                 <label data-tooltip="{{systemFields.type.hint}}">{{localizeOb system.type @root.config.modificationTypes}}&nbsp;{{localize "SR5.Weapon.Mod"}}</label>
             {{/if}}
         {{else if (isType item 'program')}}
-            {{#if @root.isEditMode}}
-                <div class="basic-row">
-                    <label data-tooltip="{{systemFields.type.hint}}">{{systemFields.type.label}}</label>
-                    <span>
-                        {{formInput systemFields.type value=source.system.type localize=true
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                    </span>
-                </div>
-            {{else}}
-                <label>{{localizeOb item.system.type @root.config.programTypes}}</label>
+            {{#if @root.isPlayMode}}
+                {{#if (or (eq system.type 'autosoft') (eq item.system.type 'autosoft'))}}
+                    {{#if (or (eq system.autosoftType 'targeting') (eq item.system.autosoftType 'targeting'))}}
+                        {{#if targetWeaponDoc}}
+                            <label data-tooltip="{{targetWeaponDoc.name}}">
+                                <i class="fa-solid fa-crosshairs"></i>
+                                <img src="{{targetWeaponDoc.img}}" class="target-weapon-icon"/>
+                            </label>
+                        {{else if targetWeaponLabel}}
+                            <label data-tooltip="{{targetWeaponLabel}}">
+                                <i class="fa-solid fa-crosshairs"></i>
+                            </label>
+                        {{else if (or system.targetWeapon item.system.targetWeapon)}}
+                            <label data-tooltip="{{or system.targetWeapon item.system.targetWeapon}}">
+                                <i class="fa-solid fa-crosshairs"></i>
+                            </label>
+                        {{else}}
+                            <label><i class="fa-solid fa-crosshairs"></i> {{localizeOb (or system.autosoftType item.system.autosoftType) @root.config.autosoftTypes}}</label>
+                        {{/if}}
+                    {{else if (and (or (eq system.autosoftType 'maneuvering') (eq system.autosoftType 'stealth') (eq system.autosoftType 'evasion') (eq item.system.autosoftType 'maneuvering') (eq item.system.autosoftType 'stealth') (eq item.system.autosoftType 'evasion')) (or system.targetModel item.system.targetModel))}}
+                        <label data-tooltip="{{or system.targetModel item.system.targetModel}}">{{localizeOb (or system.autosoftType item.system.autosoftType) @root.config.autosoftTypes}}</label>
+                    {{else}}
+                        <label>{{localizeOb (or system.autosoftType item.system.autosoftType) @root.config.autosoftTypes}}</label>
+                    {{/if}}
+                {{else}}
+                    <label>{{localizeOb (or system.type item.system.type) @root.config.programTypes}}</label>
+                {{/if}}
             {{/if}}
         {{else if (isType item 'weapon')}}
             {{#if (and (eq item.system.category 'range') (not (eq item.system.range.ranges.category 'manual')))}}

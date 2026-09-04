@@ -214,8 +214,8 @@
                         <label>{{localize "SR5.Type"}}</label>
                     </div>
                     <div class="list-item-col">
-                        {{formInput systemFields.type value=source.system.type options=config.programTypes classes="short"
-                                    rootId=rootId disabled=@root.isPlayMode}}
+                        {{formInput systemFields.type value=source.system.type localize=true classes="short"
+                                    rootId=@root.rootId disabled=@root.isPlayMode}}
                     </div>
                 </div>
                 {{#if (eq system.type 'autosoft')}}
@@ -224,8 +224,8 @@
                             <label>{{localize "SR5.AutosoftType"}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.autosoftType value=source.system.autosoftType options=config.autosoftTypes classes="short"
-                                        rootId=rootId disabled=@root.isPlayMode}}
+                            {{formInput systemFields.autosoftType value=source.system.autosoftType localize=true classes="short"
+                                        rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
                     {{#if (or (eq system.autosoftType 'maneuvering') (eq system.autosoftType 'stealth') (eq system.autosoftType 'evasion'))}}
@@ -245,8 +245,27 @@
                                 <label>{{localize "SR5.TargetWeapon"}}</label>
                             </div>
                             <div class="list-item-col">
-                                {{formInput systemFields.targetWeapon value=source.system.targetWeapon classes="short"
-                                            rootId=rootId disabled=@root.isPlayMode}}
+                                {{#if (eq @root.autosoftTargetMode 'category')}}
+                                    {{#if @root.weaponCategoryOptions}}
+                                        <select name="system.targetWeapon" {{#if @root.isPlayMode}}disabled{{/if}}>
+                                            {{#each @root.weaponCategoryOptions}}
+                                                <option value="{{this.value}}" {{#if (eq this.value @root.source.system.targetWeapon)}}selected{{/if}}>{{this.label}}</option>
+                                            {{/each}}
+                                        </select>
+                                    {{else}}
+                                        {{formInput systemFields.targetWeapon value=source.system.targetWeapon
+                                                    rootId=rootId disabled=@root.isPlayMode}}
+                                    {{/if}}
+                                {{else if @root.actorWeapons}}
+                                    <select name="system.targetWeapon" {{#if @root.isPlayMode}}disabled{{/if}}>
+                                        {{#each @root.actorWeapons}}
+                                            <option value="{{this.value}}" {{#if (eq this.value @root.source.system.targetWeapon)}}selected{{/if}}>{{this.label}}</option>
+                                        {{/each}}
+                                    </select>
+                                {{else}}
+                                    {{formInput systemFields.targetWeapon value=source.system.targetWeapon
+                                                rootId=rootId disabled=@root.isPlayMode}}
+                                {{/if}}
                             </div>
                         </div>
                     {{/if}}

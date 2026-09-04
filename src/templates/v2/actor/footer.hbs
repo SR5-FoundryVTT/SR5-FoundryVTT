@@ -97,7 +97,7 @@
         {{#if (eq actor.type 'spirit')}}
             {{#if @root.isEditMode}}
                 <span>
-                    {{formInput systemFields.spiritType value=source.system.spiritType options=config.spiritTypes classes="short" rootId=rootId }}
+                    {{formInput systemFields.spiritType value=source.system.spiritType localize=true classes="short" rootId=rootId }}
                 </span>
             {{else}}
                 <label>{{#if system.spiritType}}{{localizeTypeOr system.spiritType config.spiritTypes}}&nbsp;{{/if}}{{localize (concat 'TYPES.Actor.' actor.type)}}</label>
@@ -127,7 +127,7 @@
         {{#if (eq actor.type 'sprite')}}
             {{#if @root.isEditMode}}
                 <span>
-                    {{formInput systemFields.spriteType value=source.system.spriteType options=config.spriteTypes classes="short" rootId=rootId }}
+                    {{formInput systemFields.spriteType value=source.system.spriteType localize=true classes="short" rootId=rootId }}
                 </span>
             {{else}}
                 <label>{{#if system.spriteType}}{{localizeTypeOr system.spriteType config.spriteTypes}}&nbsp;{{/if}}{{localize (concat 'TYPES.Actor.' actor.type)}}</label>

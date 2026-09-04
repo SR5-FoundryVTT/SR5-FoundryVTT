@@ -29,7 +29,53 @@
     .item-footer {
         display: flex;
         flex-flow: column nowrap;
-        gap: 0;
+        gap: 0.25rem;
+        padding-top: 0.25rem;
+
+        .list-item.autosoft-config-row {
+            display: flex;
+            flex-flow: row wrap;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.5rem 1rem;
+            padding: 0.35rem 0.5rem;
+            background: var(--sr5v2-bg-secondary, rgba(0, 0, 0, 0.25));
+            border-bottom: 1px dashed var(--sr5v2-border-subtle, rgba(255, 255, 255, 0.15));
+
+            .basic-row {
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+                gap: 0.4rem;
+                flex: 0 0 auto;
+
+                label {
+                    font-weight: 600;
+                    white-space: nowrap;
+                    font-size: var(--font-size-13);
+                }
+
+                span {
+                    display: inline-flex;
+                    flex: 1 1 auto;
+                }
+
+                select, input {
+                    min-width: 160px;
+                    max-width: 360px;
+                    width: auto;
+                }
+            }
+        }
+    }
+
+    .target-weapon-icon {
+        width: 18px;
+        height: 18px;
+        vertical-align: middle;
+        border: none;
+        margin-left: 4px;
+        object-fit: contain;
     }
 
     .item-type-container {

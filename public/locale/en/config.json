@@ -9,6 +9,10 @@
         }
     },
     "SETTINGS": {
+        "AutosoftTargetModeCategory": "Weapon Category / Skill (Table Variant)",
+        "AutosoftTargetModeDescription": "Choose whether targeting autosofts bind to specific mounted weapons (RAW) or weapon categories / combat skills.",
+        "AutosoftTargetModeName": "Autosoft Targeting Mode",
+        "AutosoftTargetModeWeapon": "Specific Mounted Weapon (RAW)",
         "ApplyLimitsDescription": "Should Limits be applied to rolls",
         "ApplyLimitsName": "Apply Limits to Rolls",
         "AutomateMultiDefenseModifier": "Automate defense modifier",
@@ -806,6 +810,16 @@
         "CommonProgram": "Common Program",
         "Autosoft": "Autosoft",
         "AutosoftType": "Autosoft Type",
+        "AutosoftConfigManager": {
+            "Title": "Configure & Transfer Autosoft",
+            "TargetActor": "Target Drone / Vehicle",
+            "TargetWeapon": "Target Weapon (Gunnery)",
+            "TargetModel": "Target Model",
+            "NoWeapons": "No weapons mounted on target",
+            "NoDrones": "No owned drones or vehicles found",
+            "Submit": "Configure & Transfer",
+            "Cancel": "Cancel"
+        },
         "TargetModel": "Target Model",
         "TargetWeapon": "Target Weapon",
         "ControlMode": "Control Mode",

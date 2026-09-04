@@ -1,6 +1,7 @@
 import { DeepPartial } from 'fvtt-types/utils';
 
 import { SR5 } from '../config';
+import { FLAGS, SYSTEM_NAME } from '../constants';
 import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from './SR5Item';
@@ -111,6 +112,11 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     sourceIsUuid: boolean
 
     isUsingRangeCategory: boolean
+    actorWeapons?: Array<{ value: string; label: string }>
+    targetWeaponDoc?: SR5Item<'weapon'> | null
+    autosoftTargetMode?: string
+    weaponCategoryOptions?: Array<{ value: string; label: string }>
+    targetWeaponLabel?: string
 
     // Allow users to view what values is calculated and what isn´t
     calculatedEssence: boolean
@@ -126,8 +132,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static override DEFAULT_OPTIONS = {
         classes: ['item', 'named-sheet'],
         position: {
-            width: 600,
-            height: 500,
+            width: 620,
+            height: 580,
         },
         actions: {
             addItem: SR5ItemSheet.#addItem,
@@ -446,6 +452,95 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         if (this.item.isType('contact')) {
             data['linkedActor'] = await this.item.getLinkedActor();
+        }
+
+        if (this.item.isType('program')) {
+            const autosoftTargetMode = (game.settings.get(SYSTEM_NAME, FLAGS.AutosoftTargetMode) as string) || 'weapon';
+            data['autosoftTargetMode'] = autosoftTargetMode;
+
+            // Build weaponCategoryOptions for category mode (Table Variant)
+            const categoryOptions: Array<{ value: string; label: string }> = [{ value: '', label: '—' }];
+            for (const [key, catObj] of Object.entries(SR5.weaponRangeCategories)) {
+                if (key === 'manual') continue;
+                const label = game.i18n.localize(catObj.label);
+                categoryOptions.push({ value: key, label });
+            }
+            const combatSkillKeys = ['automatics', 'pistols', 'heavy_weapons', 'longarms', 'archery', 'exotic_ranged_weapon', 'blades', 'clubs', 'unarmed_combat'];
+            for (const skillKey of combatSkillKeys) {
+                if (SR5.activeSkills[skillKey as keyof typeof SR5.activeSkills]) {
+                    const label = game.i18n.localize(SR5.activeSkills[skillKey as keyof typeof SR5.activeSkills]);
+                    categoryOptions.push({ value: skillKey, label });
+                }
+            }
+            categoryOptions.sort((a, b) => a.value === '' ? -1 : b.value === '' ? 1 : a.label.localeCompare(b.label));
+
+            const currentTarget = (this.item.system as any).targetWeapon;
+            if (currentTarget && !categoryOptions.some(o => o.value === currentTarget)) {
+                let targetLabel = currentTarget;
+                if (SR5.weaponRangeCategories[currentTarget as keyof typeof SR5.weaponRangeCategories]) {
+                    targetLabel = game.i18n.localize(SR5.weaponRangeCategories[currentTarget as keyof typeof SR5.weaponRangeCategories].label);
+                } else if (SR5.activeSkills[currentTarget as keyof typeof SR5.activeSkills]) {
+                    targetLabel = game.i18n.localize(SR5.activeSkills[currentTarget as keyof typeof SR5.activeSkills]);
+                }
+                categoryOptions.push({ value: currentTarget, label: targetLabel });
+            }
+            data['weaponCategoryOptions'] = categoryOptions;
+
+            const actor = this.item.actorOwner;
+            if (actor) {
+                const weaponItems = actor.items.filter(i => i.isType('weapon'));
+                const weaponOptions: Array<{ value: string; label: string }> = [{ value: '', label: '—' }];
+                for (const w of weaponItems) {
+                    if (w.name) {
+                        weaponOptions.push({ value: w.uuid, label: w.name });
+                    }
+                }
+                if (currentTarget && !weaponOptions.some(o => o.value === currentTarget)) {
+                    // Try resolving currentTarget doc name if possible
+                    let targetDocName = currentTarget;
+                    if (currentTarget.startsWith('Item.') || currentTarget.startsWith('Actor.')) {
+                        const doc = foundry.utils.fromUuidSync(currentTarget) as any;
+                        if (doc?.name) targetDocName = doc.name;
+                    }
+                    weaponOptions.push({ value: currentTarget, label: targetDocName });
+                }
+                data['actorWeapons'] = weaponOptions;
+
+                const modelOptions: Array<{ value: string; label: string }> = [{ value: '', label: '—' }];
+                if (actor.name) {
+                    modelOptions.push({ value: actor.name, label: actor.name });
+                }
+                const actorModelField = (actor.system as any)?.model;
+                if (actorModelField && !modelOptions.some(m => m.value === actorModelField)) {
+                    modelOptions.push({ value: actorModelField, label: actorModelField });
+                }
+                const currentModel = (this.item.system as any).targetModel;
+                if (currentModel && !modelOptions.some(m => m.value === currentModel)) {
+                    modelOptions.push({ value: currentModel, label: currentModel });
+                }
+                data['actorModels'] = modelOptions;
+            }
+
+            const targetUuid = (this.item.system as any).targetWeapon;
+            if (targetUuid) {
+                let targetWeaponDoc: SR5Item<'weapon'> | null = null;
+                if (targetUuid.startsWith('Item.') || targetUuid.startsWith('Actor.')) {
+                    targetWeaponDoc = (foundry.utils.fromUuidSync(targetUuid) as SR5Item<'weapon'>) || null;
+                } else if (actor) {
+                    targetWeaponDoc = (actor.items.find(i => i.isType('weapon') && (i.uuid === targetUuid || i.name === targetUuid)) as SR5Item<'weapon'>) || null;
+                }
+                if (targetWeaponDoc) {
+                    data['targetWeaponDoc'] = targetWeaponDoc;
+                }
+
+                let targetWeaponLabel = targetWeaponDoc?.name || targetUuid;
+                if (SR5.weaponRangeCategories[targetUuid as keyof typeof SR5.weaponRangeCategories]) {
+                    targetWeaponLabel = game.i18n.localize(SR5.weaponRangeCategories[targetUuid as keyof typeof SR5.weaponRangeCategories].label);
+                } else if (SR5.activeSkills[targetUuid as keyof typeof SR5.activeSkills]) {
+                    targetWeaponLabel = game.i18n.localize(SR5.activeSkills[targetUuid as keyof typeof SR5.activeSkills]);
+                }
+                data['targetWeaponLabel'] = targetWeaponLabel;
+            }
         }
 
         // Provide action parts with all test variants.

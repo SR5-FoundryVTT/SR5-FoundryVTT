@@ -9,6 +9,7 @@ import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import { MoveInventoryDialog } from '../../apps/dialogs/MoveInventoryDialog';
 import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
+import { AutosoftConfigManager } from '@/module/apps/actor/AutosoftConfigManager';
 
 import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { prepareSortedEffects, prepareSortedItemEffects } from '../../effects';
@@ -227,6 +228,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     selectedInventory: string;
 
     private readonly expandedSkills = new Set<string>();
+    expandedDroneStacks: Record<string, boolean> = {};
 
     constructor(...args: ConstructorParameters<typeof ActorSheetV2>) {
         super(...args);
@@ -326,6 +328,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
             addItem: SR5BaseActorSheet.#createItem,
             editItem: SR5BaseActorSheet.#editItem,
+            openAutosoftConfigManager: SR5BaseActorSheet.#openAutosoftConfigManager,
+            toggleDroneStack: SR5BaseActorSheet.#toggleDroneStack,
+            openVehicleSheet: SR5BaseActorSheet.#openVehicleSheet,
             moveItem: SR5BaseActorSheet.#moveItem,
             deleteItem: SR5BaseActorSheet.#deleteItem,
             favoriteItem: SR5BaseActorSheet.#favoriteItem,
@@ -857,6 +862,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         let dragData;
 
+        if (target?.dataset.actorUuid) {
+            const actor = fromUuidSync(target.dataset.actorUuid);
+            if (actor) {
+                // @ts-expect-error toDragData exists on Document
+                dragData = typeof actor.toDragData === 'function' ? actor.toDragData() : { type: 'Actor', uuid: target.dataset.actorUuid };
+            }
+        }
+
         if (target?.dataset.itemId) {
             const item = this.actor.items.get(target.dataset.itemId);
             if (item) {
@@ -1098,6 +1111,43 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             item = await fromUuid(uuid);
         }
         if (item) await item.sheet?.render(true, { mode: 'edit' } as any);
+    }
+
+    static async #openAutosoftConfigManager(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        const id = SheetFlow.closestItemId(event.target);
+        let item = this.actor.items.get(id);
+        if (!item) {
+            const uuid = SheetFlow.closestUuid(event.target);
+            // @ts-expect-error typing clashes between items.get and fromUuid
+            item = (await fromUuid(uuid)) as SR5Item | null;
+        }
+        if (item && item.isType('program')) {
+            const app = new AutosoftConfigManager(this.actor, item as SR5Item<'program'>);
+            await app.render(true);
+        }
+    }
+
+    static async #toggleDroneStack(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+        const target = event.currentTarget as HTMLElement | null;
+        const stackName = target?.dataset.stackName || target?.closest<HTMLElement>('[data-stack-name]')?.dataset.stackName;
+        if (!stackName) return;
+        this.expandedDroneStacks[stackName] = !this.expandedDroneStacks[stackName];
+        await this.render();
+    }
+
+    static async #openVehicleSheet(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        const target = event.currentTarget as HTMLElement | null;
+        const actorUuid = target?.dataset.actorUuid || target?.closest<HTMLElement>('[data-actor-uuid]')?.dataset.actorUuid;
+        if (!actorUuid) return;
+        const actor = fromUuidSync(actorUuid) as SR5Actor | null;
+        if (actor) {
+            await actor.sheet?.render(true);
+        }
     }
 
     static async #moveItem(this: SR5BaseActorSheet, event: PointerEvent) {
@@ -1355,8 +1405,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         for (const item of this.actor.items) {
             if (!item.id) continue;
 
-            // Handled types are on the sheet outside the inventory.
-            if (handledTypes.includes(item.type)) continue;
+            // Handled types are on the sheet outside the inventory (except autosoft programs).
+            if (handledTypes.includes(item.type)) {
+                if (item.type === 'program' && item.system.type === 'autosoft') {
+                    // Autosofts are displayed in the inventory tab.
+                } else {
+                    continue;
+                }
+            }
 
             // Determine what inventory the item sits in.
             const inventory = itemIdInventory[item.id] || this.actor.defaultInventory;
@@ -1390,7 +1446,83 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             })
         });
 
+        this._prepareCarriedVehicles(inventoriesSheet);
+
         return inventoriesSheet;
+    }
+
+    _prepareCarriedVehicles(inventoriesSheet: InventoriesSheetData) {
+        if (!this.actor.isType('character')) return;
+
+        const ownedVehicles = game.actors.contents.filter(a => {
+            if (!a.isType('vehicle')) return false;
+            const isOwner = a.isOwner || (a as SR5Actor).system.driver === this.actor.uuid;
+            if (!isOwner) return false;
+            const sys = (a as SR5Actor).system as any;
+            const isDrone = sys.isDrone;
+            const category = sys.category;
+            const body = sys.attributes?.body?.value ?? 0;
+            return isDrone || ['micro', 'mini', 'small', 'medium', 'anthro'].includes(category) || body <= 6;
+        }) as SR5Actor[];
+
+        if (ownedVehicles.length === 0) return;
+
+        const groupsByName = new Map<string, SR5Actor[]>();
+        for (const vehicle of ownedVehicles) {
+            const name = vehicle.name || 'Drone';
+            if (!groupsByName.has(name)) {
+                groupsByName.set(name, []);
+            }
+            groupsByName.get(name)!.push(vehicle);
+        }
+
+        const vehicleItems: any[] = [];
+
+        for (const [name, actors] of groupsByName.entries()) {
+            const firstActor = actors[0];
+            const quantity = actors.length;
+            const isExpanded = !!this.expandedDroneStacks[name];
+
+            const itemObj = {
+                id: firstActor.id,
+                uuid: firstActor.uuid,
+                actorUuid: firstActor.uuid,
+                name: name,
+                img: firstActor.img || 'icons/svg/vehicle.svg',
+                type: 'vehicle',
+                system: firstActor.system,
+                isVehicleActor: true,
+                quantity: quantity,
+                isStacked: quantity > 1,
+                isExpanded: isExpanded,
+                actors: actors.map(a => ({
+                    id: a.id,
+                    uuid: a.uuid,
+                    name: a.name,
+                    img: a.img || 'icons/svg/vehicle.svg',
+                    actor: a,
+                    system: a.system
+                }))
+            };
+            vehicleItems.push(itemObj);
+        }
+
+        const targetInventories = [
+            inventoriesSheet[this.actor.defaultInventory.name],
+            inventoriesSheet[this.actor.allInventories.name]
+        ].filter(Boolean);
+
+        for (const inventorySheet of targetInventories) {
+            if (!inventorySheet.types['vehicle']) {
+                inventorySheet.types['vehicle'] = {
+                    type: 'vehicle',
+                    label: SR5.itemTypes['vehicle'] || 'SR5.ItemTypes.Vehicle',
+                    isOpen: this._inventoryOpenClose['vehicle'] ?? true,
+                    items: []
+                };
+            }
+            inventorySheet.types['vehicle'].items.push(...vehicleItems);
+        }
     }
 
     /**

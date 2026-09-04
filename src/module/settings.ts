@@ -86,6 +86,19 @@ export const registerSystemSettings = () => {
         default: '',
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.AutosoftTargetMode, {
+        name: 'SETTINGS.AutosoftTargetModeName',
+        hint: 'SETTINGS.AutosoftTargetModeDescription',
+        scope: 'world',
+        config: true,
+        type: String,
+        default: 'weapon',
+        choices: {
+            'weapon': 'SETTINGS.AutosoftTargetModeWeapon',
+            'category': 'SETTINGS.AutosoftTargetModeCategory'
+        }
+    });
+
     game.settings.register(SYSTEM_NAME, FLAGS.ShowGlitchAnimation, {
         name: 'SETTINGS.ShowGlitchAnimationName',
         hint: 'SETTINGS.ShowGlitchAnimationDescription',

@@ -52,6 +52,7 @@ export const SR5 = {
         spell: 'SR5.ItemTypes.Spell',
         sprite_power: 'SR5.ItemTypes.SpritePower',
         weapon: 'SR5.ItemTypes.Weapon',
+        vehicle: 'SR5.ItemTypes.Vehicle',
         call_in_action: 'TYPES.Item.call_in_action'
     },
 

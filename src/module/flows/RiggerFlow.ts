@@ -191,6 +191,7 @@ export const RiggerFlow = {
                     }
                 },
                 system: {
+                    targets: [{ id: 'actor', applyTo: 'actor' }],
                     changes
                 }
             } as any]);

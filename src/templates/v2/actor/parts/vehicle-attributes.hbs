@@ -4,7 +4,7 @@
     <div class="list-item-start">
         <label><strong>{{localize "SR5.ControlMode"}}:</strong></label>&nbsp;
         {{#if @root.isEditMode}}
-            {{formInput systemFields.controlMode value=source.system.controlMode options=config.controlModes rootId=@root.rootId}}
+            {{formInput systemFields.controlMode value=source.system.controlMode localize=true rootId=@root.rootId}}
         {{else}}
             <span class="tag badge {{system.controlMode}}">{{localize (objValue @root.config.controlModes system.controlMode)}}</span>
         {{/if}}

@@ -9,6 +9,10 @@
         }
     },
     "SETTINGS": {
+        "AutosoftTargetModeCategory": "Waffenkategorie / Fertigkeit (Hausregel)",
+        "AutosoftTargetModeDescription": "Wähle, ob Zielerfassungs-Autosofts an spezifische montierte Waffen (RAW) oder Waffenkategorien / Fertigkeiten gebunden sind.",
+        "AutosoftTargetModeName": "Autosoft-Zielerfassungs-Modus",
+        "AutosoftTargetModeWeapon": "Spezifische montierte Waffe (RAW)",
         "ApplyLimitsDescription": "Sollen Limits auf auf Würfen angewendet werden?",
         "ApplyLimitsName": "Verwende Limits bei Würfen",
         "AutomateMultiDefenseModifier": "Automatisiere Verteidigungsmodifikator",
@@ -808,6 +812,16 @@
         "CommonProgram": "Standardprogramm",
         "Autosoft": "Autosoft",
         "AutosoftType": "Autosoft-Typ",
+        "AutosoftConfigManager": {
+            "Title": "Autosoft konfigurieren & übertragen",
+            "TargetActor": "Ziel-Drohne / Fahrzeug",
+            "TargetWeapon": "Ziel-Waffe (Geschütze)",
+            "TargetModel": "Ziel-Modell",
+            "NoWeapons": "Keine Waffen am Ziel montiert",
+            "NoDrones": "Keine eigenen Drohnen oder Fahrzeuge gefunden",
+            "Submit": "Konfigurieren & Übertragen",
+            "Cancel": "Abbrechen"
+        },
         "TargetModel": "Ziel-Modell",
         "TargetWeapon": "Ziel-Waffe",
         "ControlMode": "Steuerungsmodus",
