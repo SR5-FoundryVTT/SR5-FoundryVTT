@@ -39,7 +39,8 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             'critter_power',
             'call_in_action',
             'sprite_power',
-            'ritual'
+            'ritual',
+            'preparation'
         ];
     }
 
@@ -84,7 +85,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         magic: {
             template: SheetFlow.templateBase('actor/tabs/magic'),
             templates: [
-                ...SheetFlow.templateActorSystemParts( 'spells', 'rituals', 'summonings', 'adept-powers'),
+                ...SheetFlow.templateActorSystemParts( 'spells', 'rituals', 'preparations', 'summonings', 'adept-powers'),
                 ],
             scrollable: ['.scrollable']
         },

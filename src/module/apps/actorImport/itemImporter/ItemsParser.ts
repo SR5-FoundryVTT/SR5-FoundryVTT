@@ -80,8 +80,10 @@ export class ItemsParser {
             items.push(...await new PowerParser().parseItems(chummerChar.powers?.power));
 
         if (importOptions.spells && chummerChar.spells?.spell) {
+            // Alchemical spells are imported as spells flagged alchemical, so they can be turned
+            // into preparations. Rituals have no alchemical variant. SR5#304.
             const rituals = IH.getArray(chummerChar.spells.spell).filter(s => s.category_english === "Rituals" && s.alchemy !== 'True');
-            const spells = IH.getArray(chummerChar.spells.spell).filter(s => s.category_english !== "Rituals" && s.alchemy !== 'True');
+            const spells = IH.getArray(chummerChar.spells.spell).filter(s => s.category_english !== "Rituals");
             items.push(...await new SpellParser().parseItems(spells));
             items.push(...await new RitualParser().parseItems(rituals));
         }

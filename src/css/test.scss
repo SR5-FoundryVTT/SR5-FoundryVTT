@@ -183,6 +183,13 @@
       height: 24px;
     }
 
+    > input[type='text'].text-value {
+      flex: 0 1 56%;
+      min-width: 6rem;
+      max-width: none;
+      width: auto;
+    }
+
     > input[type='checkbox'] {
       margin-left: auto;
       flex: 0 0 auto;

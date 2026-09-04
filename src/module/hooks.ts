@@ -2,6 +2,9 @@ import { CompileSpriteTest } from './tests/CompileSpriteTest';
 import { OpposedSummonSpiritTest } from './tests/OpposedSummonSpiritTest';
 import { OpposedRitualTest } from './tests/OpposedRitualTest';
 import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
+import { PreparationCreationTest } from './tests/PreparationCreationTest';
+import { OpposedPreparationForceTest } from './tests/OpposedPreparationForceTest';
+import { PreparationTriggerTest } from './tests/PreparationTriggerTest';
 import { SR5 } from './config';
 import { Migrator } from './migrator/Migrator';
 import { registerSystemSettings } from './settings';
@@ -23,6 +26,7 @@ import { WorldTimeFlow } from './flows/WorldTimeFlow';
 import { ExtendedTestManager } from './apps/ExtendedTestManager';
 import { ExtendedTestFlow } from './flows/ExtendedTestFlow';
 import { ExtendedTestDueFlow } from './flows/ExtendedTestDueFlow';
+import { PreparationDecayFlow } from './flows/PreparationDecayFlow';
 import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
 import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
 import { CharacterImporter } from './apps/actorImport/characterImporter/CharacterImporter';
@@ -124,6 +128,7 @@ import { Metamagic } from './types/item/Metamagic';
 import { Modification } from './types/item/Modification';
 import { Program } from './types/item/Program';
 import { Quality } from './types/item/Quality';
+import { Preparation } from './types/item/Preparation';
 import { Ritual } from './types/item/Ritual';
 import { Sin } from './types/item/Sin';
 import { Spell } from './types/item/Spell';
@@ -180,6 +185,7 @@ export class HooksManager {
         // Announce extended tests game time has made rollable again. Debounced, as holding a
         // time preset would otherwise scan every record per tick.
         Hooks.on('updateWorldTime', foundry.utils.debounce(() => { void ExtendedTestDueFlow.announceDue(); }, 250));
+        Hooks.on('updateWorldTime', foundry.utils.debounce(() => { void PreparationDecayFlow.onWorldTimeChange(); }, 250));
 
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();
@@ -262,6 +268,9 @@ ___________________
                 SpellCastingTest,
                 RitualSpellcastingTest,
                 OpposedRitualTest,
+                PreparationCreationTest,
+                OpposedPreparationForceTest,
+                PreparationTriggerTest,
                 CombatSpellDefenseTest,
                 DrainTest,
                 FadeTest,
@@ -314,6 +323,8 @@ ___________________
                 SummonSpiritTest,
                 CompileSpriteTest,
                 RitualSpellcastingTest,
+                PreparationCreationTest,
+                PreparationTriggerTest,
                 BruteForceTest,
                 HackOnTheFlyTest,
                 MatrixResistTest,
@@ -334,6 +345,7 @@ ___________________
                 OpposedSummonSpiritTest,
                 OpposedCompileSpriteTest,
                 OpposedRitualTest,
+                OpposedPreparationForceTest,
                 OpposedBruteForceTest,
                 OpposedHackOnTheFlyTest,
                 OpposedCheckOverwatchScoreTest,
@@ -450,6 +462,7 @@ ___________________
         CONFIG.Item.dataModels["modification"] = Modification;
         CONFIG.Item.dataModels["program"] = Program;
         CONFIG.Item.dataModels["quality"] = Quality;
+        CONFIG.Item.dataModels["preparation"] = Preparation;
         CONFIG.Item.dataModels["ritual"] = Ritual;
         CONFIG.Item.dataModels["sin"] = Sin;
         CONFIG.Item.dataModels["skill"] = Skill;

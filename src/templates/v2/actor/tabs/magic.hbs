@@ -4,8 +4,16 @@
             {{#if (isType actor 'character')}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/adept-powers.hbs' }}
             {{/if}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/spells.hbs' }}
+            {{#if (or @root.isEditMode hasSpells)}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/spells.hbs'
+                        spells=spells label='SR5.Spell.Spells' alchemical=false }}
+            {{/if}}
             {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/rituals.hbs' }}
+            {{#if (or @root.isEditMode hasAlchemicalSpells)}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/spells.hbs'
+                        spells=alchemicalSpells label='SR5.Preparation.Formulae' alchemical=true }}
+            {{/if}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/preparations.hbs' }}
             {{#if (isType actor 'character')}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/summonings.hbs' }}
             {{/if}}

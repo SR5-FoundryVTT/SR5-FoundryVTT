@@ -65,6 +65,10 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/quality.hbs"}}
             {{/if}}
 
+            {{#if (isType item 'preparation')}}
+                {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/preparation.hbs"}}
+            {{/if}}
+
             {{#if (isType item 'ritual')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/ritual.hbs"}}
             {{/if}}

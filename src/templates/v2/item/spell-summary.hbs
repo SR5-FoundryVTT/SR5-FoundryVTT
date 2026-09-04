@@ -1,5 +1,5 @@
 <section class="spell-like-summary">
-    {{#if (isType item 'spell')}}
+    {{#if (isType item 'spell' 'preparation')}}
         {{#with (spellDescriptorLine system @root.config)}}
             <div class="spell-like-summary-descriptors">{{this}}</div>
         {{/with}}

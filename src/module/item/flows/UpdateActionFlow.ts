@@ -86,6 +86,7 @@ export const UpdateActionFlow = {
         const typeHandler = {
             'weapon': UpdateActionFlow.injectWeaponTestIntoChangeData.bind(UpdateActionFlow),
             'spell': UpdateActionFlow.injectSpellTestIntoChangeData.bind(UpdateActionFlow),
+            'preparation': UpdateActionFlow.injectPreparationTestIntoChangeData.bind(UpdateActionFlow),
             'complex_form': UpdateActionFlow.injectComplexFormTestIntoChangeData.bind(UpdateActionFlow),
             'call_in_action': UpdateActionFlow.injectCallInActionTestIntoChangeData.bind(UpdateActionFlow)
         };
@@ -124,38 +125,97 @@ export const UpdateActionFlow = {
      * See injectActionTestsIntoChangeData for documentation.
      */
     injectSpellTestIntoChangeData(type: string, changeData: DeepPartial<{system: Item.SystemOfType<'spell'>}>, applyData, spell?: SR5Item<'spell'>) {
-        // Reconfigure on category or direct/indirect changes, including partial item updates.
-        if (changeData?.system?.category === undefined && changeData?.system?.combat?.type === undefined) return;
+        // Reconfigure on category, direct/indirect or alchemical changes, including partial item updates.
+        const changed = changeData?.system;
+        if (changed?.category === undefined && changed?.combat?.type === undefined && changed?.alchemical === undefined) return;
 
-        const category = changeData.system?.category ?? spell?.system.category;
-        const combatType = changeData.system?.combat?.type ?? spell?.system.combat.type;
+        const category = changed?.category ?? spell?.system.category;
+        const combatType = changed?.combat?.type ?? spell?.system.combat.type;
+        const alchemical = changed?.alchemical ?? spell?.system.alchemical ?? false;
         if (category === undefined) return;
 
         // Remove test when user selects empty category.
         if (category === '') {
             foundry.utils.setProperty(applyData, 'system.action.test', '');
             return;
-        } 
+        }
+
+        // Toggling the flag switches which skill is rolled. Only written when the flag itself
+        // changes, so a user's own skill choice survives unrelated category edits.
+        if (changed?.alchemical !== undefined) {
+            foundry.utils.setProperty(applyData, 'system.action.skill', alchemical ? 'alchemy' : 'spellcasting');
+            foundry.utils.setProperty(applyData, 'system.action.attribute', 'magic');
+        }
+
+        // An alchemical spell is a preparation formula, it's prepared rather than cast. SR5#304.
+        if (alchemical) {
+            const alchemyTest = SR5.alchemicalSpellTests.test;
+
+            foundry.utils.setProperty(applyData, 'system.action.test', alchemyTest);
+            foundry.utils.setProperty(applyData, 'system.action.opposed.test', SR5.alchemicalSpellTests.opposed);
+            foundry.utils.setProperty(applyData, 'system.action.opposed.resist.test', '');
+            foundry.utils.setProperty(applyData, 'system.action.followed.test', SR5.followedTests[alchemyTest] ?? '');
+            return;
+        }
 
         // Based on category switch out active, opposed and resist test.
         const test = SR5.activeTests[type];
         const drainTest = SR5.followedTests[test] ?? '';
-        const opposedTest = 
-            (category === 'combat' 
-                ? SR5.opposedTests[type][category][combatType]
-                : SR5.opposedTests[type][category]
-            ) || 'OpposedTest';
-
-        const resistTest = 
-            (category === 'combat'
-                ? SR5.opposedResistTests[type][category][combatType]
-                : SR5.opposedResistTests[type][category]
-            ) || '';
+        const { opposedTest, resistTest } = UpdateActionFlow.spellOpposedTests(type, category, combatType);
 
         foundry.utils.setProperty(applyData, 'system.action.test', test);
         foundry.utils.setProperty(applyData, 'system.action.opposed.test', opposedTest);
         foundry.utils.setProperty(applyData, 'system.action.opposed.resist.test', resistTest);
         foundry.utils.setProperty(applyData, 'system.action.followed.test', drainTest);
+    },
+
+    /**
+     * See injectActionTestsIntoChangeData for documentation.
+     *
+     * A preparation defends like the spell it stores, but never causes drain when triggered, as
+     * the alchemist already resisted it during creation. See SR5#306.
+     */
+    injectPreparationTestIntoChangeData(type: string, changeData: DeepPartial<{system: Item.SystemOfType<'preparation'>}>, applyData, preparation?: SR5Item<'preparation'>) {
+        // Reconfigure on category or direct/indirect changes, including partial item updates.
+        const changed = changeData?.system;
+        if (changed?.category === undefined && changed?.combat?.type === undefined) return;
+
+        const category = changed?.category ?? preparation?.system.category;
+        const combatType = changed?.combat?.type ?? preparation?.system.combat.type;
+        if (category === undefined) return;
+
+        // Remove test when the stored spell has no category.
+        if (category === '') {
+            foundry.utils.setProperty(applyData, 'system.action.test', '');
+            return;
+        }
+
+        const test = SR5.activeTests[type];
+        const { opposedTest, resistTest } = UpdateActionFlow.spellOpposedTests(type, category, combatType);
+
+        foundry.utils.setProperty(applyData, 'system.action.test', test);
+        foundry.utils.setProperty(applyData, 'system.action.opposed.test', opposedTest);
+        foundry.utils.setProperty(applyData, 'system.action.opposed.resist.test', resistTest);
+        foundry.utils.setProperty(applyData, 'system.action.followed.test', '');
+    },
+
+    /**
+     * Opposed and resist tests for a spell-like item, combat spells split by direct/indirect.
+     */
+    spellOpposedTests(type: string, category: string, combatType?: string) {
+        const opposedTest =
+            (category === 'combat'
+                ? SR5.opposedTests[type][category][combatType]
+                : SR5.opposedTests[type][category]
+            ) || 'OpposedTest';
+
+        const resistTest =
+            (category === 'combat'
+                ? SR5.opposedResistTests[type][category][combatType]
+                : SR5.opposedResistTests[type][category]
+            ) || '';
+
+        return { opposedTest, resistTest };
     },
 
     /**

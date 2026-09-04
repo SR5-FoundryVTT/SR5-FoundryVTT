@@ -35,6 +35,7 @@ import { actorArmorFlowTesting } from './sr5.ActorArmorFlow.spec';
 import { shadowrunDiceSoNiceTesting } from './sr5.DiceSoNice.spec';
 import { shadowrunDataStorage } from './sr5.DataStorage.spec';
 import { shadowrunChatMessageLayoutTesting } from './sr5.ChatMessageLayout.spec';
+import { shadowrunAlchemy } from './sr5.Alchemy.spec';
 
 import { Quench, QuenchRegisterBatchFunction, QuenchRegisterBatchOptions } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
@@ -172,6 +173,9 @@ export const quenchRegister = (quench: Quench) => {
     });
     registerBatch(quench, 'shadowrun5e.actor.armor_flow', actorArmorFlowTesting, {
         displayName: 'SHADOWRUN5e: Actor Armor Flow Test',
+    });
+    registerBatch(quench, 'shadowrun5e.rules.alchemy', shadowrunAlchemy, {
+        displayName: 'SHADOWRUN5e: Alchemy Preparations',
     });
     registerBatch(quench, 'shadowrun5e.migrators', Migrators, {
         displayName: 'SHADOWRUN5e: Migrators Test',
