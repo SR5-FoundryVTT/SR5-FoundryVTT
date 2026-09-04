@@ -76,35 +76,12 @@ export const MatrixTargetingFlow = {
 
         if (!actor.uuid) return [];
 
-        // gather all actors and find the actors that we have ownership of (shadowrun character ownership, not Foundry Player ownership)
-        const actors = game.actors.filter((a) => {
-            // we don't want to include our own persona in this list
-            if (a === actor) return false;
-            return a instanceof SR5Actor && ActorOwnershipFlow._isOwnerOfActor(actor, a) && !a.getToken();
-        });
-
-        for (const slave of actors) {
-            // Filter out the actor itself.
-            if (slave.uuid === actor.uuid) continue;
-
-            const type = MatrixNetworkFlow.getDocumentType(slave);
-            const name = slave.getToken()?.name ?? slave.name;
-            targets.push({
-                name,
-                document: slave,
-                token: null,
-                runningSilent: slave.isRunningSilent(),
-                network: this._getNetworkName(slave.network),
-                type,
-                icons: []
-            })
-        }
         if (canvas.scene?.tokens) {
-            // go through the canvas tokens and see if we own any of them
+            // Only show owned drones/vehicles present on the current active scene
             for (const token of canvas.scene.tokens) {
                 if (!token.actor?.uuid) continue;
-                // again don't add ourselves, we do that later
-                if (token.actor.uuid === actor.uuid) continue;
+                if (token.actor.uuid === actor.uuid || token.actor.id === actor.id) continue;
+
                 if (token.actor instanceof SR5Actor && ActorOwnershipFlow._isOwnerOfActor(actor, token.actor)) {
                     const type = MatrixNetworkFlow.getDocumentType(token.actor);
                     targets.push({
@@ -115,8 +92,30 @@ export const MatrixTargetingFlow = {
                         network: this._getNetworkName(token.actor.network),
                         type,
                         icons: []
-                    })
+                    });
                 }
+            }
+        } else {
+            // Fallback when no active scene is present: gather sidebar actors
+            const actors = game.actors.filter((a) => {
+                if (a === actor || a.id === actor.id) return false;
+                return a instanceof SR5Actor && ActorOwnershipFlow._isOwnerOfActor(actor, a);
+            });
+
+            for (const slave of actors) {
+                if (slave.uuid === actor.uuid) continue;
+
+                const type = MatrixNetworkFlow.getDocumentType(slave);
+                const name = slave.getToken()?.name ?? slave.name;
+                targets.push({
+                    name,
+                    document: slave,
+                    token: null,
+                    runningSilent: slave.isRunningSilent(),
+                    network: this._getNetworkName(slave.network),
+                    type,
+                    icons: []
+                });
             }
         }
         this._dedupeTargetsByDocumentUuid(targets);
