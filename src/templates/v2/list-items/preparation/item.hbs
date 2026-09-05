@@ -1,6 +1,6 @@
 {{!-- list-item expects an SR5Item to be passed in as 'item' --}}
 <div class="list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
-    <div class="list-item {{#if (isOwner item owner=@root.actor)}} draggable {{/if}}{{#if item.system.inert}} inert {{/if}}"
+    <div class="list-item {{#if (isOwner item owner=@root.actor)}} draggable {{/if}}"
          data-source="{{item.system.description.source}}"
          data-item-id="{{item.id}}"
          data-context-menu="item"
@@ -21,10 +21,18 @@
                 {{localizeOb item.system.trigger @root.config.preparationTriggers}}
             </label>
         </div>
-        <div class="list-item-col">
+        <div class="list-item-col preparation-potency-list">
             <label data-tooltip="SR5.Tooltips.Preparation.Potency">
                 {{item.system.potency.value}}/{{item.system.potency.base}}
             </label>
+            {{#with (preparationPotencyStatus item)}}
+                <div class="preparation-potency-meter state-{{state}}"
+                     style="--decay-threshold: {{decayThresholdPercent}}%;"
+                     data-tooltip="{{tooltip}}">
+                    <progress max="{{progressMax}}" value="{{progressValue}}" aria-label="{{tooltip}}"></progress>
+                    <span class="preparation-potency-threshold" aria-hidden="true"></span>
+                </div>
+            {{/with}}
         </div>
 
         <div class="list-item-icons">

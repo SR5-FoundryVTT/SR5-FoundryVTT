@@ -280,4 +280,12 @@
         }
     }
 
+    .preparation-potency-timeline-row {
+        padding-block: 0.35rem;
+
+        .preparation-potency-meter {
+            flex: 1;
+        }
+    }
+
 }

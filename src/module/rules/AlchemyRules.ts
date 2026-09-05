@@ -99,7 +99,7 @@ export const AlchemyRules = {
     },
 
     /**
-     * The world time at which a preparation reaches potency 0 and goes inert.
+     * The world time at which a preparation reaches potency 0.
      *
      * Full strength for (potency x 2) hours, then -1 per hour, so (potency x 3) hours in total.
      */

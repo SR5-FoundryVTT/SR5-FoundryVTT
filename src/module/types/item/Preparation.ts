@@ -2,7 +2,7 @@ import { SR5 } from "@/module/config";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { SpellPartData } from "../template/SpellPart";
-const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 /**
  * An alchemical preparation as described on SR5#304-306.
@@ -43,12 +43,11 @@ const PreparationData = () => ({
         worldTime: new NumberField({
             required: true,
             nullable: false,
-            initial: () => game.time.worldTime,
+            // fvtt-types currently widens callable initials in Item subtype unions. Keep the
+            // runtime callback while preserving this field's numeric source type.
+            initial: (() => game.time.worldTime) as unknown as number,
         }),
     }),
-
-    // Potency reached 0 or the lynchpin broke: the spell is lost but the object remains. SR5#305.
-    inert: new BooleanField({ initial: false }),
 });
 
 export class Preparation extends ItemBase<ReturnType<typeof PreparationData>> {

@@ -1,6 +1,82 @@
 @use 'config/variables';
 
 .sr5v2 {
+    .preparation-potency-meter {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        min-width: 5.5rem;
+
+        progress {
+            appearance: none;
+            display: block;
+            width: 100%;
+            height: 1rem;
+            overflow: hidden;
+            border: 1px solid var(--sr5v2-control-border);
+            border-radius: 0.25rem;
+            background: var(--sr5v2-control-bg);
+        }
+
+        progress::-webkit-progress-bar {
+            background: linear-gradient(
+                to right,
+                color-mix(in srgb, var(--sr5v2-label) 18%, var(--sr5v2-control-bg)) 0 var(--decay-threshold),
+                var(--sr5v2-control-bg) var(--decay-threshold) 100%
+            );
+        }
+
+        progress::-webkit-progress-value {
+            background: var(--sr5v2-positive);
+            transition: width 150ms ease;
+        }
+
+        &.state-decaying progress::-webkit-progress-value {
+            background: var(--sr5v2-label);
+        }
+
+        progress::-moz-progress-bar {
+            background: var(--sr5v2-positive);
+        }
+
+        &.state-decaying progress::-moz-progress-bar {
+            background: var(--sr5v2-label);
+        }
+
+        .preparation-potency-threshold {
+            position: absolute;
+            z-index: 1;
+            top: -0.15rem;
+            bottom: -0.15rem;
+            left: var(--decay-threshold);
+            width: 2px;
+            border-radius: 1px;
+            background: var(--sr5v2-control-border-hover);
+            box-shadow: 0 0 0 1px var(--sr5v2-control-bg);
+            pointer-events: none;
+        }
+
+        &.state-spent .preparation-potency-threshold {
+            display: none;
+        }
+    }
+
+    .preparation-potency-list {
+        flex-flow: column nowrap;
+        gap: 0.1rem;
+        min-width: 7rem;
+
+        .preparation-potency-meter progress {
+            height: 0.45rem;
+        }
+
+        .preparation-potency-threshold {
+            top: -0.1rem;
+            bottom: -0.1rem;
+        }
+    }
+
     // list-item classes should be renamed to list-item when complete
     .list-item-container {
         display: flex;

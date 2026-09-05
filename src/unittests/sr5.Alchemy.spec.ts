@@ -11,6 +11,7 @@ import { PhysicalDefenseTest } from "../module/tests/PhysicalDefenseTest";
 import { SR5Actor } from "../module/actor/SR5Actor";
 import { SR5Item } from "../module/item/SR5Item";
 import { PreparationTimeDialog } from "../module/apps/dialogs/PreparationTimeDialog";
+import { preparePreparationPotencyStatus } from "../module/item/prep/PreparationPotencyStatus";
 
 const HOUR = 3600;
 
@@ -360,18 +361,18 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.equal(trigger.data.action.followed.test, '');
 
             // Single use. SG#209.
-            assert.isTrue(preparation.system.inert);
+            assert.equal(preparation.system.potency.base, 0);
             assert.equal(preparation.system.potency.value, 0);
         });
 
-        it('does not allow an inert preparation to trigger again', async () => {
+        it('does not allow a spent preparation to trigger again', async () => {
             const alchemist = await createAlchemist();
             const [created] = await alchemist.createEmbeddedDocuments('Item', [{
                 name: 'Spent Preparation', type: 'preparation',
                 system: {
                     category: 'combat', combat: { type: 'indirect' },
-                    force: 4, trigger: 'contact', inert: true,
-                    potency: { base: 3, value: 0 },
+                    force: 4, trigger: 'contact',
+                    potency: { base: 0, value: 0 },
                     created: { worldTime: game.time.worldTime },
                 }
             }]) as SR5Item[];
@@ -382,7 +383,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             await trigger.execute();
 
             assert.isFalse(trigger.evaluated);
-            assert.isTrue(preparation.system.inert);
+            assert.equal(preparation.system.potency.base, 0);
         });
 
         it('does not grant a dodge test against a contact-triggered indirect spell', async () => {
@@ -446,7 +447,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.instanceOf(trigger, PreparationTriggerTest);
             assert.isTrue(trigger?.evaluated);
             assert.equal(trigger?.data.potency, 2);
-            assert.isTrue(preparation.system.inert);
+            assert.equal(preparation.system.potency.base, 0);
         });
     });
 
@@ -485,7 +486,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.equal(components.second, shown.second);
         });
 
-        it('updates creation time, recalculates potency, and preserves inert state', async () => {
+        it('updates creation time and recalculates potency', async () => {
             const preparation = await factory.createItem({
                 type: 'preparation',
                 system: {
@@ -493,7 +494,6 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
                     force: 4,
                     potency: { base: 3 },
                     created: { worldTime: game.time.worldTime },
-                    inert: false,
                 }
             }) as SR5Item<'preparation'>;
 
@@ -501,24 +501,23 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
 
             assert.equal(preparation.system.created.worldTime, game.time.worldTime - 8 * HOUR);
             assert.equal(preparation.system.potency.value, 1);
-            assert.isFalse(preparation.system.inert);
         });
 
-        it('does not revive an inert preparation when its creation time changes', async () => {
+        it('revives a time-expired preparation when its creation time is corrected', async () => {
             const preparation = await factory.createItem({
                 type: 'preparation',
                 system: {
                     category: 'combat',
                     potency: { base: 3 },
                     created: { worldTime: game.time.worldTime - 10 * HOUR },
-                    inert: true,
                 }
             }) as SR5Item<'preparation'>;
 
+            assert.equal(preparation.system.potency.value, 0);
+
             await PreparationTimeDialog.setCreationTime(preparation, game.time.worldTime);
 
-            assert.isTrue(preparation.system.inert);
-            assert.equal(preparation.system.potency.value, 0);
+            assert.equal(preparation.system.potency.value, 3);
         });
 
         it('derives the current potency during data preparation', async () => {
@@ -569,7 +568,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.equal(potency, 2);
         });
 
-        it('recognizes only due, live timed triggers', async () => {
+        it('recognizes only due timed triggers with potency', async () => {
             const preparation = await factory.createItem({
                 type: 'preparation',
                 system: {
@@ -584,12 +583,12 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.isTrue(PreparationDecayFlow.isTimeTriggerDue(
                 preparation.system, game.time.worldTime + HOUR));
 
-            await preparation.update({ system: { inert: true } });
+            await preparation.update({ system: { potency: { base: 0, value: 0 } } });
             assert.isFalse(PreparationDecayFlow.isTimeTriggerDue(
                 preparation.system, game.time.worldTime + HOUR));
         });
 
-        it('reports an expired preparation as ready to retire', async () => {
+        it('reports a preparation whose potency has expired', async () => {
             const preparation = await factory.createItem({
                 type: 'preparation',
                 system: {
@@ -602,22 +601,77 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.isTrue(PreparationDecayFlow.hasExpired(preparation.system, game.time.worldTime));
         });
 
-        it('does not report a fresh or already inert preparation', async () => {
+        it('does not report a fresh or spent preparation as expired', async () => {
             const fresh = await factory.createItem({
                 type: 'preparation',
                 system: { potency: { base: 2 }, created: { worldTime: game.time.worldTime } }
             });
             assert.isFalse(PreparationDecayFlow.hasExpired(fresh.system, game.time.worldTime));
 
-            const inert = await factory.createItem({
+            const spent = await factory.createItem({
                 type: 'preparation',
                 system: {
-                    inert: true,
-                    potency: { base: 2 },
+                    potency: { base: 0 },
                     created: { worldTime: game.time.worldTime - 100 * HOUR }
                 }
             });
-            assert.isFalse(PreparationDecayFlow.hasExpired(inert.system, game.time.worldTime));
+            assert.isFalse(PreparationDecayFlow.hasExpired(spent.system, game.time.worldTime));
+        });
+
+        it('detects only forward crossings of the expiration boundary', async () => {
+            const created = game.time.worldTime;
+            const preparation = await factory.createItem({
+                type: 'preparation',
+                system: { potency: { base: 2 }, created: { worldTime: created } }
+            });
+            const expiresAt = AlchemyRules.expiresAt(2, created);
+
+            assert.isTrue(PreparationDecayFlow.crossedExpiry(
+                preparation.system, expiresAt - 1, expiresAt));
+            assert.isFalse(PreparationDecayFlow.crossedExpiry(
+                preparation.system, expiresAt, expiresAt + 1));
+            assert.isFalse(PreparationDecayFlow.crossedExpiry(
+                preparation.system, expiresAt + 1, expiresAt - 1));
+        });
+
+        it('prepares full, decaying, expired, and spent potency states', async () => {
+            const created = game.time.worldTime;
+            const preparation = await factory.createItem({
+                type: 'preparation',
+                system: { potency: { base: 3 }, created: { worldTime: created } }
+            });
+
+            const full = preparePreparationPotencyStatus(preparation.system, created);
+            const decaying = preparePreparationPotencyStatus(preparation.system, created + 7 * HOUR);
+            const expired = preparePreparationPotencyStatus(preparation.system, created + 9 * HOUR);
+
+            await preparation.update({ system: { potency: { base: 0, value: 0 } } });
+            const spent = preparePreparationPotencyStatus(preparation.system, created);
+
+            assert.include(full, {
+                state: 'full', currentPotency: 3, basePotency: 3,
+                progressValue: 9 * HOUR, progressMax: 9 * HOUR,
+            });
+            assert.include(decaying, {
+                state: 'decaying', currentPotency: 2, basePotency: 3,
+                progressValue: 2 * HOUR, progressMax: 9 * HOUR,
+            });
+            assert.include(expired, {
+                state: 'expired', currentPotency: 0, basePotency: 3,
+                progressValue: 0, remainingSeconds: 0,
+            });
+            assert.include(spent, {
+                state: 'spent', currentPotency: 0, basePotency: 0,
+                progressValue: 0, progressMax: 1,
+            });
+            assert.equal(full.remainingSeconds, 9 * HOUR);
+            assert.closeTo(full.decayThresholdPercent, 100 / 3, 0.001);
+            assert.include(full.tooltip, WorldTimeFlow.format(full.expiresAt));
+        });
+
+        it('removes inert from the preparation schema', () => {
+            const fields = CONFIG.Item.dataModels['preparation'].schema.fields as Record<string, unknown>;
+            assert.notProperty(fields, 'inert');
         });
 
         it('labels its inherited spell fields', async () => {

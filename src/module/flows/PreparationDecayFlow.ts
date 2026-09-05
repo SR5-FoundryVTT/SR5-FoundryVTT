@@ -9,7 +9,7 @@ import { PreparationTriggerTest } from "../tests/PreparationTriggerTest";
  *
  * The current potency itself is derived during item data preparation (see PreparationPrep), so
  * this flow never has to write it. What it does is handle the side effects of time passing:
- * refreshing sheets that show a now stale potency, and retiring preparations that ran out.
+ * refreshing sheets that show stale potency and announcing when preparations run out.
  *
  * See SR5#305 'The Finished Preparation'.
  */
@@ -17,6 +17,10 @@ export const PreparationDecayFlow = {
     // A burst of world-time updates must not start the same timed preparation twice while its
     // asynchronous roll is still resolving.
     triggering: new Set<string>(),
+
+    // Last world time processed by this client. This detects expiry boundary crossings without
+    // persisting lifecycle state on every preparation.
+    previousWorldTime: undefined as number | undefined,
 
     /**
      * Every preparation item carried by an actor.
@@ -38,22 +42,35 @@ export const PreparationDecayFlow = {
     },
 
     /**
-     * Has this preparation run out of potency without being marked inert yet?
+     * Has this preparation run out of potency?
      *
      * Pure over the item data and time, so the rule can be unit tested.
      */
     hasExpired(system: Item.SystemOfType<'preparation'>, worldTime: number): boolean {
-        if (system.inert) return false;
         if (system.potency.base <= 0) return false;
 
         return AlchemyRules.currentPotency(system.potency.base, system.created.worldTime, worldTime) <= 0;
     },
 
     /**
+     * Did advancing world time cross this preparation's expiration boundary?
+     */
+    crossedExpiry(
+        system: Item.SystemOfType<'preparation'>,
+        previousWorldTime: number,
+        worldTime: number
+    ): boolean {
+        if (system.potency.base <= 0 || worldTime <= previousWorldTime) return false;
+
+        const expiresAt = AlchemyRules.expiresAt(system.potency.base, system.created.worldTime);
+        return previousWorldTime < expiresAt && worldTime >= expiresAt;
+    },
+
+    /**
      * Whether a valid timed preparation has reached its scheduled activation instant.
      */
     isTimeTriggerDue(system: Item.SystemOfType<'preparation'>, worldTime: number): boolean {
-        if (system.inert || system.trigger !== 'time' || system.potency.base <= 0) return false;
+        if (system.trigger !== 'time' || system.potency.base <= 0) return false;
 
         const triggerWorldTime = system.created.worldTime + Math.max(system.triggerTime, 0);
         if (triggerWorldTime > AlchemyRules.expiresAt(system.potency.base, system.created.worldTime)) return false;
@@ -71,7 +88,8 @@ export const PreparationDecayFlow = {
     ): Promise<PreparationTriggerTest | undefined> {
         const owner = preparation.actor;
         const uuid = preparation.uuid;
-        if (!owner || !uuid || preparation.system.inert || PreparationDecayFlow.triggering.has(uuid)) return;
+        if (!owner || !uuid || preparation.system.potency.base <= 0
+            || PreparationDecayFlow.triggering.has(uuid)) return;
 
         PreparationDecayFlow.triggering.add(uuid);
         try {
@@ -92,14 +110,14 @@ export const PreparationDecayFlow = {
     },
 
     /**
-     * Retire every preparation whose potency reached 0 and refresh anything showing one.
-     *
-     * The write runs on the active GM alone, so a second connected GM can't retire them twice.
-     * Preparations are never deleted: the lynchpin is still an ordinary object once the magic
-     * is gone.
+     * Resolve timed triggers, announce newly expired preparations, and refresh their displays.
+     * Only the active GM creates rolls and chat messages.
      */
     async onWorldTimeChange() {
         const worldTime = game.time.worldTime;
+        const previousWorldTime = PreparationDecayFlow.previousWorldTime ?? worldTime;
+        PreparationDecayFlow.previousWorldTime = worldTime;
+
         const preparations = PreparationDecayFlow.preparations();
         if (!preparations.length) return;
 
@@ -109,10 +127,9 @@ export const PreparationDecayFlow = {
                     await PreparationDecayFlow.triggerTimedPreparation(preparation);
                     continue;
                 }
-                if (!PreparationDecayFlow.hasExpired(preparation.system, worldTime)) continue;
-
-                await preparation.update({ system: { inert: true } });
-                await PreparationDecayFlow.announceExpiry(preparation);
+                if (PreparationDecayFlow.crossedExpiry(
+                    preparation.system, previousWorldTime, worldTime
+                )) await PreparationDecayFlow.announceExpiry(preparation);
             }
         }
 

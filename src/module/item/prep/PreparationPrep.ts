@@ -15,11 +15,6 @@ export const PreparationPrep = {
      * stays correct when the GM rewinds time. See SR5#305 'The Finished Preparation'.
      */
     preparePotency(system: Item.SystemOfType<'preparation'>) {
-        if (system.inert) {
-            system.potency.value = 0;
-            return;
-        }
-
         system.potency.value = AlchemyRules.currentPotency(
             system.potency.base,
             system.created.worldTime,

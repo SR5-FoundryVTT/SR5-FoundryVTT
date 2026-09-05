@@ -189,7 +189,6 @@ export class OpposedPreparationForceTest extends OpposedTest<OpposedPreparationF
                 triggerTime,
                 potency: { base: potency, value: potency },
                 created: { worldTime: game.time.worldTime },
-                inert: false,
             }
         };
 

@@ -3423,7 +3423,7 @@
             "TokenSelectionNeeded": "One or more tokens need to be selected",
             "PreparationForceTooHigh": "Preparation force is invalid or greater than twice your Magic rating.",
             "PreparationTriggerTimeTooLong": "The time trigger is set further out than the preparation's potency in hours. It will activate prematurely.",
-            "PreparationInert": "This preparation is inert. Its spell has been lost.",
+            "PreparationDepleted": "This preparation has no potency remaining. Its spell has been lost.",
             "PreparationNotConcluded": "The preparation is not finished yet. Let its force resist first."
         },
         "Weapon": {
@@ -3635,10 +3635,12 @@
         "WirelessUnavailable": "Unavailable",
         "Preparation": {
             "Potency": "Potency",
-            "Inert": "Inert",
             "Lynchpin": "Lynchpin",
             "Expires": "Expires",
+            "ExpiresAt": "Expires at {time}",
+            "ExpiresIn": "Expires in {duration}",
             "Expired": "Expired",
+            "ExpiredAt": "Expired at {time}",
             "ExpiredMessage": "{name} has lost its potency. The stored spell is gone.",
             "FullPotencyUntil": "Full potency until",
             "Formulae": "Alchemical Formulae",
@@ -3646,6 +3648,7 @@
             "Create": "Create Preparation",
             "CraftingTime": "Crafting Time",
             "CraftingTimeMinutes": "{minutes} minutes",
+            "Spent": "Spent",
             "CreationTimeDialog": {
                 "Edit": "Edit creation time",
                 "Invalid": "Enter a valid creation date and time.",
@@ -3693,10 +3696,6 @@
                         "label": "Creation Time",
                         "hint": "World time the preparation was created at."
                     }
-                },
-                "inert": {
-                    "label": "Inert",
-                    "hint": "The preparation lost its magic and is an ordinary object again."
                 }
             }
         }

@@ -92,14 +92,12 @@ export class PreparationTriggerTest extends SpellCastingTest {
         );
     }
 
-    /**
-     * A preparation whose magic has been released or faded cannot cast again.
-     */
+    /** A preparation without remaining potency cannot cast again. */
     override userCanExecute(): boolean {
         if (!super.userCanExecute()) return false;
-        if (this.item && !this.item.system.inert && this.data.potency > 0) return true;
+        if (this.item && this.data.potency > 0) return true;
 
-        ui.notifications?.warn('SR5.Warnings.PreparationInert', { localize: true });
+        ui.notifications?.warn('SR5.Warnings.PreparationDepleted', { localize: true });
         return false;
     }
 
@@ -164,8 +162,8 @@ export class PreparationTriggerTest extends SpellCastingTest {
      */
     async consumePreparation() {
         if (!this.item) return;
-        if (this.item.system.inert) return;
+        if (this.item.system.potency.base <= 0) return;
 
-        await this.item.update({ system: { inert: true, potency: { base: 0, value: 0 } } });
+        await this.item.update({ system: { potency: { base: 0, value: 0 } } });
     }
 }
