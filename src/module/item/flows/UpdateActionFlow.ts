@@ -1,3 +1,4 @@
+import { DeepPartial } from "fvtt-types/utils";
 import { SR5Item } from "../SR5Item";
 import { SR5 } from '../../config';
 import { PackItemFlow } from "./PackItemFlow";
@@ -99,7 +100,7 @@ export const UpdateActionFlow = {
     /**
      * See injectActionTestsIntoChangeData for documentation.
      */
-    injectWeaponTestIntoChangeData(type: string, changeData: Item.UpdateData & {system: Item.SystemOfType<'weapon'>}, applyData) {
+    injectWeaponTestIntoChangeData(type: string, changeData: DeepPartial<{system: Item.SystemOfType<'weapon'>}>, applyData) {
         // Abort when category isn't part of this change.
         if (changeData?.system?.category === undefined) return;
 
@@ -122,12 +123,16 @@ export const UpdateActionFlow = {
     /**
      * See injectActionTestsIntoChangeData for documentation.
      */
-    injectSpellTestIntoChangeData(type: string, changeData: Item.UpdateData & {system: Item.SystemOfType<'spell'>}, applyData) {
-        // Abort when category isn't part of this change.
-        if (changeData?.system?.category === undefined) return;
+    injectSpellTestIntoChangeData(type: string, changeData: DeepPartial<{system: Item.SystemOfType<'spell'>}>, applyData, spell?: SR5Item<'spell'>) {
+        // Reconfigure on category or direct/indirect changes, including partial item updates.
+        if (changeData?.system?.category === undefined && changeData?.system?.combat?.type === undefined) return;
+
+        const category = changeData.system?.category ?? spell?.system.category;
+        const combatType = changeData.system?.combat?.type ?? spell?.system.combat.type;
+        if (category === undefined) return;
 
         // Remove test when user selects empty category.
-        if (changeData.system.category === '') {
+        if (category === '') {
             foundry.utils.setProperty(applyData, 'system.action.test', '');
             return;
         } 
@@ -135,10 +140,17 @@ export const UpdateActionFlow = {
         // Based on category switch out active, opposed and resist test.
         const test = SR5.activeTests[type];
         const drainTest = SR5.followedTests[test] ?? '';
-        const opposedTest = SR5.opposedTests[type][changeData.system.category] || 'OpposedTest';
+        const opposedTest = 
+            (category === 'combat' 
+                ? SR5.opposedTests[type][category][combatType]
+                : SR5.opposedTests[type][category]
+            ) || 'OpposedTest';
 
-        const isDirectCombatSpell = changeData.system.category === 'combat' && changeData.system.combat?.type === 'direct';
-        const resistTest = isDirectCombatSpell ? '' : SR5.opposedResistTests[type][changeData.system.category] || '';
+        const resistTest = 
+            (category === 'combat'
+                ? SR5.opposedResistTests[type][category][combatType]
+                : SR5.opposedResistTests[type][category]
+            ) || '';
 
         foundry.utils.setProperty(applyData, 'system.action.test', test);
         foundry.utils.setProperty(applyData, 'system.action.opposed.test', opposedTest);
@@ -149,7 +161,7 @@ export const UpdateActionFlow = {
     /**
      * See injectActionTestsIntoChangeData for documentation.
      */
-    injectComplexFormTestIntoChangeData(type: string, changeData: Item.UpdateData & {system: Item.SystemOfType<'complex_form'>}, applyData) {
+    injectComplexFormTestIntoChangeData(type: string, changeData: DeepPartial<{system: Item.SystemOfType<'complex_form'>}>, applyData) {
         const test = SR5.activeTests[type];
 
         foundry.utils.setProperty(applyData, 'system.action.test', test);
@@ -159,7 +171,7 @@ export const UpdateActionFlow = {
     /**
      * See injectActionTestsIntoChangeData for documentation.
      */
-    injectCallInActionTestIntoChangeData(type: string, changeData: Item.UpdateData & {system: Item.SystemOfType<'call_in_action'>}, applyData) {
+    injectCallInActionTestIntoChangeData(type: string, changeData: DeepPartial<{system: Item.SystemOfType<'call_in_action'>}>, applyData) {
         if (changeData.system?.actor_type === undefined) return;
 
         if (changeData.system.actor_type === 'spirit') {

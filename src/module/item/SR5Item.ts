@@ -1542,7 +1542,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const result = await super._preCreate(...args);
         if (result === false) return false;
 
-        UpdateActionFlow.injectActionTestsIntoChangeData(this.type, data, data, this);
+        const actionChanges = {};
+        UpdateActionFlow.injectActionTestsIntoChangeData(this.type, data, actionChanges, this);
+        this.updateSource(actionChanges);
         return result;
     }
 
