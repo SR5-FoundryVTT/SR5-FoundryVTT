@@ -3,6 +3,20 @@ import { LinksHelpers } from '@/module/utils/links';
 import { SR5Item } from '@/module/item/SR5Item';
 
 export const SheetFlow = {
+    async changeItemMatrixDamage(event: Pick<Event, 'currentTarget'>, item?: SR5Item) {
+        const input = event.currentTarget;
+        if (!(input instanceof HTMLInputElement) || !Number.isFinite(input.valueAsNumber)) return;
+
+        if (!item) {
+            const uuid = input.closest<HTMLElement>('[data-uuid]')?.dataset.uuid;
+            const document = uuid ? await fromUuid(uuid) : undefined;
+            if (!(document instanceof SR5Item)) return;
+            item = document;
+        }
+
+        await item.setMatrixDamage(Math.max(0, Math.trunc(input.valueAsNumber)));
+    },
+
     _getCreateItemText(type: string): string {
         switch (type) {
             case 'lifestyle':

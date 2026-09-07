@@ -543,6 +543,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         // Inline change handlers for nested list items (qty inputs in edit mode)
         html.find('input[data-system-action="changeItemQty"]').on('change', this._onListItemChangeQuantity.bind(this));
+        html.find('input[data-system-action="changeItemMatrixDamage"]').on('change', event => SheetFlow.changeItemMatrixDamage(event, this.item));
 
         // Marks handling
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));

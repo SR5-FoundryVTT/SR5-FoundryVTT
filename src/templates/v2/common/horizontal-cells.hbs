@@ -41,6 +41,14 @@
             <i class="fas fa-ban"></i>
         </a>
     </div>
+    {{#if (and compactLargeMonitor (gt max 20))}}
+    <div class="numeric-condition-monitor">
+        <input type="number" class="short" value="{{value}}" min="0" max="{{max}}" step="1"
+               data-system-action="changeItemMatrixDamage" aria-label="{{localize tooltip}}">
+        <span>/</span>
+        <input type="number" class="short" value="{{max}}" readonly aria-label="{{localize 'SR5.ConditionMonitor'}}">
+    </div>
+    {{else}}
     <div class="cell-container">
         {{#for 1 (sum max 1)}}
             <div class="cell {{#iflte this ../value}}filled{{/iflte}}"
@@ -58,6 +66,7 @@
             </div>
         {{/for}}
     </div>
+    {{/if}}
 </div>
 {{/if}}
 {{#ife track.max 0}}
