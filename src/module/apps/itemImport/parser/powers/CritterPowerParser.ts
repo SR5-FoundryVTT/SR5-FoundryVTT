@@ -34,7 +34,7 @@ export class CritterPowerParser extends Parser<'critter_power'> {
             system.action.type = 'varies';
             system.action.attribute = 'agility';
             system.action.skill = naturalWeapon.useskill._TEXT.replace(/[\s-]/g, '_').toLowerCase();
-            system.action.damage = weaponParser.parseDamageData(naturalWeapon.damage._TEXT, naturalWeapon.ap._TEXT);
+            system.action.damage = weaponParser.parseDamageData(naturalWeapon.damage._TEXT, naturalWeapon.ap._TEXT, system.action.damage.normal_weapon);
 
             if (naturalWeapon.accuracy._TEXT.includes('Physical'))
                 system.action.limit.attribute = 'physical';
