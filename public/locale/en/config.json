@@ -3037,6 +3037,7 @@
             "RitualFailure": "The ritual was too strong for you",
             "RitualSuccess": "The ritual is sealed",
             "SoakBlockedByHardenedArmor": "Blocked By Hardened Armor",
+            "SpellResisted": "Spell Resisted",
             "SpiritSummonFailure": "Spirit fled!",
             "SpiritSummonSuccess": "Spirit summoned!",
             "SpriteCompilationFailure": "Sprite fled!",

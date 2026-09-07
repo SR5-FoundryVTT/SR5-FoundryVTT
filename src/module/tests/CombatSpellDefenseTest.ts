@@ -8,6 +8,7 @@ import {TestCreator} from "./TestCreator";
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { ActionRollType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
+import { Translation } from "../utils/strings";
 
 export interface CombatSpellDefenseTestData extends DefenseTestData {
     against: SpellCastingTestData
@@ -15,6 +16,10 @@ export interface CombatSpellDefenseTestData extends DefenseTestData {
 
 export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestData> {
     declare against: SpellCastingTest;
+
+    override get successLabel(): Translation {
+        return 'SR5.TestResults.SpellResisted';
+    }
 
     /**
      * A combat spell defense test changes it's behaviour based on the spell it's defending against.
