@@ -871,7 +871,15 @@
                 "Title": "Importador de Ator"
             },
             "BulkImporter": {
-                "Title": "Importador em Massa"
+                "Title": "Importador em Massa",
+                "Mode": "Modo de importação:",
+                "TranslationLanguage": "Idioma da tradução:",
+                "Modes": {
+                    "Add": "Adicionar itens ausentes",
+                    "Update": "Atualizar itens (manter descrição)",
+                    "Replace": "Substituir itens",
+                    "Clean": "Limpar e importar novamente"
+                }
             },
             "Spirit": {
                 "SpiritTypeNotFound": "O tipo de espírito não foi encontrado. Por favor, abra uma questão no github com seu json de exportação chummer."

@@ -1478,7 +1478,15 @@
                 "Title": "Actor Importer"
             },
             "BulkImporter": {
-                "Title": "Bulk Importer"
+                "Title": "Bulk Importer",
+                "Mode": "Import Mode:",
+                "TranslationLanguage": "Translation Language:",
+                "Modes": {
+                    "Add": "Add missing items",
+                    "Update": "Update items (keep description)",
+                    "Replace": "Replace items",
+                    "Clean": "Clear and reimport"
+                }
             },
             "ImporterSourcesConfig": {
                 "Title": "Importer Sources Configuration"

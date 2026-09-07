@@ -6,14 +6,16 @@ import { ImportHelper as IH } from '../helper/ImportHelper';
 import { ChummerFileXML, CompendiumKey, Constants } from './Constants';
 import CompendiumCollection = foundry.documents.collections.CompendiumCollection;
 
+export type BulkImportMode = 'add' | 'update' | 'replace' | 'clean';
+
 /**
  * The most basic Chummer item data importer, designed to handle one or more Chummer5a data <type>.xml files.
  */
 export abstract class DataImporter {
     /**
-     * Whether to override existing documents in the compendium.
+     * Determines how existing documents are handled during import.
      */
-    public static overrideDocuments = true;
+    public static importMode: BulkImportMode = 'update';
 
     /**
      * The list of Chummer XML files this importer can handle.
@@ -89,6 +91,7 @@ export abstract class DataImporter {
         const { compendiumKey, parser, filter, injectActionTests, documentType } = options;
         const itemMap = new Map<CompendiumKey, (Actor.CreateData | Item.CreateData)[]>();
         const compendiums: Partial<Record<CompendiumKey, CompendiumCollection<'Actor' | 'Item'>>> = {};
+        const descriptionIndexes = new Map<CompendiumKey, Awaited<ReturnType<CompendiumCollection<'Actor' | 'Item'>['getIndex']>>>();
         const dataInput = filter ? inputs.filter(x => {
             try { return filter(x); }
             catch (e) { console.error("Error:\n", e, "\nData:\n", x); return false; }
@@ -111,13 +114,25 @@ export abstract class DataImporter {
                 const key = compendiumKey(data);
                 const compendium = compendiums[key] ??= (await IH.GetCompendium(key));
 
-                if (!this.overrideDocuments && compendium.index.has(id)) {
+                if (this.importMode === 'add' && compendium.index.has(id)) {
                     IH.setItem(key, data.name._TEXT, id);
                     continue;
                 }
 
                 const item = await parser.Parse(data, key);
                 injectActionTests?.(item as Item.CreateData);
+
+                if (this.importMode === 'update' && compendium.index.has(id)) {
+                    let descriptionIndex = descriptionIndexes.get(key);
+                    if (!descriptionIndex) {
+                        descriptionIndex = await compendium.getIndex({ fields: ['system.description'] });
+                        descriptionIndexes.set(key, descriptionIndex);
+                    }
+
+                    const existing = descriptionIndex.get(id);
+                    if (typeof existing?.system?.description === 'object' && item.system?.description)
+                        Object.assign(item.system.description, existing.system.description);
+                }
 
                 item._id = id;
                 IH.setItem(key, data.name._TEXT, id);
