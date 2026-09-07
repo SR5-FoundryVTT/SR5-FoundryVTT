@@ -639,6 +639,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         html.find('input[data-system-action="changeSkillRating"]').on('change', this._onChangeSkillRating.bind(this));
         html.find('input[data-system-action="changeItemQty"]').on('change', this._onListItemChangeQuantity.bind(this));
+        html.find('input[data-system-action="changeItemMatrixDamage"]').on('change', event => SheetFlow.changeItemMatrixDamage(event));
     }
 
     private async _onSourceDrop(event?: DragEvent) {
