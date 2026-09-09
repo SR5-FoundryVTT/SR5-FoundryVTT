@@ -31,17 +31,20 @@ export class SR5Token extends foundry.canvas.placeables.Token {
     }
 
     override animate(to: any, options?: any) {
-        return super.animate(to, options);
-    }
+        options = options || {};
+        const originalOntick = options.ontick;
+        options.ontick = (dt: number, anim: any) => {
+            if (typeof originalOntick === 'function') {
+                try {
+                    originalOntick(dt, anim);
+                } catch (e) {}
+            }
+            this._updateSwarmCompanionPositions();
+        };
 
-    /**
-     * Updates swarm companion tile positions when the leader token moves.
-     * NOTE: Drag preview sprites and formation snapping are implemented.
-     * Companion tile movement animation during active token sliding is work-in-progress.
-     */
-    override _onAnimationUpdate(changed: any, context: any) {
-        super._onAnimationUpdate(changed, context);
+        const res = super.animate(to, options);
         this._updateSwarmCompanionPositions();
+        return res;
     }
 
     _swarmDragSprites: any[] = [];
