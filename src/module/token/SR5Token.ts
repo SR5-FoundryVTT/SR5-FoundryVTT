@@ -133,25 +133,71 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         }
     }
 
+    _getSnappedTopLeft(point: { x: number; y: number }): { x: number; y: number } {
+        if (!canvas.ready || !canvas.grid) return point;
+        const grid = canvas.grid as any;
+
+        if (typeof grid.getTopLeft === 'function') {
+            try {
+                const tl = grid.getTopLeft(point);
+                if (tl && typeof tl.x === 'number' && typeof tl.y === 'number') {
+                    return { x: tl.x, y: tl.y };
+                }
+            } catch (e) {}
+            try {
+                const tl = grid.getTopLeft(point.x, point.y);
+                if (tl && typeof tl.x === 'number' && typeof tl.y === 'number') {
+                    return { x: tl.x, y: tl.y };
+                }
+            } catch (e) {}
+        }
+
+        if (typeof grid.getSnappedPoint === 'function') {
+            try {
+                const mode = (CONST as any)?.GRID_SNAPPING_MODES?.TOP_LEFT ?? 16;
+                const snapped = grid.getSnappedPoint(point, { mode });
+                if (snapped && typeof snapped.x === 'number' && typeof snapped.y === 'number') {
+                    return { x: snapped.x, y: snapped.y };
+                }
+            } catch (e) {}
+        }
+
+        const size = grid.size || 100;
+        return {
+            x: Math.round(point.x / size) * size,
+            y: Math.round(point.y / size) * size
+        };
+    }
+
     override _onDragLeftMove(event: any) {
         super._onDragLeftMove(event);
 
-        const interactionData = event?.interactionData;
-        const origin = interactionData?.origin;
-        const destination = interactionData?.destination;
+        const preview = (this as any)._preview || (this as any).preview;
+        let snappedDest: { x: number; y: number } | null = null;
 
-        if (origin && destination && Array.isArray(this._swarmDragSprites) && this._swarmDragSprites.length > 0) {
-            let snappedDest = destination;
-            if (canvas.grid && typeof (canvas.grid as any).getSnappedPoint === 'function') {
-                try {
-                    snappedDest = (canvas.grid as any).getSnappedPoint(destination, { mode: 1 });
-                } catch (e) {
-                    snappedDest = destination;
+        if (preview && typeof preview.x === 'number' && typeof preview.y === 'number' && (preview.x !== this.x || preview.y !== this.y)) {
+            snappedDest = { x: preview.x, y: preview.y };
+        } else {
+            const interactionData = event?.interactionData;
+            const origin = interactionData?.origin;
+            const destination = interactionData?.destination;
+
+            if (destination) {
+                let targetX = destination.x;
+                let targetY = destination.y;
+
+                if (origin) {
+                    targetX = this.x + (destination.x - origin.x);
+                    targetY = this.y + (destination.y - origin.y);
                 }
-            }
 
-            const dx = snappedDest.x - origin.x;
-            const dy = snappedDest.y - origin.y;
+                snappedDest = this._getSnappedTopLeft({ x: targetX, y: targetY });
+            }
+        }
+
+        if (snappedDest && Array.isArray(this._swarmDragSprites) && this._swarmDragSprites.length > 0) {
+            const dx = snappedDest.x - this.x;
+            const dy = snappedDest.y - this.y;
 
             for (const sprite of this._swarmDragSprites) {
                 const start = (sprite as any)._startCoord;
@@ -280,12 +326,20 @@ export class SR5Token extends foundry.canvas.placeables.Token {
                 previewX = typeof lastWaypoint.x === 'number' ? lastWaypoint.x : (lastWaypoint.center ? lastWaypoint.center.x - (totalW / 2) : previewX);
                 previewY = typeof lastWaypoint.y === 'number' ? lastWaypoint.y : (lastWaypoint.center ? lastWaypoint.center.y - (totalH / 2) : previewY);
             }
-        } else if (typeof eventDest?.x === 'number' && typeof eventDest?.y === 'number') {
-            previewX = eventDest.x;
-            previewY = eventDest.y;
-        } else if (preview && typeof preview.x === 'number' && typeof preview.y === 'number') {
+        } else if (preview && typeof preview.x === 'number' && typeof preview.y === 'number' && preview !== this) {
             previewX = preview.x;
             previewY = preview.y;
+        } else if (typeof eventDest?.x === 'number' && typeof eventDest?.y === 'number') {
+            const eventOrigin = event?.interactionData?.origin;
+            let targetX = eventDest.x;
+            let targetY = eventDest.y;
+            if (eventOrigin) {
+                targetX = this.x + (eventDest.x - eventOrigin.x);
+                targetY = this.y + (eventDest.y - eventOrigin.y);
+            }
+            const snapped = this._getSnappedTopLeft({ x: targetX, y: targetY });
+            previewX = snapped.x;
+            previewY = snapped.y;
         }
 
         const centerX = previewX + (totalW / 2);
