@@ -76,7 +76,7 @@
           "attribute": "",
           "base_formula_operator": "add"
         },
-        "biofeedback": "none"
+        "biofeedback": ""
       },
       "opposed": {
         "test": "OpposedTest",

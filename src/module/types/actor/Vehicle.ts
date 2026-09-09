@@ -49,6 +49,12 @@ const VehicleData = () => ({
         initial: "medium",
         choices: SR5.vehicle.categories,
     }),
+    subCategory: new StringField({
+        required: false,
+        blank: true,
+        initial: "",
+        choices: SR5.vehicle.subCategories,
+    }),
     availability: new StringField({ required: true }),
     cost: new NumberField({ required: true, nullable: false, initial: 0 }),
     isDrone: new BooleanField(),
@@ -87,10 +93,14 @@ const VehicleData = () => ({
     master: new StringField({ required: true }),
 
     // === Swarm ===
-    isSwarm: new BooleanField({ initial: false }),
-    isSwarmLeader: new BooleanField({ initial: false }),
-    swarmLeaderUuid: new StringField({ required: false, initial: '' }),
-    swarmMemberUuids: new ArrayField(new StringField({ required: true })),
+    swarm: new SchemaField({
+        active: new BooleanField({ initial: false }),
+        count: new NumberField({ required: true, initial: 1, integer: true, min: 1 }),
+        tiles: new SchemaField({
+            uuids: new ArrayField(new StringField({ required: true })),
+            image: new StringField({ required: false, initial: "" }),
+        }),
+    }),
 
     // === Condition & Movement ===
     track: new SchemaField(Tracks('physical', 'matrix')),

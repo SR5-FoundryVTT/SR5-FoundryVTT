@@ -80,6 +80,7 @@ export const MatrixTargetingFlow = {
             // Only show owned drones/vehicles present on the current active scene
             for (const token of canvas.scene.tokens) {
                 if (!token.actor?.uuid) continue;
+                if ((token.flags?.shadowrun5e as any)?.isSwarmCompanion) continue;
                 if (token.actor.uuid === actor.uuid || token.actor.id === actor.id) continue;
 
                 if (token.actor instanceof SR5Actor && ActorOwnershipFlow._isOwnerOfActor(actor, token.actor)) {

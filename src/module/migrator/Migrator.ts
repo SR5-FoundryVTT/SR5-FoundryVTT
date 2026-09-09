@@ -21,6 +21,7 @@ import { Version0_35_2 } from './versions/Version0_35_2';
 import { Version0_36_0 } from './versions/Version0_36_0';
 import { Version0_37_0 } from './versions/Version0_37_0';
 import { Version0_37_4 } from './versions/Version0_37_4';
+import { Version0_38_0 } from './versions/Version0_38_0';
 import { VersionMigration, MigratableDocument, MigratableDocumentName, MigratableDocumentType } from "./VersionMigration";
 
 const { deepClone, setProperty } = foundry.utils;
@@ -70,6 +71,7 @@ export class Migrator {
         new Version0_36_0(),
         new Version0_37_0(),
         new Version0_37_4(),
+        new Version0_38_0(),
     ] as const;
 
     private static pendingMigrationCount = 0;
@@ -310,9 +312,9 @@ export class Migrator {
     }
 
     /**
-     * Migrate all actors in the game.
+     * Migrate all documents in the game.
      */
-    private static async updateAllMigratableDocuments() {
+    public static async updateAllMigratableDocuments() {
         const start = performance.now();
 
         // Estimate total migration steps
@@ -390,6 +392,25 @@ export class Migrator {
             },
             default: "ok"
         }).render(true);
+    }
+
+    /**
+     * Targeted migration helper: Migrate only vehicle actors in the world.
+     */
+    public static async migrateVehicles() {
+        let count = 0;
+        for (const actor of game.actors.filter(a => a.type === 'vehicle')) {
+            const data = actor._source;
+            data._stats ??= { systemVersion: '0.0.0' };
+            data._stats.systemVersion = '0.37.0';
+            const migrated = this.migrate('Actor', data);
+            if (migrated) {
+                await actor.update(data);
+                count++;
+                console.log(`Migrated vehicle "${actor.name}" (${actor.id}) -> subCategory: "${actor.system.subCategory}"`);
+            }
+        }
+        ui.notifications.info(`Migrated ${count} vehicle actor(s).`);
     }
 
     /**

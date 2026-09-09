@@ -171,12 +171,33 @@
             </label>
         {{else if (eq actor.type 'vehicle')}}
             {{#if @root.isEditMode}}
-                <span>
+                <div class="basic-row">
+                    <label>{{localize "SR5.Vehicle.Type"}}</label>
                     {{formInput systemFields.vehicleType value=source.system.vehicleType
                                 localize=true classes="short" rootId=rootId }}
-                </span>
+                </div>
+                {{#if system.isDrone}}
+                    <div class="basic-row">
+                        <label>{{localize "SR5.Vehicle.Category"}}</label>
+                        {{formInput systemFields.category value=source.system.category
+                                    localize=true classes="short" rootId=rootId }}
+                    </div>
+                {{/if}}
+                <div class="basic-row">
+                    <label>{{localize "SR5.Vehicle.SubCategory"}}</label>
+                    {{formInput systemFields.subCategory value=source.system.subCategory
+                                localize=true classes="short" rootId=rootId }}
+                </div>
             {{else}}
-                <label>{{#if system.isDrone}}{{localizeOb system.category config.vehicle.categories}}&nbsp;{{/if}}{{localizeOb system.vehicleType config.vehicle.types}}</label>
+                <label data-tooltip="{{#if system.isDrone}}{{localizeOb system.category config.vehicle.categories}} {{/if}}{{localizeOb system.vehicleType config.vehicle.types}}">
+                    {{#if system.subCategory}}
+                        {{localize (objValue @root.config.vehicle.subCategories system.subCategory)}}
+                    {{else if system.isDrone}}
+                        {{localizeOb system.category config.vehicle.categories}}
+                    {{else}}
+                        {{localizeOb system.vehicleType config.vehicle.types}}
+                    {{/if}}
+                </label>
             {{/if}}
 
             {{#if @root.isEditMode}}
@@ -196,20 +217,18 @@
             {{/if}}
 
             {{#if @root.isEditMode}}
-                <div class="basic-row">
+                <div class="basic-row sheet-footer-drone">
                     <label style="text-wrap: nowrap;">{{localize "SR5.Vehicle.Drone"}}&nbsp;{{formInput systemFields.isDrone value=source.system.isDrone rootId=rootId }}
                     </label>
                 </div>
+                {{#if system.isDrone}}
+                    <div class="basic-row">
+                        <label style="text-wrap: nowrap;">{{localize "SR5.Swarm.Label"}}&nbsp;{{formInput systemFields.swarm.fields.active value=source.system.swarm.active rootId=rootId }}
+                        </label>
+                    </div>
+                {{/if}}
             {{else if system.isDrone}}
-                <label>{{localize "SR5.Vehicle.Drone"}}</label>
-            {{/if}}
-
-            {{#if (and @root.isEditMode system.isDrone)}}
-                <div class="basic-row">
-                    <label>{{localize "SR5.Vehicle.Category"}}</label>
-                    {{formInput systemFields.category value=source.system.category
-                                localize=true classes="short" rootId=rootId }}
-                </div>
+                <label class="sheet-footer-drone-label">{{localize "SR5.Vehicle.Drone"}}</label>
             {{/if}}
 
             {{#if (and @root.isPlayMode (not isLimited))}}
@@ -259,6 +278,5 @@
                 {{system.armor.rating.value}}
             </label>
         {{/if}}
-        <div></div>
     </div>
 </footer>

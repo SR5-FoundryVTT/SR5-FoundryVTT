@@ -161,8 +161,8 @@ export const registerBasicHelpers = () => {
     /**
      * Given an object return the value for a given key.
      */
-    Handlebars.registerHelper('objValue', function (obj: Record<string, unknown>, key: string) {
-        return obj[key] || '';
+    Handlebars.registerHelper('objValue', function (obj: Record<string, unknown> | undefined | null, key: string) {
+        return obj ? (obj[key] || '') : '';
     });
 
     /**

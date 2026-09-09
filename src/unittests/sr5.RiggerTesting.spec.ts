@@ -286,8 +286,10 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
                 type: 'vehicle',
                 system: {
                     isDrone: true,
-                    isSwarm: true,
-                    isSwarmLeader: true,
+                    swarm: {
+                        active: true,
+                        count: 3
+                    },
                     controlMode: 'autopilot',
                     vehicle_stats: {
                         pilot: { base: 3 },
@@ -296,28 +298,10 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
                 }
             });
 
-            const droneMember = await factory.createActor({
-                type: 'vehicle',
-                system: {
-                    isDrone: true,
-                    isSwarm: true,
-                    swarmLeaderUuid: droneLeader.uuid,
-                    controlMode: 'autopilot',
-                    vehicle_stats: {
-                        pilot: { base: 4 },
-                        sensor: { base: 3 }
-                    }
-                }
-            });
-
-            await droneLeader.update({
-                system: { swarmMemberUuids: [droneMember.uuid] }
-            } as any);
-
             const swarmInfo = RiggingRules.getSwarmPilotInfo(droneLeader);
-            // Highest pilot in swarm (4) + (2 drones - 1) = 5.
-            assert.equal(swarmInfo.highestPilot, 4);
-            assert.equal(swarmInfo.memberCount, 2);
+            // Pilot in swarm (3) + (3 drones - 1) = 5.
+            assert.equal(swarmInfo.highestPilot, 3);
+            assert.equal(swarmInfo.memberCount, 3);
             assert.equal(swarmInfo.swarmPilot, 5);
             // Leader pilot is 3, so bonus = 5 - 3 = 2.
             assert.equal(swarmInfo.bonus, 2);

@@ -165,7 +165,7 @@ export class RiggingRules {
 
     /**
      * Calculate Drone Swarm Pilot info and pool bonus.
-     * Formula: Swarm Pilot = Max(Pilot in Swarm) + (Count of Drones in Swarm - 1).
+     * Formula: Swarm Pilot = Base Pilot + (Count of Drones in Swarm - 1).
      */
     static getSwarmPilotInfo(drone: SR5Actor): { swarmPilot: number; highestPilot: number; memberCount: number; bonus: number } {
         if (!drone.isType('vehicle')) {
@@ -173,53 +173,21 @@ export class RiggingRules {
         }
 
         const system = drone.system as any;
-        if (!system.isSwarm) {
+        const isSwarmActive = Boolean(system.swarm?.active ?? system.isSwarm);
+        if (!isSwarmActive) {
             return { swarmPilot: 0, highestPilot: 0, memberCount: 0, bonus: 0 };
         }
 
-        // Collect all swarm member actors
-        const memberUuids: string[] = [];
-        if (system.isSwarmLeader && Array.isArray(system.swarmMemberUuids)) {
-            if (drone.uuid) memberUuids.push(drone.uuid);
-            memberUuids.push(...system.swarmMemberUuids);
-        } else if (system.swarmLeaderUuid) {
-            const leader = fromUuidSync(system.swarmLeaderUuid) as SR5Actor | null;
-            if (leader && leader.isType('vehicle')) {
-                const leaderSys = leader.system as any;
-                if (leader.uuid) memberUuids.push(leader.uuid);
-                if (Array.isArray(leaderSys.swarmMemberUuids)) {
-                    memberUuids.push(...leaderSys.swarmMemberUuids);
-                }
-            }
-        }
-
-        const uniqueUuids = Array.from(new Set(memberUuids.filter(Boolean)));
-        if (uniqueUuids.length <= 1) {
-            return { swarmPilot: 0, highestPilot: 0, memberCount: 1, bonus: 0 };
-        }
-
-        let highestPilot = 0;
-        let count = 0;
-
-        for (const uuid of uniqueUuids) {
-            const memberActor = fromUuidSync(uuid) as SR5Actor | null;
-            if (memberActor && memberActor.isType('vehicle')) {
-                count++;
-                const pilotVal = memberActor.system.vehicle_stats?.pilot?.value || 1;
-                if (pilotVal > highestPilot) {
-                    highestPilot = pilotVal;
-                }
-            }
-        }
+        const count = Math.max(1, Number(system.swarm?.count ?? system.swarmCount) || 1);
+        const basePilot = drone.system.vehicle_stats?.pilot?.base || drone.system.vehicle_stats?.pilot?.value || 1;
 
         if (count <= 1) {
-            return { swarmPilot: highestPilot, highestPilot, memberCount: count, bonus: 0 };
+            return { swarmPilot: basePilot, highestPilot: basePilot, memberCount: 1, bonus: 0 };
         }
 
-        const swarmPilot = highestPilot + (count - 1);
-        const currentPilot = drone.system.vehicle_stats?.pilot?.value || 1;
-        const bonus = Math.max(0, swarmPilot - currentPilot);
+        const bonus = count - 1;
+        const swarmPilot = basePilot + bonus;
 
-        return { swarmPilot, highestPilot, memberCount: count, bonus };
+        return { swarmPilot, highestPilot: basePilot, memberCount: count, bonus };
     }
 }

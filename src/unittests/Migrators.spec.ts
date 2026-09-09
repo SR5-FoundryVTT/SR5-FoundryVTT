@@ -6,6 +6,7 @@ import { VersionMigration } from '@/module/migrator/VersionMigration';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 import { Version0_36_0 } from 'src/module/migrator/versions/Version0_36_0';
 import { Version0_37_0 } from 'src/module/migrator/versions/Version0_37_0';
+import { Version0_38_0 } from 'src/module/migrator/versions/Version0_38_0';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -860,6 +861,60 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.lengthOf(effect.system.targets, 1);
             assert.strictEqual(effect.system.targets[0].applyTo, 'actor');
             assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id);
+        });
+    });
+
+    describe('Version0_38_0 vehicle subCategory and swarm migration', () => {
+        it('migrates vehicle subCategory from Chummer importFlags category or image path', () => {
+            const migrator = new Version0_38_0();
+            const actor: any = {
+                type: 'vehicle',
+                img: 'systems/shadowrun5e/dist/icons/vehicle/car.svg',
+                system: {
+                    subCategory: '',
+                    importFlags: {
+                        category: 'Drones: Small',
+                    },
+                },
+            };
+            migrator.migrateActor(actor);
+            assert.strictEqual(actor.system.subCategory, 'small_drone');
+        });
+
+        it('migrates helicopter / rotorcraft subCategory from image path or name', () => {
+            const migrator = new Version0_38_0();
+            const actor: any = {
+                type: 'vehicle',
+                name: 'Ares Dragon Helicopter',
+                img: 'systems/shadowrun5e/dist/icons/vehicle/rotorcraft.svg',
+                system: {
+                    subCategory: '',
+                    category: 'medium', // Default VehicleData value
+                    isDrone: false,
+                    importFlags: {
+                        category: 'Flugzeuge',
+                    },
+                },
+            };
+            migrator.migrateActor(actor);
+            assert.strictEqual(actor.system.subCategory, 'rotorcraft');
+        });
+
+        it('migrates legacy isSwarm and swarmCount properties to system.swarm schema', () => {
+            const migrator = new Version0_38_0();
+            const actor: any = {
+                type: 'vehicle',
+                system: {
+                    subCategory: 'micro_drone',
+                    isSwarm: true,
+                    swarmCount: 5,
+                },
+            };
+            migrator.migrateActor(actor);
+            assert.isTrue(actor.system.swarm.active);
+            assert.strictEqual(actor.system.swarm.count, 5);
+            assert.notProperty(actor.system, 'isSwarm');
+            assert.notProperty(actor.system, 'swarmCount');
         });
     });
 };

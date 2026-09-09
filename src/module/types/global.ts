@@ -217,6 +217,8 @@ declare module "fvtt-types/configuration" {
         Token: {
             shadowrun5e: {
                 TokenUseRoutingLib?: boolean;
+                isSwarmCompanion?: boolean;
+                swarmPrimaryTokenId?: string;
             };
         }
         User: {

@@ -40,7 +40,6 @@ interface VehicleSheetDataFields extends MatrixActorSheetData {
         isOverSharingLimit: boolean;
         loadedAutosofts: SR5Item[];
     };
-    eligibleSwarmLeaders?: Array<{ uuid: string | null; name: string }>;
 }
 
 export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFields> {
@@ -70,7 +69,6 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             toggleChaseEnvironment: SR5VehicleActorSheet.#toggleChaseEnvironment,
             toggleOffRoad: SR5VehicleActorSheet.#toggleOffRoad,
             toggleJumpIn: SR5VehicleActorSheet.#toggleJumpIn,
-            toggleSwarmLeader: SR5VehicleActorSheet.#toggleSwarmLeader,
             toggleProgramEquipped: SR5VehicleActorSheet.#toggleProgramEquipped,
         }
     }
@@ -119,16 +117,6 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         };
 
         data.swarmInfo = RiggingRules.getSwarmPilotInfo(this.actor);
-
-        if ((this.actor.system as any).isSwarm) {
-            const eligibleLeaders = game.actors.contents.filter(a => {
-                return a.isType('vehicle') && a.uuid !== this.actor.uuid && (a.system as any).isSwarm && (a.system as any).isSwarmLeader;
-            }) as SR5Actor[];
-            data.eligibleSwarmLeaders = eligibleLeaders.map(a => ({
-                uuid: a.uuid,
-                name: a.name || ''
-            }));
-        }
 
         if (data.vehicle.master && data.vehicle.master.system.category === 'rcc') {
             const info = RiggingRules.getRCCSharingInfo(data.vehicle.master);
@@ -307,20 +295,6 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
     static async #toggleJumpIn(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
         await RiggerFlow.toggleJumpIn(null, this.actor);
-        void this.render();
-    }
-
-    static async #toggleSwarmLeader(this: SR5VehicleActorSheet, event: Event) {
-        event.preventDefault();
-        const currentIsSwarm = !!(this.actor.system as any).isSwarm;
-        const currentIsLeader = !!(this.actor.system as any).isSwarmLeader;
-
-        await this.actor.update({
-            system: {
-                isSwarm: !currentIsSwarm,
-                isSwarmLeader: !currentIsSwarm ? true : !currentIsLeader
-            }
-        } as any);
         void this.render();
     }
 

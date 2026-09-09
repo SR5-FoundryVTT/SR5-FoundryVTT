@@ -49,6 +49,16 @@ export class VehiclePrep {
     static prepareVehicleStats(system: Actor.SystemOfType<'vehicle'>) {
         const { vehicle_stats, isDrone } = system;
 
+        const isSwarmActive = Boolean(system.swarm?.active ?? (system as any).isSwarm);
+        const swarmCount = isSwarmActive ? Math.max(1, Number(system.swarm?.count ?? (system as any).swarmCount) || 1) : 1;
+
+        if (isSwarmActive && swarmCount > 1) {
+            const swarmBonus = swarmCount - 1;
+            ModifiableValue.addUnique(vehicle_stats.pilot, 'SR5.Swarm.Label', swarmBonus);
+        } else {
+            ModifiableValue.remove(vehicle_stats.pilot, 'SR5.Swarm.Label');
+        }
+
         for (const [key, stat] of Object.entries(vehicle_stats)) {
             ModifiableValue.calcTotal(stat);
             stat.label = SR5.vehicle.stats[key];
