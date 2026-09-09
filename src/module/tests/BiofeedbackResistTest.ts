@@ -48,7 +48,7 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
         if (incomingDamageType === 'stun') {
             return 'stun';
         }
-        const actor = this.actor ?? this.persona ?? this.device?.actorOwner ?? this.device?.actor;
+        const actor = this.actor ?? this.persona ?? this.device?.actor;
         if (!actor) return 'stun'
         return actor.isUsingHotSim ? 'physical': 'stun';
     }
@@ -132,7 +132,7 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
             return;
         }
 
-        const actor = document instanceof SR5Item ? document.actorOwner : document;
+        const actor = document instanceof SR5Item ? document.actor : document;
         if (!actor) {
             console.error(`Shadowrun5e | Can't perform a Biofeedback resist due to missing actor`, this);
             return;

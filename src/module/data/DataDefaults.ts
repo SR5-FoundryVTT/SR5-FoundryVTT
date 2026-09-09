@@ -24,6 +24,7 @@ import { Armor } from "../types/item/Armor";
 import { Bioware } from "../types/item/Bioware";
 import { CallInAction } from "../types/item/CallInAction";
 import { ComplexForm } from "../types/item/ComplexForm";
+import { Container } from "../types/item/Container";
 import { Contact } from "../types/item/Contact";
 import { CritterPower } from "../types/item/CritterPower";
 import { Cyberware } from "../types/item/Cyberware";
@@ -62,6 +63,7 @@ const systemMap = {
     bioware: Bioware,
     call_in_action: CallInAction,
     complex_form: ComplexForm,
+    container: Container,
     contact: Contact,
     critter_power: CritterPower,
     cyberware: Cyberware,

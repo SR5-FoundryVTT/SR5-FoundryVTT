@@ -25,6 +25,9 @@ import { VersionMigration, MigratableDocument, MigratableDocumentName, Migratabl
 
 const { deepClone, setProperty } = foundry.utils;
 
+/** Version assigned to raw embedded data so it receives the complete migration chain. */
+export const UNMIGRATED_VERSION = '0.0.0';
+
 
 /**
  * Seamless data migrator for the SR5 system.
@@ -91,6 +94,14 @@ export class Migrator {
         );
     }
 
+    private static getPendingWorldMigrators(): readonly VersionMigration[] {
+        const version = game.settings.get(game.system.id, FLAGS.KEY_DATA_VERSION);
+        return this.s_Versions.filter(migrator =>
+            migrator.handlesWorldMigration() &&
+            this.compareVersion(migrator.TargetVersion, version) > 0
+        );
+    }
+
     private static normalizeArray(data: any): any[] {
         if (data == null) return [];
         return Array.isArray(data) ? data : Object.values(data); 
@@ -138,7 +149,7 @@ export class Migrator {
         if (nested || (type === "ActiveEffect" && data.label)) {
             data.type ??= "base";
             data._stats ??= {};
-            data._stats.systemVersion ??= "0.0.0";
+            data._stats.systemVersion ??= UNMIGRATED_VERSION;
         }
 
         // If _stats is missing, or systemVersion is not present, or the document is already migrated, skip migration.
@@ -245,7 +256,8 @@ export class Migrator {
     }
 
     public static BeginMigration() {
-        if (this.pendingMigrationCount === 0) return;
+        const pendingForcedMigrations = this.getPendingWorldMigrators();
+        if (this.pendingMigrationCount === 0 && pendingForcedMigrations.length === 0) return;
         const migratedVersion = game.settings.get(game.system.id, FLAGS.KEY_DATA_VERSION);
         if (this.compareVersion(migratedVersion, game.system.version) >= 0) return;
 
@@ -259,7 +271,7 @@ export class Migrator {
         const d = new foundry.appv1.api.Dialog({
             title: localizedWarningTitle,
             content:
-                `<h2 style="color: red; text-align: center">${localizedWarningHeader} (${this.pendingMigrationCount})</h2>` +
+                `<h2 style="color: red; text-align: center">${localizedWarningHeader} (${this.pendingMigrationCount + pendingForcedMigrations.length})</h2>` +
                 `<p style="text-align: center"><i>${localizedWarningRequired}</i></p>` +
                 `<p>${localizedWarningDescription}</p>` +
                 `<h3 style="color: red">${localizedWarningBackup}</h3>`,
@@ -314,6 +326,7 @@ export class Migrator {
      */
     private static async updateAllMigratableDocuments() {
         const start = performance.now();
+        const worldMigrators = this.getPendingWorldMigrators();
 
         // Estimate total migration steps
         this.totalMigrations =
@@ -321,7 +334,8 @@ export class Migrator {
             1 + game.actors.size * 2 +                    // Actor + their items + their effects
             [...game.actors].reduce((sum, actor) => sum + actor.items.size, 0) +  // Actor item effects
             1 + game.combats.size +                       // Combats + their combatants
-            game.scenes.size;                             // Non-actor tokens
+            game.scenes.size +                            // Non-actor tokens
+            worldMigrators.length;                       // Forced world migrations
 
         /* Items and its embedded Effects */
         await this.updateDocuments(Item, deepClone(game.items._source));
@@ -366,6 +380,15 @@ export class Migrator {
                 );
             } catch (error) {
                 console.error(`Failed migration update for Token documents in ${scene.uuid}.`, error);
+            }
+        }
+
+        for (const migrator of worldMigrators) {
+            this.updateProgressbar();
+            try {
+                await migrator.MigrateWorld();
+            } catch (error) {
+                console.error(`Failed forced migration to ${migrator.TargetVersion}.`, error);
             }
         }
 

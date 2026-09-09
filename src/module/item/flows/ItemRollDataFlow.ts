@@ -71,7 +71,7 @@ export const ItemRollDataFlow = {
      * @returns 
      */
     matrixTestRollDataFlow(item: SR5Item, rollData: any, action?: ActionRollType, testData?: RollDataTestAccessor) {
-        const actor = item.actorOwner;
+        const actor = item.actor ?? undefined;
 
         // CASE - Matrix Device is slaved inside a PAN or WAN
         // => Weapon slaved to owned commlink

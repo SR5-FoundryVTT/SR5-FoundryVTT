@@ -74,7 +74,7 @@ export const RiggingTestDataFlow = {
      */
     replacePhysicalAttributesForMentalDriver: (action: ActionRollType, document?: SR5Actor|SR5Item) => {
         if (!document) return;
-        const actor = document instanceof SR5Actor ? document : document.actorOwner;
+        const actor = document instanceof SR5Actor ? document : document.actor;
         if (!actor?.isControlledByDriver('rigger', 'remote')) return;
         AttributeRules.replacePhysicalAttributesWithMentalAttributes(action);
     },

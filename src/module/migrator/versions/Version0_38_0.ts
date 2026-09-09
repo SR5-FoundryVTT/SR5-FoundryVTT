@@ -1,11 +1,19 @@
-import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
+import { SR5 } from '@/module/config';
 import { VersionMigration } from '../VersionMigration';
+import { FLAGS, SYSTEM_NAME } from '@/module/constants';
+import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
+
+const { deepClone, getProperty, hasProperty, randomID, setProperty } = foundry.utils;
 
 /** Migrate item-sheet data introduced for 0.38.0. */
 export class Version0_38_0 extends VersionMigration {
     readonly TargetVersion = '0.38.0';
 
+    /** Stamped on children lifted from raw actor source, so they run every migrator in turn. */
+    private static readonly UNMIGRATED_VERSION = '0.0.0';
+
     override migrateItem(item: any): void {
+        this.consolidateParentId(item);
         Version0_38_0.ensureNestedDocumentIds(item);
 
         const technology = item.system?.technology;
@@ -19,6 +27,164 @@ export class Version0_38_0 extends VersionMigration {
                 technology.essence = Version0_38_0.migrateEssence(technology.calculated.essence);
             }
             delete technology.calculated;
+        }
+    }
+
+    override migrateActor(actor: any): void {
+        const items = Array.isArray(actor.items) ? [...actor.items] : [];
+        for (const item of items) this.consolidateParentId(item);
+
+        const lifted = items.flatMap(item => this.liftLegacyDescendants(item));
+        for (const child of lifted) {
+            Version0_38_0.stampAsUnmigrated(child);
+            this.consolidateParentId(child);
+        }
+        if (lifted.length > 0) actor.items.push(...lifted);
+    }
+
+    override async MigrateWorld(): Promise<void> {
+        await this.liftLegacyChildrenFromItems(game.items.contents.map(item => item.toObject()), null);
+
+        for (const collection of game.packs) {
+            if (collection.documentName !== 'Item' || collection.metadata.packageType !== 'world') continue;
+
+            const pack = collection as foundry.documents.collections.CompendiumCollection<'Item'>;
+            const wasLocked = pack.locked;
+            if (wasLocked) {
+                try {
+                    await pack.configure({ locked: false });
+                } catch (error) {
+                    console.error(`Failed to unlock compendium ${pack.collection} for legacy attachment migration.`, error);
+                    continue;
+                }
+            }
+
+            try {
+                const documents = await pack.getDocuments();
+                await this.liftLegacyChildrenFromItems(documents.map(document => document.toObject()), pack);
+            } finally {
+                if (wasLocked) {
+                    try {
+                        await pack.configure({ locked: true });
+                    } catch (error) {
+                        console.error(`Failed to re-lock compendium ${pack.collection} after legacy attachment migration.`, error);
+                    }
+                }
+            }
+        }
+    }
+
+    private consolidateParentId(item: any) {
+        if (!item?.system || typeof item.system !== 'object') return;
+
+        const parentId = getProperty(item.system, 'parentId');
+        const container = getProperty(item.system, 'container');
+        if ((parentId === null || parentId === undefined || parentId === '') && typeof container === 'string' && container) {
+            setProperty(item.system, 'parentId', container);
+        }
+        if (!hasProperty(item.system, 'parentId')) setProperty(item.system, 'parentId', null);
+    }
+
+    private async liftLegacyChildrenFromItems(items: any[], pack: foundry.documents.collections.CompendiumCollection<'Item'> | null) {
+        const lifted: any[] = [];
+        const updatedParents: any[] = [];
+
+        for (const item of items) {
+            const liftedChildren = this.liftLegacyDescendants(item);
+            if (liftedChildren.length === 0) continue;
+
+            lifted.push(...liftedChildren);
+            updatedParents.push({ _id: item._id, flags: item.flags });
+        }
+
+        if (lifted.length === 0) return;
+
+        // Clear the parents' flags only once their children are safely stored. The world is marked
+        // migrated either way, so on a failed create the legacy flag is all the data there is left.
+        try {
+            await Item.implementation.createDocuments(lifted as Item.CreateData[], { pack: pack?.collection });
+        } catch (error) {
+            console.error(`Failed legacy attachment lift for ${pack ? pack.collection : 'world items'}.`, error);
+            return;
+        }
+
+        try {
+            await Item.implementation.updateDocuments(updatedParents as any, { pack: pack?.collection, diff: false, recursive: false });
+        } catch (error) {
+            console.error(`Failed clearing legacy attachment flags for ${pack ? pack.collection : 'world items'}.`, error);
+        }
+    }
+
+    /**
+     * Move a parent's legacy embedded children out into standalone item data.
+     */
+    private liftLegacyEmbeddedChildren(parent: any): any[] {
+        const embeddedItems = Version0_38_0.legacyChildren(parent);
+        if (embeddedItems.length === 0 || !parent?._id) return [];
+
+        // Bioware and cyberware take 'ware' modifications rather than modifications named after
+        // their own item type, so the parent type can't be used as the modification type directly.
+        const modificationType = SR5.modificationTypeByParentType[parent.type];
+
+        const lifted: any[] = [];
+        const remaining: any[] = [];
+        for (const child of embeddedItems) {
+            const canLift = parent.type === 'container' ||
+                (parent.type === 'weapon' && child.type === 'ammo') ||
+                (child.type === 'modification' && !!modificationType);
+            if (!canLift) {
+                remaining.push(child);
+                continue;
+            }
+
+            const liftedChild = deepClone(child);
+            liftedChild._id = randomID();
+            setProperty(liftedChild, 'system.parentId', parent._id);
+            if (liftedChild.type === 'modification' && modificationType) setProperty(liftedChild, 'system.type', modificationType);
+            lifted.push(liftedChild);
+        }
+
+        if (remaining.length > 0) setProperty(parent, `flags.${SYSTEM_NAME}.${FLAGS.EmbeddedItems}`, remaining);
+        else if (lifted.length > 0) delete parent.flags?.[SYSTEM_NAME]?.[FLAGS.EmbeddedItems];
+        return lifted;
+    }
+
+    /**
+     * Lift all eligible legacy descendants, preserving each child's direct parent relationship.
+     */
+    private liftLegacyDescendants(parent: any): any[] {
+        const lifted: any[] = [];
+        const pending = [parent];
+
+        while (pending.length > 0) {
+            const current = pending.shift();
+            const children = this.liftLegacyEmbeddedChildren(current);
+            lifted.push(...children);
+            pending.push(...children);
+        }
+
+        return lifted;
+    }
+
+    /**
+     * A parent's legacy embedded children, which older worlds stored as an object rather than an array.
+     */
+    private static legacyChildren(parent: any): any[] {
+        const embeddedItems = getProperty(parent, `flags.${SYSTEM_NAME}.${FLAGS.EmbeddedItems}`);
+        if (embeddedItems == null) return [];
+        return Array.isArray(embeddedItems) ? embeddedItems : Object.values(embeddedItems);
+    }
+
+    /**
+     * Mark raw flag data lifted into an actor as owing the complete item migration chain.
+     */
+    private static stampAsUnmigrated(item: any) {
+        setProperty(item, '_stats.systemVersion', Version0_38_0.UNMIGRATED_VERSION);
+        if (!Array.isArray(item.effects)) return;
+
+        for (const effect of item.effects) {
+            effect.type ??= 'base';
+            setProperty(effect, '_stats.systemVersion', Version0_38_0.UNMIGRATED_VERSION);
         }
     }
 
