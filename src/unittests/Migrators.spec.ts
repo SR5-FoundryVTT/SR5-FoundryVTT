@@ -940,6 +940,110 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(mod.system.type, 'ware');
         });
 
+        it('persists lifted children through the actor update the migrator performs', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [
+                { name: 'Ares Predator', type: 'weapon', system: { category: 'range' } },
+            ]) as Item.Stored[];
+
+            // Rebuild the source the way a pre-0.38 world stored a weapon with its ammo in flags.
+            const source: any = actor.toObject();
+            const weaponSource = source.items.find((item: any) => item._id === weapon.id);
+            foundry.utils.setProperty(weaponSource, `flags.${SYSTEM_NAME}.${FLAGS.EmbeddedItems}`, [{
+                _id: foundry.utils.randomID(16),
+                name: 'Legacy APDS',
+                type: 'ammo',
+                system: DataDefaults.baseSystemData('ammo'),
+            }]);
+
+            new Version0_38_0().migrateActor(source);
+
+            // Exactly the write Migrator.updateMigratedDocument makes. Embedded collections are only
+            // replaceable through a parent update like this one, so the lift depends on it landing.
+            await actor.update(source, { diff: false, recursive: false, noHook: true, render: false });
+
+            const ammo = actor.items.find(item => item.name === 'Legacy APDS');
+            assert.exists(ammo, 'lifted child is stored on the actor');
+            assert.strictEqual(foundry.utils.getProperty(ammo!, 'system.parentId'), weapon.id);
+            assert.isUndefined(actor.items.get(weapon.id!)?.flags?.[SYSTEM_NAME]?.[FLAGS.EmbeddedItems]);
+        });
+
+        it('stamps actor-lifted children as unmigrated for Foundry item migration', () => {
+            const migrator = new Version0_38_0();
+            const weapon: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Ares Predator',
+                type: 'weapon',
+                system: DataDefaults.baseSystemData('weapon'),
+                flags: {
+                    [SYSTEM_NAME]: {
+                        [FLAGS.EmbeddedItems]: [{
+                            // Legacy nested data predates _stats, which Migrator.migrate requires.
+                            _id: foundry.utils.randomID(16),
+                            name: 'APDS',
+                            type: 'ammo',
+                            system: DataDefaults.baseSystemData('ammo'),
+                            effects: [{
+                                _id: foundry.utils.randomID(16),
+                                name: 'Nested Effect',
+                                system: { changes: [], targets: [] },
+                            }],
+                        }],
+                    },
+                },
+            };
+            const actor: any = { items: [weapon] };
+
+            migrator.migrateActor(actor);
+
+            const ammo = actor.items.find((item: any) => item.name === 'APDS');
+            assert.strictEqual(ammo._stats.systemVersion, '0.0.0');
+            assert.strictEqual(ammo.effects[0]._stats.systemVersion, '0.0.0');
+            assert.strictEqual(ammo.effects[0].type, 'base');
+        });
+
+        it('recursively lifts nested actor-owned container items', () => {
+            const migrator = new Version0_38_0();
+            const backpack: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Backpack',
+                type: 'container',
+                system: DataDefaults.baseSystemData('container'),
+                flags: {
+                    [SYSTEM_NAME]: {
+                        [FLAGS.EmbeddedItems]: [{
+                            _id: foundry.utils.randomID(16),
+                            name: 'Pouch',
+                            type: 'container',
+                            system: DataDefaults.baseSystemData('container'),
+                            flags: {
+                                [SYSTEM_NAME]: {
+                                    [FLAGS.EmbeddedItems]: [{
+                                        _id: foundry.utils.randomID(16),
+                                        name: 'Rope',
+                                        type: 'equipment',
+                                        system: DataDefaults.baseSystemData('equipment'),
+                                    }],
+                                },
+                            },
+                        }],
+                    },
+                },
+            };
+            const actor: any = { items: [backpack] };
+
+            migrator.migrateActor(actor);
+
+            const pouch = actor.items.find((item: any) => item.name === 'Pouch');
+            const rope = actor.items.find((item: any) => item.name === 'Rope');
+            assert.lengthOf(actor.items, 3);
+            assert.exists(pouch);
+            assert.exists(rope);
+            assert.strictEqual(pouch.system.parentId, backpack._id);
+            assert.strictEqual(rope.system.parentId, pouch._id);
+            assert.isUndefined(pouch.flags[SYSTEM_NAME][FLAGS.EmbeddedItems]);
+        });
+
         it('lifts actor-owned armor mods into sibling actor items', () => {
             const migrator = new Version0_38_0();
             const armor: any = {

@@ -1,3 +1,4 @@
+import { AnyObject } from 'fvtt-types/utils';
 import { SR5Item } from './SR5Item';
 
 /**
@@ -16,6 +17,21 @@ interface CompendiumItemEntry {
  * also present in the same pack.
  */
 export class SR5ItemCompendium extends foundry.applications.sidebar.apps.Compendium<typeof SR5Item> {
+    /**
+     * Dropping an item which already lives in this pack onto the directory takes it out of its
+     * container. Core only routes drops through _createDroppedEntry for entries which don't exist
+     * yet, so unlinking has to happen here, before the usual sorting runs.
+     */
+    protected override async _handleDroppedEntry(target: HTMLElement | null, data: AnyObject) {
+        const entry = await this._getDroppedEntryFromData(data) as SR5Item | null;
+
+        if (entry?.system.parentId && this._entryAlreadyExists(entry)) {
+            await entry.update({ system: { parentId: null } });
+        }
+
+        return super._handleDroppedEntry(target, data);
+    }
+
     protected override async _createDroppedEntry(entry: SR5Item, updates: Record<string, unknown> = {}) {
         const collection = (this as any).collection as foundry.documents.collections.CompendiumCollection<'Item'>;
         const root = entry.clone(updates, { keepId: true });
@@ -27,6 +43,7 @@ export class SR5ItemCompendium extends foundry.applications.sidebar.apps.Compend
 
         const itemData = await SR5Item.createWithLinkedItems(Array.from(contents.values()), {
             parentId: created.id,
+            parent: created,
             transformAll: item => item.toCompendium(collection, {
                 clearSort: false,
                 keepId: true,
@@ -48,7 +65,10 @@ export class SR5ItemCompendium extends foundry.applications.sidebar.apps.Compend
         let items: Iterable<CompendiumItemEntry> = collection;
 
         if (collection.index) {
-            await collection.getIndex({ fields: ['system.parentId'] });
+            // Share a single reindex across renders; a request per render would be wasteful.
+            const pack = collection as { _sr5Reindexing?: Promise<unknown> };
+            pack._sr5Reindexing ??= collection.getIndex({ fields: ['system.parentId'] });
+            await pack._sr5Reindexing;
             items = collection.index;
         }
 

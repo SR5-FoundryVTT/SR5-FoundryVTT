@@ -1361,7 +1361,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             return item.update({ system: { parentId: container.id } });
         }
 
-        const itemData = await SR5Item.createWithLinkedItems([item], { parentId: container.id });
+        const itemData = await SR5Item.createWithLinkedItems([item], { parentId: container.id, parent: container });
         if (itemData.length === 0) return null;
 
         if (container.isEmbedded && container.actor) {
@@ -1397,7 +1397,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             return item.update({ system: { parentId: this.item.id } });
         }
 
-        const itemData = await SR5Item.createWithLinkedItems([item], { parentId: this.item.id });
+        const itemData = await SR5Item.createWithLinkedItems([item], { parentId: this.item.id, parent: this.item });
         if (itemData.length === 0) return null;
 
         if (item.isType('modification')) {

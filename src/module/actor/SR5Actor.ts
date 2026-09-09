@@ -331,9 +331,25 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     prepareLinkedItemRelationships() {
         const items = this.items as unknown as SR5Item[];
-        const prepared = [...items].sort((left, right) => this._attachmentDepth(right) - this._attachmentDepth(left));
+
+        // Index children by parent once. Without this every item rescans the whole collection twice,
+        // for its mods and its ammo, making a single prepare pass quadratic in the actor's item count.
+        const childrenByParent = new Map<string, SR5Item[]>();
+        for (const item of items) {
+            const parentId = item.system.parentId;
+            if (!parentId) continue;
+
+            const siblings = childrenByParent.get(parentId);
+            if (siblings) siblings.push(item);
+            else childrenByParent.set(parentId, [item]);
+        }
+
+        // Deepest first, so a parent always reads children which are themselves already prepared.
+        const depths = new Map(items.map(item => [item, this._attachmentDepth(item)]));
+        const prepared = [...items].sort((left, right) => depths.get(right)! - depths.get(left)!);
+
         for (const item of prepared) {
-            item.prepareRelationshipData();
+            item.prepareRelationshipData(childrenByParent.get(item.id ?? '') ?? []);
         }
     }
 

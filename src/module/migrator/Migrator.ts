@@ -25,6 +25,9 @@ import { VersionMigration, MigratableDocument, MigratableDocumentName, Migratabl
 
 const { deepClone, setProperty } = foundry.utils;
 
+/** Version assigned to raw embedded data so it receives the complete migration chain. */
+export const UNMIGRATED_VERSION = '0.0.0';
+
 
 /**
  * Seamless data migrator for the SR5 system.
@@ -146,7 +149,7 @@ export class Migrator {
         if (nested || (type === "ActiveEffect" && data.label)) {
             data.type ??= "base";
             data._stats ??= {};
-            data._stats.systemVersion ??= "0.0.0";
+            data._stats.systemVersion ??= UNMIGRATED_VERSION;
         }
 
         // If _stats is missing, or systemVersion is not present, or the document is already migrated, skip migration.

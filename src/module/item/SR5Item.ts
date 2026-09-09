@@ -44,6 +44,8 @@ type FormerParentIdOptions = { sr5FormerParentIds?: Record<string, string | null
 type LinkedItemTransformer = (item: SR5Item, depth: number) => Item.CreateData | Promise<Item.CreateData>;
 interface CreateWithLinkedItemsOptions {
     parentId?: string | null;
+    /** The item the new data is linked under, used to measure the existing nesting depth. */
+    parent?: SR5Item;
     transformAll?: LinkedItemTransformer;
 }
 const { fromUuid, getProperty, setProperty } = foundry.utils;
@@ -68,10 +70,21 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     static async createWithLinkedItems(
         items: SR5Item[],
-        { parentId = null, transformAll }: CreateWithLinkedItemsOptions = {}
+        { parentId = null, parent, transformAll }: CreateWithLinkedItemsOptions = {}
     ): Promise<Item.CreateData[]> {
         const created: Item.CreateData[] = [];
         const visited = new Set<string>();
+
+        // Where the new items land in an existing nesting chain. Guarding here as well as in the
+        // sheet keeps imports and other programmatic callers from nesting past the limit.
+        let initialDepth = 0;
+        if (parent) {
+            initialDepth = 1 + (await parent.allContainers()).length;
+            if (initialDepth > SR5Item.MAX_CONTAINER_DEPTH) {
+                ui.notifications?.warn(game.i18n.format('SR5.Container.MaxDepth', { depth: SR5Item.MAX_CONTAINER_DEPTH }));
+                return [];
+            }
+        }
 
         const createItemData = async (item: SR5Item, linkedParentId: string | null, depth: number) => {
             if (item.id && visited.has(item.uuid ?? item.id)) return;
@@ -84,13 +97,15 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             setProperty(itemData, 'system.parentId', linkedParentId);
             created.push(itemData);
 
+            if (depth >= SR5Item.MAX_CONTAINER_DEPTH) return;
+
             const contents = await item.loadContents();
             for (const child of contents) {
                 await createItemData(child, itemData._id, depth + 1);
             }
         };
 
-        for (const item of items) await createItemData(item, parentId, 0);
+        for (const item of items) await createItemData(item, parentId, initialDepth);
         return created;
     }
 
@@ -394,9 +409,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             HostPrep.prepareDerivedData(this.system);
     }
 
-    prepareRelationshipData(): void {
-        const equippedMods = this.getEquippedMods();
-        const equippedAmmo = this.getEquippedAmmo();
+    prepareRelationshipData(children: Iterable<SR5Item> = this.childItems): void {
+        const equippedMods = this.getEquippedMods(children);
+        const equippedAmmo = this.getEquippedAmmo(children);
         const technology = this.getTechnologyData();
 
         if (technology) {
@@ -560,16 +575,15 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return undefined;
     }
 
-    getEquippedAmmo(): SR5Item<'ammo'> | undefined {
-        const equippedAmmos = this.childItems
-            .filter((item) => item.isType('ammo') && item.isEquipped()) as SR5Item<'ammo'>[];
-        return equippedAmmos[0];
+    getEquippedAmmo(children: Iterable<SR5Item> = this.childItems): SR5Item<'ammo'> | undefined {
+        return Array.from(children)
+            .find((item) => item.isType('ammo') && item.isEquipped()) as SR5Item<'ammo'> | undefined;
     }
 
-    getEquippedMods(): SR5Item<'modification'>[] {
+    getEquippedMods(children: Iterable<SR5Item> = this.childItems): SR5Item<'modification'>[] {
         const type = this.modificationType();
         if (!type) return [];
-        return this.childItems.filter((item) =>
+        return Array.from(children).filter((item) =>
             item.isType('modification') &&
             item.system.type === type &&
             item.isEquipped()
@@ -1726,7 +1740,15 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     override _onUpdate(...args: Parameters<Item['_onUpdate']>) {
         super._onUpdate(...args);
-        const [, options] = args;
+        const [changed, options, userId] = args;
+
+        // Children sit beside their parent in the sidebar tree, so they have to follow it between folders.
+        if (userId === game.user?.id && 'folder' in changed) {
+            // An update may name the folder either by id or by document.
+            const folder = changed.folder;
+            void this._syncChildFolders(typeof folder === 'string' ? folder : folder?.id ?? null);
+        }
+
         if (options.render === false) return;
 
         const formerParentIds = (options as FormerParentIdOptions).sr5FormerParentIds;
@@ -1748,18 +1770,56 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     private async _refreshLinkedParents(parentIds: (string | null | undefined)[]) {
         const ids = new Set(parentIds.filter((id): id is string => !!id));
-        for (const parentId of ids) {
-            let parent: SR5Item | undefined;
-            if (this.isEmbedded) {
-                parent = this.actor?.items.get(parentId);
-            } else if (this.pack) {
-                parent = await game.packs.get(this.pack)?.getDocument(parentId) as SR5Item | undefined;
-            } else {
-                parent = game.items?.get(parentId);
-            }
-            if (!parent) continue;
+        const refreshed = new Set<string>();
 
-            await parent.refreshLinkedData();
+        for (const parentId of ids) {
+            let parent = await this._resolveSibling(parentId);
+
+            while (parent?.id && !refreshed.has(parent.id)) {
+                refreshed.add(parent.id);
+                await parent.refreshLinkedData();
+                parent = parent.system.parentId ? await this._resolveSibling(parent.system.parentId) : undefined;
+            }
+        }
+
+        if (ids.size > 0) this._renderContainingDirectory();
+    }
+
+    /**
+     * Move this item's children into the folder it was just moved to.
+     */
+    private async _syncChildFolders(folder: string | null) {
+        if (this.isEmbedded) return;
+
+        const contents = await this.loadContents();
+        if (contents.size === 0) return;
+
+        const updates = contents.map(child => ({ _id: child.id, folder }));
+        await Item.implementation.updateDocuments(updates as Item.UpdateData[], {
+            pack: this.pack ?? undefined,
+            render: false,
+        });
+    }
+
+    /**
+     * Resolve an item id within the same collection as this item.
+     */
+    private async _resolveSibling(id: string): Promise<SR5Item | undefined> {
+        if (this.isEmbedded) return this.actor?.items.get(id) as SR5Item | undefined;
+        if (this.pack) return await game.packs.get(this.pack)?.getDocument(id) as SR5Item | undefined;
+        return game.items?.get(id) as SR5Item | undefined;
+    }
+
+    /**
+     * Rerender whatever lists this item, since linking or unlinking changes whether it is shown there.
+     */
+    private _renderContainingDirectory() {
+        if (this.isEmbedded) {
+            this.actor?.sheet?.render(false);
+        } else if (this.pack) {
+            game.packs.get(this.pack)?.apps.forEach(app => app.render(false));
+        } else {
+            ui.items?.render(false);
         }
     }
 }

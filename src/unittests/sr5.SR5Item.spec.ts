@@ -1,6 +1,8 @@
 import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
+import { SR5Item } from "@/module/item/SR5Item";
 import { SR5ItemCompendium } from "@/module/item/SR5ItemCompendium";
+import { HooksManager } from "@/module/hooks";
 
 export const shadowrunSR5Item = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -8,6 +10,15 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
     const assert: Chai.AssertStatic = context.assert;
 
     after(async () => { await factory.destroy(); });
+
+    /** Poll until a condition holds, for work dispatched from a document hook without being awaited. */
+    const waitFor = async (predicate: () => boolean, timeout = 1000) => {
+        const start = Date.now();
+        while (!predicate() && (Date.now() - start < timeout)) {
+            await new Promise(resolve => setTimeout(resolve, 20));
+        }
+        return predicate();
+    };
 
     describe('SR5Items', () => {
         it('create a naked item of any type', async () => {
@@ -75,6 +86,145 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             await container.delete();
 
             assert.isDefined(game.items.get(content.id!));
+        });
+
+        it('deletes an actor-owned parent together with its attachments', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [
+                { name: 'Ares Alpha', type: 'weapon', system: { category: 'range' } },
+            ]) as SR5Item<'weapon'>[];
+            const [ammo, mod] = await actor.createEmbeddedDocuments('Item', [
+                { name: 'APDS', type: 'ammo', system: { parentId: weapon.id } },
+                { name: 'Gas Vent', type: 'modification', system: { parentId: weapon.id, type: 'weapon' } },
+            ]) as SR5Item[];
+
+            await weapon.delete();
+
+            assert.isUndefined(actor.items.get(ammo.id!), 'ammo');
+            assert.isUndefined(actor.items.get(mod.id!), 'modification');
+        });
+
+        it('keeps an actor-owned parent when only a child is deleted', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [
+                { name: 'Ares Alpha', type: 'weapon', system: { category: 'range' } },
+            ]) as SR5Item<'weapon'>[];
+            const [ammo] = await actor.createEmbeddedDocuments('Item', [
+                { name: 'APDS', type: 'ammo', system: { parentId: weapon.id } },
+            ]) as SR5Item[];
+
+            await ammo.delete();
+
+            assert.isDefined(actor.items.get(weapon.id!));
+        });
+
+        it('terminates deletion on a parentId cycle', async () => {
+            const first = await factory.createItem({type: 'container'});
+            const second = await factory.createItem({type: 'container'});
+            await first.update({ system: { parentId: second.id } } as any);
+            await second.update({ system: { parentId: first.id } } as any);
+
+            await first.delete();
+
+            assert.isUndefined(game.items.get(first.id!));
+            assert.isUndefined(game.items.get(second.id!));
+        });
+
+        it('carries linked children along when an item is copied onto an actor', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const weapon = await factory.createItem({type: 'weapon', system: {category: 'range'}});
+            const ammo = await factory.createItem({type: 'ammo', name: 'Linked APDS'});
+            await ammo.update({ system: { parentId: weapon.id } } as any);
+
+            const itemData = await SR5Item.createWithLinkedItems([weapon]);
+            const created = await actor.createEmbeddedDocuments('Item', itemData, { keepId: true }) as SR5Item[];
+
+            const copiedWeapon = created.find(item => item.type === 'weapon');
+            const copiedAmmo = actor.items.find(item => item.name === 'Linked APDS') as SR5Item | undefined;
+
+            assert.exists(copiedAmmo);
+            assert.strictEqual(copiedAmmo?.system.parentId, copiedWeapon?.id);
+            // The copy must not point back at the world item it was made from.
+            assert.notStrictEqual(copiedAmmo?.system.parentId, weapon.id);
+        });
+
+        it('moves contents along when their container changes folder', async () => {
+            const container = await factory.createItem({type: 'container'});
+            const content = await factory.createItem({type: 'ammo'});
+            await content.update({ system: { parentId: container.id } } as any);
+
+            const folder = await Folder.create({ name: '#QUENCH Contents', type: 'Item' });
+            // Any key works here; the factory deletes every folder it has recorded on teardown.
+            factory.createdFolder.set('ItemContentsMove', folder!.id);
+            await container.update({ folder: folder!.id });
+
+            // The sync is dispatched from _onUpdate without being awaited, as Foundry hooks are.
+            const moved = await waitFor(() => game.items.get(content.id!)?.folder?.id === folder!.id);
+            assert.isTrue(moved, 'contents followed their container');
+        });
+
+        it('prepares world items which own children once the collection is built', async () => {
+            const weapon = await factory.createItem({type: 'weapon', system: {category: 'range'}});
+            const mod = await factory.createItem({
+                type: 'modification',
+                system: { type: 'weapon', mod_weapon: { rc: 2 }, technology: { equipped: true } },
+            });
+            await mod.update({ system: { parentId: weapon.id } } as any);
+
+            // Wipe the derived value the way an out-of-order construction during world load would.
+            weapon.system.range.rc.value = 0;
+            HooksManager.prepareLinkedWorldItems();
+
+            assert.strictEqual(weapon.system.range.rc.value, 2);
+        });
+
+        it('maps each parent item type to the modification type it accepts', () => {
+            assert.strictEqual(SR5Item.modificationTypeFor('weapon'), 'weapon');
+            assert.strictEqual(SR5Item.modificationTypeFor('armor'), 'armor');
+            // Ware shares one modification type rather than using its own item type.
+            assert.strictEqual(SR5Item.modificationTypeFor('bioware'), 'ware');
+            assert.strictEqual(SR5Item.modificationTypeFor('cyberware'), 'ware');
+            assert.isNull(SR5Item.modificationTypeFor('equipment'));
+
+            assert.isTrue(SR5Item.isAttachment('cyberware', 'modification'));
+            assert.isTrue(SR5Item.isAttachment('weapon', 'ammo'));
+            assert.isFalse(SR5Item.isAttachment('equipment', 'modification'));
+            assert.isFalse(SR5Item.isAttachment('armor', 'ammo'));
+        });
+
+        it('refuses to contain itself, an ancestor, or a tree past the depth limit', async () => {
+            const outer = await factory.createItem({type: 'container'});
+            const inner = await factory.createItem({type: 'container'});
+            await inner.update({ system: { parentId: outer.id } } as any);
+
+            assert.isFalse(await outer.canContainItem(outer), 'itself');
+            assert.isFalse(await inner.canContainItem(outer), 'its own ancestor');
+            assert.isTrue(await outer.canContainItem(await factory.createItem({type: 'ammo'})));
+
+            // Build a chain long enough that nesting it under outer would exceed MAX_CONTAINER_DEPTH.
+            let deepest = await factory.createItem({type: 'container'});
+            const root = deepest;
+            for (let i = 0; i < SR5Item.MAX_CONTAINER_DEPTH; i++) {
+                const next = await factory.createItem({type: 'container'});
+                await next.update({ system: { parentId: deepest.id } } as any);
+                deepest = next;
+            }
+
+            assert.isFalse(await outer.canContainItem(root), 'a subtree deeper than the limit');
+        });
+
+        it('stops building linked item data at the maximum nesting depth', async () => {
+            let deepest = await factory.createItem({type: 'container'});
+            const root = deepest;
+            for (let i = 0; i < SR5Item.MAX_CONTAINER_DEPTH + 2; i++) {
+                const next = await factory.createItem({type: 'container'});
+                await next.update({ system: { parentId: deepest.id } } as any);
+                deepest = next;
+            }
+
+            const itemData = await SR5Item.createWithLinkedItems([root]);
+
+            assert.isAtMost(itemData.length, SR5Item.MAX_CONTAINER_DEPTH + 1);
         });
 
         it('detects linked child items for item compendium display', () => {

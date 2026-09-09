@@ -559,8 +559,28 @@ ___________________
         }
     }
 
+    /**
+     * Re-prepare world items which own linked children.
+     *
+     * World items derive their data from their children during prepareBaseData, but documents are
+     * constructed one at a time, so any parent built before its children saw an empty collection.
+     */
+    static prepareLinkedWorldItems() {
+        const parentIds = new Set<string>();
+        for (const item of game.items ?? []) {
+            const parentId = item.system.parentId;
+            if (parentId) parentIds.add(parentId);
+        }
+
+        for (const parentId of parentIds) {
+            game.items?.get(parentId)?.reset();
+        }
+    }
+
     static async ready() {
         await IconAssign.refreshIconFiles();
+
+        HooksManager.prepareLinkedWorldItems();
 
         if (game.user?.isGM) {
             Migrator.BeginMigration();

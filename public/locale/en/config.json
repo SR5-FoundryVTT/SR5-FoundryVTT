@@ -903,6 +903,7 @@
         "Container": {
             "CannotContain": "This item cannot be placed in that container.",
             "Empty": "This container is empty.",
+            "MaxDepth": "Containers cannot be nested more than {depth} levels deep.",
             "Remove": "Remove from container"
         },
         "Conceal": "Conceal",

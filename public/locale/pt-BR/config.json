@@ -462,6 +462,7 @@
         "Container": {
             "CannotContain": "This item cannot be placed in that container.",
             "Empty": "This container is empty.",
+            "MaxDepth": "Contêineres não podem ser aninhados em mais de {depth} níveis.",
             "Remove": "Remove from container"
         },
         "Conceal": "Ocultar",
