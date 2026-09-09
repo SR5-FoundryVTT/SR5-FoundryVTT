@@ -75,6 +75,7 @@ const animateSwarmTile = (
 ) => {
     if (!tileObject) return;
 
+    const tileDoc = tileObject.document || tileObject;
     const animName = `swarmTile_${tileObject.id || Math.random()}`;
 
     try {
@@ -84,15 +85,36 @@ const animateSwarmTile = (
         }
     } catch (e) {}
 
-    try {
-        if (typeof fromX === 'number') tileObject.x = fromX;
-        if (typeof fromY === 'number') tileObject.y = fromY;
-        if (typeof tileObject._refreshPosition === 'function') {
-            tileObject._refreshPosition();
-        } else if (typeof tileObject.refresh === 'function') {
-            tileObject.refresh();
-        }
-    } catch (e) {}
+    const setTilePos = (x: number, y: number) => {
+        try {
+            if (tileDoc) {
+                if ((tileDoc as any).shape) {
+                    (tileDoc as any).shape.x = x;
+                    (tileDoc as any).shape.y = y;
+                }
+                (tileDoc as any).x = x;
+                (tileDoc as any).y = y;
+            }
+            tileObject.x = x;
+            tileObject.y = y;
+            if (tileObject.mesh && typeof tileObject.mesh.position?.set === 'function') {
+                tileObject.mesh.position.set(x, y);
+            }
+            if (tileObject.bg && typeof tileObject.bg.position?.set === 'function') {
+                tileObject.bg.position.set(x, y);
+            }
+            if (tileObject.position && typeof tileObject.position.set === 'function') {
+                tileObject.position.set(x, y);
+            }
+            if (typeof tileObject._refreshPosition === 'function') {
+                tileObject._refreshPosition();
+            } else if (typeof tileObject.refresh === 'function') {
+                tileObject.refresh();
+            }
+        } catch (e) {}
+    };
+
+    setTilePos(fromX, fromY);
 
     const startAnim = () => {
         try {
@@ -108,23 +130,11 @@ const animateSwarmTile = (
                     duration: durationMs,
                     easing: 'easeOutCubic',
                     ontick: () => {
-                        try {
-                            if (typeof tileObject._refreshPosition === 'function') {
-                                tileObject._refreshPosition();
-                            } else if (typeof tileObject.refresh === 'function') {
-                                tileObject.refresh();
-                            }
-                        } catch (e) {}
+                        setTilePos(tileObject.x, tileObject.y);
                     }
                 });
             } else {
-                tileObject.x = targetX;
-                tileObject.y = targetY;
-                if (typeof tileObject._refreshPosition === 'function') {
-                    tileObject._refreshPosition();
-                } else if (typeof tileObject.refresh === 'function') {
-                    tileObject.refresh();
-                }
+                setTilePos(targetX, targetY);
             }
         } catch (e) {
             console.warn('Shadowrun5e | SwarmTileHooks: Tile animation failed', e);

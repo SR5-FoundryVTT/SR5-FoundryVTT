@@ -31,20 +31,15 @@ export class SR5Token extends foundry.canvas.placeables.Token {
     }
 
     override animate(to: any, options?: any) {
-        options = options || {};
-        const originalOntick = options.ontick;
-        options.ontick = (dt: number, anim: any) => {
-            if (typeof originalOntick === 'function') {
-                try {
-                    originalOntick(dt, anim);
-                } catch (e) {}
-            }
-            this._updateSwarmCompanionPositions();
-        };
+        return super.animate(to, options);
+    }
 
-        const res = super.animate(to, options);
+    /**
+     * Updates swarm companion tile positions when the leader token moves.
+     */
+    override _onAnimationUpdate(changed: any, context: any) {
+        super._onAnimationUpdate(changed, context);
         this._updateSwarmCompanionPositions();
-        return res;
     }
 
     _swarmDragSprites: any[] = [];
@@ -419,8 +414,8 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         const totalW = tokenW * gridSize;
         const totalH = tokenH * gridSize;
 
-        const currentX = this.x;
-        const currentY = this.y;
+        const currentX = typeof this.document?.x === 'number' ? this.document.x : this.x;
+        const currentY = typeof this.document?.y === 'number' ? this.document.y : this.y;
 
         const centerX = currentX + (totalW / 2);
         const centerY = currentY + (totalH / 2);
@@ -441,13 +436,23 @@ export class SR5Token extends foundry.canvas.placeables.Token {
                 const targetX = coords[i].x;
                 const targetY = coords[i].y;
 
-                // Update in-memory document coordinates so Foundry's _refreshPosition uses the current frame coordinates
+                // Update in-memory document & shape coordinates for Foundry v14
+                if ((tileDoc as any).shape) {
+                    (tileDoc as any).shape.x = targetX;
+                    (tileDoc as any).shape.y = targetY;
+                }
                 (tileDoc as any).x = targetX;
                 (tileDoc as any).y = targetY;
 
                 tileObject.x = targetX;
                 tileObject.y = targetY;
 
+                if (tileObject.mesh && typeof tileObject.mesh.position?.set === 'function') {
+                    tileObject.mesh.position.set(targetX, targetY);
+                }
+                if (tileObject.bg && typeof tileObject.bg.position?.set === 'function') {
+                    tileObject.bg.position.set(targetX, targetY);
+                }
                 if (tileObject.position && typeof tileObject.position.set === 'function') {
                     tileObject.position.set(targetX, targetY);
                 }
