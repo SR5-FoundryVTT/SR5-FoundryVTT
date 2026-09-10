@@ -94,14 +94,7 @@
         "AP": "AP",
         "Accessory": "Accessory",
         "Accuracy": "Accuracy",
-        "Action": {
-            "0": "A",
-            "1": "c",
-            "2": "t",
-            "3": "i",
-            "4": "o",
-            "5": "n"
-        },
+        "Action": "Action",
         "ActionCategory": {
             "Addiction": "Addiction Actions",
             "AddictionMental": "Mental Addiction",

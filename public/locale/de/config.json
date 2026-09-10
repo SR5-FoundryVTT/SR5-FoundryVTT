@@ -94,16 +94,7 @@
         "AP": "DK",
         "Accessory": "Zubehör",
         "Accuracy": "Präz.",
-        "Action": {
-            "0": "H",
-            "1": "a",
-            "2": "n",
-            "3": "d",
-            "4": "l",
-            "5": "u",
-            "6": "n",
-            "7": "g"
-        },
+        "Action": "Handlung",
         "ActionCategory": {
             "Addiction": "Abhängigkeits-Handlungen",
             "AddictionMental": "Abhängigkeit Geistig",
@@ -1335,7 +1326,8 @@
             "NoAvailableActorFound": "Es wurde kein verfügbarer Akteur für diese Aktion gefunden",
             "SkillWithoutAttribute": "Die Fertigkeit hat kein konfiguriertes Attribut.",
             "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug-Akteur geworfen werden",
-            "TooManyActionsWithCategory": "Es darf nur eine Aktion mit der Kategorie {category} pro Akteur geben."
+            "TooManyActionsWithCategory": "Es darf nur eine Aktion mit der Kategorie {category} pro Akteur geben.",
+            "NoDriverSelectedForJumpIn": "Kein Fahrer für das Hineinspringen ausgewählt oder zugewiesen."
         },
         "EssenceCost": "Essenz",
         "Expand": "Ausklappen",
@@ -3361,7 +3353,8 @@
                 "ResultOverrideGlitches": "Überschreibt Patzer für dieses Probenergebnis.",
                 "ResultOverrideHits": "Überschreibt Erfolge für dieses Probenergebnis.",
                 "RollMode": "Sichtbarkeit der FoundryVTT-Chat-Nachricht",
-                "Threshold": "Vollständiger Schwellenwert"
+                "Threshold": "Vollständiger Schwellenwert",
+                "LimitIgnored": "Limit wird ignoriert"
             },
             "ToggleEditMode": "Umschalter Editiermodus"
         },
