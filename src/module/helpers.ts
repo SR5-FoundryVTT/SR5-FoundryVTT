@@ -77,14 +77,14 @@ export class Helpers {
         // array of labels to check for on the incoming data
         const matrixLabels = [
             'SR5.MatrixAttrFirewall',
-            'SR5.MatrixAttrDataProcessing',
+            'SR5.MatrixAttrDataProc',
             'SR5.MatrixAttrSleaze',
             'SR5.MatrixAttrAttack',
             'SR5.Skill.Computer',
             'SR5.Skill.Hacking',
             'SR5.Skill.Cybercombat',
             'SR5.Skill.ElectronicWarfare',
-            'SR5.Software',
+            'SR5.Skill.Software',
         ];
         if (!Array.isArray(atts)) atts = [atts];
         atts = atts.filter((att) => att);
@@ -271,7 +271,9 @@ export class Helpers {
         const dest2D = canvas.grid.getCenterPoint({ x: tokenDest.x, y: tokenDest.y });
 
         // Use gridSpace to measure in grids instead of distance. This will give results parity to FoundryVTTs canvas ruler.
-        const distanceInGridUnits2D = canvas.grid.measurePath([origin2D, dest2D], {});
+        // all three declare the same signature, so measure through one of them no matter the scene's grid type.
+        const grid = canvas.grid as foundry.grid.SquareGrid;
+        const distanceInGridUnits2D = grid.measurePath([origin2D, dest2D]);
 
         // 3d coordinates and distance
         const originLOSHeight = Helpers.getTokenLOSHeight(tokenOrigin);
@@ -647,7 +649,7 @@ export class Helpers {
     ): { id: string, updateSkillData: Record<string, Record<string, SkillFieldType>> } | undefined {
         if (!skillDataPath || skillDataPath.length === 0) return undefined;
 
-        const id = randomID(idLength);
+        const id = foundry.utils.randomID(idLength);
         const updateSkillData = {
             [skillDataPath]: { [id]: skillField }
         };

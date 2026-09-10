@@ -1,5 +1,4 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
-import { RoutingLibIntegration } from '../integrations/routingLibIntegration';
 
 import Token = foundry.canvas.placeables.Token;
 import PrototypeTokenConfig = foundry.applications.sheets.PrototypeTokenConfig;
@@ -26,46 +25,5 @@ export class SR5Token extends foundry.canvas.placeables.Token {
             data.value = data.max - data.value;
         }
         return super._drawBar(number, bar, data);
-    }
-
-    override findMovementPath(
-        waypoints: Token.FindMovementPathWaypoint[],
-        options?: Token.FindMovementPathOptions & { skipRoutingLib?: boolean; }
-    ) {
-        const movement = this.actor?.system.movement;
-        const useRoutLib = this.document.getFlag(SYSTEM_NAME, FLAGS.TokenUseRoutingLib) ?? true;
-        if (RoutingLibIntegration.ready && movement && useRoutLib && !options?.skipRoutingLib && !options?.ignoreWalls) {
-            return RoutingLibIntegration.routinglibPathfinding(waypoints, this, movement);
-        }
-
-        return super.findMovementPath(waypoints, options);
-    }
-
-    static tokenConfig(
-        app: any, // TokenConfig | PrototypeTokenConfig, Stubs on FVTT-Types
-        html: HTMLElement,
-        data: TokenConfig.RenderContext | PrototypeTokenConfig.RenderContext,
-        options: TokenConfig.RenderOptions | PrototypeTokenConfig.RenderOptions
-    ) {
-        const actor = app.actor as Actor.Implementation | null | undefined;
-        if (!RoutingLibIntegration.ready || !actor?.system.movement) return;
-
-        // Default it to true, so that it is enabled by default.
-        const flagValue = app.token.getFlag(SYSTEM_NAME, FLAGS.TokenUseRoutingLib) ?? true;
-        const id = `${app.id}-${FLAGS.TokenUseRoutingLib}`;
-
-        const settingDiv = $(`
-            <div class="form-group">
-                <label for="${id}">${game.i18n.localize("SETTINGS.TokenUseRoutingLib")}</label>
-                <div class="form-fields">
-                    <input type="checkbox"
-                        name="flags.${SYSTEM_NAME}.${FLAGS.TokenUseRoutingLib}"
-                        id="${id}"
-                        ${flagValue ? 'checked' : ''}>
-                </div>
-            </div>
-        `);
-
-        $(html).find('label[for$="-movementAction"]').closest('div.form-group').after(settingDiv);
     }
 }

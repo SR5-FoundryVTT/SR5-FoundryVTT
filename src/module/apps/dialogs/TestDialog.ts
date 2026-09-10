@@ -25,7 +25,7 @@ export interface TestDialogListener {
 
 interface TestDialogContext extends HandlebarsApplicationMixin.RenderContext {
     test: any;
-    rollMode: ChatMessage.MessageMode;
+    rollMode: ChatMessage.Mode;
     rollModes: typeof CONFIG.ChatMessage.modes;
     config: typeof SR5;
     expandedPaths: string[];
@@ -126,14 +126,14 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
     }
 
     override async close(options?: ApplicationV2.ClosingOptions): Promise<this> {
-        const closed = await super.close(options);
+        await super.close(options);
 
         if (this.canceled && !this._selectionSettled) {
             this._selectionSettled = true;
             this._selectionResolve(this.selection);
         }
 
-        return closed;
+        return this;
     }
 
     static async #roll(this: TestDialog, event: Event) {

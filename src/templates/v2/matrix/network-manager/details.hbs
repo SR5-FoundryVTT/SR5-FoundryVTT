@@ -17,7 +17,7 @@
             {{#if driver}}{{#unless (eq driver.uuid @root.connected_network.uuid)}}
                 <div class="list-item" data-uuid="{{this.uuid}}">
                     <div class="list-item-start">
-                        <button class="list-item-image-container icon sr5-icon" data-action="connectToDriver" data-tooltip="SR5.ConnectToDriver">
+                        <button class="list-item-image-container icon sr5-icon" data-action="connectToDriver" data-tooltip="SR5.Labels.ActorSheet.ConnectToDriver">
                             <img class="list-item-image-connect" src="{{speakerImg driver}}" />
                         </button>
                         <a data-action="connectToDriver">
@@ -30,7 +30,7 @@
                         </label>
                     </div>
                     <div class="list-item-icons">
-                        <a data-action="connectToDriver" data-tooltip="SR5.ConnectToDriver">
+                        <a data-action="connectToDriver" data-tooltip="SR5.Labels.ActorSheet.ConnectToDriver">
                             <i class="fas fa-right-to-bracket"></i>
                         </a>
                     </div>

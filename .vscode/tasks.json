@@ -1,0 +1,30 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "SR5: watch development build",
+            "type": "npm",
+            "script": "watch:dev",
+            "isBackground": true,
+            "problemMatcher": []
+        },
+        {
+            "label": "SR5: validate",
+            "type": "npm",
+            "script": "test",
+            "problemMatcher": ["$tsc"]
+        },
+        {
+            "label": "SR5: build application",
+            "type": "npm",
+            "script": "build:prod",
+            "problemMatcher": []
+        },
+        {
+            "label": "SR5: validate compendiums",
+            "type": "npm",
+            "script": "validate:packs",
+            "problemMatcher": []
+        }
+    ]
+}

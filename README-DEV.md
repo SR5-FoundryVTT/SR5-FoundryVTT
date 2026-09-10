@@ -1,35 +1,35 @@
 # Local development environment
 
 ## General development
-The main development workflow uses a build system using npm and gulp with Github pull requests required for changes made. Should you have issues while setting it up, please web search first.
+Shadowrun5e uses TypeScript, esbuild, Sass, npm, and Gulp. Use a Node.js version supported by
+[`package.json`](package.json) and a Foundry VTT version supported by [`system.json`](system.json). A global Gulp
+installation is not required. The setup instructions below were last tested with Node.js 24.
 
-Shadowrun5e uses Typescript (with esbuild), npm with gulp and git.
+Install a supported [Node.js version](https://nodejs.org/en/download), [Git](https://git-scm.com/downloads), and a
+local Foundry application. Then clone your fork and run:
 
-You'll have to install node.js (npm) (Use node v18! v20 seems to cause issues) and git: 
-* Node v18: [https://nodejs.org/download/release/v18.18.2/node-v18.18.2-x64.msi](https://nodejs.org/download/release/v18.18.2/node-v18.18.2-x64.msi)
-* [https://git-scm.com/download/](https://git-scm.com/download/)
+```sh
+npm ci
+npm run watch:dev
+```
 
-Follow these steps using your terminal (cmd.exe on Windows):
-* `npm install --global gulp-cli`
-* Follow this manual on how to work with a Github forking and cloning, git branches and Github pull requests ([https://opensource.com/article/19/7/create-pull-request-github](https://opensource.com/article/19/7/create-pull-request-github))
-* `git clone <the_fork_url_on_your_github`
-* `cd <the_cloned_fork_directory>`
-* `npm install` (this will take a while)
-* `gulp watch`
-* Start developing (you might want to link your dev and local systems folder)
+The main npm commands are:
 
-There are multiple gulp tasks available to help development:
-* watch => rebuild the system after a change is detected (code and `/public` data), using implicit dev build
-* watch:prod => same as watch but using prod build
-* watch:dev => same as watch but explicitly using dev build
-* build => rebuild the system once (dev build, includes unit tests), using implicit dev build
-* build:prod => build the system once as a explicit prod build
-* build:dev => build the system once as a explicit dev build
-* link => See section below
+* `npm run watch:dev`: copy assets and rebuild development code, styles, templates, and tours as files change.
+* `npm run watch:prod`: run the watcher with production feature flags.
+* `npm run build:dev`: build application code and assets once for development.
+* `npm run build:prod`: clean and build application code and assets once for production.
+* `npm run build:db`: intentionally rebuild LevelDB compendium output under `/packs`.
+* `npm run package`: build the production application and compendiums for a release.
+* `npm run validate:packs`: validate and compile compendium sources in a temporary directory without touching live packs.
+* `npm test`: type-check production and Quench test sources.
+
+Stop Foundry before running `npm run build:db` or `npm run package`. A running Foundry process can lock the LevelDB pack
+directories. Normal application builds do not compile packs and are safe to run independently.
 
 The resulting application used for FoundryVTT will only use contents in `/dist`.
 
-**Note:** By default, builds include the Quench unit test framework for testing during development. Production builds (created by GitHub Actions via `npm run build:prod`) exclude unit tests.
+Development builds include the Quench registration code. Production builds exclude it.
 
 ## Linking the dev and system folder
 It's helpful, but not strictly necessary, to place your development folder separate from the FoundryVTT system folder as a system update will overwrite your development folder otherwise. This can be done by linking the two. For this to work, the shadowrun5e system can't be installed in your local Foundry.
@@ -40,18 +40,45 @@ You can execute this command from within your `cmd` or `Windows Terminal`:
 
 <yourClonedRepoPath> must be the cloned repository that includes the `dist` folder within it.
 
-## ESLint / Prettier
+## oxlint / Prettier
 
-This project uses ESLint and Prettier to enforce code style and formatting.
+This project uses oxlint and Prettier to enforce code style and formatting.
 
-It is strongly recommended to set up Prettier and ESLint in your IDE to run automatically as you develop. ESLint is also ran as part of the PR build pipeline.
+It is strongly recommended to set up Prettier and oxlint in your IDE to run automatically as you develop. oxlint is also ran as part of the PR build pipeline.
 
 The relevant commands are:
  * `npm run lint`: Run the linter, outputting all errors and warnings
  * `npm run lint:fix`: Run the linter, fixing all errors and warnings it can auto-fix and outputting the rest
  * `npm run lint:errors`: Run the linter, outputting only errors
  * `npm run lint:errors:fix`: Run the linter, fixing all errors it can auto-fix and outputting the rest
- * `npm run prettier`: Run prettier, auto-formatting your changeset
+ * `npm run format:all`: Run Prettier over the configured repository files. Keep formatting-only changes separate from behavior changes.
+
+Linting runs with `--type-aware`, which needs type information and therefore the `oxlint-tsgolint` binary that ships as
+a dependency. Rules live in `.oxlintrc.json`.
+
+## VS Code setup
+
+The repository publishes portable tasks and extension recommendations under `.vscode`. The shared files contain no
+machine-specific paths. If you want VS Code to launch Foundry, set `FOUNDRY_APP_PATH` and `FOUNDRY_DATA_PATH` in your
+user environment and create an ignored `.vscode/launch.json`, for example:
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Foundry VTT",
+            "type": "node",
+            "request": "launch",
+            "program": "${env:FOUNDRY_APP_PATH}/main.mjs",
+            "args": ["--dataPath=${env:FOUNDRY_DATA_PATH}", "--hotReload"],
+            "cwd": "${env:FOUNDRY_APP_PATH}"
+        }
+    ]
+}
+```
+
+These variables are local paths, not secrets, but they should remain in user configuration rather than committed files.
 
 ## Sourcebook citation tooling
 
@@ -103,9 +130,11 @@ Source code
 
 
 ## Translations
-The FoundryVTT language config files used by Foundry will be at `/dist/lang/<language>/config.json`. The `/dist` directory does only exist on releases and changes made here to language files won't be accepted into the GitHub repository. Instead, use `/public/lang/<language>/config.json` as these are copied over to `/dist/lang` when running `gulp build` or `gulp watch`.
+The FoundryVTT language config files used by Foundry are at `/dist/locale/<language>/config.json`. The `/dist` directory
+is generated, so translation changes belong in `/public/locale/<language>/config.json`. Application build and watch
+commands copy those files into `/dist/locale`.
 
-In order to get your translation changes to the `/public` language files into the system, you'll have to create a GitHub pull request against the systems `master`/`main` branch. 
+To include translation changes to `/public` language files in the system, create a GitHub pull request targeting `master`.
 
 ## Separation
 More and more parts of the system move to separate modules organized into these broad layers:
@@ -122,10 +151,12 @@ Additional separations are made for
 ## Branches and Pull Requests
 We'll gladly accept pull requests for all things moving the system forward. :)
 
-The system branch workflow is simple:
-`master` is the main and stable branch that is *safe* to pull from and is meant to adress your pull requests into. It's setup with an GitHub action performing a TypeScript build dry run; this action has to succeed for any pull request to be considered.
+The system branch workflow is simple: submit bug fixes and small features to `master`. CI installs from the lockfile,
+type-checks production and Quench sources, checks error-level lint findings, builds application assets, and validates
+compendium sources; all required checks must pass.
 
-`release/**` is the active branch for upcoming releases. It's temporary and will be removed once merged into `master`. If you're actively working on changes for that release, you can pull from it and address your pull request into it. It's setup using the same GitHub action as `master`. You should only pull from this branch, if you need commits in its history. Otherwise, use `master`.
+Implement significant features on an active `release/**` branch. These branches are temporary and are removed after
+being merged into `master`. If no active `release/**` branch exists, use `master` instead.
 
 ## Unittesting
 There is unit testing support using the FVTT Quench module. It's encouraged to do some unit testing where possible but it's not mandatory. Rule modules should always contain some testing, while flow modules are encouraged to have some. Any application layers don't need testing. See the structure section for some broad overview over different layers / modules. 
@@ -140,7 +171,7 @@ You should see a success message and a little arrow symbol on the shadowrun5e fo
 The Quench runner connects to an existing Foundry development world and tests the currently checked-out
 branch. It does not build the system or start Foundry.
 
-* Run `gulp watch` or `npm run build:dev` so the development system is available to Foundry.
+* Run `npm run watch:dev` or `npm run build:dev` so the development system is available to Foundry.
 * Install Quench in the same Foundry data directory and launch a world using the development system.
 * Install the browser once with `npx playwright install chromium`.
 * Run `npm run quench`.

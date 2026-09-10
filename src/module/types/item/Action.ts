@@ -178,7 +178,11 @@ export const ActionRollData = (
     roll_mode: new StringField({
         blank: true,
         required: true,
-        choices: CONFIG.ChatMessage.modes,
+        choices: () => Object.entries(CONFIG.ChatMessage.modes)
+            .reduce<Record<string, string>>((choices, [mode, { label }]) => {
+                choices[mode] = label;
+                return choices;
+            }, {}),
     }),
 });
 

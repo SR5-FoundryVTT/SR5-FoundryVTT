@@ -12,6 +12,7 @@ import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { SkillFieldType } from 'src/module/types/template/Skills';
 import { ItemPrep } from './functions/ItemPrep';
+import { SR5 } from '@/module/config';
 
 export class SpiritPrep {
     static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
@@ -77,7 +78,7 @@ export class SpiritPrep {
         const { armor, attributes, modifiers } = system;
 
         const immunityRating = Math.max(attributes.essence.value * 2, 0);
-        ModifiableValue.addUnique(armor.immunities.normal_weapons, 'SR5.armorImmunityTypes.normal_weapons', immunityRating);
+        ModifiableValue.addUnique(armor.immunities.normal_weapons, SR5.armorImmunityTypes.normal_weapons, immunityRating);
 
         if (modifiers.armor)
             ModifiableValue.addUnique(armor.rating, game.i18n.localize('SR5.Bonus'), modifiers.armor);

@@ -49,7 +49,6 @@ import { SpritePower } from './item/SpritePower';
 import { Weapon } from './item/Weapon';
 import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from "./flags/ItemFlags";
 
-import { RoutingLib } from "../integrations/routingLibIntegration";
 import SR5CompendiaSettings from "../settings/SR5CompendiaSettings";
 import AstralPerceptionDetectionMode from "../vision/astralPerception/astralPerceptionDetectionMode";
 import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDetectionMode";
@@ -109,6 +108,13 @@ declare module "fvtt-types/configuration" {
 
     interface SystemNameConfig {
         name: "shadowrun5e";
+    }
+
+    namespace CONFIG.ActiveEffect {
+        interface ExpiryEvents {
+            sr5MyActionStart: string;
+            sr5MyActionEnd: string;
+        }
     }
 
     namespace CONFIG.Canvas {
@@ -217,7 +223,6 @@ declare module "fvtt-types/configuration" {
         };
         Token: {
             shadowrun5e: {
-                TokenUseRoutingLib?: boolean;
                 TokenMovementPhaseMarkers?: MovementPhaseMarker[];
             };
         }
@@ -246,7 +251,6 @@ declare module "fvtt-types/configuration" {
             sr5_processTagifyElements: any;
             // Fired on all clients on global data storage changes, with the changed keys.
             'sr5e.storageChanged': (changedKeys: string[]) => void;
-            "routinglib.ready": () => void;
             SR5_CastItemAction: (arg0: SR5Item) => void;
             SR5_PreActorItemRoll: (arg0: SR5Actor, arg1: SR5Item) => void;
             getSceneControlButtons: (arg0: any) => void;
@@ -313,8 +317,6 @@ type _NormalizeNever<T> = [T] extends [never] ? unknown : T;
 type _NormalizeEmptyEntries<T> = [T] extends [never[]] ? [string, unknown][] : T;
 
 declare global {
-    var routinglib: RoutingLib | null;
-
     interface Game {
         dice3d: DiceSoNice | undefined;
     }

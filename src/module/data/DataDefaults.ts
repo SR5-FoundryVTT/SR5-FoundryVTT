@@ -163,9 +163,9 @@ export class DataDefaults {
         if (createData) {
             let correctionLogs: CorrectionLog | null;
             if (entity in CONFIG.Actor.dataModels)
-                correctionLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels[entity].schema, createData);
+                correctionLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels[entity as Actor.SubType].schema, createData);
             else if (entity in CONFIG.Item.dataModels)
-                correctionLogs = Sanitizer.sanitize(CONFIG.Item.dataModels[entity].schema, createData);
+                correctionLogs = Sanitizer.sanitize(CONFIG.Item.dataModels[entity as Item.SubType].schema, createData);
             else
                 throw new Error(`No schema found for entity type: ${entity}`);
 

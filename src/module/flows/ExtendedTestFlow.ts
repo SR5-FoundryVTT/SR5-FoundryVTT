@@ -466,7 +466,7 @@ export const ExtendedTestFlow = {
             glitch: test.glitched,
             criticalGlitch: test.criticalGlitched,
             poolUsed: test.pool.value,
-            timestamp: chatMessage.timestamp,
+            timestamp: chatMessage.timestamp ?? Date.now(),
             worldTime: game.time.worldTime,
             messageUuid,
             userId: senderId,

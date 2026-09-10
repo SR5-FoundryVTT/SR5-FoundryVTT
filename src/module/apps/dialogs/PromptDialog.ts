@@ -102,14 +102,14 @@ export class PromptDialog extends HandlebarsApplicationMixin(ApplicationV2)<Prom
     }
 
     override async close(options?: ApplicationV2.ClosingOptions): Promise<this> {
-        const closed = await super.close(options);
+        await super.close(options);
 
         if (this.canceled && !this._selectionSettled) {
             this._selectionSettled = true;
             this._selectionResolve(this.selection);
         }
 
-        return closed;
+        return this;
     }
 
     protected override async _prepareContext(

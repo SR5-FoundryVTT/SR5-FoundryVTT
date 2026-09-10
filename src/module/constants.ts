@@ -62,7 +62,6 @@ export const FLAGS = {
     TokenRulerColorSprinting: "TokenRulerColorSprinting",
     TokenRulerColorPhaseMarker: "TokenRulerColorPhaseMarker",
     TokenRulerOpacity: 'TokenRulerOpacity',
-    TokenUseRoutingLib: 'TokenUseRoutingLib',
     TokenMovementHistoryReset: 'TokenMovementHistoryReset',
     TokenMovementPhaseMarkers: 'TokenMovementPhaseMarkers',
     GeneralActionsPack: 'GeneralActionsPack',

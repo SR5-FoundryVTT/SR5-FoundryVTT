@@ -1,6 +1,7 @@
 import { SR5Actor } from '../../SR5Actor';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { InitiativeType } from '@/module/types/template/Initiative';
+import { SR5 } from '@/module/config';
 
 const isKeyOf = <T extends object>(obj: T, key: PropertyKey): key is keyof T => key in obj;
 
@@ -33,12 +34,12 @@ export class InitiativePrep {
         const constMod = new ModifiableValue(modeInit.constant);
         if (modeInit.attribute_a) {
             const attributeA = this.getAttributeValue(system, modeInit.attribute_a);
-            constMod.addBase(`SR5.attributes.${modeInit.attribute_a}`, attributeA);
+            constMod.addBase(SR5.attributes[modeInit.attribute_a], attributeA);
         }
 
         if (modeInit.attribute_b) {
             const attributeB = this.getAttributeValue(system, modeInit.attribute_b);
-            constMod.addBase(`SR5.attributes.${modeInit.attribute_b}`, attributeB);
+            constMod.addBase(SR5.attributes[modeInit.attribute_b], attributeB);
         }
 
         constMod.calcTotal();
