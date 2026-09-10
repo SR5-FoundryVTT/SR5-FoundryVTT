@@ -67,12 +67,12 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
 
         it('visibility checks', async () => {
             const vehicle = await factory.createActor({ type: 'vehicle', system: { attributes: { body: { base : 5 } } } });
-            assert.strictEqual(vehicle.system.visibilityChecks.astral.hasAura, false);
-            assert.strictEqual(vehicle.system.visibilityChecks.astral.astralActive, false);
-            assert.strictEqual(vehicle.system.visibilityChecks.astral.affectedBySpell, false);
-            assert.strictEqual(vehicle.system.visibilityChecks.meat.hasHeat, true);
-            assert.strictEqual(vehicle.system.visibilityChecks.matrix.hasIcon, true);
-            assert.strictEqual(vehicle.system.visibilityChecks.matrix.runningSilent, false);
+            assert.strictEqual(vehicle.system.visibilityChecks.targets.astral.hasAura, false);
+            assert.strictEqual(vehicle.system.visibilityChecks.targets.astral.astralActive, false);
+            assert.strictEqual(vehicle.system.visibilityChecks.targets.astral.affectedBySpell, false);
+            assert.strictEqual(vehicle.system.visibilityChecks.targets.physical.thermographic, 'warm');
+            assert.strictEqual(vehicle.system.visibilityChecks.targets.matrix.hasIcon, true);
+            assert.strictEqual(vehicle.system.visibilityChecks.targets.matrix.runningSilent, false);
         });
 
         it('Recoil compensation', async () => {
@@ -127,6 +127,5 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
         });
     });
 };
-
 
 

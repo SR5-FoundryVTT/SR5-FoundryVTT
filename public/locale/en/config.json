@@ -9,6 +9,8 @@
         }
     },
     "SETTINGS": {
+        "AutomaticTokenSenses": "Automatically manage token senses",
+        "AutomaticTokenSensesDescription": "Refresh system-managed token detection modes when actor, item, effect, or token data changes. Individual tokens can opt out with the shadowrun5e.AutomaticTokenSenses flag.",
         "ApplyLimitsDescription": "Should Limits be applied to rolls",
         "ApplyLimitsName": "Apply Limits to Rolls",
         "AutomateMultiDefenseModifier": "Automate defense modifier",
@@ -3348,8 +3350,34 @@
         },
         "Vision": {
             "AstralPerception": "Astral Perception",
+            "AstralPerceptionOverride": "Astral perception override",
+            "AstralPerceptionOverrideHint": "GM override for whether this actor may use astral perception.",
+            "AstralProjectionOverride": "Astral projection override",
+            "AstralProjectionOverrideHint": "GM override for whether this actor may use astral projection.",
             "AugmentedReality": "Augmented Reality",
             "LowLight": "Low-Light Vision",
+            "MagicalType": "Magical type",
+            "MagicalTypeHint": "Determines the actor's default astral perception and projection eligibility.",
+            "MagicalTypes": {
+                "Adept": "Adept",
+                "AspectedMagician": "Aspected magician",
+                "Magician": "Magician",
+                "Mundane": "Mundane",
+                "MysticAdept": "Mystic adept"
+            },
+            "OverrideModes": {
+                "Allow": "Allow",
+                "Default": "Use magical type",
+                "Deny": "Deny"
+            },
+            "ThermographicSignature": "Thermographic signature",
+            "ThermographicSignatureHint": "How this actor appears when detected by thermographic vision.",
+            "ThermographicSignatures": {
+                "None": "None",
+                "Cold": "Cold",
+                "Warm": "Warm",
+                "Hot": "Hot"
+            },
             "ThermographicVision": "Thermographic Vision"
         },
         "Walk": "Walk",

@@ -142,6 +142,7 @@ import { Skill } from './types/item/Skill';
 import { SR5SkillSheet } from './item/sheets/SR5SkillSheet';
 import { SkillGroupFlow } from './actor/flows/SkillGroupFlow';
 import { OpposedMatrixTest } from './tests/OpposedMatrixTest';
+import { PerceptionFlow } from './vision/PerceptionFlow';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -183,6 +184,8 @@ export class HooksManager {
         Hooks.on('updateWorldTime', foundry.utils.debounce(() => { void ExtendedTestDueFlow.announceDue(); }, 250));
 
         Hooks.on('renderChatLog', HooksManager.chatLogListeners.bind(HooksManager));
+
+        PerceptionFlow.registerHooks();
 
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();

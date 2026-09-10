@@ -9,6 +9,8 @@
         }
     },
     "SETTINGS": {
+        "AutomaticTokenSenses": "토큰 감각 자동 관리",
+        "AutomaticTokenSensesDescription": "액터, 아이템, 효과 또는 토큰 데이터가 변경되면 시스템이 관리하는 감지 모드를 갱신합니다. 개별 토큰은 shadowrun5e.AutomaticTokenSenses 플래그로 제외할 수 있습니다.",
         "ApplyLimitsDescription": "굴림에 한계치가 반드시 적용됨",
         "ApplyLimitsName": "굴림에 한계치 적용",
         "AutomateMultiDefenseModifier": "자동 방어 수정치",
@@ -3348,8 +3350,34 @@
         },
         "Vision": {
             "AstralPerception": "아스트랄 인식",
+            "AstralPerceptionOverride": "아스트랄 지각 재정의",
+            "AstralPerceptionOverrideHint": "이 액터의 아스트랄 지각 사용 가능 여부를 GM이 재정의합니다.",
+            "AstralProjectionOverride": "아스트랄 투사 재정의",
+            "AstralProjectionOverrideHint": "이 액터의 아스트랄 투사 사용 가능 여부를 GM이 재정의합니다.",
             "AugmentedReality": "증강 현실",
             "LowLight": "저광 시야",
+            "MagicalType": "마법 유형",
+            "MagicalTypeHint": "액터의 기본 아스트랄 지각 및 투사 가능 여부를 결정합니다.",
+            "MagicalTypes": {
+                "Adept": "어뎁트",
+                "AspectedMagician": "특화 마법사",
+                "Magician": "마법사",
+                "Mundane": "일반인",
+                "MysticAdept": "미스틱 어뎁트"
+            },
+            "OverrideModes": {
+                "Allow": "허용",
+                "Default": "마법 유형 사용",
+                "Deny": "거부"
+            },
+            "ThermographicSignature": "열화상 신호",
+            "ThermographicSignatureHint": "열화상 시야로 감지될 때 이 액터가 보이는 방식을 정합니다.",
+            "ThermographicSignatures": {
+                "None": "없음",
+                "Cold": "저온",
+                "Warm": "온열",
+                "Hot": "고온"
+            },
             "ThermographicVision": "열화상 시야"
         },
         "Walk": "걷기",

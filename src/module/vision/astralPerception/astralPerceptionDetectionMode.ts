@@ -10,15 +10,14 @@ export default class AstralPerceptionDetectionMode extends foundry.canvas.percep
         ...[visionSource, target]: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>
     ) {
         const tgt = target?.document instanceof TokenDocument ? target.document : null;
-        const targetAstralActive = !!tgt?.actor?.system.visibilityChecks.astral.astralActive;
+        const targetAstralActive = !!tgt?.actor?.system.visibilityChecks.targets.astral.astralActive;
 
-        const targetHasAura = !!tgt?.actor?.system.visibilityChecks.astral.hasAura;
+        const targetHasAura = !!tgt?.actor?.system.visibilityChecks.targets.astral.hasAura;
 
-        const targetAffectedBySpell = !!tgt?.actor?.system.visibilityChecks.astral.affectedBySpell;
+        const targetAffectedBySpell = !!tgt?.actor?.system.visibilityChecks.targets.astral.affectedBySpell;
 
         const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
 
         return (targetHasAura || targetAstralActive || targetAffectedBySpell) && isAstralPerceiving;
     }
 }
-  

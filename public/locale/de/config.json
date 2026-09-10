@@ -9,6 +9,8 @@
         }
     },
     "SETTINGS": {
+        "AutomaticTokenSenses": "Token-Sinne automatisch verwalten",
+        "AutomaticTokenSensesDescription": "Aktualisiert systemverwaltete Wahrnehmungsmodi, wenn sich Akteur-, Gegenstands-, Effekt- oder Tokendaten ändern. Einzelne Tokens können über das Flag shadowrun5e.AutomaticTokenSenses ausgenommen werden.",
         "ApplyLimitsDescription": "Sollen Limits auf auf Würfen angewendet werden?",
         "ApplyLimitsName": "Verwende Limits bei Würfen",
         "AutomateMultiDefenseModifier": "Automatisiere Verteidigungsmodifikator",
@@ -3389,8 +3391,34 @@
         },
         "Vision": {
             "AstralPerception": "Astrale Wahrnehmung",
+            "AstralPerceptionOverride": "Override für astrale Wahrnehmung",
+            "AstralPerceptionOverrideHint": "SL-Override, ob dieser Akteur astral wahrnehmen darf.",
+            "AstralProjectionOverride": "Override für astrale Projektion",
+            "AstralProjectionOverrideHint": "SL-Override, ob dieser Akteur astral projizieren darf.",
             "AugmentedReality": "Augmented Reality",
             "LowLight": "Restlistverstärkung",
+            "MagicalType": "Magischer Typ",
+            "MagicalTypeHint": "Bestimmt die standardmäßige Berechtigung für astrale Wahrnehmung und Projektion.",
+            "MagicalTypes": {
+                "Adept": "Adept",
+                "AspectedMagician": "Aspektmagier",
+                "Magician": "Magier",
+                "Mundane": "Mundan",
+                "MysticAdept": "Magieradept"
+            },
+            "OverrideModes": {
+                "Allow": "Erlauben",
+                "Default": "Magischen Typ verwenden",
+                "Deny": "Verweigern"
+            },
+            "ThermographicSignature": "Thermografische Signatur",
+            "ThermographicSignatureHint": "Legt fest, wie dieser Akteur durch Infrarotsicht erscheint.",
+            "ThermographicSignatures": {
+                "None": "Keine",
+                "Cold": "Kalt",
+                "Warm": "Warm",
+                "Hot": "Heiß"
+            },
             "ThermographicVision": "Infrarotsicht"
         },
         "Walk": "Gehen",

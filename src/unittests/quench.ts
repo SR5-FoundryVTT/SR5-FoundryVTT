@@ -38,6 +38,7 @@ import { shadowrunDataStorage } from './sr5.DataStorage.spec';
 import { Quench, QuenchRegisterBatchFunction, QuenchRegisterBatchOptions } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
 import { shadowrunMatrixDamageResist } from '@/unittests/sr5.MatrixDamageResist.spec';
+import { shadowrunVisionFoundation } from '@/unittests/sr5.VisionFoundation.spec';
 
 const QUENCH_TIMEOUT_MS = 5000;
 
@@ -70,6 +71,9 @@ export const quenchRegister = (quench: Quench) => {
 
     registerBatch(quench, 'shadowrun5e.rules.matrix', shadowrunMatrix, {
         displayName: 'SHADOWRUN5e: Matrix Rules Test',
+    });
+    registerBatch(quench, 'shadowrun5e.vision.foundation', shadowrunVisionFoundation, {
+        displayName: 'SHADOWRUN5e: Vision Foundation',
     });
     registerBatch(quench, 'shadowrun5e.apps.matrix_opposed_device_dialog', shadowrunMatrixOpposedDeviceDialog, {
         displayName: 'SHADOWRUN5e: Matrix Opposed Device Dialog Test',

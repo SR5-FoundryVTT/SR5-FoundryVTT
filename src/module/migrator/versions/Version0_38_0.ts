@@ -1,9 +1,48 @@
 import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
 import { VersionMigration } from '../VersionMigration';
 
+const PERCEPTION_TARGET_PATHS = {
+    'system.visibilityChecks.astral.hasAura': 'system.visibilityChecks.targets.astral.hasAura',
+    'system.visibilityChecks.astral.astralActive': 'system.visibilityChecks.targets.astral.astralActive',
+    'system.visibilityChecks.astral.affectedBySpell': 'system.visibilityChecks.targets.astral.affectedBySpell',
+    'system.visibilityChecks.matrix.hasIcon': 'system.visibilityChecks.targets.matrix.hasIcon',
+    'system.visibilityChecks.matrix.runningSilent': 'system.visibilityChecks.targets.matrix.runningSilent',
+    'system.visibilityChecks.meat.hasHeat': 'system.visibilityChecks.targets.physical.thermographic',
+} as const;
+
 /** Migrate item-sheet data introduced for 0.38.0. */
 export class Version0_38_0 extends VersionMigration {
     readonly TargetVersion = '0.38.0';
+
+    override migrateActor(actor: any): void {
+        const visibility = actor.system?.visibilityChecks;
+        if (!visibility) return;
+
+        visibility.targets ??= {};
+        visibility.targets.physical ??= {};
+        visibility.targets.astral ??= {};
+        visibility.targets.matrix ??= {};
+
+        visibility.targets.physical.thermographic ??= visibility.meat?.hasHeat ? 'warm' : 'none';
+        visibility.targets.astral.hasAura ??= !!visibility.astral?.hasAura;
+        visibility.targets.astral.astralActive ??= !!visibility.astral?.astralActive;
+        visibility.targets.astral.affectedBySpell ??= !!visibility.astral?.affectedBySpell;
+        visibility.targets.matrix.hasIcon ??= !!visibility.matrix?.hasIcon;
+        visibility.targets.matrix.runningSilent ??= !!visibility.matrix?.runningSilent;
+
+        delete visibility.meat;
+        delete visibility.astral;
+        delete visibility.matrix;
+    }
+
+    override migrateActiveEffect(effect: any): void {
+        this.migrateEffectChanges(effect, PERCEPTION_TARGET_PATHS);
+        for (const change of effect.system?.changes ?? []) {
+            if (change.key !== PERCEPTION_TARGET_PATHS['system.visibilityChecks.meat.hasHeat']) continue;
+            if (change.value === true || change.value === 1 || String(change.value).toLowerCase() === 'true') change.value = 'warm';
+            else if (change.value === false || change.value === 0 || String(change.value).toLowerCase() === 'false') change.value = 'none';
+        }
+    }
 
     override migrateItem(item: any): void {
         Version0_38_0.ensureNestedDocumentIds(item);

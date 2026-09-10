@@ -9,6 +9,8 @@
         }
     },
     "SETTINGS": {
+        "AutomaticTokenSenses": "Gérer automatiquement les sens des jetons",
+        "AutomaticTokenSensesDescription": "Actualise les modes de détection gérés par le système lorsque les données d'acteur, d'objet, d'effet ou de jeton changent. Un jeton peut être exclu avec le drapeau shadowrun5e.AutomaticTokenSenses.",
         "ApplyLimitsDescription": "Est-ce que des limites doivent être appliquées aux lancés",
         "ApplyLimitsName": "Appliquer des limites aux lancés",
         "EnforceExtendedTestIntervalDescription": "N'autoriser le prochain lancer d'un test étendu qu'une fois son intervalle écoulé en temps de jeu.",
@@ -1535,8 +1537,34 @@
         },
         "Vision": {
             "AstralPerception": "Perception astrale",
+            "AstralPerceptionOverride": "Forçage de la perception astrale",
+            "AstralPerceptionOverrideHint": "Forçage MJ déterminant si cet acteur peut utiliser la perception astrale.",
+            "AstralProjectionOverride": "Forçage de la projection astrale",
+            "AstralProjectionOverrideHint": "Forçage MJ déterminant si cet acteur peut utiliser la projection astrale.",
             "AugmentedReality": "Réalité Augmentée",
             "LowLight": "Vision dans l'obsucrité",
+            "MagicalType": "Type magique",
+            "MagicalTypeHint": "Détermine l'accès par défaut de l'acteur à la perception et à la projection astrales.",
+            "MagicalTypes": {
+                "Adept": "Adepte",
+                "AspectedMagician": "Magicien spécialisé",
+                "Magician": "Magicien",
+                "Mundane": "Ordinaire",
+                "MysticAdept": "Adepte mystique"
+            },
+            "OverrideModes": {
+                "Allow": "Autoriser",
+                "Default": "Utiliser le type magique",
+                "Deny": "Refuser"
+            },
+            "ThermographicSignature": "Signature thermographique",
+            "ThermographicSignatureHint": "Détermine l’apparence de cet acteur lorsqu’il est détecté par vision thermographique.",
+            "ThermographicSignatures": {
+                "None": "Aucune",
+                "Cold": "Froide",
+                "Warm": "Chaude",
+                "Hot": "Très chaude"
+            },
             "ThermographicVision": "Vision thermographique"
         },
         "Walk": "Marcher",

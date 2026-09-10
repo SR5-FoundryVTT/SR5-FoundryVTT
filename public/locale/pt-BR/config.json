@@ -9,6 +9,8 @@
         }
     },
     "SETTINGS": {
+        "AutomaticTokenSenses": "Gerenciar sentidos dos tokens automaticamente",
+        "AutomaticTokenSensesDescription": "Atualiza os modos de detecção gerenciados pelo sistema quando dados de ator, item, efeito ou token mudam. Tokens individuais podem ser excluídos com a flag shadowrun5e.AutomaticTokenSenses.",
         "ApplyLimitsDescription": "Os limites devem ser aplicados às rolagens",
         "ApplyLimitsName": "Aplicar Limites às Rolagens",
         "AutomateMultiDefenseModifier": "Automatizar modificadores de defesa",
@@ -2135,8 +2137,34 @@
         },
         "Vision": {
             "AstralPerception": "Percepção Astral",
+            "AstralPerceptionOverride": "Substituição de percepção astral",
+            "AstralPerceptionOverrideHint": "Substituição do MJ para permitir ou impedir que este ator use percepção astral.",
+            "AstralProjectionOverride": "Substituição de projeção astral",
+            "AstralProjectionOverrideHint": "Substituição do MJ para permitir ou impedir que este ator use projeção astral.",
             "AugmentedReality": "Realidade Aumentada",
             "LowLight": "Visão de Pouca Luz",
+            "MagicalType": "Tipo mágico",
+            "MagicalTypeHint": "Determina a elegibilidade padrão do ator para percepção e projeção astral.",
+            "MagicalTypes": {
+                "Adept": "Adepto",
+                "AspectedMagician": "Mago aspectado",
+                "Magician": "Mago",
+                "Mundane": "Mundano",
+                "MysticAdept": "Adepto místico"
+            },
+            "OverrideModes": {
+                "Allow": "Permitir",
+                "Default": "Usar tipo mágico",
+                "Deny": "Negar"
+            },
+            "ThermographicSignature": "Assinatura termográfica",
+            "ThermographicSignatureHint": "Define como este ator aparece quando detectado por visão termográfica.",
+            "ThermographicSignatures": {
+                "None": "Nenhuma",
+                "Cold": "Fria",
+                "Warm": "Morna",
+                "Hot": "Quente"
+            },
             "ThermographicVision": "Visão Termográfica"
         },
         "Walk": "Caminhar",

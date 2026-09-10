@@ -19,12 +19,12 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
 
         it('visibility checks', async () => {
             const ic = await factory.createActor({ type: 'ic' });
-            assert.strictEqual(ic.system.visibilityChecks.astral.hasAura, false);
-            assert.strictEqual(ic.system.visibilityChecks.astral.astralActive, false);
-            assert.strictEqual(ic.system.visibilityChecks.astral.affectedBySpell, false);
-            assert.strictEqual(ic.system.visibilityChecks.meat.hasHeat, false);
-            assert.strictEqual(ic.system.visibilityChecks.matrix.hasIcon, true);
-            assert.strictEqual(ic.system.visibilityChecks.matrix.runningSilent, false);
+            assert.strictEqual(ic.system.visibilityChecks.targets.astral.hasAura, false);
+            assert.strictEqual(ic.system.visibilityChecks.targets.astral.astralActive, false);
+            assert.strictEqual(ic.system.visibilityChecks.targets.astral.affectedBySpell, false);
+            assert.strictEqual(ic.system.visibilityChecks.targets.physical.thermographic, 'none');
+            assert.strictEqual(ic.system.visibilityChecks.targets.matrix.hasIcon, true);
+            assert.strictEqual(ic.system.visibilityChecks.targets.matrix.runningSilent, false);
         });
 
         it('has meat attributes based on the host rating', async () => {

@@ -977,4 +977,49 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(item.system.technology.availability.label, '6F');
         });
     });
+
+    describe('Version0_38_0 perception target migration', () => {
+        it('moves legacy actor targets and preserves their values', () => {
+            const migrator = new Version0_38_0();
+            const actor: any = {
+                system: {
+                    visibilityChecks: {
+                        meat: { hasHeat: true },
+                        astral: { hasAura: true, astralActive: false, affectedBySpell: true },
+                        matrix: { hasIcon: true, runningSilent: true },
+                    },
+                },
+            };
+
+            migrator.migrateActor(actor);
+
+            assert.deepEqual(actor.system.visibilityChecks.targets, {
+                physical: { thermographic: 'warm' },
+                astral: { hasAura: true, astralActive: false, affectedBySpell: true },
+                matrix: { hasIcon: true, runningSilent: true },
+            });
+            assert.notProperty(actor.system.visibilityChecks, 'meat');
+            assert.notProperty(actor.system.visibilityChecks, 'astral');
+            assert.notProperty(actor.system.visibilityChecks, 'matrix');
+        });
+
+        it('rewrites legacy Active Effect paths and heat values', () => {
+            const migrator = new Version0_38_0();
+            const effect: any = {
+                system: {
+                    changes: [
+                        { key: 'system.visibilityChecks.meat.hasHeat', value: true },
+                        { key: 'system.visibilityChecks.matrix.runningSilent', value: false },
+                    ],
+                },
+            };
+
+            migrator.migrateActiveEffect(effect);
+
+            assert.deepEqual(effect.system.changes, [
+                { key: 'system.visibilityChecks.targets.physical.thermographic', value: 'warm' },
+                { key: 'system.visibilityChecks.targets.matrix.runningSilent', value: false },
+            ]);
+        });
+    });
 };
