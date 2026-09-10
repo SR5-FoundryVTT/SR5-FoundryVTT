@@ -1,5 +1,27 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
+        {{#if (or rccInfo.isOverAllocated rccInfo.isOverSharingLimit autosoftInfo.isOverSlots)}}
+            <div class="list-item warning-banner matrix-warning-badges" style="background-color: rgba(255, 69, 0, 0.15); padding: 6px 10px; border: 1px solid red; border-radius: 4px; margin-bottom: 6px; display: flex; flex-direction: column; gap: 4px;">
+                {{#if rccInfo.isOverAllocated}}
+                    <div style="display: flex; align-items: center; gap: 6px; color: #ff6b6b;">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <span><strong>{{localize "SR5.Warnings.RCCOverAllocated"}}</strong> ({{rccInfo.sharing}} {{localize "SR5.RCC.Sharing"}} + {{rccInfo.noiseReduction}} {{localize "SR5.RCC.NoiseReduction"}} &gt; {{rccInfo.deviceRating}} {{localize "SR5.Labels.ActorSheet.DeviceRating"}})</span>
+                    </div>
+                {{/if}}
+                {{#if rccInfo.isOverSharingLimit}}
+                    <div style="display: flex; align-items: center; gap: 6px; color: #ffa94d;">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <span><strong>{{localize "SR5.Warnings.OverSharingLimit"}}</strong> ({{rccInfo.loadedAutosoftsCount}} / {{rccInfo.sharing}})</span>
+                    </div>
+                {{/if}}
+                {{#if autosoftInfo.isOverSlots}}
+                    <div style="display: flex; align-items: center; gap: 6px; color: #ffa94d;">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <span><strong>{{localize "SR5.Warnings.OverAutosoftSlots"}}</strong> ({{autosoftInfo.runningCount}} / {{autosoftInfo.maxSlots}})</span>
+                    </div>
+                {{/if}}
+            </div>
+        {{/if}}
         <div class="list-item list-item-header">
             {{#if matrixDevice}}
                 <div class="basic-row" data-item-id="{{matrixDevice.id}}" data-context-menu="item" data-uuid="{{matrixDevice.uuid}}">
@@ -48,6 +70,20 @@
                                 matrixAttributes=../config/matrixAttributes
                                 item=../system.matrix.item }}
                         {{/each}}
+                        {{#if rccInfo}}
+                            <div class="attribute" data-attribute-id="sharing">
+                                <label>{{localize "SR5.RCC.Sharing"}}</label>
+                                <div class="attribute-value">
+                                    <button class="icon sr5-icon" type="button" disabled>{{rccInfo.sharing}}</button>
+                                </div>
+                            </div>
+                            <div class="attribute" data-attribute-id="noise_reduction">
+                                <label>{{localize "SR5.RCC.NoiseReduction"}}</label>
+                                <div class="attribute-value">
+                                    <button class="icon sr5-icon" type="button" disabled>{{rccInfo.noiseReduction}}</button>
+                                </div>
+                            </div>
+                        {{/if}}
                     </div>
                 {{/if}}
                 <div class="list-item list-item-header">

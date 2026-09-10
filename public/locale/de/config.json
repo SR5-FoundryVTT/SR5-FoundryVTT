@@ -856,7 +856,9 @@
         },
         "RCC": {
             "Sharing": "Zugriff",
-            "NoiseReduction": "Rauschunterdrückung"
+            "NoiseReduction": "Rauschunterdrückung",
+            "SharedAutosofts": "Geteilte RCC-Autosofts",
+            "SharedFromRCC": "Geteilt via RCC"
         },
         "CompendiaSettings": {
             "Description": "Diese Kompendien werden vom System verwendet. Du kannst sie mit eigenen Kompendien überschreiben, solltest sie aber nicht entfernen.",
@@ -3349,6 +3351,54 @@
                 "Title": "Zustandsmonitor-Tour",
                 "WoundModifierContent": "Dieses Kästchen zeigt an, dass das Ausfüllen den Wundmodifikator um die im Kästchen angegebene Zahl erhöht.",
                 "WoundModifierTitle": "Wundmodifikator"
+            },
+            "RiggerSwarm": {
+                "Title": "Drohnenschwarm Erstellungs- & Steuerungs-Tour",
+                "Description": "Schritt-für-Schritt-Anleitung zum Erstellen einer Drohne, Aktivieren des Schwarm-Modus, Einstellen der Drohnen-Anzahl und Anzeigen der Begleit-Tiles auf der Karte.",
+                "DroneAttributesTitle": "1. Fahrzeug- & Drohnen-Attribute",
+                "DroneAttributesContent": "Beim Erstellen einer Drohne werden die Basis-Attribute (Pilot, Rumpf, Handling, Geschwindigkeit, Beschleunigung, Sensor) mit mindestens Stufe 1 festgelegt.",
+                "EnableSwarmTitle": "2. Drohnenschwarm Aktivieren",
+                "EnableSwarmContent": "Im Editiermodus des Fahrzeugbogens findest du unten den Schwarm-Bereich. Klicke auf das 'Schwarm:' Kontrollkästchen, um den Schwarm-Modus zu aktivieren.",
+                "EnableSwarmActiveTitle": "3. Schwarm-Kontrollkästchen Aktiviert",
+                "EnableSwarmActiveContent": "Sobald der Schwarm-Modus aktiv ist, wird das Häkchen gesetzt und das Eingabefeld 'Anzahl:' für die Drohnen-Anzahl freigeschaltet.",
+                "SwarmCountTitle": "4. Drohnen-Anzahl Einrichten",
+                "SwarmCountContent": "Trage die Anzahl der Drohnen im Schwarm ein (z.B. 4). Eine höhere Drohnen-Anzahl erhöht die effektive Pilot-Stufe und Teamwork-Boni.",
+                "CanvasSwarmDisplayTitle": "5. Schwarm-Begleit-Tiles auf der Karte",
+                "CanvasSwarmDisplayContent": "Beim Wechsel in den Spielmodus erscheint das Anführer-Token auf der Karte. Die restlichen 3 Drohnen werden automatisch als gesperrte Formations-Tiles um den Anführer platziert!",
+                "TokenHUDControlTitle": "6. Token HUD & Echtzeit-Formationsbewegung",
+                "TokenHUDControlContent": "Rechtsklicke auf das Anführer-Token für das native SR5 Token HUD (Hineinspringen / Herausspringen). Beim Ziehen des Tokens gleiten alle Begleit-Tiles synchron über das Raster."
+            },
+            "Autosofts": {
+                "Title": "Autosoft Verwaltungs-Anleitung",
+                "Description": "Umfassende Anleitung zum Erstellen, Konfigurieren und Ausrüsten von Autosofts für Drohnen und Rigger-Kommandokonsolen.",
+                "AutosoftItemCreationTitle": "Autosoft-Gegenstand erstellen",
+                "AutosoftItemCreationContent": "Autosofts werden als Programm-Items vom Typ 'autosoft' erstellt. Im Edit-Modus kannst du Stufe, Typ und Zielanforderungen konfigurieren.",
+                "AutosoftTypesTitle": "Autosoft-Typen & Zielzuweisung",
+                "AutosoftTypesContent": "Konfiguriere den autosoftType: ClearSight (Wahrnehmung), Evasion (Ausweichen), Maneuvering (Steuern), Stealth (Schleichen), Targeting (Geschütze) oder Cyberware. Wähle je nach Typ passende Ziel-Fahrzeugmodelle oder Waffenkategorien.",
+                "AutosoftPlayModeTitle": "Autosoft Play-Modus",
+                "AutosoftPlayModeContent": "Der Wechsel in den Play-Modus sperrt Bearbeitungsfelder und zeigt übersichtliche Eigenschafts-Badges für Stufe und Zielspezifikationen.",
+                "EquipAutosoftOnDroneTitle": "Autosoft auf Fahrzeug ausrüsten",
+                "EquipAutosoftOnDroneContent": "Rüste die Autosoft auf deinem Drohnen-Fahrzeug aus. Der Matrix-Tab listet aktive lokale Autosofts und die verbleibende Slot-Kapazität auf.",
+                "AutosoftEffectsTitle": "Autosoft-Effekte & Modifikatoren",
+                "AutosoftEffectsContent": "Der Effekte-Tab im Play-Modus zeigt aktive Effekte ausgerüsteter Autosofts, die sich direkt auf Würfelpools und Fahrzeugwerte auswirken.",
+                "TargetingSchemasTitle": "Ziel- & Modell-Schemata",
+                "TargetingSchemasContent": "Ziel-Autosofts benötigen ein Ziel-Waffenmodell oder eine Kategorie. Manövrier-Autosofts benötigen ein Ziel-Fahrzeugmodell. Autosofts funktionieren nur auf passenden Modellen.",
+                "DroneSlotLimitsTitle": "Drohnen Slot-Limits & Warnungen",
+                "DroneSlotLimitsContent": "Drohnen können lokale Autosofts bis zu ihrer Pilot-Stufe ausführen. Bei Überschreitung warnt ein Slot-Überlauf-Badge.",
+                "RCCOverrideHierarchyTitle": "Lokale vs. Geteilte Hierarchie",
+                "RCCOverrideHierarchyContent": "Wenn eine Drohne mit einem RCC verbunden ist, überschreiben spezifische lokale Autosofts geteilte RCC-Autosofts des gleichen Typs. Geteilte Autosofts füllen unbesetzte Slots."
+            },
+            "MatrixNoise": {
+                "Title": "Matrix-Rauschen & Kompensations-Anleitung",
+                "Description": "Lerne, wie Distanzrauschen, Störsender, statisches Rauschen und RCC-Rauschunterdrückung bei Rigger- & Matrix-Proben zusammenwirken.",
+                "OverviewTitle": "Matrix-Rauschen verstehen",
+                "OverviewContent": "Matrix-Rauschen erzeugt Würfelpool-Abzüge für Rigger- & Matrixproben basierend auf Entfernung, Barrieren, Störsendern und Gitter-Abzügen.",
+                "RCCNoiseVsSharingTitle": "RCC Rauschunterdrückung vs Program-Sharing",
+                "RCCNoiseVsSharingContent": "Rigger-Kommandokonsolen teilen ihre Gerätestufe zwischen Rauschunterdrückung und Program-Sharing auf. Höhere Rauschunterdrückung senkt die Sharing-Kapazität.",
+                "CalculationTitle": "Rausch-Kompensations-Berechnung",
+                "CalculationContent": "Gesamte Rauschunterdrückung von RCCs, Antennen und Cyberware verrechnet eingehende Rauschabzüge automatisch in Proben.",
+                "SoftWarningBadgesTitle": "Kapazitäts Soft-Warnungen",
+                "SoftWarningBadgesContent": "Wenn aktive geteilte Autosofts die RCC-Sharing-Kapazität überschreiten, machen Soft-Warnungen auf dem Matrix-Reiter darauf aufmerksam."
             }
         },
         "UnderBarrel": "Unterlaufmontiert",
@@ -3459,6 +3509,7 @@
         "Walk": "Gehen",
         "WalkingSpeed": "Gehen",
         "Warnings": {
+            "RCCOverAllocated": "RCC-Sharing + Rauschunterdrückung überschreitet Gerätestufe",
             "OverAutosoftSlots": "Autosoft-Programmplätze für diese Drohne überschritten",
             "OverSharingLimit": "Geladene Autosofts überschreiten RCC-Zugriffskapazität",
             "TokenMovementLockedJumpedIn": "{vehicle} ist aktuell geriggt! Metamensch-Tokenbewegung ist gesperrt.",

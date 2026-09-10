@@ -854,7 +854,9 @@
         },
         "RCC": {
             "Sharing": "Sharing",
-            "NoiseReduction": "Noise Reduction"
+            "NoiseReduction": "Noise Reduction",
+            "SharedAutosofts": "Shared RCC Autosofts",
+            "SharedFromRCC": "Shared from RCC"
         },
         "CompendiaSettings": {
             "Description": "These packs will be used for the system. You can override them with your own packs, but you should not remove them.",
@@ -3312,6 +3314,54 @@
                 "Title": "Condition Monitor Tour",
                 "WoundModifierContent": "This cell denotes that filling it increases your wound modifier by the number written in the cell",
                 "WoundModifierTitle": "Wound Modifier"
+            },
+            "RiggerSwarm": {
+                "Title": "Drone Swarm Creation & Control Tour",
+                "Description": "Step-by-step interactive guide on creating a drone actor, enabling Swarm mode, configuring drone count, and observing companion tiles on the canvas.",
+                "DroneAttributesTitle": "1. Vehicle & Drone Attributes",
+                "DroneAttributesContent": "Creating a drone actor requires setting base vehicle attributes (Pilot, Body, Handling, Speed, Acceleration, Sensor). All stats start at minimum rating 1.",
+                "EnableSwarmTitle": "2. Enable Drone Swarm",
+                "EnableSwarmContent": "In Edit Mode on the Vehicle sheet, locate the Swarm section. Click the 'Swarm:' checkbox to activate swarm leader mode for this drone.",
+                "EnableSwarmActiveTitle": "3. Swarm Active Checkbox Ticked",
+                "EnableSwarmActiveContent": "With Swarm mode active, the checkbox is ticked and reveals the 'Count:' input field for configuring how many identical drones are linked into the swarm.",
+                "SwarmCountTitle": "4. Set Swarm Drone Count",
+                "SwarmCountContent": "Enter the number of drones in the swarm (e.g. 4). A higher drone count boosts effective Pilot rating and teamwork bonuses for autosoft tests.",
+                "CanvasSwarmDisplayTitle": "5. Swarm Companion Tiles on Canvas",
+                "CanvasSwarmDisplayContent": "Switching back to Play Mode displays the leader drone token on the canvas. The remaining 3 companion drones are automatically rendered as locked formation tiles around the leader!",
+                "TokenHUDControlTitle": "6. Token HUD & Real-Time Formation Movement",
+                "TokenHUDControlContent": "Right-click the leader token to access the native SR5 Token HUD for Jump In / Jump Out actions. Dragging the leader token smoothly slides all companion swarm tiles in lockstep across the grid."
+            },
+            "Autosofts": {
+                "Title": "Autosoft Management Guide",
+                "Description": "Comprehensive guide on creating, configuring, and equipping Autosofts for Drones and Rigger Command Consoles.",
+                "AutosoftItemCreationTitle": "Creating Autosoft Items",
+                "AutosoftItemCreationContent": "Autosofts are created as Program items with type 'autosoft'. In Edit Mode, you can configure their rating, type, and target requirements.",
+                "AutosoftTypesTitle": "Autosoft Types & Targeting",
+                "AutosoftTypesContent": "Configure the autosoftType: ClearSight (perception), Evasion (defense), Maneuvering (piloting), Stealth (sneaking), Targeting (gunnery), or Cyberware. Depending on the type, specify target vehicle models or weapon categories.",
+                "AutosoftPlayModeTitle": "Autosoft Play Mode",
+                "AutosoftPlayModeContent": "Switching to Play Mode locks schema editing fields and shows clean property badges for the autosoft rating and target specs.",
+                "EquipAutosoftOnDroneTitle": "Equipping Autosoft on Vehicle",
+                "EquipAutosoftOnDroneContent": "Equip the autosoft on your drone vehicle. The Matrix tab lists active running autosofts along with remaining slot capacity.",
+                "AutosoftEffectsTitle": "Autosoft Effects & Modifiers",
+                "AutosoftEffectsContent": "The Effects tab in Play Mode displays active effects and modifiers provided by equipped autosofts, demonstrating their impact on vehicle tests.",
+                "TargetingSchemasTitle": "Targeting & Model Schemas",
+                "TargetingSchemasContent": "Targeting autosofts require a target weapon model/category. Maneuvering autosofts require a target vehicle model. Autosofts only function when loaded onto matching models or weapons.",
+                "DroneSlotLimitsTitle": "Drone Slot Limits & Capacity Badges",
+                "DroneSlotLimitsContent": "Drones can load up to their Pilot Rating in local autosofts. If more autosofts are loaded than allowed, a warning badge alerts you to slot overflow.",
+                "RCCOverrideHierarchyTitle": "Local vs Shared Hierarchy",
+                "RCCOverrideHierarchyContent": "When a drone connects to an RCC, specific local autosofts on the drone override shared RCC autosofts of the same type. Shared autosofts fill in any unassigned slots."
+            },
+            "MatrixNoise": {
+                "Title": "Matrix Noise & Compensation Guide",
+                "Description": "Learn how distance noise, jamming, static, and RCC Noise Reduction interact during Rigger and Matrix operations.",
+                "OverviewTitle": "Understanding Matrix Noise",
+                "OverviewContent": "Matrix Noise imposes dice pool penalties on Rigger and Matrix tests based on distance, physical barriers, jamming, and grid penalties.",
+                "RCCNoiseVsSharingTitle": "RCC Noise Reduction vs Program Sharing",
+                "RCCNoiseVsSharingContent": "Rigger Command Consoles split Device Rating between Noise Reduction and Program Sharing. Increasing Noise Reduction reduces shared program capacity.",
+                "CalculationTitle": "Noise Compensation Calculation",
+                "CalculationContent": "Total Noise Reduction from RCCs, antennae, and cyberware automatically offsets incoming Noise penalties during dice pool resolution.",
+                "SoftWarningBadgesTitle": "Capacity Soft Warning Badges",
+                "SoftWarningBadgesContent": "If total active shared autosoft ratings exceed RCC Sharing capacity, soft warning badges notify you on the Matrix tab to adjust your allocation."
             }
         },
         "UnderBarrel": "Under Barrel",
@@ -3422,6 +3472,7 @@
         "Walk": "Walk",
         "WalkingSpeed": "Walking",
         "Warnings": {
+            "RCCOverAllocated": "RCC Sharing + Noise Reduction exceeds Device Rating",
             "OverAutosoftSlots": "Autosoft program slots exceeded for this drone",
             "OverSharingLimit": "Loaded autosofts exceed RCC Sharing capacity",
             "TokenMovementLockedJumpedIn": "{vehicle} is currently geriggt! Metahuman token movement is locked.",

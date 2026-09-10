@@ -88,7 +88,9 @@ const animateSwarmTile = (
     const setTilePos = (x: number, y: number) => {
         try {
             if (tileDoc) {
-                if ((tileDoc as any).shape) {
+                if (!(tileDoc as any).shape) {
+                    (tileDoc as any).shape = { x, y };
+                } else {
                     (tileDoc as any).shape.x = x;
                     (tileDoc as any).shape.y = y;
                 }

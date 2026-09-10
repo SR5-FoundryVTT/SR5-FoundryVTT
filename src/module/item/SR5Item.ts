@@ -171,7 +171,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     hasActionCategory(category: Shadowrun.ActionCategories) {
         const action = this.asType('action');
         if (!action) return false;
-        return action.system.action.categories.includes(category);
+        return (action.system as any).action?.categories?.includes(category) ?? false;
     }
 
     /**
@@ -413,14 +413,15 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * Amount of ammunition this weapon has currently available
      */
     ammoLeft(this: SR5Item): number {
-        return this.system.ammo?.current.value || 0;
+        const weapon = this.asType('weapon');
+        return weapon ? weapon.system.ammo.current.value : 0;
     }
 
     /**
      * Use the weapons ammunition with the amount of bullets fired.
      * @param fired Amount of bullets fired.
      */
-    async useAmmo(fired) {
+    async useAmmo(fired: number) {
         if (!this.isType('weapon')) return;
 
         const value = Math.max(0, this.system.ammo.current.value - fired);
@@ -675,7 +676,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @returns The action result, or undefined if not applicable.
      */
     getActionResult(): ActionResultType | undefined {
-        return this.isType('action') ? this.system.result : undefined;
+        return this.isType('action') ? (this.system as any).result : undefined;
     }
 
     /**
@@ -958,7 +959,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     asType<ST extends readonly Item.ConfiguredSubType[]>(this: SR5Item, ...types: ST): SR5Item<ST[number]> | undefined {
-        return types.some((t) => this.isType(t)) ? this : undefined;
+        return types.some((t) => this.isType(t)) ? (this as unknown as SR5Item<ST[number]>) : undefined;
     }
 
     /**
@@ -1583,6 +1584,27 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             UpdateSkillFlow.injectSkillCategoryDefaults(changed, this);
         }
 
+        if (this.isType('device') && (this.system as any).category === 'rcc') {
+            const sys = changed.system as Record<string, any> | undefined;
+            const newSharing = sys?.sharing !== undefined ? Number(sys.sharing) : Number((this.system as any).sharing || 0);
+            const newNoiseRed = sys?.noise_reduction !== undefined ? Number(sys.noise_reduction) : Number((this.system as any).noise_reduction || 0);
+            const sum = newSharing + newNoiseRed;
+
+            const currentRating = sys?.technology?.rating !== undefined
+                ? Number(sys.technology.rating)
+                : this.getRating();
+
+            if (sum > currentRating) {
+                if (!changed.system) changed.system = {};
+                const sysAny = changed.system as Record<string, any>;
+                if (!sysAny.technology) {
+                    sysAny.technology = { rating: sum };
+                } else {
+                    sysAny.technology.rating = sum;
+                }
+            }
+        }
+
         return super._preUpdate(...args);
     }
 
@@ -1598,24 +1620,14 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     /**
      * Override getEmbeddedDocument to support Nested Items
      */
-    override getEmbeddedDocument(
-        embeddedName: 'Item' | 'items',
-        id: string,
-        options?: GetEmbeddedDocumentOptions
-    ): Item.Implementation | undefined;
-    override getEmbeddedDocument(
-        embeddedName: 'ActiveEffect' | 'effects',
-        id: string,
-        options?: GetEmbeddedDocumentOptions
-    ): ReturnType<Item['getEmbeddedCollection']>;
-    override getEmbeddedDocument(
-        embeddedName: 'ActiveEffect' | 'effects' | 'Item' | 'items',
-        id: string,
-        options?: GetEmbeddedDocumentOptions
-    ) {
-        if (embeddedName === 'Item' || embeddedName === 'items') {
-            return this.getOwnedItem(id);
+    override getEmbeddedDocument<
+        EmbeddedName extends Item.Embedded.CollectionName,
+        Options extends foundry.abstract.Document.GetEmbeddedDocumentOptions | undefined = undefined
+    >(embeddedName: EmbeddedName, id: string, options?: Options): Item.Embedded.GetReturn<EmbeddedName, Options> {
+        const nameStr = embeddedName as string;
+        if (nameStr === 'Item' || nameStr === 'items') {
+            return this.getOwnedItem(id) as any;
         }
-        return super.getEmbeddedDocument(embeddedName, id, options);
+        return super.getEmbeddedDocument(embeddedName, id, options) as any;
     }
 }

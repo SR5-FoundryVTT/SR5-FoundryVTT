@@ -281,6 +281,27 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
             assert.equal(effective.source, 'rcc');
         });
 
+        it('Auto-adjusts RCC device rating in _preUpdate when sharing + noise reduction exceeds device rating', async () => {
+            const driver = await createDriver();
+
+            const rcc = await factory.createItem({
+                type: 'device',
+                system: {
+                    category: 'rcc',
+                    sharing: 3,
+                    noise_reduction: 2,
+                    technology: { rating: 5, equipped: true }
+                }
+            }, { parent: driver } as any);
+
+            assert.equal(rcc.getRating(), 5);
+
+            // Update sharing so total sharing (5) + noise_reduction (2) = 7 > 5
+            await rcc.update({ system: { sharing: 5 } } as any);
+
+            assert.equal(rcc.getRating(), 7);
+        });
+
         it('Calculates Drone Swarm Pilot rating and applies Swarm bonus to autonomous rolls', async () => {
             const droneLeader = await factory.createActor({
                 type: 'vehicle',

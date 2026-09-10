@@ -9,6 +9,7 @@ import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { MatrixSheetFlow } from '@/module/flows/MatrixSheetFlow';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
+import { RiggingRules } from '@/module/rules/RiggingRules';
 import { NetworkManager } from '@/module/apps/NetworkManager';
 import { RiggerFlow } from '@/module/flows/RiggerFlow';
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
@@ -17,6 +18,7 @@ import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicati
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 
 const { fromUuid, fromUuidSync } = foundry.utils;
+const { TextEditor } = foundry.applications.ux;
 
 // Meant for sheet display only. Doesn't use the SR5Item.getChatData approach to avoid changing system data.
 type sheetAction = {
@@ -36,6 +38,15 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
     matrixTargets: Shadowrun.MatrixTargetDocument[];
     // the master device being used to connect to the matrix
     matrixDevice: SR5Item | undefined;
+    rccInfo?: {
+        deviceRating: number;
+        sharing: number;
+        noiseReduction: number;
+        isOverAllocated: boolean;
+        loadedAutosoftsCount: number;
+        isOverSharingLimit: boolean;
+        loadedAutosofts: SR5Item[];
+    };
     // Matrix ICONs that are owned by this actor
     ownedIcons: MatrixTargetDocument[];
 
@@ -256,7 +267,21 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * @param data
      */
     _prepareMatrixDevice(data: MatrixActorSheetData) {
-        data.matrixDevice = this.actor?.getMatrixDevice();
+        const device = this.actor?.getMatrixDevice();
+        data.matrixDevice = device;
+
+        const masterItem = this.actor?.master;
+        const rccItem = (device && device.system?.category === 'rcc')
+            ? device
+            : (masterItem && masterItem.system?.category === 'rcc' ? masterItem : undefined);
+
+        if (rccItem) {
+            const info = RiggingRules.getRCCSharingInfo(rccItem);
+            data.rccInfo = {
+                ...info,
+                loadedAutosofts: RiggingRules.getLoadedRCCAutosofts(rccItem)
+            };
+        }
     }
 
     _prepareOwnedIcons(data: MatrixActorSheetData) {
@@ -433,18 +458,22 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         ];
 
         actions = actions.filter(action => {
+            const sys = action.system as any;
+            const actionData = sys?.action;
+            if (!actionData) return true;
+
             if (MatrixRules.isSleazeAction(
-                    action.system.action.attribute as ActorAttribute,
-                    action.system.action.attribute2 as ActorAttribute,
-                    action.system.action.limit.attribute as ActorAttribute)
+                    actionData.attribute as ActorAttribute,
+                    actionData.attribute2 as ActorAttribute,
+                    actionData.limit?.attribute as ActorAttribute)
                 && (this.actor.findAttribute('sleaze')?.value ?? 0) <= 0
             ) {
                 return false;
             }
             if (MatrixRules.isAttackAction(
-                    action.system.action.attribute as ActorAttribute,
-                    action.system.action.attribute2 as ActorAttribute,
-                    action.system.action.limit.attribute as ActorAttribute)
+                    actionData.attribute as ActorAttribute,
+                    actionData.attribute2 as ActorAttribute,
+                    actionData.limit?.attribute as ActorAttribute)
                 && (this.actor.findAttribute('attack')?.value ?? 0) <= 0
             ) {
                 return false;
@@ -457,9 +486,10 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         // Prepare sorting and display of a possibly translated document name.
         const sheetActions: sheetAction[] = [];
         for (const action of actions) {
+            const descValue = (action.system as any)?.description?.value ?? '';
             sheetActions.push({
                 name: PackItemFlow.localizePackAction(action.name),
-                description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(action.system.description.value),
+                description: await TextEditor.enrichHTML(descValue),
                 action,
             });
         }
@@ -486,7 +516,9 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         const marksPlaced = this.actor.getMarksPlaced(target.uuid!);
 
         return actions.filter(action => {
-            const { marks, owner } = action.system.action.category.matrix;
+            const matrixCat = (action.system as any)?.action?.category?.matrix;
+            if (!matrixCat) return true;
+            const { marks, owner } = matrixCat;
             if (owner) return ownedItem;
             // you can do actions that require marks on your own devices
             return ownedItem || marks <= marksPlaced;

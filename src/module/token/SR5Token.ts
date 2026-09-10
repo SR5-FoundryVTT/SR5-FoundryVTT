@@ -437,7 +437,9 @@ export class SR5Token extends foundry.canvas.placeables.Token {
                 const targetY = coords[i].y;
 
                 // Update in-memory document & shape coordinates for Foundry v14
-                if ((tileDoc as any).shape) {
+                if (!(tileDoc as any).shape) {
+                    (tileDoc as any).shape = { x: targetX, y: targetY };
+                } else {
                     (tileDoc as any).shape.x = targetX;
                     (tileDoc as any).shape.y = targetY;
                 }
@@ -456,10 +458,14 @@ export class SR5Token extends foundry.canvas.placeables.Token {
                 if (tileObject.position && typeof tileObject.position.set === 'function') {
                     tileObject.position.set(targetX, targetY);
                 }
-                if (typeof tileObject._refreshPosition === 'function') {
-                    tileObject._refreshPosition();
+                if ((tileDoc as any).shape && typeof tileObject._refreshPosition === 'function') {
+                    try {
+                        tileObject._refreshPosition();
+                    } catch (e) {}
                 } else if (typeof tileObject.refresh === 'function') {
-                    tileObject.refresh();
+                    try {
+                        tileObject.refresh();
+                    } catch (e) {}
                 }
             }
         }
