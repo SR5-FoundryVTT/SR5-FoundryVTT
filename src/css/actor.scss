@@ -63,8 +63,13 @@
                 display: flex;
                 flex-flow: row nowrap;
                 justify-content: center;
+                align-items: center;
+                gap: 4px;
                 &.edit-mode {
                     font-size: 0.8rem;
+                }
+                i {
+                    font-size: 0.95rem;
                 }
             }
 

@@ -9,11 +9,17 @@
         }
     },
     "SETTINGS": {
+        "MatrixAttributeDisplayModeName": "Matrix-Attribut Anzeige-Modus",
+        "MatrixAttributeDisplayModeDescription": "Wählen Sie, ob Matrix-Attribute auf Bogen-Tabs als voller Text oder als Icons mit Hover-Tooltip angezeigt werden.",
+        "MatrixAttributeDisplayModeFull": "Vollständiger Text",
+        "MatrixAttributeDisplayModeIcons": "Nur Icons (mit Tooltip)",
+        "RequireRiggerInterfaceName": "Erfordere Rigger-Interface Pflicheinstellung",
+        "RequireRiggerInterfaceDescription": "Wenn aktiviert, wird das Hineinspringen in ein Fahrzeug ohne Rigger-Interface blockiert. Wenn deaktiviert (Standard), sendet G.O.D. eine Ingame-Warnung im Chat.",
         "AutosoftTargetModeCategory": "Waffenkategorie / Fertigkeit (Hausregel)",
         "AutosoftTargetModeDescription": "Wähle, ob Zielerfassungs-Autosofts an spezifische montierte Waffen (RAW) oder Waffenkategorien / Fertigkeiten gebunden sind.",
         "AutosoftTargetModeName": "Autosoft-Zielerfassungs-Modus",
         "AutosoftTargetModeWeapon": "Spezifische montierte Waffe (RAW)",
-        "ApplyLimitsDescription": "Sollen Limits auf auf Würfen angewendet werden?",
+        "ApplyLimitsDescription": "Sollen Limits auf Würfen angewendet werden?",
         "ApplyLimitsName": "Verwende Limits bei Würfen",
         "AutomateMultiDefenseModifier": "Automatisiere Verteidigungsmodifikator",
         "AutomateMultiDefenseModifierDescription": "Automatische Anwendung des Verteidigungsmodifikators, wenn man mehrfach pro Runde angegriffen wird.",
@@ -846,7 +852,15 @@
             "JumpedOutSuccess": "Aus {vehicle} hinausgesprungen",
             "JumpInTestRequired": "Das Hineinspringen in das fremde Fahrzeug {vehicle} erfordert eine Probe.",
             "JumpedInEffectName": "Hineingesprungen ({rigger})",
-            "RiggerMovingVehicle": "{rigger} steuert {vehicle}"
+            "RiggerMovingVehicle": "{rigger} steuert {vehicle}",
+            "GODRiggerInterfaceWarning": "<div class='sr5-god-alert'><div class='god-header'>⚡ GRID OVERWATCH DIVISION // SYSTEMALERT</div><div class='god-body'><p><strong>WARNUNG:</strong> Fahrzeug <em>{vehicle}</em> verfügt über keine verifizierte Rigger-Interface-Verbindung. Direct Neural Interface Verbindung ohne Hardware-Link hergestellt.</p></div></div>",
+            "ResistBiofeedback": "Biofeedback-Schaden widerstehen",
+            "ResistDumpShock": "Auswurfschock widerstehen",
+            "MissingRiggerInterface": "Fahrzeug {vehicle} besitzt kein installiertes Rigger-Interface!",
+            "RepairMatrixDamage": "Matrix-Schaden reparieren",
+            "ActiveSensorLock": "Aktive Zielerfassung",
+            "ActiveSensorLockSuccess": "{attacker} hat Sensoren auf {target} aufgeschaltet (+{netHits} Ziel-Verteidigungsmalus)",
+            "Disoriented": "Orientierungslos"
         },
         "Swarm": {
             "Label": "Schwarm",
@@ -858,7 +872,11 @@
             "Sharing": "Zugriff",
             "NoiseReduction": "Rauschunterdrückung",
             "SharedAutosofts": "Geteilte RCC-Autosofts",
-            "SharedFromRCC": "Geteilt via RCC"
+            "SharedFromRCC": "Geteilt via RCC",
+            "ReconfigureTitle": "Rigger-Konsole neukonfiguriert",
+            "ReconfiguredMessage": "hat die Rigger-Konsole neukonfiguriert",
+            "SimpleAction": "Einfache Handlung",
+            "SimpleActionInCombat": "Einfache Handlung (Kampf)"
         },
         "CompendiaSettings": {
             "Description": "Diese Kompendien werden vom System verwendet. Du kannst sie mit eigenen Kompendien überschreiben, solltest sie aber nicht entfernen.",

@@ -99,6 +99,35 @@ export const registerSystemSettings = () => {
         }
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.RequireRiggerInterface, {
+        name: 'SETTINGS.RequireRiggerInterfaceName',
+        hint: 'SETTINGS.RequireRiggerInterfaceDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+    });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.MatrixAttributeDisplayMode, {
+        name: 'SETTINGS.MatrixAttributeDisplayModeName',
+        hint: 'SETTINGS.MatrixAttributeDisplayModeDescription',
+        scope: 'client',
+        config: true,
+        type: String,
+        default: 'icons',
+        choices: {
+            'full': 'SETTINGS.MatrixAttributeDisplayModeFull',
+            'icons': 'SETTINGS.MatrixAttributeDisplayModeIcons',
+        },
+        onChange: () => {
+            for (const window of Object.values(ui.windows)) {
+                if ('render' in window && typeof window.render === 'function') {
+                    void (window as any).render();
+                }
+            }
+        }
+    });
+
     game.settings.register(SYSTEM_NAME, FLAGS.ShowGlitchAnimation, {
         name: 'SETTINGS.ShowGlitchAnimationName',
         hint: 'SETTINGS.ShowGlitchAnimationDescription',

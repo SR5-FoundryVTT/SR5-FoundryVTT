@@ -9,6 +9,7 @@ import { ConditionType } from "@/module/types/template/Condition";
 import { CombatRules } from "@/module/rules/CombatRules";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { ResonsanceRules } from "@/module/rules/ResonanceRules";
+import { RiggerFlow } from "@/module/flows/RiggerFlow";
 
 type DamageElement = Item.SystemOfType<'weapon'>['action']['damage']['element']['base'];
 
@@ -201,6 +202,47 @@ export class DamageApplicationFlow {
 
         await DamageApplicationFlow._addDamageToTrack(actor, rest, track);
         await DamageApplicationFlow._addDamageToOverflow(actor, overflow, track);
+
+        if (actor.isType('vehicle') && actor.system.controlMode === 'rigger') {
+            const driver = actor.getVehicleDriver();
+            if (driver && rest.value > 0) {
+                const bioDmg = Math.ceil(rest.value / 2);
+                const content = `
+                    <div class="sr5-chat-card biofeedback-card">
+                        <div class="card-header">
+                            <h3>⚡ ${game.i18n.localize('SR5.Rigger.ResistBiofeedback')}</h3>
+                        </div>
+                        <div class="card-content">
+                            <p>Vehicle <strong>${actor.name}</strong> took ${rest.value} physical damage. <strong>${driver.name}</strong> must resist Biofeedback damage!</p>
+                            <div class="test-value">
+                                <span class="value">${game.i18n.localize('SR5.Rigger.ResistBiofeedback')}: </span>
+                                <span class="value-result">
+                                    <span class="button apply-damage"
+                                          data-tooltip="${game.i18n.localize('SR5.Rigger.ResistBiofeedback')}"
+                                          data-damage-value="${bioDmg}"
+                                          data-damage-type="stun"
+                                          data-damage-biofeedback="true"
+                                          data-target-uuid="${driver.uuid}">
+                                        ${bioDmg}S (${game.i18n.localize('SR5.BiofeedbackDamage')})
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                await ChatMessage.create({
+                    speaker: ChatMessage.getSpeaker({ actor: driver }),
+                    content,
+                    style: CONST.CHAT_MESSAGE_STYLES.OTHER
+                });
+            }
+
+            const updatedTrack = actor.getPhysicalTrack();
+            if (updatedTrack && updatedTrack.value >= updatedTrack.max) {
+                await RiggerFlow.ejectDriver(actor, true);
+            }
+        }
+
         return undefined;
     }
 
@@ -354,16 +396,16 @@ export class DamageApplicationFlow {
 
         track.value += damage.value;
         if (track.value > track.max) {
-            // dev error, not really meant to be ever seen by users. Therefore no localization.
-            console.error("Damage did overflow the track, which shouldn't happen at this stage. Damage has been set to max. Please use applyDamage.")
             track.value = track.max;
+        } else if (track.value < 0) {
+            track.value = 0;
         }
 
         return track;
     }
 
     /**
-     * Add damage to a device's condition monitor.
+     * Add damage to a device's condition monitor. Support negative damage for matrix repair/healing.
      * 
      * @param damage 
      * @param device 
@@ -376,7 +418,8 @@ export class DamageApplicationFlow {
         if (!condition) return damage;
 
         if (damage.value === 0) return;
-        if (condition.value === condition.max) return;
+        if (damage.value > 0 && condition.value === condition.max) return;
+        if (damage.value < 0 && condition.value === 0) return;
 
         condition = DamageApplicationFlow._addDamageToTrackValue(damage, condition);
 

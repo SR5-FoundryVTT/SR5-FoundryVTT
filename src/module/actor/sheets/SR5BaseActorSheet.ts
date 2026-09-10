@@ -1,5 +1,6 @@
 import { DeepPartial } from 'fvtt-types/utils';
 
+import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 import { SR5 } from '../../config';
 import { Helpers } from '../../helpers';
 import { SR5Actor } from '../SR5Actor';
@@ -38,6 +39,7 @@ import { SkillFieldType } from '@/module/types/template/Skills';
 import { CreateItemFlow } from '@/module/item/flows/CreateItemFlow';
 import { ActorSkillFlow } from '../flows/ActorSkillFlow';
 import { ModifiableValueType } from '@/module/types/template/Base';
+import { MatrixRepairFlow } from '@/module/flows/MatrixRepairFlow';
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -102,6 +104,8 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
         uuid: string;
     } | null;
 
+    matrixAttributeIconsOnly?: boolean;
+
     // Sheet filters
     filters: SR5SheetFilters;
 
@@ -133,6 +137,7 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
     selectedInventory: string;
     spells: Record<string, SR5Item[]>;
     program_count: string;
+    hasHardwareSkill?: boolean;
 
     // UI
     tab: SR5Tab;
@@ -328,6 +333,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
             addItem: SR5BaseActorSheet.#createItem,
             editItem: SR5BaseActorSheet.#editItem,
+            repairMatrixDevice: SR5BaseActorSheet.#repairMatrixDevice,
             openAutosoftConfigManager: SR5BaseActorSheet.#openAutosoftConfigManager,
             toggleDroneStack: SR5BaseActorSheet.#toggleDroneStack,
             openVehicleSheet: SR5BaseActorSheet.#openVehicleSheet,
@@ -439,6 +445,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
         data.program_count = this._prepareProgramCount(data.itemType);
+        data.hasHardwareSkill = (this.actor.findActiveSkill?.('hardware')?.value ?? 0) > 0;
+        data.matrixAttributeIconsOnly = game.settings.get(SYSTEM_NAME, FLAGS.MatrixAttributeDisplayMode) === 'icons';
 
         data.situationModifiers = this._prepareSituationModifiers();
 
@@ -1154,6 +1162,18 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         if (!(event.target instanceof HTMLElement)) return;
         await this._moveItemToInventory(event.target);
+    }
+
+    static async #repairMatrixDevice(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
+        const itemUuid = SheetFlow.closestUuid(event.target) || event.target.dataset.itemUuid;
+        if (!itemUuid) return;
+        const item = (await fromUuid(itemUuid)) as SR5Item | null;
+        if (!item || !(item instanceof SR5Item)) return;
+
+        await MatrixRepairFlow.runRepair(this.actor, item);
     }
 
     async _handleDeleteItem(item: SR5Item) {

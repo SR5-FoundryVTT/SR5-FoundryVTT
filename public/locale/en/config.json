@@ -9,6 +9,12 @@
         }
     },
     "SETTINGS": {
+        "MatrixAttributeDisplayModeName": "Matrix Attribute Display Mode",
+        "MatrixAttributeDisplayModeDescription": "Choose whether matrix attributes on actor sheets render as full text labels or compact icons with hover tooltips.",
+        "MatrixAttributeDisplayModeFull": "Full Text Labels",
+        "MatrixAttributeDisplayModeIcons": "Icons Only (with Tooltip)",
+        "RequireRiggerInterfaceName": "Enforce Rigger Interface Requirement",
+        "RequireRiggerInterfaceDescription": "When enabled, jumping into a vehicle without an installed Rigger Interface is hard-blocked. When disabled (default), G.O.D. issues an in-game alert chat message.",
         "AutosoftTargetModeCategory": "Weapon Category / Skill (Table Variant)",
         "AutosoftTargetModeDescription": "Choose whether targeting autosofts bind to specific mounted weapons (RAW) or weapon categories / combat skills.",
         "AutosoftTargetModeName": "Autosoft Targeting Mode",
@@ -844,7 +850,15 @@
             "JumpedOutSuccess": "Jumped out of {vehicle}",
             "JumpInTestRequired": "Jumping into unowned vehicle {vehicle} requires a test.",
             "JumpedInEffectName": "Jumped-In ({rigger})",
-            "RiggerMovingVehicle": "{rigger} is piloting {vehicle}"
+            "RiggerMovingVehicle": "{rigger} is piloting {vehicle}",
+            "GODRiggerInterfaceWarning": "<div class='sr5-god-alert'><div class='god-header'>⚡ GRID OVERWATCH DIVISION // SYSTEM ALERT</div><div class='god-body'><p><strong>WARNING:</strong> Vehicle <em>{vehicle}</em> lacks a verified Rigger Interface connection. Direct Neural Interface connection established without hardware link.</p></div></div>",
+            "ResistBiofeedback": "Resist Biofeedback Damage",
+            "ResistDumpShock": "Resist Dump Shock",
+            "MissingRiggerInterface": "Vehicle {vehicle} does not have an installed Rigger Interface!",
+            "RepairMatrixDamage": "Repair Matrix Damage",
+            "ActiveSensorLock": "Active Sensor Lock",
+            "ActiveSensorLockSuccess": "{attacker} locked sensors onto {target} (+{netHits} target defense penalty)",
+            "Disoriented": "Disoriented"
         },
         "Swarm": {
             "Label": "Swarm",
@@ -856,7 +870,11 @@
             "Sharing": "Sharing",
             "NoiseReduction": "Noise Reduction",
             "SharedAutosofts": "Shared RCC Autosofts",
-            "SharedFromRCC": "Shared from RCC"
+            "SharedFromRCC": "Shared from RCC",
+            "ReconfigureTitle": "RCC Reconfigured",
+            "ReconfiguredMessage": "reconfigured RCC attribute array",
+            "SimpleAction": "Simple Action",
+            "SimpleActionInCombat": "Combat Simple Action"
         },
         "CompendiaSettings": {
             "Description": "These packs will be used for the system. You can override them with your own packs, but you should not remove them.",

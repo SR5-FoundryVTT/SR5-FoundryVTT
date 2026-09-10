@@ -1,5 +1,5 @@
 {{#if item.system.technology.condition_monitor.max}}
-    <div class="condition-monitor-container matrix-condition-monitor-property">
+    <div class="condition-monitor-container matrix-condition-monitor-property" style="display: flex; align-items: center; gap: 4px;">
         {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
             tooltip=(localize "SR5.Labels.ActorSheet.Matrix")
             uuid=item.uuid
@@ -9,5 +9,14 @@
             id='matrix'
             compactLargeMonitor=true
             disabled=item.system.technology.condition_monitor.disabled }}
+        {{#if (and (gt item.system.technology.condition_monitor.value 0) @root.hasHardwareSkill)}}
+            <button class="icon sr5-icon repair-matrix-device-button"
+                    type="button"
+                    data-action="repairMatrixDevice"
+                    data-item-uuid="{{item.uuid}}"
+                    data-tooltip="{{localize 'SR5.Rigger.RepairMatrixDamage'}}">
+                <i class="fas fa-wrench"></i>
+            </button>
+        {{/if}}
     </div>
 {{/if}}

@@ -783,6 +783,15 @@ export const SR5 = {
         firewall: 'SR5.MatrixAttrFirewall'
     },
 
+    matrixAttributeIcons: {
+        attack: 'fas fa-crosshairs',
+        sleaze: 'fas fa-user-secret',
+        data_processing: 'fas fa-microchip',
+        firewall: 'fas fa-shield-halved',
+        sharing: 'fas fa-share-nodes',
+        noise_reduction: 'fas fa-wifi'
+    },
+
     initiativeCategories: {
         meatspace: 'SR5.InitCatMeatspace',
         astral: 'SR5.InitCatAstral',

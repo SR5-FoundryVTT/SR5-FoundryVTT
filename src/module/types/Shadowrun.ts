@@ -62,6 +62,8 @@ declare namespace Shadowrun {
         | 'drone_pilot_vehicle'
         | 'drone_perception'
         | 'drone_infiltration'
+        | 'active_sensor_lock'
+        | 'matrix_device_repair'
         | string; // Allow document names to be given...
 
     /**

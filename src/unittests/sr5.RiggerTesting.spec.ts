@@ -6,6 +6,7 @@ import { RiggingRules } from '@/module/rules/RiggingRules';
 import { RiggerFlow } from '@/module/flows/RiggerFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { MatrixTargetingFlow } from '@/module/flows/MatrixTargetingFlow';
+import { DamageApplicationFlow } from '@/module/actor/flows/DamageApplicationFlow';
 
 export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -380,6 +381,40 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
             assert.isTrue(ActorOwnershipFlow._isOwnerOfActor(driver, vehicle));
             const ownIcons = MatrixTargetingFlow.prepareOwnIcons(driver);
             assert.isTrue(ownIcons.some(t => t.document.uuid === vehicle.uuid));
+        });
+
+        it('RiggerFlow.ejectDriver applies disoriented status effect and unlinks driver', async () => {
+            const driver = await createDriver();
+            const vehicle = await createVehicle();
+            await RiggerFlow.jumpIn(driver, vehicle);
+
+            assert.equal(vehicle.system.controlMode, 'rigger');
+
+            await RiggerFlow.ejectDriver(vehicle, true);
+
+            assert.equal(vehicle.system.controlMode, 'autopilot');
+            assert.isTrue(driver.statuses.has('sr5disoriented'));
+        });
+
+        it('DamageApplicationFlow supports matrix damage healing with negative values', async () => {
+            const driver = await createDriver();
+            const device = await factory.createItem({
+                type: 'device',
+                system: {
+                    category: 'commlink',
+                    technology: { rating: 3, condition_monitor: { value: 4, max: 10 } }
+                }
+            }, { parent: driver } as any);
+
+            assert.equal((device.system.technology as any).condition_monitor.value, 4);
+
+            await DamageApplicationFlow.addMatrixDamage(driver, {
+                type: { base: 'matrix', value: 'matrix' },
+                base: -2,
+                value: -2
+            } as any);
+
+            assert.equal((device.system.technology as any).condition_monitor.value, 2);
         });
     });
 };

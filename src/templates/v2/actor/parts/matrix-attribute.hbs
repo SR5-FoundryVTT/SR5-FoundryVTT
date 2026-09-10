@@ -1,13 +1,20 @@
 <div class="attribute" data-attribute-id="{{key}}" data-context-menu="attribute">
     {{#if isCyberdeck}}
-        <label>
+        <label {{#if @root.matrixAttributeIconsOnly}}data-tooltip="{{localize label}}"{{/if}}>
+            {{#if @root.matrixAttributeIconsOnly}}
+                <i class="{{lookup @root.config.matrixAttributeIcons key}}"></i>
+            {{/if}}
             <select class="matrix-att-selector sr5-select" name="matrix-{{key}}" data-att="{{key}}">
                 {{selectOptions (matrixChoices item matrixAtt) selected=matrixAtt.device_att  }}
             </select>
         </label>
     {{else}}
-        <label>
-            {{localize label}}
+        <label {{#if @root.matrixAttributeIconsOnly}}data-tooltip="{{localize label}}"{{/if}}>
+            {{#if @root.matrixAttributeIconsOnly}}
+                <i class="{{lookup @root.config.matrixAttributeIcons key}}"></i>
+            {{else}}
+                {{localize label}}
+            {{/if}}
         </label>
     {{/if}}
     <div class="attribute-value">

@@ -3,7 +3,7 @@ import { TokenLockHooks } from '@/module/token/TokenLockHooks';
 import { TestCreator } from '@/module/tests/TestCreator';
 import { SR5 } from '@/module/config';
 import { Helpers } from '@/module/helpers';
-import { SYSTEM_NAME } from '@/module/constants';
+import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 
 export const RiggerFlow = {
     /**
@@ -11,6 +11,28 @@ export const RiggerFlow = {
      */
     async jumpIn(driver: SR5Actor, vehicle: SR5Actor) {
         if (!driver || !vehicle || !vehicle.isType('vehicle')) return;
+
+        // Check for installed Rigger Interface on non-drone vehicles
+        const hasRiggerInterface = vehicle.system.isDrone || vehicle.items.some((item: any) => {
+            const cat = item.system?.category;
+            const name = item.name?.toLowerCase() || '';
+            return cat === 'rigger_interface' || name.includes('rigger interface');
+        });
+
+        if (!hasRiggerInterface) {
+            const requireSetting = game.settings.get(SYSTEM_NAME, FLAGS.RequireRiggerInterface) as boolean;
+            if (requireSetting) {
+                ui.notifications?.error(game.i18n.format('SR5.Rigger.MissingRiggerInterface', { vehicle: vehicle.name }));
+                return;
+            } else {
+                const warningHtml = game.i18n.format('SR5.Rigger.GODRiggerInterfaceWarning', { vehicle: vehicle.name });
+                await ChatMessage.create({
+                    speaker: { alias: 'G.O.D.' },
+                    content: warningHtml,
+                    style: CONST.CHAT_MESSAGE_STYLES.OTHER
+                });
+            }
+        }
 
         // 1. If driver is currently jumped into another vehicle, jump out of that vehicle first
         const currentJumpedVehicleUuid = (driver as any).getFlag(SYSTEM_NAME, 'jumpedInVehicleUuid') as string | undefined;
@@ -94,6 +116,52 @@ export const RiggerFlow = {
         }
 
         ui.notifications?.info(game.i18n.format('SR5.Rigger.JumpedOutSuccess', { vehicle: vehicle.name }));
+    },
+
+    /**
+     * Perform forced ejection of driver from vehicle/drone with Dump Shock.
+     */
+    async ejectDriver(vehicle: SR5Actor, isDeviceDestroyed = false) {
+        if (!vehicle || !vehicle.isType('vehicle')) return;
+        const driver = vehicle.getVehicleDriver();
+        if (!driver) return;
+
+        const isHotSim = driver.system.matrix?.hot_sim === true;
+        const damageType = isHotSim ? 'physical' : 'stun';
+        const damageValue = 6;
+
+        const content = `
+            <div class="sr5-chat-card dump-shock-card">
+                <div class="card-header">
+                    <h3>⚡ ${game.i18n.localize('SR5.Rigger.ResistDumpShock')}</h3>
+                </div>
+                <div class="card-content">
+                    <p><strong>${driver.name}</strong> suffered forced ejection from <strong>${vehicle.name}</strong> (${isDeviceDestroyed ? 'Device Destroyed' : 'Connection Severed'}).</p>
+                    <div class="test-value">
+                        <span class="value">${game.i18n.localize('SR5.Rigger.ResistDumpShock')}: </span>
+                        <span class="value-result">
+                            <span class="button apply-damage"
+                                  data-tooltip="${game.i18n.localize('SR5.Rigger.ResistDumpShock')}"
+                                  data-damage-value="${damageValue}"
+                                  data-damage-type="${damageType}"
+                                  data-damage-biofeedback="true"
+                                  data-target-uuid="${driver.uuid}">
+                                ${damageValue}${damageType.charAt(0).toUpperCase()} (${game.i18n.localize('SR5.BiofeedbackDamage')})
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        await ChatMessage.create({
+            speaker: ChatMessage.getSpeaker({ actor: driver }),
+            content,
+            style: CONST.CHAT_MESSAGE_STYLES.OTHER
+        });
+
+        await driver.toggleStatusEffect('sr5disoriented', { active: true });
+        await this.jumpOut(driver, vehicle);
     },
 
     /**

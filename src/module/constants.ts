@@ -81,7 +81,9 @@ export const FLAGS = {
     EnforceExtendedTestInterval: 'EnforceExtendedTestInterval',
     ExtendedTestDueMessage: 'ExtendedTestDueMessage',
     WorldTimeInitialized: 'WorldTimeInitialized',
-    AutosoftTargetMode: 'autosoftTargetMode'
+    AutosoftTargetMode: 'autosoftTargetMode',
+    RequireRiggerInterface: 'requireRiggerInterface',
+    MatrixAttributeDisplayMode: 'matrixAttributeDisplayMode'
 } as const;
 export const CORE_NAME = 'core';
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';

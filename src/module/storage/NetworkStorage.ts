@@ -137,15 +137,26 @@ export const NetworkStorage = {
         const masterUuid = Helpers.uuidForStorage(master.uuid);
         const slaveUuids = networks[masterUuid] ?? [];
         const slaves: (Actor.Stored | Item.Stored)[] = [];
+        let hasStale = false;
+        const validSlaveUuids: string[] = [];
+
         for (const uuid of slaveUuids) {
             const item = fromUuidSync(Helpers.uuidFromStorage(uuid)) as Item.Stored | Actor.Stored | null;
             // in case we have a stale id in storage, only add valid items
             if (item) {
                 slaves.push(item);
+                validSlaveUuids.push(uuid);
             } else {
-                console.warn(`Could not find item from id ${uuid}. Consider clearing all Networked Items for ${master?.name}`)
+                hasStale = true;
+                console.warn(`Could not find item from id ${uuid}. Automatically pruning stale Networked Item entry for ${master?.name}`);
             }
         }
+
+        if (hasStale) {
+            networks[masterUuid] = validSlaveUuids;
+            void DataStorage.set(NetworkStorage.key, networks);
+        }
+
         return slaves;
     },
 

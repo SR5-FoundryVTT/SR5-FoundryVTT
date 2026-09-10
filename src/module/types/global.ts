@@ -303,6 +303,8 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.WorldTimeInitialized": boolean;
         "shadowrun5e.TokenMovementHistoryReset": 'firstActionPhase' | 'turnStart';
         "shadowrun5e.autosoftTargetMode": string;
+        "shadowrun5e.requireRiggerInterface": boolean;
+        "shadowrun5e.matrixAttributeDisplayMode": string;
     }
 }
 

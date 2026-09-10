@@ -129,6 +129,46 @@ const SRStatus = [
         name: 'SR5.StatusEffects.RiggedVehicle',
         img: 'systems/shadowrun5e/dist/icons/status-effects/steering-wheel.svg',
     },
+    {
+        id: 'sr5disoriented',
+        name: 'SR5.Rigger.Disoriented',
+        img: 'icons/svg/daze.svg',
+        system: {
+            targets: [
+                {
+                    id: 'penalty',
+                    name: 'penalty',
+                    applyTo: 'test_all',
+                    conditions: [
+                        { type: 'tests', mode: 'exclude', values: ['PhysicalDefenseTest', 'SuppressionDefenseTest', 'PhysicalResistTest', 'BiofeedbackResistTest'] },
+                    ],
+                },
+            ],
+            changes: [
+                { key: "data.pool", type: "add", value: "-2", target: 'penalty' },
+            ],
+        },
+    },
+    {
+        id: 'sr5sensorLock',
+        name: 'SR5.Rigger.ActiveSensorLock',
+        img: 'icons/svg/target.svg',
+        system: {
+            targets: [
+                {
+                    id: 'defensePenalty',
+                    name: 'defensePenalty',
+                    applyTo: 'test_target',
+                    conditions: [
+                        { type: 'tests', mode: 'include', values: ['PhysicalDefenseTest', 'RangedDefenseTest', 'MeleeDefenseTest'] },
+                    ],
+                },
+            ],
+            changes: [
+                { key: "data.pool", type: "add", value: "-1", target: 'defensePenalty' },
+            ],
+        },
+    },
 ];
 
 export function getSRStatus(): CONFIG.StatusEffect[] {

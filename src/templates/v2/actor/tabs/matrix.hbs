@@ -70,21 +70,23 @@
                                 matrixAttributes=../config/matrixAttributes
                                 item=../system.matrix.item }}
                         {{/each}}
-                        {{#if rccInfo}}
-                            <div class="attribute" data-attribute-id="sharing">
-                                <label>{{localize "SR5.RCC.Sharing"}}</label>
-                                <div class="attribute-value">
-                                    <button class="icon sr5-icon" type="button" disabled>{{rccInfo.sharing}}</button>
-                                </div>
-                            </div>
-                            <div class="attribute" data-attribute-id="noise_reduction">
-                                <label>{{localize "SR5.RCC.NoiseReduction"}}</label>
-                                <div class="attribute-value">
-                                    <button class="icon sr5-icon" type="button" disabled>{{rccInfo.noiseReduction}}</button>
-                                </div>
-                            </div>
-                        {{/if}}
                     </div>
+                    {{#if rccInfo}}
+                        <div class="rcc-allocation-slider" style="display: flex; flex-direction: column; gap: 4px; padding: 6px; background: rgba(0,0,0,0.2); border-radius: 4px; margin-top: 4px; margin-bottom: 6px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.85em;">
+                                <span><i class="fas fa-wifi" data-tooltip="{{localize "SR5.RCC.NoiseReduction"}}"></i> {{localize "SR5.RCC.NoiseReduction"}}: <strong>{{rccInfo.noiseReduction}}</strong></span>
+                                <span>{{localize "SR5.RCC.Sharing"}}: <strong>{{rccInfo.sharing}}</strong> <i class="fas fa-share-nodes" data-tooltip="{{localize "SR5.RCC.Sharing"}}"></i></span>
+                            </div>
+                            <input type="range"
+                                   class="rcc-allocation-input"
+                                   data-action="updateRccAllocation"
+                                   min="0"
+                                   max="{{rccInfo.deviceRating}}"
+                                   value="{{rccInfo.sharing}}"
+                                   data-rcc-item-id="{{rccInfo.rccItemId}}"
+                                   style="width: 100%; cursor: pointer;" />
+                        </div>
+                    {{/if}}
                 {{/if}}
                 <div class="list-item list-item-header">
                     <div class="list-item-start">
