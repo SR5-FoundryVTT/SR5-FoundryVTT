@@ -94,7 +94,16 @@
         "AP": "DK",
         "Accessory": "Zubehör",
         "Accuracy": "Präz.",
-        "Action": "Handlung",
+        "Action": {
+            "0": "H",
+            "1": "a",
+            "2": "n",
+            "3": "d",
+            "4": "l",
+            "5": "u",
+            "6": "n",
+            "7": "g"
+        },
         "ActionCategory": {
             "Addiction": "Abhängigkeits-Handlungen",
             "AddictionMental": "Abhängigkeit Geistig",
@@ -860,7 +869,12 @@
             "RepairMatrixDamage": "Matrix-Schaden reparieren",
             "ActiveSensorLock": "Aktive Zielerfassung",
             "ActiveSensorLockSuccess": "{attacker} hat Sensoren auf {target} aufgeschaltet (+{netHits} Ziel-Verteidigungsmalus)",
-            "Disoriented": "Orientierungslos"
+            "Disoriented": "Orientierungslos",
+            "SpunOut": "Ins Schleudern Geraten",
+            "SpunOutInfo": "{target} ist ins Schleudern geraten!",
+            "EWarNoiseReductionSuccess": "{actor} erhält +{hits} Rauschunterdrückung für 1 Runde.",
+            "RammingSuccess": "{attacker} hat {target} gerammt und {damage} körperlichen Schaden verursacht!",
+            "EmergencyExitFailure": "{actor} Notausstieg fehlgeschlagen und erleidet {damage} Aufprallschaden!"
         },
         "Swarm": {
             "Label": "Schwarm",
@@ -3087,6 +3101,8 @@
         "TemporaryModifiers": "Temporäre Modifikatoren",
         "Test": "Probe",
         "TestResults": {
+            "ActiveSensorLockFailure": "Aktive Zielerfassung fehlgeschlagen!",
+            "ActiveSensorLockSuccess": "Aktive Zielerfassung erfolgreich!",
             "AttackBlockedByHardenedArmor": "Angriff trifft, wird aber von verstärkter Panzerung abgewehrt",
             "AttackBlockedByVehicleArmor": "Angriff trifft, wird aber von Fahrzeugpanzerung abgewehrt",
             "AttackDodged": "Ausgewichen",

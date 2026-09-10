@@ -94,7 +94,14 @@
         "AP": "AP",
         "Accessory": "Accessory",
         "Accuracy": "Accuracy",
-        "Action": "Action",
+        "Action": {
+            "0": "A",
+            "1": "c",
+            "2": "t",
+            "3": "i",
+            "4": "o",
+            "5": "n"
+        },
         "ActionCategory": {
             "Addiction": "Addiction Actions",
             "AddictionMental": "Mental Addiction",
@@ -210,9 +217,9 @@
             "AddTarget": "Add Target",
             "ExpiryTriggers": {
                 "CombatStart": "Combat Start",
-                "CombatEnd":   "Combat End",
-                "TurnStart":   "Turn Start",
-                "TurnEnd":     "Turn End",
+                "CombatEnd": "Combat End",
+                "TurnStart": "Turn Start",
+                "TurnEnd": "Turn End",
                 "MyActionStart": "Start of My Action Phase",
                 "MyActionEnd": "End of My Action Phase"
             },
@@ -858,7 +865,12 @@
             "RepairMatrixDamage": "Repair Matrix Damage",
             "ActiveSensorLock": "Active Sensor Lock",
             "ActiveSensorLockSuccess": "{attacker} locked sensors onto {target} (+{netHits} target defense penalty)",
-            "Disoriented": "Disoriented"
+            "Disoriented": "Disoriented",
+            "SpunOut": "Spun Out",
+            "SpunOutInfo": "{target} has spun out!",
+            "EWarNoiseReductionSuccess": "{actor} gained +{hits} Noise Reduction for 1 round.",
+            "RammingSuccess": "{attacker} rammed {target} dealing {damage} physical damage!",
+            "EmergencyExitFailure": "{actor} failed emergency exit and suffers {damage} impact damage!"
         },
         "Swarm": {
             "Label": "Swarm",
@@ -3093,6 +3105,8 @@
         "TemporaryModifiers": "Temporary Modifiers",
         "Test": "Test",
         "TestResults": {
+            "ActiveSensorLockFailure": "Active Sensor Lock failed!",
+            "ActiveSensorLockSuccess": "Active Sensor Lock successful!",
             "AttackBlockedByHardenedArmor": "Attack Hits But Is Blocked By Hardened Armor",
             "AttackBlockedByVehicleArmor": "Attack Hits But Is Blocked By Vehicle Armor",
             "AttackDodged": "Attack Dodged",

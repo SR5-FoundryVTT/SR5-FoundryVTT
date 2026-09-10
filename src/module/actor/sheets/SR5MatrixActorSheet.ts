@@ -11,7 +11,6 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { RiggingRules } from '@/module/rules/RiggingRules';
 import { NetworkManager } from '@/module/apps/NetworkManager';
-import { RiggerFlow } from '@/module/flows/RiggerFlow';
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import ActorAttribute = Shadowrun.ActorAttribute;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
@@ -350,7 +349,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         const vehicleActor = (await fromUuid(uuid)) as SR5Actor | null;
         if (!vehicleActor || !(vehicleActor instanceof SR5Actor) || !vehicleActor.isType('vehicle')) return;
 
-        await RiggerFlow.toggleJumpIn(this.actor, vehicleActor);
+        await this.actor.toggleJumpIn(vehicleActor);
         void this.render();
     }
 

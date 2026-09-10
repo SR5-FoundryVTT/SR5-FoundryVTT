@@ -1,5 +1,6 @@
 import { SuccessTest } from '@/module/tests/SuccessTest';
 import { RiggingTestDataFlow } from '@/module/tests/flows/RiggingTestDataFlow';
+import { RiggerActionFlows } from '@/module/flows/RiggerActionFlows';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { ActionRollType } from '@/module/types/item/Action';
 import { SR5Item } from '@/module/item/SR5Item';
@@ -12,6 +13,7 @@ export const RiggingHooks = {
         Hooks.on('sr5_testPrepareBaseValues', RiggingHooks.onTestPrepareBaseValues_AddAutosoftModifier.bind(this));
         Hooks.on('sr5_testPrepareBaseValues', RiggingHooks.onTestPrepareBaseValues_AddSwarmModifier.bind(this));
         Hooks.on('sr5_beforePrepareTestDataWithAction', RiggingHooks.onBeforePrepareTestDataWithAction_ReplaceAttributesForMental.bind(this));
+        Hooks.on('sr5_afterTestComplete', RiggingHooks.onAfterTestComplete_ProcessRiggerActionFlows.bind(this));
     },
 
     onTestPrepareBaseValues_AddControlRigModifier: (test: SuccessTest) => {
@@ -36,5 +38,10 @@ export const RiggingHooks = {
 
     onBeforePrepareTestDataWithAction_ReplaceAttributesForMental: (action: ActionRollType, document: SR5Item|SR5Actor) => {
         RiggingTestDataFlow.replacePhysicalAttributesForMentalDriver(action, document);
+    },
+
+    onAfterTestComplete_ProcessRiggerActionFlows: async (test: SuccessTest) => {
+        await RiggerActionFlows.processTestOutcome(test);
     }
 }
+

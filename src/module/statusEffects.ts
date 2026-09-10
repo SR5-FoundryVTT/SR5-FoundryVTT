@@ -169,6 +169,26 @@ const SRStatus = [
             ],
         },
     },
+    {
+        id: 'sr5spunOut',
+        name: 'SR5.Rigger.SpunOut',
+        img: 'systems/shadowrun5e/dist/icons/anticlockwise-rotation.svg',
+        system: {
+            targets: [
+                {
+                    id: 'handlingPenalty',
+                    name: 'handlingPenalty',
+                    applyTo: 'test_all',
+                    conditions: [
+                        { type: 'tests', mode: 'include', values: ['PilotVehicleTest'] },
+                    ],
+                },
+            ],
+            changes: [
+                { key: "data.pool", type: "add", value: "-2", target: 'handlingPenalty' },
+            ],
+        },
+    },
 ];
 
 export function getSRStatus(): CONFIG.StatusEffect[] {

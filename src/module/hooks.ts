@@ -23,6 +23,7 @@ import { WorldTimeFlow } from './flows/WorldTimeFlow';
 import { ExtendedTestManager } from './apps/ExtendedTestManager';
 import { ExtendedTestFlow } from './flows/ExtendedTestFlow';
 import { ExtendedTestDueFlow } from './flows/ExtendedTestDueFlow';
+import { RiggerFlow } from './flows/RiggerFlow';
 import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
 import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
 import { CharacterImporter } from './apps/actorImport/characterImporter/CharacterImporter';
@@ -70,6 +71,7 @@ import { MatrixTest } from './tests/MatrixTest';
 import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
 import { CheckOverwatchScoreTest } from '@/module/tests/CheckOverwatchScoreTest';
 import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
+import { OpposedActiveSensorLockTest } from '@/module/tests/OpposedActiveSensorLockTest';
 
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
 
@@ -246,6 +248,12 @@ ___________________
             CompendiumBrowser,
 
             /**
+             * Rigger & Vehicle workflow API (jumpIn, jumpOut, ejectDriver, toggleJumpIn).
+             */
+            rigger: RiggerFlow,
+            RiggerFlow,
+
+            /**
              * You want to create a test from whatever source?
              * Use this.
              */
@@ -301,7 +309,8 @@ ___________________
                 BiofeedbackResistTest,
                 CheckOverwatchScoreTest,
                 OpposedCheckOverwatchScoreTest,
-                OpposedMatrixTest
+                OpposedMatrixTest,
+                OpposedActiveSensorLockTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -353,7 +362,8 @@ ___________________
                 OpposedBruteForceTest,
                 OpposedHackOnTheFlyTest,
                 OpposedCheckOverwatchScoreTest,
-                OpposedMatrixTest
+                OpposedMatrixTest,
+                OpposedActiveSensorLockTest
             },
             /**
              * Subset of tests meant to be used as resist tests.

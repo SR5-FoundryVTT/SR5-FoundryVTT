@@ -1,4 +1,6 @@
 import { TestCreator } from "@/module/tests/TestCreator";
+import { OpposedActiveSensorLockTest } from "@/module/tests/OpposedActiveSensorLockTest";
+import { RiggerActionFlows } from "@/module/flows/RiggerActionFlows";
 import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { SR5 } from '@/module/config';
@@ -416,5 +418,57 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
 
             assert.equal((device.system.technology as any).condition_monitor.value, 2);
         });
+
+        it('OpposedActiveSensorLockTest applies sr5sensorLock status effect on defender upon processFailure', async () => {
+            const rigger = await createDriver();
+            const defender = await factory.createActor({ type: 'vehicle' });
+
+            const opposedTest = Object.create(OpposedActiveSensorLockTest.prototype);
+            opposedTest.against = { actor: rigger, hits: { value: 4 } };
+            opposedTest.actor = defender;
+            opposedTest.hits = { value: 1 };
+            opposedTest.againstNetHits = { value: 3 };
+
+            await opposedTest.processFailure();
+
+            assert.isTrue(defender.statuses.has('sr5sensorLock'));
+        });
+
+        it('RiggerActionFlows.handlePitManeuver applies sr5spunOut status effect on defender', async () => {
+            const rigger = await createDriver();
+            const defender = await factory.createActor({ type: 'vehicle' });
+
+            const fakeOpposedTest = {
+                opposing: true,
+                success: false,
+                actor: defender,
+                against: { item: { name: 'PIT Maneuver' }, actor: rigger },
+                againstNetHits: { value: 2 }
+            } as any;
+
+            await RiggerActionFlows.handlePitManeuver(fakeOpposedTest);
+
+            assert.isTrue(defender.statuses.has('sr5spunOut'));
+        });
+
+        it('RiggerActionFlows.handleEWarNoiseReduction applies active effect to actor', async () => {
+            const rigger = await createDriver();
+
+            const fakeActiveTest = {
+                opposing: false,
+                success: true,
+                actor: rigger,
+                item: { name: 'E-War Noise Reduction' },
+                netHits: { value: 3 }
+            } as any;
+
+            await RiggerActionFlows.handleEWarNoiseReduction(fakeActiveTest);
+
+            const effect = rigger.effects.find((e: any) => e.name === 'E-War Noise Reduction');
+            assert.isDefined(effect);
+            assert.equal((effect as any).duration.rounds, 1);
+        });
     });
 };
+
+

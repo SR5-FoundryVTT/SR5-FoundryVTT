@@ -10,7 +10,6 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { TestCreator } from '@/module/tests/TestCreator';
 import { SR5 } from '@/module/config';
 import { TokenLockHooks } from '@/module/token/TokenLockHooks';
-import { RiggerFlow } from '@/module/flows/RiggerFlow';
 
 interface VehicleSheetDataFields extends MatrixActorSheetData {
     isVehicle: boolean;
@@ -294,7 +293,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
     static async #toggleJumpIn(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
-        await RiggerFlow.toggleJumpIn(null, this.actor);
+        await this.actor.toggleJumpIn();
         void this.render();
     }
 
