@@ -51,6 +51,7 @@ import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } fro
 
 import { RoutingLib } from "../integrations/routingLibIntegration";
 import SR5CompendiaSettings from "../settings/SR5CompendiaSettings";
+import { CombatTrackerDockConfig } from "../integrations/combatTrackerDockIntegration";
 import AstralPerceptionDetectionMode from "../vision/astralPerception/astralPerceptionDetectionMode";
 import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDetectionMode";
 import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
@@ -257,6 +258,7 @@ declare module "fvtt-types/configuration" {
             dropItemSheetData: any;
             // Hooks for Autocomplete Inline Properties integration
             aipSetup: (packageConfig: {packageName: string}[]) => void;
+            'combat-tracker-dock-init': (config: CombatTrackerDockConfig) => void;
         }
     }
 

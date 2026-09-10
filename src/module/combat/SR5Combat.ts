@@ -285,7 +285,7 @@ export class SR5Combat extends Combat<"base"> {
         // Add padding combatants for the new pass.
         // These will be sorted to the end of the initiative order and can be used to track pass
         // changes in the UI and prevent issues with combatants being added mid-pass.
-        const padData = this.turns.filter(c => !c.system.pad).map(() => ({ system: { pad: true } }));
+        const padData = this.turns.filter(c => !c.system.pad).map(() => ({ hidden: true, system: { pad: true } }));
         await this.createEmbeddedDocuments("Combatant", padData);
 
         updateData.combatants = this.combatants.map((c) => c.initPassUpdateData());
