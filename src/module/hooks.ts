@@ -143,6 +143,7 @@ import { SR5SkillSheet } from './item/sheets/SR5SkillSheet';
 import { SkillGroupFlow } from './actor/flows/SkillGroupFlow';
 import { OpposedMatrixTest } from './tests/OpposedMatrixTest';
 import { PerceptionFlow } from './vision/PerceptionFlow';
+import { VisionHUD } from './apps/VisionHUD';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -170,6 +171,7 @@ export class HooksManager {
         Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory.bind(HooksManager));
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory.bind(HooksManager));
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));
+        Hooks.on('renderTokenHUD', VisionHUD.onRenderTokenHUD.bind(VisionHUD));
         Hooks.on('moveToken', SR5TokenDocument.moveToken.bind(SR5Token));
         Hooks.on('createItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('updateItem', (item, data, options, userId) => { void HooksManager.updateIcConnectedToHostItem(item, data, options, userId); });

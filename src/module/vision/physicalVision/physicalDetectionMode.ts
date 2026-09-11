@@ -14,9 +14,14 @@ export const isInvisiblePhysicalTarget = (target: DetectionTarget) => {
     return getPhysicalTargetActor(target)?.statuses.has(CONFIG.specialStatusEffects.INVISIBLE) ?? false;
 };
 
+export const isAstralVisionSource = (
+    visionSource: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>[0],
+) => visionSource?.visionMode?.id === 'astralPerception';
+
 export class PhysicalSightDetectionMode extends foundry.canvas.perception.DetectionMode {
     override _canDetect(...args: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>) {
-        return hasPhysicalPresence(args[1])
+        return !isAstralVisionSource(args[0])
+            && hasPhysicalPresence(args[1])
             && !isInvisiblePhysicalTarget(args[1])
             && super._canDetect(...args);
     }

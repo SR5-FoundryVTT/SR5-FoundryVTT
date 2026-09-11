@@ -8,6 +8,10 @@ import {
     PhysicalLightPerceptionDetectionMode,
     PhysicalSightDetectionMode,
 } from './physicalVision/physicalDetectionMode';
+import {
+    AstralAwareCanvasVisibility,
+    AstralVisionSource,
+} from './astralPerception/astralVisibility';
 
 export default class VisionConfigurator {
     static configurePhysicalSight() {
@@ -22,9 +26,13 @@ export default class VisionConfigurator {
     }
 
     static configureAstralPerception() {
+        CONFIG.Canvas.visionSourceClass = AstralVisionSource as unknown as typeof CONFIG.Canvas.visionSourceClass;
+        CONFIG.Canvas.groups.visibility.groupClass = AstralAwareCanvasVisibility as unknown as
+            typeof CONFIG.Canvas.groups.visibility.groupClass;
         CONFIG.Canvas.detectionModes.astralPerception = new AstralPerceptionDetectionMode({
             id: 'astralPerception',
             label: 'SR5.Vision.AstralPerception',
+            walls: true,
             type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
         });
   

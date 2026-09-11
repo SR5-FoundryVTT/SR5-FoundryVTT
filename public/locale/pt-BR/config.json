@@ -2137,6 +2137,8 @@
         },
         "Vision": {
             "AstralPerception": "Percepção Astral",
+            "CannotPerceiveAstrally": "Este ator não pode usar percepção astral.",
+            "ToggleAstralPerception": "Alternar Percepção Astral",
             "AstralPerceptionOverride": "Substituição de percepção astral",
             "AstralPerceptionOverrideHint": "Substituição do MJ para permitir ou impedir que este ator use percepção astral.",
             "AstralProjectionOverride": "Substituição de projeção astral",
@@ -2308,6 +2310,7 @@
         },
         "Wireless": "Conexão Sem Fio",
         "StatusEffects": {
+            "AstralPerception": "Percepção Astral",
             "Running": "Correndo",
             "Sprinting": "Corrida Veloz"
         }

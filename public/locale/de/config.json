@@ -3391,6 +3391,8 @@
         },
         "Vision": {
             "AstralPerception": "Astrale Wahrnehmung",
+            "CannotPerceiveAstrally": "Dieser Akteur kann keine astrale Wahrnehmung verwenden.",
+            "ToggleAstralPerception": "Astrale Wahrnehmung umschalten",
             "AstralPerceptionOverride": "Override für astrale Wahrnehmung",
             "AstralPerceptionOverrideHint": "SL-Override, ob dieser Akteur astral wahrnehmen darf.",
             "AstralProjectionOverride": "Override für astrale Projektion",
@@ -3668,6 +3670,7 @@
         "WirelessOnline": "Online",
         "WirelessUnavailable": "Kabel",
         "StatusEffects": {
+            "AstralPerception": "Astrale Wahrnehmung",
             "Running": "Laufen",
             "Sprinting": "Sprint"
         }

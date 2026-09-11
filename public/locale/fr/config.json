@@ -1537,6 +1537,8 @@
         },
         "Vision": {
             "AstralPerception": "Perception astrale",
+            "CannotPerceiveAstrally": "Cet acteur ne peut pas utiliser la perception astrale.",
+            "ToggleAstralPerception": "Activer/désactiver la perception astrale",
             "AstralPerceptionOverride": "Forçage de la perception astrale",
             "AstralPerceptionOverrideHint": "Forçage MJ déterminant si cet acteur peut utiliser la perception astrale.",
             "AstralProjectionOverride": "Forçage de la projection astrale",
@@ -1664,6 +1666,7 @@
         "WoundTolerance": "Tolérance blessures",
         "Wounds": "Blessures",
         "StatusEffects": {
+            "AstralPerception": "Perception astrale",
             "Running": "Course",
             "Sprinting": "Sprint"
         }

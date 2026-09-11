@@ -1,12 +1,15 @@
-import { hasPhysicalPresence } from '@/module/vision/physicalVision/physicalDetectionMode';
+import {
+    hasPhysicalPresence,
+    isAstralVisionSource,
+} from '@/module/vision/physicalVision/physicalDetectionMode';
 
 export const ULTRASOUND_RANGE_METERS = 50;
 
 export default class UltrasoundDetectionMode extends foundry.canvas.perception.DetectionMode {
     override _canDetect(
-        ...[, target]: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>
+        ...[visionSource, target]: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>
     ) {
-        return hasPhysicalPresence(target);
+        return !isAstralVisionSource(visionSource) && hasPhysicalPresence(target);
     }
 
     override _testLOS(

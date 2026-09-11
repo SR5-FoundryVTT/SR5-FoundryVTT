@@ -1,6 +1,12 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
 
 export class SR5Token extends foundry.canvas.placeables.Token {
+    override _getVisionBlindedStates() {
+        const states = super._getVisionBlindedStates();
+        if (this.document.sight.visionMode === 'astralPerception') states.blind = false;
+        return states;
+    }
+
     override _drawBar(number: number, bar: PIXI.Graphics, data: NonNullable<TokenDocument.GetBarAttributeReturn>) {
         const tokenHealthBars = game.settings.get(SYSTEM_NAME, FLAGS.TokenHealthBars);
         // FoundryVTT draws resource bars as full/good when the value is the

@@ -51,6 +51,29 @@ export class PerceptionFlow {
         return next;
     }
 
+    static reconcileAstralDetectionModes(
+        detectionModes: Record<string, { enabled: boolean; range: number | null }>,
+        range: number,
+    ) {
+        const next = foundry.utils.deepClone(detectionModes);
+        for (const id of ['lowlight', 'thermographic', 'ultrasound', 'augmentedReality']) delete next[id];
+        next.basicSight = { enabled: false, range: null };
+        delete next.lightPerception;
+        next.astralPerception = { enabled: true, range };
+        return next;
+    }
+
+    static detectionModeUpdate(
+        current: Record<string, { enabled: boolean; range: number | null }>,
+        next: Record<string, { enabled: boolean; range: number | null }>,
+    ) {
+        const update = foundry.utils.deepClone(next) as Record<string, unknown>;
+        for (const id of Object.keys(current)) {
+            if (!(id in next)) update[`-=${id}`] = null;
+        }
+        return update;
+    }
+
     static metersToSceneUnits(meters: number, sceneUnit: string) {
         const normalizedUnit = sceneUnit.trim().toLowerCase() as keyof typeof LENGTH_UNIT_TO_METERS_MULTIPLIERS;
         const multiplier = LENGTH_UNIT_TO_METERS_MULTIPLIERS[normalizedUnit];
@@ -59,6 +82,27 @@ export class PerceptionFlow {
 
     private static worldSettingEnabled() {
         return game.settings.get(SYSTEM_NAME, FLAGS.AutomaticTokenSenses);
+    }
+
+    static refreshTokenSource(token: TokenDocument) {
+        if (!this.isRefreshEnabled(token) || !token.actor) return false;
+        const source = token.toObject();
+        const range = Math.max(token.sight.range ?? 0, 10000);
+        const astralActive = !!token.getFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision);
+        const detectionModes = astralActive
+            ? this.reconcileAstralDetectionModes(source.detectionModes, range)
+            : this.reconcileDetectionModes(
+                source.detectionModes,
+                PerceptionResolver.resolve(token.actor).capabilities,
+                range,
+                token.parent?.grid.units,
+            );
+        token.updateSource({
+            detectionModes: this.detectionModeUpdate(source.detectionModes, detectionModes) as any,
+        });
+        if (token.parent !== canvas.scene) return false;
+        token.object?.initializeSources();
+        return true;
     }
 
     private static tokensFor(document: RefreshDocument): TokenDocument[] {
@@ -83,22 +127,8 @@ export class PerceptionFlow {
     private static flush() {
         let refreshCanvas = false;
         for (const token of this.pendingTokens) {
-            if (!this.isRefreshEnabled(token) || !token.actor) continue;
-            const state = PerceptionResolver.resolve(token.actor);
-            const source = token.toObject();
-            const range = Math.max(token.sight.range ?? 0, 10000);
-            const detectionModes = this.reconcileDetectionModes(
-                source.detectionModes,
-                state.capabilities,
-                range,
-                token.parent?.grid.units,
-            );
-            token.updateSource({ detectionModes });
-
-            if (token.parent === canvas.scene) {
-                token.object?.initializeSources();
-                refreshCanvas = true;
-            }
+            const tokenRefreshed = this.refreshTokenSource(token);
+            refreshCanvas = tokenRefreshed || refreshCanvas;
         }
         this.pendingTokens.clear();
         if (refreshCanvas) canvas.perception.update({ refreshVision: true, refreshLighting: true });

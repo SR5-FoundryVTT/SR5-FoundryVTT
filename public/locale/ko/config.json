@@ -2972,6 +2972,7 @@
             "Type": "유형"
         },
         "StatusEffects": {
+            "AstralPerception": "아스트랄 지각",
             "Running": "달리기",
             "Sprinting": "전력 질주"
         },																 
@@ -3350,6 +3351,8 @@
         },
         "Vision": {
             "AstralPerception": "아스트랄 인식",
+            "CannotPerceiveAstrally": "이 액터는 아스트랄 지각을 사용할 수 없습니다.",
+            "ToggleAstralPerception": "아스트랄 지각 전환",
             "AstralPerceptionOverride": "아스트랄 지각 재정의",
             "AstralPerceptionOverrideHint": "이 액터의 아스트랄 지각 사용 가능 여부를 GM이 재정의합니다.",
             "AstralProjectionOverride": "아스트랄 투사 재정의",

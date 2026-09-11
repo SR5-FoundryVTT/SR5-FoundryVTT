@@ -79,6 +79,7 @@ export const FLAGS = {
     ExtendedTestDueMessage: 'ExtendedTestDueMessage',
     WorldTimeInitialized: 'WorldTimeInitialized',
     AutomaticTokenSenses: 'AutomaticTokenSenses',
+    AstralPerceptionVision: 'astralPerceptionVision',
 } as const;
 export const CORE_NAME = 'core';
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';

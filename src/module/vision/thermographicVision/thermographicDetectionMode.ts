@@ -3,6 +3,7 @@ import type { ThermographicSignature } from '@/module/types/template/Visibility'
 import {
     getPhysicalTargetActor,
     hasPhysicalPresence,
+    isAstralVisionSource,
     isInvisiblePhysicalTarget,
 } from '@/module/vision/physicalVision/physicalDetectionMode';
 
@@ -27,9 +28,7 @@ export default class ThermographicVisionDetectionMode extends foundry.canvas.per
         if (!signature || signature === 'none') return false;
         ThermographicVisionDetectionMode.activeSignature = signature;
 
-        const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
-
-        return !isInvisiblePhysicalTarget(target) && !isAstralPerceiving;
+        return !isInvisiblePhysicalTarget(target) && !isAstralVisionSource(visionSource);
     }
 
     private static heatLevel(signature: Exclude<ThermographicSignature, 'none'>) {

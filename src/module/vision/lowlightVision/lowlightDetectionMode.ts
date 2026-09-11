@@ -10,12 +10,5 @@ export default class LowlightVisionDetectionMode extends PhysicalSightDetectionM
         return this._detectionFilter ??= LowLightVisionFilter.create();
     }
 
-    override _canDetect(
-        ...args: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>
-    ) {
-        const [visionSource] = args;
-        const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
-
-        return !isAstralPerceiving && super._canDetect(...args);
-    }
+    // PhysicalSightDetectionMode supplies the optical and astral-source restrictions.
 }

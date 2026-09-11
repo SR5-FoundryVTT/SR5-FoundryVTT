@@ -2972,6 +2972,7 @@
             "Type": "Type"
         },
         "StatusEffects": {
+            "AstralPerception": "Astral Perception",
             "Running": "Running",
             "Sprinting": "Sprinting"
         },
@@ -3350,6 +3351,8 @@
         },
         "Vision": {
             "AstralPerception": "Astral Perception",
+            "CannotPerceiveAstrally": "This actor cannot use astral perception.",
+            "ToggleAstralPerception": "Toggle Astral Perception",
             "AstralPerceptionOverride": "Astral perception override",
             "AstralPerceptionOverrideHint": "GM override for whether this actor may use astral perception.",
             "AstralProjectionOverride": "Astral projection override",

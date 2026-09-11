@@ -234,6 +234,15 @@ declare module "fvtt-types/configuration" {
                 modifier?: Shadowrun.SituationModifiersSourceData;
             }
         };
+        Token: {
+            shadowrun5e: {
+                AutomaticTokenSenses?: boolean;
+                astralPerceptionVision?: {
+                    sight: Record<string, unknown>;
+                    detectionModes: Record<string, { enabled: boolean; range: number | null }>;
+                };
+            };
+        };
     }
 
     namespace Hooks {

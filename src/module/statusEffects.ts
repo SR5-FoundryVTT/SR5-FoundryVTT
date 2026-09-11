@@ -12,6 +12,44 @@ function getMovementExpiry() {
 
 const SRStatus = [
     {
+        id: 'sr5astralPerception',
+        name: 'SR5.StatusEffects.AstralPerception',
+        img: 'icons/svg/eye.svg',
+        hud: false,
+        system: {
+            targets: [
+                {
+                    id: 'actor',
+                    applyTo: 'actor',
+                },
+                {
+                    id: 'physicalAction',
+                    applyTo: 'test_all',
+                    conditions: [{
+                        type: 'categories',
+                        mode: 'exclude',
+                        values: [
+                            'attack_matrix', 'brute_force', 'compiling', 'complex_form',
+                            'defense_matrix', 'drain', 'fade', 'hack_on_the_fly', 'magic',
+                            'matrix', 'resist_matrix', 'resonance', 'spell_combat',
+                            'spell_detection', 'spell_healing', 'spell_illusion',
+                            'spell_manipulation', 'spell_ritual', 'summoning',
+                        ],
+                    }],
+                },
+            ],
+            changes: [
+                {
+                    key: 'system.visibilityChecks.targets.astral.astralActive',
+                    type: 'override',
+                    value: true,
+                    target: 'actor',
+                },
+                { key: 'data.pool', type: 'add', value: '-2', target: 'physicalAction' },
+            ],
+        },
+    },
+    {
         id: 'sr5run',
         name: 'SR5.StatusEffects.Running',
         img: 'systems/shadowrun5e/dist/icons/status-effects/run.svg',
@@ -96,8 +134,7 @@ const SRStatus = [
 export function getSRStatus(): CONFIG.StatusEffect[] {
     const expiry = getMovementExpiry();
 
-    return SRStatus.map(status => ({
-        ...status,
-        duration: { ...status.duration, expiry },
-    }));
+    return SRStatus.map(status => 'duration' in status
+        ? { ...status, duration: { ...status.duration, expiry } }
+        : status);
 }
