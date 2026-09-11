@@ -33,33 +33,37 @@ const actorData = (metatype: string, changes: Record<string, unknown> = {}): any
     items: [],
 });
 
-const target = (active = true, invisible = false, thermographic = 'warm') => ({
-    document: {
-        actor: {
-            system: {
-                visibilityChecks: {
-                    targets: { physical: { active, thermographic } },
+const target = (active = true, invisible = false, thermographic = 'warm') =>
+    ({
+        document: {
+            actor: {
+                system: {
+                    visibilityChecks: {
+                        targets: { physical: { active, thermographic } },
+                    },
                 },
+                statuses: new Set(invisible ? [CONFIG.specialStatusEffects.INVISIBLE] : []),
             },
-            statuses: new Set(invisible ? [CONFIG.specialStatusEffects.INVISIBLE] : []),
         },
-    },
-}) as any;
+    }) as any;
 
-const visionSource = (darkness = false) => ({
-    blinded: { darkness },
-    object: { document: { hasStatusEffect: () => false }, getLightRadius: (range: number) => range },
-    visionMode: { id: 'basic' },
-    data: { x: 0, y: 0, elevation: 0, angle: 360, rotation: 0, externalRadius: 0 },
-    los: { config: { type: 'sight', angle: 360 } },
-}) as any;
+const visionSource = (darkness = false) =>
+    ({
+        blinded: { darkness },
+        object: { document: { hasStatusEffect: () => false }, getLightRadius: (range: number) => range },
+        visionMode: { id: 'basic' },
+        data: { x: 0, y: 0, elevation: 0, angle: 360, rotation: 0, externalRadius: 0 },
+        los: { config: { type: 'sight', angle: 360 } },
+    }) as any;
 
 export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
     const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
     const factory = new SR5TestFactory({ skipDefaultSkills: true });
 
-    after(async () => { await factory.destroy(); });
+    after(async () => {
+        await factory.destroy();
+    });
 
     describe('Physical vision', () => {
         it('derives only the canonical metatype senses', () => {
@@ -80,35 +84,53 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
 
         it('uses equipped item grants and ignores disabled effects and unequipped items', async () => {
             const actor = await factory.createActor({ type: 'character', system: { metatype: 'human' } });
-            const [effect] = await actor.createEmbeddedDocuments('ActiveEffect', [{
-                name: '#QUENCH Disabled Ultrasound',
-                disabled: true,
-                system: {
-                    targets: [{ id: 'actor', name: 'Actor', applyTo: 'actor' }],
-                    changes: [{
-                        key: 'system.visibilityChecks.capabilities.physical.ultrasound',
-                        type: 'override',
-                        value: true,
-                        target: 'actor',
-                    }],
-                },
-            }]);
-            const [item] = await actor.createEmbeddedDocuments('Item', [{
-                name: '#QUENCH Vision Equipment',
-                type: 'equipment',
-                system: { technology: { equipped: true } },
-                effects: [{
-                    name: '#QUENCH Optical Grants',
+            const [effect] = await actor.createEmbeddedDocuments('ActiveEffect', [
+                {
+                    name: '#QUENCH Disabled Ultrasound',
+                    disabled: true,
                     system: {
-                        onlyForEquipped: true,
                         targets: [{ id: 'actor', name: 'Actor', applyTo: 'actor' }],
                         changes: [
-                            { key: 'system.visibilityChecks.capabilities.physical.lowLight', type: 'override', value: true, target: 'actor' },
-                            { key: 'system.visibilityChecks.capabilities.physical.thermographic', type: 'override', value: true, target: 'actor' },
+                            {
+                                key: 'system.visibilityChecks.capabilities.physical.ultrasound',
+                                type: 'override',
+                                value: true,
+                                target: 'actor',
+                            },
                         ],
                     },
-                }],
-            }]);
+                },
+            ]);
+            const [item] = await actor.createEmbeddedDocuments('Item', [
+                {
+                    name: '#QUENCH Vision Equipment',
+                    type: 'equipment',
+                    system: { technology: { equipped: true } },
+                    effects: [
+                        {
+                            name: '#QUENCH Optical Grants',
+                            system: {
+                                onlyForEquipped: true,
+                                targets: [{ id: 'actor', name: 'Actor', applyTo: 'actor' }],
+                                changes: [
+                                    {
+                                        key: 'system.visibilityChecks.capabilities.physical.lowLight',
+                                        type: 'override',
+                                        value: true,
+                                        target: 'actor',
+                                    },
+                                    {
+                                        key: 'system.visibilityChecks.capabilities.physical.thermographic',
+                                        type: 'override',
+                                        value: true,
+                                        target: 'actor',
+                                    },
+                                ],
+                            },
+                        },
+                    ],
+                },
+            ]);
 
             let senses = PerceptionResolver.resolve(actor).capabilities.physical;
             assert.deepEqual(senses, { lowLight: true, thermographic: true, ultrasound: false });
@@ -124,16 +146,55 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
 
         it('applies darkness and invisibility according to each physical sense', () => {
             const lowLight = new LowlightVisionDetectionMode({ id: 'lowlight', label: 'Low-Light', type: SIGHT });
-            const thermographic = new ThermographicVisionDetectionMode({ id: 'thermographic', label: 'Thermographic', type: SIGHT });
+            const thermographic = new ThermographicVisionDetectionMode({
+                id: 'thermographic',
+                label: 'Thermographic',
+                type: SIGHT,
+            });
             const ultrasound = new UltrasoundDetectionMode({ id: 'ultrasound', label: 'Ultrasound', type: SOUND });
 
             assert.isFalse((lowLight as any)._canDetect(visionSource(true), target()), 'low-light needs some light');
-            assert.isTrue((thermographic as any)._canDetect(visionSource(true), target()), 'thermographic ignores darkness');
+            assert.isTrue(
+                (thermographic as any)._canDetect(visionSource(true), target()),
+                'thermographic ignores darkness',
+            );
             assert.isTrue((ultrasound as any)._canDetect(visionSource(true), target()), 'ultrasound ignores darkness');
 
-            assert.isFalse((lowLight as any)._canDetect(visionSource(), target(true, true)), 'low-light cannot bypass invisibility');
-            assert.isFalse((thermographic as any)._canDetect(visionSource(), target(true, true)), 'thermographic cannot bypass invisibility');
-            assert.isTrue((ultrasound as any)._canDetect(visionSource(), target(true, true)), 'ultrasound detects physical shape');
+            assert.isFalse(
+                (lowLight as any)._canDetect(visionSource(), target(true, true)),
+                'low-light cannot bypass invisibility',
+            );
+            assert.isFalse(
+                (thermographic as any)._canDetect(visionSource(), target(true, true)),
+                'thermographic cannot bypass invisibility',
+            );
+            assert.isTrue(
+                (ultrasound as any)._canDetect(visionSource(), target(true, true)),
+                'ultrasound detects physical shape',
+            );
+        });
+
+        it('uses signature-specific glow overlays for thermographic targets', () => {
+            const mode = new ThermographicVisionDetectionMode({
+                id: 'thermographic',
+                label: 'Thermographic',
+                type: SIGHT,
+            });
+            const expectedColors = {
+                cold: [0.25, 0.5, 1, 1],
+                warm: [1, 0.55, 0, 1],
+                hot: [1, 0.1, 0, 1],
+            };
+
+            for (const [signature, color] of Object.entries(expectedColors)) {
+                assert.isTrue((mode as any)._canDetect(visionSource(), target(true, false, signature)));
+                const filter = ThermographicVisionDetectionMode.getDetectionFilter() as any;
+                assert.instanceOf(filter, foundry.canvas.rendering.filters.GlowOverlayFilter);
+                assert.deepEqual(Array.from(filter.uniforms.glowColor), color, signature);
+            }
+
+            assert.isFalse((mode as any)._canDetect(visionSource(), target(true, false, 'none')));
+            assert.isUndefined(ThermographicVisionDetectionMode.getDetectionFilter());
         });
 
         it('prevents every physical mode from detecting a purely astral form', () => {
@@ -150,11 +211,19 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
 
         it('uses a wall-aware, angle-independent physical collision for ultrasound', () => {
             const mode = new UltrasoundDetectionMode({
-                id: 'ultrasound', label: 'Ultrasound', walls: true, angle: false, type: SOUND,
+                id: 'ultrasound',
+                label: 'Ultrasound',
+                walls: true,
+                angle: false,
+                type: SOUND,
             });
             const originalCollision = (UltrasoundDetectionMode as any)._testCollision;
             let collisionConfig: Record<string, unknown> | undefined;
-            (UltrasoundDetectionMode as any)._testCollision = (_source: unknown, _test: unknown, config: Record<string, unknown>) => {
+            (UltrasoundDetectionMode as any)._testCollision = (
+                _source: unknown,
+                _test: unknown,
+                config: Record<string, unknown>,
+            ) => {
                 collisionConfig = config;
                 return true;
             };
@@ -179,8 +248,12 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
 
             const mode = new UltrasoundDetectionMode({ id: 'ultrasound', label: 'Ultrasound', type: SOUND });
             const config = { enabled: true, range: 50 };
-            assert.isTrue((mode as any)._testRange(visionSource(), config, target(), { point: { x: 50, y: 0, elevation: 0 } }));
-            assert.isFalse((mode as any)._testRange(visionSource(), config, target(), { point: { x: 50.01, y: 0, elevation: 0 } }));
+            assert.isTrue(
+                (mode as any)._testRange(visionSource(), config, target(), { point: { x: 50, y: 0, elevation: 0 } }),
+            );
+            assert.isFalse(
+                (mode as any)._testRange(visionSource(), config, target(), { point: { x: 50.01, y: 0, elevation: 0 } }),
+            );
         });
     });
 };
