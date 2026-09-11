@@ -1,8 +1,5 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
 
-import Token = foundry.canvas.placeables.Token;
-import PrototypeTokenConfig = foundry.applications.sheets.PrototypeTokenConfig;
-
 export class SR5Token extends foundry.canvas.placeables.Token {
     override _onUpdate(...args: Parameters<foundry.canvas.placeables.Token['_onUpdate']>) {
         super._onUpdate(...args);
