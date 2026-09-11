@@ -64,6 +64,8 @@
         "TokenRulerColorRunningDescription": "달리기 범위 내에서의 색상.",
         "TokenRulerColorSprinting": "토큰 이동 전력질주 색상",
         "TokenRulerColorSprintingDescription": "달리기 범위를 초과하고 전력 질주가 필요한 범위의 색상.",
+        "TokenRulerColorPhaseMarker": "토큰 이동 단계 표식 색상",
+        "TokenRulerColorPhaseMarkerDescription": "행동 단계의 끝을 표시하는 경유점의 색상입니다.",
         "TokenRulerColorWalking": "토큰 이동 걷기 색상",
         "TokenRulerColorWalkingDescription": "걷기 범위 내에서의 색상.",
         "TokenRulerOpacity": "토큰 이동 투명도",
