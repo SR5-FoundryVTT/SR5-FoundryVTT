@@ -3,8 +3,24 @@ import AstralPerceptionBackgroundVisionShader  from './astralPerception/astralPe
 import ThermographicVisionDetectionMode from './thermographicVision/thermographicDetectionMode';
 import LowlightVisionDetectionMode from './lowlightVision/lowlightDetectionMode';
 import AugmentedRealityVisionDetectionMode from './augmentedReality/arDetectionMode';
+import UltrasoundDetectionMode from './ultrasoundVision/ultrasoundDetectionMode';
+import {
+    PhysicalLightPerceptionDetectionMode,
+    PhysicalSightDetectionMode,
+} from './physicalVision/physicalDetectionMode';
 
 export default class VisionConfigurator {
+    static configurePhysicalSight() {
+        const basicSight = CONFIG.Canvas.detectionModes.basicSight;
+        const lightPerception = CONFIG.Canvas.detectionModes.lightPerception;
+        CONFIG.Canvas.detectionModes.basicSight = new PhysicalSightDetectionMode(
+            basicSight.toObject(),
+        ) as unknown as typeof basicSight;
+        CONFIG.Canvas.detectionModes.lightPerception = new PhysicalLightPerceptionDetectionMode(
+            lightPerception.toObject(),
+        ) as unknown as typeof lightPerception;
+    }
+
     static configureAstralPerception() {
         CONFIG.Canvas.detectionModes.astralPerception = new AstralPerceptionDetectionMode({
             id: 'astralPerception',
@@ -50,6 +66,16 @@ export default class VisionConfigurator {
         });
     }
 
+    static configureUltrasound() {
+        CONFIG.Canvas.detectionModes.ultrasound = new UltrasoundDetectionMode({
+            id: 'ultrasound',
+            label: 'SR5.Vision.Ultrasound',
+            walls: true,
+            angle: false,
+            type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SOUND,
+        });
+    }
+
     static configureAR() {
         CONFIG.Canvas.detectionModes.augmentedReality = new AugmentedRealityVisionDetectionMode({
             id: 'augmentedReality',
@@ -58,4 +84,3 @@ export default class VisionConfigurator {
         });
     }
 }
-  

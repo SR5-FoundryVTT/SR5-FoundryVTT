@@ -994,7 +994,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             migrator.migrateActor(actor);
 
             assert.deepEqual(actor.system.visibilityChecks.targets, {
-                physical: { thermographic: 'warm' },
+                physical: { active: true, thermographic: 'warm' },
                 astral: { hasAura: true, astralActive: false, affectedBySpell: true },
                 matrix: { hasIcon: true, runningSilent: true },
             });

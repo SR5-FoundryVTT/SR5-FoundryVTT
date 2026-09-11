@@ -7,7 +7,7 @@ const actorData = (overrides: Record<string, unknown> = {}): any => ({
     system: {
         visibilityChecks: {
             targets: {
-                physical: { thermographic: 'warm' },
+                physical: { active: true, thermographic: 'warm' },
                 astral: { hasAura: true, astralActive: false, affectedBySpell: false },
                 matrix: { hasIcon: true, runningSilent: false },
             },
@@ -35,7 +35,7 @@ export const shadowrunVisionFoundation = (context: QuenchBatchContext) => {
         it('resolves domain-based target state', () => {
             const state = PerceptionResolver.resolve(actorData());
             assert.deepEqual(state.targets, {
-                physical: { thermographic: 'warm' },
+                physical: { active: true, thermographic: 'warm' },
                 astral: { hasAura: true, astralActive: false, affectedBySpell: false },
                 matrix: { hasIcon: true, runningSilent: false },
             });

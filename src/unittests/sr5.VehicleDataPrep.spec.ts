@@ -70,6 +70,7 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(vehicle.system.visibilityChecks.targets.astral.hasAura, false);
             assert.strictEqual(vehicle.system.visibilityChecks.targets.astral.astralActive, false);
             assert.strictEqual(vehicle.system.visibilityChecks.targets.astral.affectedBySpell, false);
+            assert.strictEqual(vehicle.system.visibilityChecks.targets.physical.active, true);
             assert.strictEqual(vehicle.system.visibilityChecks.targets.physical.thermographic, 'warm');
             assert.strictEqual(vehicle.system.visibilityChecks.targets.matrix.hasIcon, true);
             assert.strictEqual(vehicle.system.visibilityChecks.targets.matrix.runningSilent, false);
@@ -127,5 +128,4 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
         });
     });
 };
-
 

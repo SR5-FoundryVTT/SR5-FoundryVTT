@@ -1565,7 +1565,8 @@
                 "Warm": "Chaude",
                 "Hot": "Très chaude"
             },
-            "ThermographicVision": "Vision thermographique"
+            "ThermographicVision": "Vision thermographique",
+            "Ultrasound": "Ultrasons"
         },
         "Walk": "Marcher",
         "Warnings": {

@@ -2165,7 +2165,8 @@
                 "Warm": "Morna",
                 "Hot": "Quente"
             },
-            "ThermographicVision": "Visão Termográfica"
+            "ThermographicVision": "Visão Termográfica",
+            "Ultrasound": "Ultrassom"
         },
         "Walk": "Caminhar",
         "WalkingSpeed": "Caminhando",

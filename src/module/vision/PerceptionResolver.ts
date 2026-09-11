@@ -57,6 +57,7 @@ export class PerceptionResolver {
             },
             targets: {
                 physical: {
+                    active: !!visibility.targets?.physical?.active,
                     thermographic: visibility.targets?.physical?.thermographic ?? 'none',
                 },
                 astral: {
@@ -71,10 +72,26 @@ export class PerceptionResolver {
             },
         };
 
+        this.applyMetatypeSenses(actor.system.metatype, resolved.capabilities);
         this.applyMagicalEligibility(actor.system.magic, resolved.capabilities);
         this.applyEffects(actor.effects, resolved.capabilities);
         this.applyItemEffects(actor.items, resolved.capabilities);
         return resolved;
+    }
+
+    private static applyMetatypeSenses(metatype: unknown, capabilities: PerceptionCapabilities) {
+        if (typeof metatype !== 'string') return;
+
+        switch (metatype.toLowerCase()) {
+            case 'elf':
+            case 'ork':
+                capabilities.physical.lowLight = true;
+                break;
+            case 'dwarf':
+            case 'troll':
+                capabilities.physical.thermographic = true;
+                break;
+        }
     }
 
     private static applyMagicalEligibility(magic: Record<string, any> | undefined, capabilities: PerceptionCapabilities) {

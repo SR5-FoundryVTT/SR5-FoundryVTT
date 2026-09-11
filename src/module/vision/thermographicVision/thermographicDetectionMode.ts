@@ -1,5 +1,10 @@
 import ThermographicVisionFilter from './thermographicFilter';
 import type { ThermographicSignature } from '@/module/types/template/Visibility';
+import {
+    getPhysicalTargetActor,
+    hasPhysicalPresence,
+    isInvisiblePhysicalTarget,
+} from '@/module/vision/physicalVision/physicalDetectionMode';
 
 export default class ThermographicVisionDetectionMode extends foundry.canvas.perception.DetectionMode {
     private static activeSignature: Exclude<ThermographicSignature, 'none'> = 'warm';
@@ -17,16 +22,14 @@ export default class ThermographicVisionDetectionMode extends foundry.canvas.per
     override _canDetect(
         ...[visionSource, target]: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>
     ) {
-        const tgt = target?.document instanceof TokenDocument ? target.document : null;
-        const signature = tgt?.actor?.system.visibilityChecks.targets.physical.thermographic as ThermographicSignature | undefined;
+        if (!hasPhysicalPresence(target)) return false;
+        const signature = getPhysicalTargetActor(target)?.system.visibilityChecks.targets.physical.thermographic;
         if (!signature || signature === 'none') return false;
         ThermographicVisionDetectionMode.activeSignature = signature;
 
-        const targetIsVisible = !tgt?.actor?.statuses.has(CONFIG.specialStatusEffects.INVISIBLE);
-
         const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
 
-        return targetIsVisible && !isAstralPerceiving;
+        return !isInvisiblePhysicalTarget(target) && !isAstralPerceiving;
     }
 
     private static heatLevel(signature: Exclude<ThermographicSignature, 'none'>) {

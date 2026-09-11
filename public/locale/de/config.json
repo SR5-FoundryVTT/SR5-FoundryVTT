@@ -3419,7 +3419,8 @@
                 "Warm": "Warm",
                 "Hot": "Heiß"
             },
-            "ThermographicVision": "Infrarotsicht"
+            "ThermographicVision": "Infrarotsicht",
+            "Ultrasound": "Ultraschall"
         },
         "Walk": "Gehen",
         "WalkingSpeed": "Gehen",

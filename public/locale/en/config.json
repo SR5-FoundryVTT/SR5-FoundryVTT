@@ -3378,7 +3378,8 @@
                 "Warm": "Warm",
                 "Hot": "Hot"
             },
-            "ThermographicVision": "Thermographic Vision"
+            "ThermographicVision": "Thermographic Vision",
+            "Ultrasound": "Ultrasound"
         },
         "Walk": "Walk",
         "WalkingSpeed": "Walking",

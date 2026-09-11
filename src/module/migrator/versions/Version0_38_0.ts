@@ -23,6 +23,7 @@ export class Version0_38_0 extends VersionMigration {
         visibility.targets.astral ??= {};
         visibility.targets.matrix ??= {};
 
+        visibility.targets.physical.active ??= ['character', 'critter', 'vehicle'].includes(actor.type);
         visibility.targets.physical.thermographic ??= visibility.meat?.hasHeat ? 'warm' : 'none';
         visibility.targets.astral.hasAura ??= !!visibility.astral?.hasAura;
         visibility.targets.astral.astralActive ??= !!visibility.astral?.astralActive;

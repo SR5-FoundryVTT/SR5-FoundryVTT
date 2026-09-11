@@ -763,9 +763,11 @@ ___________________
 
     static configureVision() {
         //register detection modes
+        VisionConfigurator.configurePhysicalSight()
         VisionConfigurator.configureAstralPerception()
         VisionConfigurator.configureThermographicVision()
         VisionConfigurator.configureLowlight()
+        VisionConfigurator.configureUltrasound()
         VisionConfigurator.configureAR()
     }
 

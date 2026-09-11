@@ -22,6 +22,7 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(ic.system.visibilityChecks.targets.astral.hasAura, false);
             assert.strictEqual(ic.system.visibilityChecks.targets.astral.astralActive, false);
             assert.strictEqual(ic.system.visibilityChecks.targets.astral.affectedBySpell, false);
+            assert.strictEqual(ic.system.visibilityChecks.targets.physical.active, false);
             assert.strictEqual(ic.system.visibilityChecks.targets.physical.thermographic, 'none');
             assert.strictEqual(ic.system.visibilityChecks.targets.matrix.hasIcon, true);
             assert.strictEqual(ic.system.visibilityChecks.targets.matrix.runningSilent, false);

@@ -54,6 +54,7 @@ import AstralPerceptionDetectionMode from "../vision/astralPerception/astralPerc
 import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDetectionMode";
 import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
+import UltrasoundDetectionMode from '../vision/ultrasoundVision/ultrasoundDetectionMode';
 import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
 
@@ -121,6 +122,7 @@ declare module "fvtt-types/configuration" {
             astralPerception: AstralPerceptionDetectionMode;
             thermographic: ThermographicVisionDetectionMode;
             lowlight: LowlightVisionDetectionMode;
+            ultrasound: UltrasoundDetectionMode;
             augmentedReality: AugmentedRealityVisionDetectionMode;
         }
 

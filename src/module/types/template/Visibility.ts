@@ -19,6 +19,7 @@ export interface PerceptionCapabilities {
 
 export interface PerceptionTargets {
     physical: {
+        active: boolean;
         thermographic: ThermographicSignature;
     };
     astral: {
@@ -49,6 +50,7 @@ export const VisibilityChecks = (...spaces: (Shadowrun.SpaceTypes | 'astralActiv
     }),
     targets: new SchemaField({
         physical: new SchemaField({
+            active: new BooleanField({ initial: spaces.includes('meatspace') }),
             thermographic: new StringField({
                 required: true,
                 initial: spaces.includes('meatspace') ? 'warm' : 'none',

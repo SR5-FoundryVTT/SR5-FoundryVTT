@@ -2,22 +2,20 @@
 //todo: v10 foundry-vtt-types 
 
 import LowLightVisionFilter from "./lowlightFilter";
+import { PhysicalSightDetectionMode } from '@/module/vision/physicalVision/physicalDetectionMode';
 
-export default class LowlightVisionDetectionMode extends foundry.canvas.perception.DetectionMode {
+export default class LowlightVisionDetectionMode extends PhysicalSightDetectionMode {
 
     static override getDetectionFilter() {
         return this._detectionFilter ??= LowLightVisionFilter.create();
     }
 
     override _canDetect(
-        ...[visionSource, target]: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>
+        ...args: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>
     ) {
-        const tgt = target?.document instanceof TokenDocument ? target.document : null;
-        const targetIsVisible = !tgt?.actor?.statuses.has(CONFIG.specialStatusEffects.INVISIBLE);
-
+        const [visionSource] = args;
         const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
 
-        return targetIsVisible && !isAstralPerceiving;
+        return !isAstralPerceiving && super._canDetect(...args);
     }
 }
-  

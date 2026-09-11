@@ -1,7 +1,8 @@
-import { FLAGS, SYSTEM_NAME } from '@/module/constants';
+import { FLAGS, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from '@/module/constants';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SR5Item } from '@/module/item/SR5Item';
 import { PerceptionResolver } from './PerceptionResolver';
+import { ULTRASOUND_RANGE_METERS } from './ultrasoundVision/ultrasoundDetectionMode';
 
 type RefreshDocument = SR5Actor | SR5Item | ActiveEffect | TokenDocument;
 
@@ -31,18 +32,29 @@ export class PerceptionFlow {
         detectionModes: Record<string, { enabled: boolean; range: number | null }>,
         capabilities: ReturnType<typeof PerceptionResolver.resolve>['capabilities'],
         range: number,
+        sceneUnit = 'm',
     ) {
         const next = foundry.utils.deepClone(detectionModes);
         const managed = {
-            lowlight: capabilities.physical.lowLight,
-            thermographic: capabilities.physical.thermographic,
+            lowlight: { enabled: capabilities.physical.lowLight, range },
+            thermographic: { enabled: capabilities.physical.thermographic, range },
+            ultrasound: {
+                enabled: capabilities.physical.ultrasound,
+                range: this.metersToSceneUnits(ULTRASOUND_RANGE_METERS, sceneUnit),
+            },
         };
 
-        for (const [id, enabled] of Object.entries(managed)) {
-            if (enabled) next[id] = { enabled: true, range };
+        for (const [id, sense] of Object.entries(managed)) {
+            if (sense.enabled) next[id] = { enabled: true, range: sense.range };
             else delete next[id];
         }
         return next;
+    }
+
+    static metersToSceneUnits(meters: number, sceneUnit: string) {
+        const normalizedUnit = sceneUnit.trim().toLowerCase() as keyof typeof LENGTH_UNIT_TO_METERS_MULTIPLIERS;
+        const multiplier = LENGTH_UNIT_TO_METERS_MULTIPLIERS[normalizedUnit];
+        return multiplier ? meters / multiplier : meters;
     }
 
     private static worldSettingEnabled() {
@@ -75,7 +87,12 @@ export class PerceptionFlow {
             const state = PerceptionResolver.resolve(token.actor);
             const source = token.toObject();
             const range = Math.max(token.sight.range ?? 0, 10000);
-            const detectionModes = this.reconcileDetectionModes(source.detectionModes, state.capabilities, range);
+            const detectionModes = this.reconcileDetectionModes(
+                source.detectionModes,
+                state.capabilities,
+                range,
+                token.parent?.grid.units,
+            );
             token.updateSource({ detectionModes });
 
             if (token.parent === canvas.scene) {

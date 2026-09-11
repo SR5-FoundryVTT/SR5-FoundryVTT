@@ -3378,7 +3378,8 @@
                 "Warm": "온열",
                 "Hot": "고온"
             },
-            "ThermographicVision": "열화상 시야"
+            "ThermographicVision": "열화상 시야",
+            "Ultrasound": "초음파"
         },
         "Walk": "걷기",
         "WalkingSpeed": "걷기",

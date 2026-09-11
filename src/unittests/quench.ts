@@ -39,6 +39,7 @@ import { Quench, QuenchRegisterBatchFunction, QuenchRegisterBatchOptions } from 
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
 import { shadowrunMatrixDamageResist } from '@/unittests/sr5.MatrixDamageResist.spec';
 import { shadowrunVisionFoundation } from '@/unittests/sr5.VisionFoundation.spec';
+import { shadowrunVisionPhysical } from '@/unittests/sr5.VisionPhysical.spec';
 
 const QUENCH_TIMEOUT_MS = 5000;
 
@@ -74,6 +75,9 @@ export const quenchRegister = (quench: Quench) => {
     });
     registerBatch(quench, 'shadowrun5e.vision.foundation', shadowrunVisionFoundation, {
         displayName: 'SHADOWRUN5e: Vision Foundation',
+    });
+    registerBatch(quench, 'shadowrun5e.vision.physical', shadowrunVisionPhysical, {
+        displayName: 'SHADOWRUN5e: Physical Vision',
     });
     registerBatch(quench, 'shadowrun5e.apps.matrix_opposed_device_dialog', shadowrunMatrixOpposedDeviceDialog, {
         displayName: 'SHADOWRUN5e: Matrix Opposed Device Dialog Test',
