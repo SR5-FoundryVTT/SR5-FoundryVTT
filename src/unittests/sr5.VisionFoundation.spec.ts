@@ -146,5 +146,26 @@ export const shadowrunVisionFoundation = (context: QuenchBatchContext) => {
             assert.isFalse(PerceptionFlow.isRefreshEnabled(optedOut, true));
             assert.isFalse(PerceptionFlow.isRefreshEnabled(automatic, false));
         });
+
+        it('reconciles derived senses when a scene is loaded', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: { metatype: 'elf' },
+            });
+            const scene = await factory.createScene({});
+            const [token] = await scene.createEmbeddedDocuments('Token', [
+                {
+                    actorId: actor.id,
+                    actorLink: true,
+                    sight: { enabled: true, range: 30 },
+                },
+            ]);
+
+            token.updateSource({ detectionModes: {} });
+            PerceptionFlow.refreshScene(scene);
+
+            assert.isTrue(token.detectionModes.lowlight.enabled);
+            assert.strictEqual(token.detectionModes.lowlight.range, 10000);
+        });
     });
 };

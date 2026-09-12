@@ -197,6 +197,16 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             assert.isUndefined(ThermographicVisionDetectionMode.getDetectionFilter());
         });
 
+        it('uses a pulsing gray wave outline for ultrasound targets', () => {
+            const filter = UltrasoundDetectionMode.getDetectionFilter() as any;
+
+            assert.instanceOf(filter, foundry.canvas.rendering.filters.OutlineOverlayFilter);
+            assert.deepEqual(Array.from(filter.uniforms.outlineColor), [0.75, 0.75, 0.75, 1]);
+            assert.isTrue(filter.uniforms.knockout);
+            assert.isTrue(filter.uniforms.wave);
+            assert.isTrue(filter.animated);
+        });
+
         it('prevents every physical mode from detecting a purely astral form', () => {
             const astralTarget = target(false, false, 'hot');
             const modes = [
