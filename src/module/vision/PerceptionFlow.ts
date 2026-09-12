@@ -16,6 +16,18 @@ export class PerceptionFlow {
             Hooks.on(`update${documentName}`, (document: RefreshDocument) => this.schedule(document));
             Hooks.on(`delete${documentName}`, (document: RefreshDocument) => this.schedule(document));
         }
+        Hooks.on('canvasReady', (canvas) => this.refreshScene(canvas.scene));
+    }
+
+    /** Reconcile derived senses after loading or switching scenes. */
+    static refreshScene(scene: Scene | null | undefined) {
+        if (!scene) return;
+        let refreshCanvas = false;
+        for (const token of scene.tokens) {
+            const tokenRefreshed = this.refreshTokenSource(token);
+            refreshCanvas = tokenRefreshed || refreshCanvas;
+        }
+        if (refreshCanvas) canvas.perception.update({ refreshVision: true, refreshLighting: true });
     }
 
     static schedule(document: RefreshDocument) {
