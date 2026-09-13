@@ -900,6 +900,49 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.subCategory, 'rotorcraft');
         });
 
+        it('migrates vehicle subCategory using icon evaluation for Bikes and Construction', () => {
+            const migrator = new Version0_38_0();
+            const bikeActor: any = {
+                type: 'vehicle',
+                system: {
+                    subCategory: '',
+                    importFlags: {
+                        category: 'Bikes',
+                    },
+                },
+            };
+            migrator.migrateActor(bikeActor);
+            assert.strictEqual(bikeActor.system.subCategory, 'motorcycle');
+
+            const constructionActor: any = {
+                type: 'vehicle',
+                flags: {
+                    shadowrun5e: {
+                        importFlags: {
+                            category: 'Municipal & Construction',
+                        },
+                    },
+                },
+                system: {
+                    subCategory: '',
+                },
+            };
+            migrator.migrateActor(constructionActor);
+            assert.strictEqual(constructionActor.system.subCategory, 'heavy_equipment');
+
+            const missileDroneActor: any = {
+                type: 'vehicle',
+                system: {
+                    subCategory: '',
+                    importFlags: {
+                        category: 'Drones: Missile',
+                    },
+                },
+            };
+            migrator.migrateActor(missileDroneActor);
+            assert.strictEqual(missileDroneActor.system.subCategory, 'missile_drone');
+        });
+
         it('migrates legacy isSwarm and swarmCount properties to system.swarm schema', () => {
             const migrator = new Version0_38_0();
             const actor: any = {

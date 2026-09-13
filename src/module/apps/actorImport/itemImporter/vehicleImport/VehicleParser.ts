@@ -37,7 +37,7 @@ export function parseVehicleSubCategory(input: string): string {
     if (lower.includes('large') && (lower.includes('drone') || lower.includes('drones'))) return 'large_drone';
     if (lower.includes('huge') && (lower.includes('drone') || lower.includes('drones'))) return 'huge_drone';
     if ((lower.includes('anthro') || lower.includes('humanoid')) && (lower.includes('drone') || lower.includes('drones'))) return 'anthro_drone';
-    if (lower.includes('missile') && (lower.includes('drone') || lower.includes('drones'))) return 'missile_drone';
+    if ((lower.includes('missile') && (lower.includes('drone') || lower.includes('drones'))) || lower.includes('ammo/missile') || lower.includes('drones-missile')) return 'missile_drone';
 
     if (lower.includes('drone/micro') || lower.includes('drones-micro')) return 'micro_drone';
     if (lower.includes('drone/mini') || lower.includes('drones-mini')) return 'mini_drone';
@@ -48,7 +48,7 @@ export function parseVehicleSubCategory(input: string): string {
     if (lower.includes('drone/anthro') || lower.includes('drones-anthro')) return 'anthro_drone';
 
     // Vehicles (including icon paths, English/German Chummer categories, image filenames, name keywords)
-    if (lower.includes('motorcycle') || lower.includes('bikes') || lower.includes('bike') || lower.includes('motorrad') || lower.includes('vehicle/bike') || lower.includes('scooter') || lower.includes('chopper')) return 'motorcycle';
+    if (lower.includes('motorcycle') || lower.includes('bikes') || lower.includes('bike') || lower.includes('motorrad') || lower.includes('vehicle/bike') || lower.includes('scooter') || lower.includes('scoot') || lower.includes('chopper') || lower.includes('moped')) return 'motorcycle';
     if (lower.includes('car') || lower.includes('auto') || lower.includes('pkw') || lower.includes('vehicle/car') || lower.includes('sedan') || lower.includes('coupe') || lower.includes('automobile')) return 'car';
     if (lower.includes('truck') || lower.includes('lkw') || lower.includes('transporter') || lower.includes('vehicle/truck') || lower.includes('pickup') || lower.includes('van')) return 'truck';
     if (lower.includes('boat') || lower.includes('schiff') || lower.includes('ship') || lower.includes('boot') || lower.includes('vehicle/boat') || lower.includes('yacht') || lower.includes('vessel')) return 'boat';

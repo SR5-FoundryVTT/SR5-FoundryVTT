@@ -1,9 +1,24 @@
+import { SR5 } from '@/module/config';
 import { VersionMigration } from '../VersionMigration';
 import { parseVehicleSubCategory } from '@/module/apps/actorImport/itemImporter/vehicleImport/VehicleParser';
 
 /**
+ * Helper to check how IconAssign evaluates a vehicle category to an icon path override.
+ */
+function evaluateVehicleIconCategory(category: string): string {
+    if (!category || typeof category !== 'string') return '';
+    const slug = category
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    return (SR5.itemCategoryIconOverrides?.vehicle as Record<string, string> | undefined)?.[slug] ?? '';
+}
+
+/**
  * Migration 0.38.0:
- * - Migrate vehicle subCategory from Chummer importFlags category, category, img, or name.
+ * - Migrate vehicle subCategory from Chummer importFlags category, evaluated icon override, img, or name.
  * - Migrate legacy isSwarm / swarmCount properties to system.swarm schema object.
  */
 export class Version0_38_0 extends VersionMigration {
@@ -18,12 +33,25 @@ export class Version0_38_0 extends VersionMigration {
         // Populate subCategory if empty or if generic/default value needs refinement
         const isGenericSubCategory = !system.subCategory || system.subCategory === 'aircraft' || (system.subCategory === 'medium_drone' && !system.isDrone);
         if (isGenericSubCategory) {
+            const importFlags = system.importFlags ?? actor.flags?.shadowrun5e?.importFlags;
+            const importCategory = typeof importFlags?.category === 'string' ? importFlags.category : '';
+            const evaluatedImportIcon = evaluateVehicleIconCategory(importCategory);
+
+            const fallbackDroneCategory = system.isDrone && typeof system.category === 'string'
+                ? `drones-${system.category.trim()}`
+                : '';
+            const evaluatedDroneIcon = evaluateVehicleIconCategory(fallbackDroneCategory);
+
             const candidates = [
+                evaluatedImportIcon,
+                evaluatedDroneIcon,
+                importCategory,
                 actor.img,
                 actor.prototypeToken?.texture?.src,
+                importFlags?.name,
                 actor.name,
-                system.importFlags?.category,
-                system.isDrone ? system.category : '',
+                system.isDrone && system.category ? `${system.category}_drone` : '',
+                system.vehicleType,
             ];
 
             let bestSubCategory = '';
@@ -69,5 +97,24 @@ export class Version0_38_0 extends VersionMigration {
         if (system.damage?.biofeedback === 'none') {
             system.damage.biofeedback = '';
         }
+    }
+
+    /**
+     * Targeted migration helper: Migrate only vehicle actors in the world.
+     */
+    public async migrateVehicles(): Promise<void> {
+        let count = 0;
+        for (const actor of game.actors.filter(a => a.type === 'vehicle')) {
+            const data = actor.toObject();
+            this.migrateActor(data);
+            await actor.update(data);
+            count++;
+            console.log(`Migrated vehicle "${actor.name}" (${actor.id}) -> subCategory: "${actor.system.subCategory}"`);
+        }
+        ui.notifications.info(`Migrated ${count} vehicle actor(s).`);
+    }
+
+    public static async migrateVehicles(): Promise<void> {
+        return new Version0_38_0().migrateVehicles();
     }
 }

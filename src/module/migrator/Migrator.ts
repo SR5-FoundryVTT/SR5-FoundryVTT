@@ -395,24 +395,6 @@ export class Migrator {
     }
 
     /**
-     * Targeted migration helper: Migrate only vehicle actors in the world.
-     */
-    public static async migrateVehicles() {
-        let count = 0;
-        for (const actor of game.actors.filter(a => a.type === 'vehicle')) {
-            const data = actor.toObject();
-            data._stats.systemVersion = '0.37.0';
-            const migrated = this.migrate('Actor', data);
-            if (migrated) {
-                await actor.update(data);
-                count++;
-                console.log(`Migrated vehicle "${actor.name}" (${actor.id}) -> subCategory: "${actor.system.subCategory}"`);
-            }
-        }
-        ui.notifications.info(`Migrated ${count} vehicle actor(s).`);
-    }
-
-    /**
      * compare two version numbers
      * @return 1 if v1 > v2, -1 if v1 < v2, 0 if equal
      */
