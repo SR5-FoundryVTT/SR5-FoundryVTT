@@ -43,6 +43,7 @@ import { shadowrunVisionPhysical } from '@/unittests/sr5.VisionPhysical.spec';
 import { shadowrunVisionAstralPerception } from '@/unittests/sr5.VisionAstralPerception.spec';
 import { shadowrunVisionProjection } from '@/unittests/sr5.VisionProjection.spec';
 import { shadowrunVisionAstralRegions } from '@/unittests/sr5.VisionAstralRegions.spec';
+import { shadowrunVisionEnvironmentalRegions } from '@/unittests/sr5.VisionEnvironmentalRegions.spec';
 
 const QUENCH_TIMEOUT_MS = 5000;
 
@@ -90,6 +91,9 @@ export const quenchRegister = (quench: Quench) => {
     });
     registerBatch(quench, 'shadowrun5e.vision.astral_regions', shadowrunVisionAstralRegions, {
         displayName: 'SHADOWRUN5e: Astral Regions',
+    });
+    registerBatch(quench, 'shadowrun5e.vision.environmental_regions', shadowrunVisionEnvironmentalRegions, {
+        displayName: 'SHADOWRUN5e: Environmental Regions',
     });
     registerBatch(quench, 'shadowrun5e.apps.matrix_opposed_device_dialog', shadowrunMatrixOpposedDeviceDialog, {
         displayName: 'SHADOWRUN5e: Matrix Opposed Device Dialog Test',

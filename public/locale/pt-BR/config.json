@@ -2151,6 +2151,42 @@
                 "AllowedActors": "Atores permitidos",
                 "AllowedActorsHint": "O criador da barreira e quem ele deixar passar. Esses atores ignoram a barreira tanto para visão quanto para movimento."
             },
+            "EnvironmentalRegions": {
+                "Environment": {
+                    "Label": "Ambiente SR5"
+                },
+                "Level": {
+                    "None": "Nenhum",
+                    "Light": "Leve",
+                    "Moderate": "Moderado",
+                    "Heavy": "Pesado"
+                },
+                "BackgroundCount": {
+                    "Label": "Contagem de fundo",
+                    "Hint": "O maior índice entre Regiões sobrepostas se aplica a ações mágicas.",
+                    "Contribution": "Contagem de fundo regional"
+                },
+                "MatrixNoise": {
+                    "Label": "Ruído da Matrix",
+                    "Hint": "Os índices de Regiões sobrepostas são somados.",
+                    "Contribution": "Ruído da Matrix regional"
+                },
+                "Visibility": {
+                    "Label": "Visibilidade",
+                    "Hint": "Condição de visibilidade dentro desta Região.",
+                    "Contribution": "Visibilidade regional"
+                },
+                "Light": {
+                    "Label": "Luz / Ofuscamento",
+                    "Hint": "Condição de luz ou ofuscamento dentro desta Região.",
+                    "Contribution": "Luz / ofuscamento regional"
+                },
+                "Wind": {
+                    "Label": "Vento",
+                    "Hint": "Condição de vento dentro desta Região.",
+                    "Contribution": "Vento regional"
+                }
+            },
             "CannotPerceiveAstrally": "Este ator não pode usar percepção astral.",
             "ToggleAstralPerception": "Alternar Percepção Astral",
             "BeginAstralProjection": "Iniciar Projeção Astral",

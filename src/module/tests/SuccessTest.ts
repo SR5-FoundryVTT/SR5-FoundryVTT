@@ -106,6 +106,8 @@ export interface TestData {
     // Documents the test might has been derived from.
     sourceItemUuid?: string
     sourceActorUuid?: string
+    /** Placed token that originated this test, used for transient Region modifiers. */
+    sourceTokenUuid?: string
     
     // The document test values have been taken from. This can be both actor and item.
     sourceUuid?: string
@@ -269,6 +271,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Store given document uuids to be fetched during evaluation.
         prepared.sourceActorUuid ||= this.actor?.uuid ?? undefined;
+        prepared.sourceTokenUuid ||= this.actor?.getToken()?.uuid ?? undefined;
         prepared.sourceItemUuid ||= this.item?.uuid ?? undefined;
         prepared.sourceUuid ||= this.source?.uuid ?? undefined;
 
@@ -301,6 +304,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get title(): string {
         return `${game.i18n.localize(this.constructor.label)}`;
+    }
+
+    /** The placed token captured when this test was created. */
+    get sourceToken(): TokenDocument | null {
+        if (!this.data.sourceTokenUuid) return null;
+        const document = fromUuidSync(this.data.sourceTokenUuid as any);
+        return document instanceof TokenDocument ? document : null;
     }
 
     /**

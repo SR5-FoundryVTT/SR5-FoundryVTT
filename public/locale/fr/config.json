@@ -1551,6 +1551,42 @@
                 "AllowedActors": "Acteurs autorisés",
                 "AllowedActorsHint": "Le créateur de la barrière et ceux qu'il laisse passer. Ces acteurs ignorent la barrière pour la vision et le déplacement."
             },
+            "EnvironmentalRegions": {
+                "Environment": {
+                    "Label": "Environnement SR5"
+                },
+                "Level": {
+                    "None": "Aucun",
+                    "Light": "Léger",
+                    "Moderate": "Modéré",
+                    "Heavy": "Fort"
+                },
+                "BackgroundCount": {
+                    "Label": "Indice de perturbation astrale",
+                    "Hint": "L’indice le plus élevé des régions superposées s’applique aux actions magiques.",
+                    "Contribution": "Perturbation astrale régionale"
+                },
+                "MatrixNoise": {
+                    "Label": "Bruit matriciel",
+                    "Hint": "Les indices des régions superposées s’additionnent.",
+                    "Contribution": "Bruit matriciel régional"
+                },
+                "Visibility": {
+                    "Label": "Visibilité",
+                    "Hint": "Conditions de visibilité dans cette région.",
+                    "Contribution": "Visibilité régionale"
+                },
+                "Light": {
+                    "Label": "Lumière / Éblouissement",
+                    "Hint": "Conditions de lumière ou d’éblouissement dans cette région.",
+                    "Contribution": "Lumière / éblouissement régional"
+                },
+                "Wind": {
+                    "Label": "Vent",
+                    "Hint": "Conditions de vent dans cette région.",
+                    "Contribution": "Vent régional"
+                }
+            },
             "CannotPerceiveAstrally": "Cet acteur ne peut pas utiliser la perception astrale.",
             "ToggleAstralPerception": "Activer/désactiver la perception astrale",
             "BeginAstralProjection": "Commencer la projection astrale",

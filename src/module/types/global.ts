@@ -60,6 +60,7 @@ import type {
     AstralBarrierRegionBehavior,
     AstralWardRegionBehavior,
 } from '../vision/astralRegions/AstralRegionBehavior';
+import type { EnvironmentalRegionBehavior } from '../vision/environmentalRegions/EnvironmentalRegionBehavior';
 import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
 
@@ -164,6 +165,7 @@ declare module "fvtt-types/configuration" {
         RegionBehavior: {
             'shadowrun5e.astralBarrier': typeof AstralBarrierRegionBehavior;
             'shadowrun5e.astralWard': typeof AstralWardRegionBehavior;
+            'shadowrun5e.environment': typeof EnvironmentalRegionBehavior;
         };
         Item: {
             action: typeof Action;

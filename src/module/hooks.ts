@@ -148,6 +148,8 @@ import { AstralProjectionFlow } from './vision/astralProjection/AstralProjection
 import { ActorRollDataFlow } from './actor/flows/ActorRollDataFlow';
 import { AstralRegionFlow } from './vision/astralRegions/AstralRegionFlow';
 import { registerAstralRegionBehaviors } from './vision/astralRegions/AstralRegionBehavior';
+import { EnvironmentalRegionFlow } from './vision/environmentalRegions/EnvironmentalRegionFlow';
+import { registerEnvironmentalRegionBehaviors } from './vision/environmentalRegions/EnvironmentalRegionBehavior';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -195,6 +197,7 @@ export class HooksManager {
         AstralProjectionFlow.registerHooks();
         ActorRollDataFlow.registerHooks();
         AstralRegionFlow.registerHooks();
+        EnvironmentalRegionFlow.registerHooks();
 
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();
@@ -446,6 +449,7 @@ ___________________
         CONFIG.Combatant.dataModels["base"] = CombatantDM;
 
         registerAstralRegionBehaviors();
+        registerEnvironmentalRegionBehaviors();
 
         CONFIG.Item.dataModels["action"] = Action;
         CONFIG.Item.dataModels["ammo"] = Ammo;

@@ -3407,6 +3407,42 @@
                 "ForcePenalty": "아스트랄 장벽 위력",
                 "AllowedActors": "허용된 액터",
                 "AllowedActorsHint": "장벽의 생성자와 그가 통과를 허락한 대상입니다. 이 액터들은 시야와 이동 모두에서 이 장벽을 무시합니다."
+            },
+            "EnvironmentalRegions": {
+                "Environment": {
+                    "Label": "SR5 환경"
+                },
+                "Level": {
+                    "None": "없음",
+                    "Light": "약함",
+                    "Moderate": "보통",
+                    "Heavy": "심함"
+                },
+                "BackgroundCount": {
+                    "Label": "배경 마나",
+                    "Hint": "겹치는 지역 중 가장 높은 등급이 마법 행동에 적용됩니다.",
+                    "Contribution": "지역 배경 마나"
+                },
+                "MatrixNoise": {
+                    "Label": "매트릭스 노이즈",
+                    "Hint": "겹치는 지역의 등급을 합산합니다.",
+                    "Contribution": "지역 매트릭스 노이즈"
+                },
+                "Visibility": {
+                    "Label": "시야",
+                    "Hint": "이 지역 안의 시야 상태입니다.",
+                    "Contribution": "지역 시야"
+                },
+                "Light": {
+                    "Label": "조명 / 눈부심",
+                    "Hint": "이 지역 안의 조명 또는 눈부심 상태입니다.",
+                    "Contribution": "지역 조명 / 눈부심"
+                },
+                "Wind": {
+                    "Label": "바람",
+                    "Hint": "이 지역 안의 바람 상태입니다.",
+                    "Contribution": "지역 바람"
+                }
             }
         },
         "Walk": "걷기",

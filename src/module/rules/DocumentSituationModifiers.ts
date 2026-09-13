@@ -9,6 +9,10 @@ import {FLAGS, SYSTEM_NAME} from "../constants";
 import SituationModifiersSourceData = Shadowrun.SituationModifiersSourceData;
 import SituationModifiersData = Shadowrun.SituationModifiersData;
 import { DefenseModifier } from './modifiers/DefenseModifier';
+import {
+    EnvironmentalRegionFlow,
+    type EnvironmentalRegionRatings,
+} from '../vision/environmentalRegions/EnvironmentalRegionFlow';
 
 
 interface DocumentSituationModifiersTotalForOptions {
@@ -79,6 +83,10 @@ export type ModifiableDocumentTypes = SR5Actor | Scene;
 export class DocumentSituationModifiers {
     // A reference to the original document holding modifier source data.
     document: ModifiableDocumentTypes | undefined;
+    /** Placed token given to measure Region ratings at. Without one, an actor's current token is used. */
+    sourceToken: TokenDocument | null;
+    /** Region ratings, kept separate from persisted scene and actor selections. */
+    regional: EnvironmentalRegionRatings;
     // The source data stored on the document.
     source: SituationModifiersSourceData;
     // The applied data from the document and it's apply chain.
@@ -98,7 +106,11 @@ export class DocumentSituationModifiers {
      * @param data situational modifiers taken from a Document.
      * @param document The source document used to retrieve data.
      */
-    constructor(data?: SituationModifiersSourceData, document?: ModifiableDocumentTypes) {
+    constructor(
+        data?: SituationModifiersSourceData,
+        document?: ModifiableDocumentTypes,
+        sourceToken?: TokenDocument | null,
+    ) {
         // Fail gracefully for no modifiers given.
         // This can happen as Foundry returns empty objects for no flags set.
         if (!data || foundry.utils.getType(data) !== 'Object') {
@@ -107,6 +119,8 @@ export class DocumentSituationModifiers {
 
         this.source = this. _completeSourceData(data);
         this.document = document;
+        this.sourceToken = sourceToken ?? null;
+        this.regional = EnvironmentalRegionFlow.ratingsAtToken(this.regionalToken);
 
         // Map all modifier types to their respectiv implementation.
         this._prepareModifiers();
@@ -196,7 +210,9 @@ export class DocumentSituationModifiers {
     getTotalFor(category: keyof SituationModifiersSourceData|string, options:DocumentSituationModifiersTotalForOptions={}): number {
         const modifier = this._modifiers[category];
 
-        if (options.reapply || options.applicable) {
+        const regionalChanged = this.refreshRegional();
+
+        if (options.reapply || options.applicable || regionalChanged) {
             modifier.apply({applicable: options.applicable, test: options.test})
         }
 
@@ -216,6 +232,7 @@ export class DocumentSituationModifiers {
      *                 The source property will be overriden.
      */
     applyAll(options: SituationalModifierApplyOptions={}) {
+        this.refreshRegional();
         //@ts-expect-error // Rebuild applied data fully for all modifiers.
         this.applied = {};
 
@@ -268,8 +285,12 @@ export class DocumentSituationModifiers {
      * @param category Modifiers category to clear
      * @returns A new instance with the resulting modifiers structure
      */
-    static async clearTypeOn(document: ModifiableDocumentTypes, category: keyof SituationModifiersSourceData): Promise<DocumentSituationModifiers> {
-        const modifiers = DocumentSituationModifiers.getDocumentModifiers(document);
+    static async clearTypeOn(
+        document: ModifiableDocumentTypes,
+        category: keyof SituationModifiersSourceData,
+        sourceToken?: TokenDocument | null,
+    ): Promise<DocumentSituationModifiers> {
+        const modifiers = DocumentSituationModifiers.getDocumentModifiers(document, sourceToken);
 
         if (!Object.hasOwn(modifiers.source, category)) return modifiers;
         modifiers.source[category] = DocumentSituationModifiers._defaultModifier;
@@ -331,11 +352,11 @@ export class DocumentSituationModifiers {
      * 
      * @param document The document containing modifiers or implementing a custom modifier retrieval system.
      */
-    static fromDocument(document: ModifiableDocumentTypes): DocumentSituationModifiers {
+    static fromDocument(document: ModifiableDocumentTypes, sourceToken?: TokenDocument | null): DocumentSituationModifiers {
         // Actor targets might have no personal modifiers, but still see the scene modifiers then, and use those
         // as a template for their local modifiers.
         if (document instanceof SR5Actor) {
-            return document.getSituationModifiers();
+            return document.getSituationModifiers(sourceToken);
         }
         // All other types are handled without special cases.
         return DocumentSituationModifiers.getDocumentModifiers(document);
@@ -347,9 +368,50 @@ export class DocumentSituationModifiers {
      * @param document Any document that may contain situational modifiers.
      * @returns A full set of situational modifiers.
      */
-    static getDocumentModifiers(document: ModifiableDocumentTypes): DocumentSituationModifiers {
+    static getDocumentModifiers(
+        document: ModifiableDocumentTypes,
+        sourceToken?: TokenDocument | null,
+    ): DocumentSituationModifiers {
         const data = DocumentSituationModifiers.getDocumentModifiersData(document);
-        return new DocumentSituationModifiers(data, document);
+        return new DocumentSituationModifiers(data, document, sourceToken);
+    }
+
+    /**
+     * The token Region ratings are measured at.
+     *
+     * A token given on creation always wins, so a HUD or dialog opened for one token keeps showing
+     * that token even when the actor has others.
+     */
+    get regionalToken(): TokenDocument | null {
+        if (this.sourceToken) return this.sourceToken;
+        return this.document instanceof SR5Actor ? this.document.getToken() : null;
+    }
+
+    /**
+     * Measure Region ratings again, as the token or the Regions might have changed since.
+     *
+     * @returns true, when ratings changed.
+     */
+    refreshRegional(): boolean {
+        const regional = EnvironmentalRegionFlow.ratingsAtToken(this.regionalToken);
+        const changed = regional.backgroundCount !== this.regional.backgroundCount
+            || regional.matrixNoise !== this.regional.matrixNoise
+            || regional.physical.visibility !== this.regional.physical.visibility
+            || regional.physical.light !== this.regional.physical.light
+            || regional.physical.wind !== this.regional.physical.wind;
+        this.regional = regional;
+        return changed;
+    }
+
+    /**
+     * Dice pool modifier of Region ratings for a modifier category.
+     *
+     * Region ratings are stored as positive magnitudes and applied as penalties.
+     */
+    regionalModifierFor(category: string): number {
+        if (category === 'background_count') return -this.regional.backgroundCount;
+        if (category === 'noise') return -this.regional.matrixNoise;
+        return 0;
     }
 
     /**

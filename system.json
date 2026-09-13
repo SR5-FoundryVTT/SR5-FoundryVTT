@@ -127,7 +127,8 @@
         },
         "RegionBehavior": {
             "shadowrun5e.astralBarrier": {},
-            "shadowrun5e.astralWard": {}
+            "shadowrun5e.astralWard": {},
+            "shadowrun5e.environment": {}
         }
     },
     "scripts": [],

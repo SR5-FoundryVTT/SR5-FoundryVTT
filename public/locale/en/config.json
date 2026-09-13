@@ -3407,6 +3407,42 @@
                 "ForcePenalty": "Astral barrier Force",
                 "AllowedActors": "Allowed actors",
                 "AllowedActorsHint": "The barrier's creator and anyone they let through. These actors ignore this barrier for both sight and movement."
+            },
+            "EnvironmentalRegions": {
+                "Environment": {
+                    "Label": "SR5 Environment"
+                },
+                "Level": {
+                    "None": "None",
+                    "Light": "Light",
+                    "Moderate": "Moderate",
+                    "Heavy": "Heavy"
+                },
+                "BackgroundCount": {
+                    "Label": "Background Count",
+                    "Hint": "Highest overlapping rating applies to magical actions.",
+                    "Contribution": "Regional background count"
+                },
+                "MatrixNoise": {
+                    "Label": "Matrix Noise",
+                    "Hint": "Ratings from overlapping Regions add together.",
+                    "Contribution": "Regional Matrix noise"
+                },
+                "Visibility": {
+                    "Label": "Visibility",
+                    "Hint": "Visibility condition inside this Region.",
+                    "Contribution": "Regional visibility"
+                },
+                "Light": {
+                    "Label": "Light / Glare",
+                    "Hint": "Light or glare condition inside this Region.",
+                    "Contribution": "Regional light / glare"
+                },
+                "Wind": {
+                    "Label": "Wind",
+                    "Hint": "Wind condition inside this Region.",
+                    "Contribution": "Regional wind"
+                }
             }
         },
         "Walk": "Walk",
