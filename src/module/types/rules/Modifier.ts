@@ -31,7 +31,8 @@ declare namespace Shadowrun {
         'memory'|
         'soak'|
         'wounds' |
-        'recoil'
+        'recoil' |
+        'damage'
 
 
     export type SituationModifierType = keyof SituationModifiersData;

@@ -865,6 +865,7 @@ export const SR5 = {
         soak: 'SR5.ModifierTypes.Soak',
         wounds: 'SR5.ModifierTypes.Wounds',
         recoil: 'SR5.ModifierTypes.Recoil',
+        damage: 'SR5.ModifierTypes.Damage',
     },
 
     /**

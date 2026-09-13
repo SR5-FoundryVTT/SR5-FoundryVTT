@@ -134,9 +134,56 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
      * Rigging related value resolutions based on vehicle mode.
      */
     describe('Rigging Tests', () => {
-        it('Calculate vehicle values for autopilot');
-        it('Calculate vehicle values for rigged in');
-        it('Calculate vehicle values for remote controlled');
+        it('Calculate vehicle values for autopilot', async () => {
+            const vehicle = await factory.createActor({ type: 'vehicle', system: { attributes: { body: { base: 4 } }, vehicle_stats: { pilot: { base: 3 } } } });
+            assert.equal(vehicle.system.vehicle_stats.pilot.value, 3);
+            assert.equal(vehicle.system.controlMode, 'autopilot');
+            assert.equal(vehicle.hasDriver(), false);
+        });
+
+        it('Calculate vehicle values for rigged in', async () => {
+            const driver = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: { logic: { base: 6 }, intuition: { base: 5 } },
+                    skills: { active: { gunnery: { base: 4 }, pilot_ground_craft: { base: 5 } } }
+                }
+            });
+            const vehicle = await factory.createActor({ type: 'vehicle', system: { vehicle_stats: { pilot: { base: 2 } } } });
+            const { RiggerFlow } = await import('@/module/flows/RiggerFlow');
+
+            await RiggerFlow.jumpIn(driver, vehicle);
+
+            assert.equal(vehicle.system.controlMode, 'rigger');
+            assert.equal(vehicle.getVehicleDriver()?.uuid, driver.uuid);
+
+            const jumpedEffect = vehicle.effects.find(e => (e.flags as any)?.shadowrun5e?.isJumpedInEffect === true);
+            assert.notEqual(jumpedEffect, undefined);
+
+            const logicChange = (jumpedEffect?.system as any)?.changes?.find((c: any) => c.key === 'system.attributes.logic.value');
+            assert.equal(logicChange?.value, '6');
+            assert.equal(logicChange?.type, 'upgrade');
+
+            await RiggerFlow.jumpOut(driver, vehicle);
+            assert.equal(vehicle.system.controlMode, 'autopilot');
+        });
+
+        it('Calculate vehicle values for remote controlled', async () => {
+            const driver = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: { agility: { base: 4 } },
+                    skills: { active: { gunnery: { base: 3 } } }
+                }
+            });
+            const vehicle = await factory.createActor({ type: 'vehicle', system: { vehicle_stats: { pilot: { base: 2 } } } });
+            await vehicle.addVehicleDriver(driver.uuid);
+            await vehicle.update({ 'system.controlMode': 'manual' } as any);
+
+            assert.equal(vehicle.hasDriver(), true);
+            assert.equal(vehicle.getVehicleDriver()?.uuid, driver.uuid);
+            assert.equal(vehicle.system.controlMode, 'manual');
+        });
     });
 
 
