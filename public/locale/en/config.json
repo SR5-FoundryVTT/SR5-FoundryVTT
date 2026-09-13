@@ -70,6 +70,8 @@
         "TokenRulerColorRunningDescription": "The color for distance within running rate.",
         "TokenRulerColorSprinting": "Token Movement Sprinting Color",
         "TokenRulerColorSprintingDescription": "The color for distance above running rate, where sprinting is necessary.",
+        "TokenRulerColorPhaseMarker": "Token Movement Phase Marker Color",
+        "TokenRulerColorPhaseMarkerDescription": "The color of the waypoint that marks the end of an action phase.",
         "TokenRulerColorWalking": "Token Movement Walking Color",
         "TokenRulerColorWalkingDescription": "The color for distance within walking rate.",
         "TokenRulerOpacity": "Token Movement Opacity",

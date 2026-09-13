@@ -347,7 +347,18 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * TokenRuler color: Sprinting
+     * TokenRuler color: Action phase marker
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenRulerColorPhaseMarker, {
+        name: 'SETTINGS.TokenRulerColorPhaseMarker',
+        hint: 'SETTINGS.TokenRulerColorPhaseMarkerDescription',
+        scope: 'world',
+        config: true,
+        type: new foundry.data.fields.ColorField({ initial: 'FFFF00' } as const ),
+    });
+
+    /**
+     * TokenRuler opacity
      */
     game.settings.register(SYSTEM_NAME, FLAGS.TokenRulerOpacity, {
         name: 'SETTINGS.TokenRulerOpacity',
@@ -367,7 +378,7 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * Select compendia to use for system porpuses like different action packs
+     * Select compendia to use for system proposes like different action packs
      */
     game.settings.registerMenu(SYSTEM_NAME, FLAGS.CompendiaSettingsMenu, {
         name: 'SR5.CompendiaSettings.Title',

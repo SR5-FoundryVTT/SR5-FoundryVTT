@@ -64,6 +64,8 @@
         "TokenRulerColorRunningDescription": "Die Farbe für Distanzen innerhalb der Laufrate.",
         "TokenRulerColorSprinting": "Token-Bewegung: Farbe für Sprinten",
         "TokenRulerColorSprintingDescription": "Die Farbe für Distanzen außer der Laufrate, wo Sprinten notwendig ist.",
+        "TokenRulerColorPhaseMarker": "Token-Bewegung: Farbe für Phasenmarker",
+        "TokenRulerColorPhaseMarkerDescription": "Die Farbe des Wegpunkts, der das Ende einer Handlungsphase markiert.",
         "TokenRulerColorWalking": "Token-Bewegung: Farbe für Gehrate",
         "TokenRulerColorWalkingDescription": "Die Farbe für Distanzen innerhalb der Gehrate.",
         "TokenRulerOpacity": "Token-Bewegung: Deckkraft",
