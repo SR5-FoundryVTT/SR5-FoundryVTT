@@ -228,6 +228,27 @@ export class SR5CombatTracker extends CombatTracker {
         await actor.setInitiativeMode(mode);
     }
 
+    /**
+     * Handles manual edits of a combatant's initiative input in the tracker.
+     */
+    protected override _onUpdateInitiative(event: Event): void {
+        const input = event.target as HTMLInputElement | null;
+        const combatant = input && this._getCombatant(input);
+        const previousInit = combatant?.initiative ?? null;
+
+        const result: unknown = super._onUpdateInitiative(event);
+        if (!combatant || previousInit === null || !(result instanceof Promise)) return;
+
+        void result.then((updated: unknown) => {
+            if (!(updated instanceof SR5Combatant)) return;
+
+            const currentInit = updated.initiative;
+            if (currentInit !== null && currentInit !== previousInit) {
+                void combatant._postInitiativeChangeCard(previousInit, currentInit);
+            }
+        });
+    }
+
     // ==========================================
     // Utility & DOM Helpers
     // ==========================================
