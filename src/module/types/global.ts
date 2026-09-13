@@ -56,6 +56,10 @@ import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetect
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
 import UltrasoundDetectionMode from '../vision/ultrasoundVision/ultrasoundDetectionMode';
 import type { AstralProjectionState } from '../vision/astralProjection/AstralProjectionFlow';
+import type {
+    AstralBarrierRegionBehavior,
+    AstralWardRegionBehavior,
+} from '../vision/astralRegions/AstralRegionBehavior';
 import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
 
@@ -156,6 +160,10 @@ declare module "fvtt-types/configuration" {
         };
         Combatant: {
             base: typeof CombatantDM;
+        };
+        RegionBehavior: {
+            'shadowrun5e.astralBarrier': typeof AstralBarrierRegionBehavior;
+            'shadowrun5e.astralWard': typeof AstralWardRegionBehavior;
         };
         Item: {
             action: typeof Action;

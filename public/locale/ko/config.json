@@ -3389,7 +3389,25 @@
                 "Hot": "고온"
             },
             "ThermographicVision": "열화상 시야",
-            "Ultrasound": "초음파"
+            "Ultrasound": "초음파",
+            "AstralRegions": {
+                "Barrier": {
+                    "Label": "아스트랄 장벽"
+                },
+                "Ward": {
+                    "Label": "아스트랄 결계"
+                },
+                "BlockSight": "아스트랄 시야 차단",
+                "BlockSightHint": "아스트랄 시야가 이 지역의 경계를 통과하지 못하게 합니다.",
+                "BlockMovement": "아스트랄 이동 차단",
+                "BlockMovementHint": "아스트랄 형태가 이 지역의 경계를 통과하지 못하게 합니다.",
+                "MovementBlocked": "아스트랄 장벽이 이 이동을 막습니다.",
+                "Force": "위력",
+                "ForceHint": "마나 장벽의 위력입니다. 장벽을 통과하는 아스트랄 지각 판정은 이 값만큼 주사위 풀 페널티를 받습니다.",
+                "ForcePenalty": "아스트랄 장벽 위력",
+                "AllowedActors": "허용된 액터",
+                "AllowedActorsHint": "장벽의 생성자와 그가 통과를 허락한 대상입니다. 이 액터들은 시야와 이동 모두에서 이 장벽을 무시합니다."
+            }
         },
         "Walk": "걷기",
         "WalkingSpeed": "걷기",

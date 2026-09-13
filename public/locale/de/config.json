@@ -3391,6 +3391,20 @@
         },
         "Vision": {
             "AstralPerception": "Astrale Wahrnehmung",
+            "AstralRegions": {
+                "Barrier": { "Label": "Astrale Barriere" },
+                "Ward": { "Label": "Astraler Schutzkreis" },
+                "BlockSight": "Astrale Sicht blockieren",
+                "BlockSightHint": "Verhindert, dass astrale Sicht die Grenze dieser Region überschreitet.",
+                "BlockMovement": "Astrale Bewegung blockieren",
+                "BlockMovementHint": "Verhindert, dass astrale Formen die Grenze dieser Region überschreiten.",
+                "MovementBlocked": "Eine astrale Barriere blockiert diese Bewegung.",
+                "Force": "Kraft",
+                "ForceHint": "Die Kraft der Manabarriere. Askennenproben durch sie erhalten einen Würfelpoolmalus in Höhe dieses Werts.",
+                "ForcePenalty": "Kraft der Astralbarriere",
+                "AllowedActors": "Erlaubte Akteure",
+                "AllowedActorsHint": "Der Erschaffer der Barriere und alle, die er durchlässt. Diese Akteure ignorieren die Barriere für Sicht und Bewegung."
+            },
             "CannotPerceiveAstrally": "Dieser Akteur kann keine astrale Wahrnehmung verwenden.",
             "ToggleAstralPerception": "Astrale Wahrnehmung umschalten",
             "BeginAstralProjection": "Astrale Projektion beginnen",

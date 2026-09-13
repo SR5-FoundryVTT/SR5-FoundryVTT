@@ -124,6 +124,10 @@
             "weapon": {
                 "htmlFields": ["description.value"]
             }
+        },
+        "RegionBehavior": {
+            "shadowrun5e.astralBarrier": {},
+            "shadowrun5e.astralWard": {}
         }
     },
     "scripts": [],

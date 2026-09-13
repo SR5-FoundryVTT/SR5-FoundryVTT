@@ -3389,7 +3389,25 @@
                 "Hot": "Hot"
             },
             "ThermographicVision": "Thermographic Vision",
-            "Ultrasound": "Ultrasound"
+            "Ultrasound": "Ultrasound",
+            "AstralRegions": {
+                "Barrier": {
+                    "Label": "Astral Barrier"
+                },
+                "Ward": {
+                    "Label": "Astral Ward"
+                },
+                "BlockSight": "Block astral sight",
+                "BlockSightHint": "Prevent astral sight from crossing this Region's boundary.",
+                "BlockMovement": "Block astral movement",
+                "BlockMovementHint": "Prevent astral forms from crossing this Region's boundary.",
+                "MovementBlocked": "An astral barrier blocks this movement.",
+                "Force": "Force",
+                "ForceHint": "The mana barrier's Force. Assensing tests through it receive a dice-pool penalty equal to this value.",
+                "ForcePenalty": "Astral barrier Force",
+                "AllowedActors": "Allowed actors",
+                "AllowedActorsHint": "The barrier's creator and anyone they let through. These actors ignore this barrier for both sight and movement."
+            }
         },
         "Walk": "Walk",
         "WalkingSpeed": "Walking",

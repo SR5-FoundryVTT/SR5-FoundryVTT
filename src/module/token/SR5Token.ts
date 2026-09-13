@@ -1,6 +1,23 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
+import { AstralRegionFlow } from '@/module/vision/astralRegions/AstralRegionFlow';
 
 export class SR5Token extends foundry.canvas.placeables.Token {
+    /**
+     * Stop astral forms before astral boundaries, so drag previews and executed movement end in front
+     * of them the same way they end in front of walls.
+     */
+    override constrainMovementPath(
+        ...args: Parameters<foundry.canvas.placeables.Token['constrainMovementPath']>
+    ): ReturnType<foundry.canvas.placeables.Token['constrainMovementPath']> {
+        const [path, constrained] = super.constrainMovementPath(...args);
+        if (args[1]?.ignoreWalls) return [path, constrained];
+        // Keep previews wall-like, but let the document pre-movement hook reject executed crossings
+        // in full and notify the acting user.
+        if (!args[1]?.preview) return [path, constrained];
+        const astralPath = AstralRegionFlow.constrainMovementPath(this.document, path as any);
+        return astralPath ? [astralPath as typeof path, true] : [path, constrained];
+    }
+
     override _getVisionBlindedStates() {
         const states = super._getVisionBlindedStates();
         if (this.document.sight.visionMode === 'astralPerception') states.blind = false;

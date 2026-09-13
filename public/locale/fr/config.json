@@ -1537,6 +1537,20 @@
         },
         "Vision": {
             "AstralPerception": "Perception astrale",
+            "AstralRegions": {
+                "Barrier": { "Label": "Barrière astrale" },
+                "Ward": { "Label": "Protection astrale" },
+                "BlockSight": "Bloquer la vision astrale",
+                "BlockSightHint": "Empêche la vision astrale de traverser la limite de cette région.",
+                "BlockMovement": "Bloquer le déplacement astral",
+                "BlockMovementHint": "Empêche les formes astrales de traverser la limite de cette région.",
+                "MovementBlocked": "Une barrière astrale bloque ce déplacement.",
+                "Force": "Puissance",
+                "ForceHint": "La Puissance de la barrière de mana. Les tests d'analyse astrale effectués à travers elle subissent une pénalité de réserve de dés égale à cette valeur.",
+                "ForcePenalty": "Puissance de la barrière astrale",
+                "AllowedActors": "Acteurs autorisés",
+                "AllowedActorsHint": "Le créateur de la barrière et ceux qu'il laisse passer. Ces acteurs ignorent la barrière pour la vision et le déplacement."
+            },
             "CannotPerceiveAstrally": "Cet acteur ne peut pas utiliser la perception astrale.",
             "ToggleAstralPerception": "Activer/désactiver la perception astrale",
             "BeginAstralProjection": "Commencer la projection astrale",

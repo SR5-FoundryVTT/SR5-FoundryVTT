@@ -2137,6 +2137,20 @@
         },
         "Vision": {
             "AstralPerception": "Percepção Astral",
+            "AstralRegions": {
+                "Barrier": { "Label": "Barreira astral" },
+                "Ward": { "Label": "Proteção astral" },
+                "BlockSight": "Bloquear visão astral",
+                "BlockSightHint": "Impede que a visão astral atravesse o limite desta Região.",
+                "BlockMovement": "Bloquear movimento astral",
+                "BlockMovementHint": "Impede que formas astrais atravessem o limite desta Região.",
+                "MovementBlocked": "Uma barreira astral bloqueia este movimento.",
+                "Force": "Força",
+                "ForceHint": "A Força da barreira de mana. Testes de Percepção Astral através dela sofrem uma penalidade na parada de dados igual a este valor.",
+                "ForcePenalty": "Força da barreira astral",
+                "AllowedActors": "Atores permitidos",
+                "AllowedActorsHint": "O criador da barreira e quem ele deixar passar. Esses atores ignoram a barreira tanto para visão quanto para movimento."
+            },
             "CannotPerceiveAstrally": "Este ator não pode usar percepção astral.",
             "ToggleAstralPerception": "Alternar Percepção Astral",
             "BeginAstralProjection": "Iniciar Projeção Astral",

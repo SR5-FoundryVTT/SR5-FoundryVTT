@@ -1,6 +1,7 @@
 
 import AstralVisionFilter from './astralPerceptionFilter';
 import { FLAGS, SYSTEM_NAME } from '@/module/constants';
+import { AstralRegionFlow } from '../astralRegions/AstralRegionFlow';
 
 export default class AstralPerceptionDetectionMode extends foundry.canvas.perception.DetectionMode {
     static override getDetectionFilter() {
@@ -22,5 +23,11 @@ export default class AstralPerceptionDetectionMode extends foundry.canvas.percep
         const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
 
         return (targetHasAura || targetAstralActive || targetAffectedBySpell) && isAstralPerceiving;
+    }
+
+    override _testPoint(...args: Parameters<foundry.canvas.perception.DetectionMode['_testPoint']>) {
+        if (!super._testPoint(...args)) return false;
+        const [visionSource, , target, test] = args;
+        return !AstralRegionFlow.blocksDetection(visionSource, target, test);
     }
 }

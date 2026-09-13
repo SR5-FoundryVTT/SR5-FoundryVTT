@@ -2,6 +2,7 @@ import { DeepReadonly } from "fvtt-types/utils";
 import { SYSTEM_NAME, FLAGS } from "../constants";
 import { StorageFlow } from "@/module/flows/StorageFlow";
 import { AstralProjectionFlow } from '@/module/vision/astralProjection/AstralProjectionFlow';
+import { AstralRegionFlow } from '@/module/vision/astralRegions/AstralRegionFlow';
 
 /**
  * A custom TokenDocument class for the SR5 system.
@@ -38,6 +39,16 @@ export class SR5TokenDocument extends TokenDocument {
         }
 
         return result;
+    }
+
+    protected override async _preUpdateMovement(
+        ...args: Parameters<TokenDocument['_preUpdateMovement']>
+    ) {
+        const allowed = await super._preUpdateMovement(...args);
+        if (allowed === false) return false;
+        if (!AstralRegionFlow.blocksMovement(this, args[0])) return allowed;
+        AstralRegionFlow.notifyBlockedMovement();
+        return false;
     }
 
     /**
