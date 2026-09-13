@@ -80,6 +80,8 @@ export const FLAGS = {
     WorldTimeInitialized: 'WorldTimeInitialized',
     AutomaticTokenSenses: 'AutomaticTokenSenses',
     AstralPerceptionVision: 'astralPerceptionVision',
+    AstralProjection: 'astralProjection',
+    AstralProjectionOperation: 'AstralProjectionOperation',
 } as const;
 export const CORE_NAME = 'core';
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';

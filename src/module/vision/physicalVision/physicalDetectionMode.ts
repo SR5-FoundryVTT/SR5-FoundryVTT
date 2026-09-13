@@ -1,3 +1,5 @@
+import { FLAGS, SYSTEM_NAME } from '@/module/constants';
+
 type DetectionTarget = Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>[1];
 
 export const getPhysicalTargetActor = (target: DetectionTarget) => {
@@ -6,6 +8,11 @@ export const getPhysicalTargetActor = (target: DetectionTarget) => {
 };
 
 export const hasPhysicalPresence = (target: DetectionTarget) => {
+    const token = (target as { document?: TokenDocument } | null)?.document;
+    if (token instanceof TokenDocument) {
+        const projection = token.getFlag(SYSTEM_NAME, FLAGS.AstralProjection) as { role?: string } | undefined;
+        if (projection?.role === 'form') return false;
+    }
     const actor = getPhysicalTargetActor(target);
     return !actor || actor.system.visibilityChecks.targets.physical.active !== false;
 };

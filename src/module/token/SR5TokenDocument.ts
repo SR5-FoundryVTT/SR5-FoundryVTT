@@ -1,12 +1,26 @@
 import { DeepReadonly } from "fvtt-types/utils";
 import { SYSTEM_NAME, FLAGS } from "../constants";
 import { StorageFlow } from "@/module/flows/StorageFlow";
+import { AstralProjectionFlow } from '@/module/vision/astralProjection/AstralProjectionFlow';
 
 /**
  * A custom TokenDocument class for the SR5 system.
  * It extends the base functionality to handle system-specific movement rules and data cleanup.
  */
 export class SR5TokenDocument extends TokenDocument {
+    /** A projected form uses the body's exact actor, including an unlinked body's synthetic ActorDelta. */
+    override get actor() {
+        const state = this.getFlag(SYSTEM_NAME, FLAGS.AstralProjection) as
+            | { role?: string; bodyTokenUuid?: string }
+            | undefined;
+        if (state?.role === 'form' && state.bodyTokenUuid) {
+            const bodyId = /^Scene\.[^.]+\.Token\.([^.]+)$/.exec(state.bodyTokenUuid)?.[1];
+            const body = bodyId ? this.parent?.tokens.get(bodyId) : null;
+            if (body && body !== this && body.actor) return body.actor;
+        }
+        return super.actor;
+    }
+
     /**
      * Tracks if a movement operation is in progress to prevent visual flicker in `measureMovementPath`.
      * @private
@@ -30,8 +44,10 @@ export class SR5TokenDocument extends TokenDocument {
      * Handles system-specific cleanup before the token document is deleted.
      */
     protected override async _preDelete(...args: Parameters<TokenDocument["_preDelete"]>) {
+        // A projected form borrows the body's actor, which outlives the form token. Cleaning up its
+        // storage references here would disconnect the still living body from its networks and marks.
         // Disconnect from any networks before a token actor is deleted.
-        if (this.actor?.isToken) {
+        if (this.actor?.isToken && !AstralProjectionFlow.isForm(this)) {
             await StorageFlow.deleteStorageReferences(this.actor);
         }
 
@@ -56,7 +72,10 @@ export class SR5TokenDocument extends TokenDocument {
         options?: TokenDocument.MeasureMovementPathOptions,
     ): foundry.grid.BaseGrid.MeasurePathResult {
         const measurement = super.measureMovementPath(waypoints, options);
-        const movementData = this.actor?.system.movement;
+        const astralMovement = AstralProjectionFlow.getMovementRates(this);
+        const movementData = astralMovement
+            ? { walk: { value: astralMovement.walk }, run: { value: astralMovement.run } }
+            : this.actor?.system.movement;
 
         // Abort if actor has no movement data, it's not a standard walk, or movement is in progress.
         if (!movementData || this.movementAction !== "walk" || this.#movementInProgress) {
@@ -109,6 +128,7 @@ export class SR5TokenDocument extends TokenDocument {
     ): Promise<void> {
         // Perform checks to ensure this logic should run.
         if (game.user.id !== user.id) return;
+        if (AstralProjectionFlow.isForm(token)) return;
         if (!token.actor?.system.movement) return;
         if (!game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) return;
 

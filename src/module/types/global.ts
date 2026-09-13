@@ -55,6 +55,7 @@ import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDe
 import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
 import UltrasoundDetectionMode from '../vision/ultrasoundVision/ultrasoundDetectionMode';
+import type { AstralProjectionState } from '../vision/astralProjection/AstralProjectionFlow';
 import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
 
@@ -241,6 +242,7 @@ declare module "fvtt-types/configuration" {
                     sight: Record<string, unknown>;
                     detectionModes: Record<string, { enabled: boolean; range: number | null }>;
                 };
+                astralProjection?: AstralProjectionState;
             };
         };
     }

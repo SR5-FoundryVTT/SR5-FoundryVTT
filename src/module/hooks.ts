@@ -144,6 +144,8 @@ import { SkillGroupFlow } from './actor/flows/SkillGroupFlow';
 import { OpposedMatrixTest } from './tests/OpposedMatrixTest';
 import { PerceptionFlow } from './vision/PerceptionFlow';
 import { VisionHUD } from './apps/VisionHUD';
+import { AstralProjectionFlow } from './vision/astralProjection/AstralProjectionFlow';
+import { ActorRollDataFlow } from './actor/flows/ActorRollDataFlow';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -188,6 +190,8 @@ export class HooksManager {
         Hooks.on('renderChatLog', HooksManager.chatLogListeners.bind(HooksManager));
 
         PerceptionFlow.registerHooks();
+        AstralProjectionFlow.registerHooks();
+        ActorRollDataFlow.registerHooks();
 
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();
@@ -723,6 +727,7 @@ ___________________
             [FLAGS.UnsetDataStorage]: [DataStorage._handleUnsetDataStorageSocketMessage.bind(DataStorage)],
             [FLAGS.UpdateDocumentsAsGM]: [SocketMessageFlow.handleUpdateDocumentsAsGMMessage.bind(SocketMessage)],
             [FLAGS.ApplyExtendedTestRoll]: [ExtendedTestFlow._handleApplyRollSocketMessage.bind(ExtendedTestFlow)],
+            [FLAGS.AstralProjectionOperation]: [AstralProjectionFlow.handleSocketMessage.bind(AstralProjectionFlow)],
         } as const;
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData, senderId?: string) => {

@@ -100,7 +100,9 @@ export class PerceptionFlow {
         if (!this.isRefreshEnabled(token) || !token.actor) return false;
         const source = token.toObject();
         const range = Math.max(token.sight.range ?? 0, 10000);
-        const astralActive = !!token.getFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision);
+        const projection = token.getFlag(SYSTEM_NAME, FLAGS.AstralProjection) as { role?: string } | undefined;
+        const astralActive = !!token.getFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision)
+            || projection?.role === 'form';
         const detectionModes = astralActive
             ? this.reconcileAstralDetectionModes(source.detectionModes, range)
             : this.reconcileDetectionModes(
