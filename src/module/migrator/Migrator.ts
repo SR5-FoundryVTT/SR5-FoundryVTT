@@ -400,9 +400,8 @@ export class Migrator {
     public static async migrateVehicles() {
         let count = 0;
         for (const actor of game.actors.filter(a => a.type === 'vehicle')) {
-            const data = actor._source;
-            (data as any)._stats ??= { systemVersion: '0.0.0' };
-            (data as any)._stats.systemVersion = '0.37.0';
+            const data = actor.toObject();
+            data._stats.systemVersion = '0.37.0';
             const migrated = this.migrate('Actor', data);
             if (migrated) {
                 await actor.update(data);

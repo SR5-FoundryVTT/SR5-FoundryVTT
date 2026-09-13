@@ -1,6 +1,23 @@
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SR5Item } from '@/module/item/SR5Item';
 import { DamageApplicationFlow } from '@/module/actor/flows/DamageApplicationFlow';
+import type { DamageType } from '@/module/types/item/Action';
+
+function createMatrixDamage(value: number): DamageType {
+    return {
+        base: value,
+        value,
+        changes: [],
+        attribute: '',
+        base_formula_operator: 'add',
+        type: { base: 'matrix', value: 'matrix' },
+        element: { base: '', value: '' },
+        ap: { base: 0, value: 0, changes: [], attribute: '', base_formula_operator: 'add' },
+        biofeedback: '',
+        source: { actorId: '', itemId: '', itemName: '', itemType: '' },
+        normal_weapon: false
+    };
+}
 
 export const MatrixRepairFlow = {
     /**
@@ -23,16 +40,12 @@ export const MatrixRepairFlow = {
 
         const skillItem = actor.items.find(i => i.isType('skill') && i.name?.toLowerCase() === 'hardware');
         if (skillItem) {
-            const test = (await actor.testFromItem(skillItem, { showDialog: true } as any)) as any;
+            const test = await actor.testFromItem(skillItem);
             if (test) {
                 await test.execute();
-                const hits = Number(test.hits) || 0;
+                const hits = Number(test.hits?.value ?? 0);
                 if (hits > 0) {
-                    await DamageApplicationFlow.addMatrixDamage(actor, {
-                        type: { base: 'matrix', value: 'matrix' },
-                        base: -hits,
-                        value: -hits
-                    } as any);
+                    await DamageApplicationFlow.addMatrixDamage(actor, createMatrixDamage(-hits));
                     ui.notifications?.info(game.i18n.format('SR5.Infos.MatrixDamageRepaired', {
                         hits: String(hits),
                         device: device.name || ''

@@ -231,7 +231,7 @@ export class DamageApplicationFlow {
                     </div>
                 `;
                 await ChatMessage.create({
-                    speaker: ChatMessage.getSpeaker({ actor: driver as any }),
+                    speaker: ChatMessage.getSpeaker({ actor: driver as Actor.Stored }),
                     content,
                     style: CONST.CHAT_MESSAGE_STYLES.OTHER
                 });

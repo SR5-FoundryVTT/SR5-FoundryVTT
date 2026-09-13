@@ -4,6 +4,7 @@ import { TestCreator } from '@/module/tests/TestCreator';
 import { SR5 } from '@/module/config';
 import { Helpers } from '@/module/helpers';
 import { FLAGS, SYSTEM_NAME } from '@/module/constants';
+import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 
 export const RiggerFlow = {
     /**
@@ -13,10 +14,9 @@ export const RiggerFlow = {
         if (!driver || !vehicle || !vehicle.isType('vehicle')) return;
 
         // Check for installed Rigger Interface on non-drone vehicles
-        const hasRiggerInterface = vehicle.system.isDrone || vehicle.items.some((item: any) => {
-            const cat = item.system?.category;
+        const hasRiggerInterface = vehicle.system.isDrone || vehicle.items.some(item => {
             const name = item.name?.toLowerCase() || '';
-            return cat === 'rigger_interface' || name.includes('rigger interface');
+            return name.includes('rigger interface');
         });
 
         if (!hasRiggerInterface) {
@@ -35,7 +35,7 @@ export const RiggerFlow = {
         }
 
         // 1. If driver is currently jumped into another vehicle, jump out of that vehicle first
-        const currentJumpedVehicleUuid = (driver as any).getFlag(SYSTEM_NAME, 'jumpedInVehicleUuid') as string | undefined;
+        const currentJumpedVehicleUuid = driver.getFlag(SYSTEM_NAME, 'jumpedInVehicleUuid') as string | undefined;
         if (currentJumpedVehicleUuid && currentJumpedVehicleUuid !== vehicle.uuid) {
             const prevVehicle = (await fromUuid(currentJumpedVehicleUuid)) as SR5Actor | null;
             if (prevVehicle && prevVehicle instanceof SR5Actor && prevVehicle.isType('vehicle')) {
@@ -63,21 +63,23 @@ export const RiggerFlow = {
         }
 
         // 4. Update vehicle controlMode to 'rigger'
-        await vehicle.update({ system: { controlMode: 'rigger' } } as any);
+        await vehicle.update({ system: { controlMode: 'rigger' } });
 
         // 5. Update driver matrix state to VR & Hot Sim
-        await driver.update({
-            system: {
-                matrix: {
-                    vr: true,
-                    hot_sim: true
+        if (driver.isType('character')) {
+            await driver.update({
+                system: {
+                    matrix: {
+                        vr: true,
+                        hot_sim: true
+                    }
                 }
-            }
-        } as any);
+            });
+        }
 
         // 6. Lock driver token movement and set driver flags
         await TokenLockHooks.setJumpedInState(driver, vehicle, true);
-        await (driver as any).setFlag(SYSTEM_NAME, 'jumpedInVehicleUuid', vehicle.uuid);
+        await driver.setFlag(SYSTEM_NAME, 'jumpedInVehicleUuid', vehicle.uuid ?? '');
 
         // 7. Apply temporary Active Effect on the vehicle actor for jumped-in skills
         await this._applyJumpedInActiveEffect(driver, vehicle);
@@ -97,14 +99,14 @@ export const RiggerFlow = {
         const currentDriver = driver || vehicle.getVehicleDriver() || null;
 
         // 1. Update vehicle controlMode to 'autopilot'
-        await vehicle.update({ system: { controlMode: 'autopilot' } } as any);
+        await vehicle.update({ system: { controlMode: 'autopilot' } });
 
         // 2. Unlock driver token movement & unset flags
         if (currentDriver) {
             await TokenLockHooks.setJumpedInState(currentDriver, vehicle, false);
-            await (currentDriver as any).unsetFlag(SYSTEM_NAME, 'jumpedInVehicleUuid');
+            await currentDriver.unsetFlag(SYSTEM_NAME, 'jumpedInVehicleUuid');
         } else {
-            await TokenLockHooks.setJumpedInState(null as any, vehicle, false);
+            await TokenLockHooks.setJumpedInState(null, vehicle, false);
         }
 
         // 3. Remove temporary jumped-in Active Effect on vehicle actor
@@ -155,7 +157,7 @@ export const RiggerFlow = {
         `;
 
         await ChatMessage.create({
-            speaker: ChatMessage.getSpeaker({ actor: driver as any }),
+            speaker: ChatMessage.getSpeaker({ actor: driver as Actor.Stored }),
             content,
             style: CONST.CHAT_MESSAGE_STYLES.OTHER
         });
@@ -223,12 +225,12 @@ export const RiggerFlow = {
      * Create/apply or update persistent ActiveEffect on vehicle actor with driver's attributes, skills, and Control Rig modifiers.
      */
     async _applyJumpedInActiveEffect(driver: SR5Actor, vehicle: SR5Actor) {
-        const changes: any[] = [];
+        const changes: Array<{ key: string; value: string; type: string }> = [];
 
         // Transfer Driver attributes
-        const attributeKeysToTransfer = ['logic', 'intuition', 'reaction', 'agility'];
+        const attributeKeysToTransfer = ['logic', 'intuition', 'reaction', 'agility'] as const;
         for (const attKey of attributeKeysToTransfer) {
-            const att = driver.findAttribute(attKey as any);
+            const att = driver.findAttribute(attKey);
             const rating = att?.value || 0;
             if (rating > 0) {
                 changes.push({
@@ -263,9 +265,9 @@ export const RiggerFlow = {
 
         const hasExistingHandlingEffect = (actor: SR5Actor) => {
             return actor.effects.some(e => {
-                if (e.disabled || (e as any).isSuppressed) return false;
-                const changes = (e as any).changes || (e.system as any)?.changes || [];
-                return changes.some((c: any) =>
+                if (e.disabled || (e instanceof SR5ActiveEffect && e.isSuppressed)) return false;
+                const changes = (e instanceof SR5ActiveEffect ? e.system.changes : (e as ActiveEffect.Stored).changes) || [];
+                return changes.some(c =>
                     c.key?.includes('vehicle_stats.handling') ||
                     c.key?.includes('vehicle_stats.speed') ||
                     c.key?.includes('modifiers.handling') ||
@@ -276,13 +278,14 @@ export const RiggerFlow = {
 
         const controlRigItemHasEffects = () => {
             const items = Array.from(driver.items.values());
-            return items.some((item: any) => {
-                const isControlRig = item.name?.toLowerCase().includes('control rig') || (item.system as any)?.category === 'control_rig';
+            return items.some(item => {
+                const isControlRig = item.name?.toLowerCase().includes('control rig') ||
+                    (item.isType('cyberware', 'bioware') && item.system.category === 'control_rig');
                 if (!isControlRig) return false;
-                return item.effects.some((e: any) => {
-                    if (e.disabled || (e as any).isSuppressed) return false;
-                    const changes = (e as any).changes || (e.system as any)?.changes || [];
-                    return changes.some((c: any) =>
+                return item.effects.some(e => {
+                    if (e.disabled || (e instanceof SR5ActiveEffect && e.isSuppressed)) return false;
+                    const changes = (e instanceof SR5ActiveEffect ? e.system.changes : (e as ActiveEffect.Stored).changes) || [];
+                    return changes.some(c =>
                         c.key?.includes('vehicle_stats.handling') ||
                         c.key?.includes('vehicle_stats.speed') ||
                         c.key?.includes('modifiers.handling') ||
@@ -311,17 +314,16 @@ export const RiggerFlow = {
 
         const instances = this.getActorInstances(vehicle);
         for (const v of instances) {
-            const riggerInterfaceItem = v.items.find((item: any): boolean => {
-                const cat = (item.system as any)?.category;
-                const name = (item.name as string | undefined)?.toLowerCase() || '';
-                return cat === 'rigger_interface' || name.includes('rigger interface');
+            const riggerInterfaceItem = v.items.find((item): boolean => {
+                const name = item.name?.toLowerCase() || '';
+                return name.includes('rigger interface');
             });
 
-            const savedEffectId = (v as any).getFlag(SYSTEM_NAME, 'jumpedInEffectId') as string | undefined;
-            const riggerInterfaceEffectId = riggerInterfaceItem ? (riggerInterfaceItem as any).getFlag(SYSTEM_NAME, 'jumpedInEffectId') as string | undefined : undefined;
+            const savedEffectId = v.getFlag(SYSTEM_NAME, 'jumpedInEffectId') as string | undefined;
+            const riggerInterfaceEffectId = riggerInterfaceItem ? (riggerInterfaceItem.getFlag(SYSTEM_NAME, 'jumpedInEffectId') as string | undefined) : undefined;
 
-            const existingEffect = v.effects.find((e: any): boolean => {
-                if ((e.flags as any)?.shadowrun5e?.isJumpedInEffect === true) return true;
+            const existingEffect = v.effects.find((e): boolean => {
+                if (e.getFlag('shadowrun5e', 'isJumpedInEffect') === true) return true;
                 if (savedEffectId && e.id === savedEffectId) return true;
                 if (riggerInterfaceEffectId && e.id === riggerInterfaceEffectId) return true;
                 return false;
@@ -334,7 +336,7 @@ export const RiggerFlow = {
                     flags: {
                         shadowrun5e: {
                             isJumpedInEffect: true,
-                            driverUuid: driver.uuid,
+                            driverUuid: driver.uuid ?? undefined,
                             riggerInterfaceItemId: riggerInterfaceItem?.id || null
                         }
                     },
@@ -342,10 +344,10 @@ export const RiggerFlow = {
                         targets: [{ id: 'actor', applyTo: 'actor' }],
                         changes
                     }
-                } as any);
-                await (v as any).setFlag(SYSTEM_NAME, 'jumpedInEffectId', existingEffect.id);
+                });
+                await v.setFlag(SYSTEM_NAME, 'jumpedInEffectId', existingEffect.id);
                 if (riggerInterfaceItem) {
-                    await (riggerInterfaceItem as any).setFlag(SYSTEM_NAME, 'jumpedInEffectId', existingEffect.id);
+                    await riggerInterfaceItem.setFlag(SYSTEM_NAME, 'jumpedInEffectId', existingEffect.id);
                 }
             } else {
                 const createdEffects = await v.createEmbeddedDocuments('ActiveEffect', [{
@@ -355,7 +357,7 @@ export const RiggerFlow = {
                     flags: {
                         shadowrun5e: {
                             isJumpedInEffect: true,
-                            driverUuid: driver.uuid,
+                            driverUuid: driver.uuid ?? undefined,
                             riggerInterfaceItemId: riggerInterfaceItem?.id || null
                         }
                     },
@@ -363,13 +365,13 @@ export const RiggerFlow = {
                         targets: [{ id: 'actor', applyTo: 'actor' }],
                         changes
                     }
-                } as any]);
+                }]);
 
                 if (createdEffects && createdEffects.length > 0 && createdEffects[0].id) {
                     const newId = createdEffects[0].id;
-                    await (v as any).setFlag(SYSTEM_NAME, 'jumpedInEffectId', newId);
+                    await v.setFlag(SYSTEM_NAME, 'jumpedInEffectId', newId);
                     if (riggerInterfaceItem) {
-                        await (riggerInterfaceItem as any).setFlag(SYSTEM_NAME, 'jumpedInEffectId', newId);
+                        await riggerInterfaceItem.setFlag(SYSTEM_NAME, 'jumpedInEffectId', newId);
                     }
                 }
             }
@@ -384,17 +386,16 @@ export const RiggerFlow = {
 
         const instances = this.getActorInstances(vehicle);
         for (const v of instances) {
-            const riggerInterfaceItem = v.items.find((item: any) => {
-                const cat = item.system?.category;
+            const riggerInterfaceItem = v.items.find((item) => {
                 const name = item.name?.toLowerCase() || '';
-                return cat === 'rigger_interface' || name.includes('rigger interface');
+                return name.includes('rigger interface');
             });
 
-            const savedEffectId = (v as any).getFlag(SYSTEM_NAME, 'jumpedInEffectId') as string | undefined;
-            const riggerInterfaceEffectId = riggerInterfaceItem ? (riggerInterfaceItem as any).getFlag(SYSTEM_NAME, 'jumpedInEffectId') as string | undefined : undefined;
+            const savedEffectId = v.getFlag(SYSTEM_NAME, 'jumpedInEffectId') as string | undefined;
+            const riggerInterfaceEffectId = riggerInterfaceItem ? (riggerInterfaceItem.getFlag(SYSTEM_NAME, 'jumpedInEffectId') as string | undefined) : undefined;
 
             for (const effect of v.effects) {
-                const isJumpedInFlag = (effect.flags as any)?.shadowrun5e?.isJumpedInEffect === true;
+                const isJumpedInFlag = effect.getFlag('shadowrun5e', 'isJumpedInEffect') === true;
                 const isSavedEffect = Boolean(savedEffectId && effect.id === savedEffectId);
                 const isRiggerInterfaceEffect = Boolean(riggerInterfaceEffectId && effect.id === riggerInterfaceEffectId);
                 if (isJumpedInFlag || isSavedEffect || isRiggerInterfaceEffect) {

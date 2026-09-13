@@ -54,28 +54,26 @@ export class RiggingRules {
     /**
      * Get running/equipped local autosofts on a drone actor.
      */
-    static getRunningLocalAutosofts(drone: SR5Actor): SR5Item[] {
+    static getRunningLocalAutosofts(drone: SR5Actor): SR5Item<'program'>[] {
         if (!drone.isType('vehicle')) return [];
-        const programs = drone.itemsForType.get('program') || [];
+        const programs = (drone.itemsForType.get('program') || []).filter(item => item.isType('program'));
         return programs.filter(item => {
-            const system = item.system as any;
-            return system.type === 'autosoft' && item.isEquipped();
+            return item.system.type === 'autosoft' && item.isEquipped();
         });
     }
 
     /**
      * Get loaded/equipped autosofts from an RCC device.
      */
-    static getLoadedRCCAutosofts(rccItem: SR5Item): SR5Item[] {
-        if (!rccItem || rccItem.system.category !== 'rcc') return [];
+    static getLoadedRCCAutosofts(rccItem: SR5Item): SR5Item<'program'>[] {
+        if (!rccItem.isType('device') || rccItem.system.category !== 'rcc') return [];
 
         const owner = rccItem.actorOwner;
         if (!owner) return [];
 
-        const programs = owner.itemsForType.get('program') || [];
+        const programs = (owner.itemsForType.get('program') || []).filter(item => item.isType('program'));
         return programs.filter(item => {
-            const system = item.system as any;
-            return system.type === 'autosoft' && item.isEquipped();
+            return item.system.type === 'autosoft' && item.isEquipped();
         });
     }
 
@@ -83,7 +81,7 @@ export class RiggingRules {
      * Calculate RCC Sharing vs Noise Reduction state and soft warnings.
      */
     static getRCCSharingInfo(rccItem: SR5Item) {
-        if (!rccItem || rccItem.system.category !== 'rcc') {
+        if (!rccItem.isType('device') || rccItem.system.category !== 'rcc') {
             return {
                 deviceRating: 0,
                 sharing: 0,
@@ -95,9 +93,8 @@ export class RiggingRules {
         }
 
         const deviceRating = rccItem.getRating();
-        const system = rccItem.system as any;
-        const sharing = Number(system.sharing || 0);
-        const noiseReduction = Number(system.noise_reduction || 0);
+        const sharing = Number(rccItem.system.sharing || 0);
+        const noiseReduction = Number(rccItem.system.noise_reduction || 0);
 
         const loadedAutosofts = this.getLoadedRCCAutosofts(rccItem);
         const loadedAutosoftsCount = loadedAutosofts.length;
@@ -130,8 +127,7 @@ export class RiggingRules {
 
         if (localAutosofts.length > 0) {
             const match = localAutosofts.find(item => {
-                const sys = item.system as any;
-                return sys.autosoftType === autosoftType;
+                return item.system.autosoftType === autosoftType;
             });
             if (match) {
                 return {
@@ -145,11 +141,10 @@ export class RiggingRules {
 
         // Check if slaved to an RCC master device
         const masterItem = drone.master;
-        if (masterItem && masterItem.system.category === 'rcc') {
+        if (masterItem && masterItem.isType('device') && masterItem.system.category === 'rcc') {
             const rccAutosofts = this.getLoadedRCCAutosofts(masterItem);
             const match = rccAutosofts.find(item => {
-                const sys = item.system as any;
-                return sys.autosoftType === autosoftType;
+                return item.system.autosoftType === autosoftType;
             });
             if (match) {
                 return {
@@ -172,13 +167,12 @@ export class RiggingRules {
             return { swarmPilot: 0, highestPilot: 0, memberCount: 0, bonus: 0 };
         }
 
-        const system = drone.system as any;
-        const isSwarmActive = Boolean(system.swarm?.active ?? system.isSwarm);
+        const isSwarmActive = Boolean(drone.system.swarm.active);
         if (!isSwarmActive) {
             return { swarmPilot: 0, highestPilot: 0, memberCount: 0, bonus: 0 };
         }
 
-        const count = Math.max(1, Number(system.swarm?.count ?? system.swarmCount) || 1);
+        const count = Math.max(1, Number(drone.system.swarm.count) || 1);
         const basePilot = drone.system.vehicle_stats?.pilot?.base || drone.system.vehicle_stats?.pilot?.value || 1;
 
         if (count <= 1) {

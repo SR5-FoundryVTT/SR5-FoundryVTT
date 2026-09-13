@@ -461,8 +461,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         ];
 
         actions = actions.filter(action => {
-            const sys = action.system as any;
-            const actionData = sys?.action;
+            const actionData = action.system.action;
             if (!actionData) return true;
 
             if (MatrixRules.isSleazeAction(
@@ -489,7 +488,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         // Prepare sorting and display of a possibly translated document name.
         const sheetActions: sheetAction[] = [];
         for (const action of actions) {
-            const descValue = (action.system as any)?.description?.value ?? '';
+            const descValue = action.system.description?.value ?? '';
             sheetActions.push({
                 name: PackItemFlow.localizePackAction(action.name),
                 description: await TextEditor.enrichHTML(descValue),
@@ -519,7 +518,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         const marksPlaced = this.actor.getMarksPlaced(target.uuid!);
 
         return actions.filter(action => {
-            const matrixCat = (action.system as any)?.action?.category?.matrix;
+            const matrixCat = action.system.action?.category?.matrix;
             if (!matrixCat) return true;
             const { marks, owner } = matrixCat;
             if (owner) return ownedItem;
@@ -801,7 +800,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         if (isNaN(newSharing)) return;
 
         const rccItem = rccItemId ? this.actor.items.get(rccItemId) : this.actor.getMatrixDevice();
-        if (!rccItem || rccItem.system?.category !== 'rcc') return;
+        if (!rccItem || !rccItem.isType('device') || rccItem.system.category !== 'rcc') return;
 
         const deviceRating = rccItem.system.technology?.rating || 0;
         const boundedSharing = Math.min(Math.max(newSharing, 0), deviceRating);
@@ -812,7 +811,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
                 sharing: boundedSharing,
                 noise_reduction: newNoiseReduction
             }
-        } as any);
+        });
 
         if (this.isPlayMode) {
             if (this._rccAllocationDebounceTimer) {
@@ -826,23 +825,23 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     }
 
     protected async _sendRccReconfigureMessage(sharing: number, noiseReduction: number) {
-        const speaker = ChatMessage.getSpeaker({ actor: this.actor as any });
+        const speaker = ChatMessage.getSpeaker({ actor: this.actor as Actor.Stored });
         const inCombat = this.actor.inCombat;
         const actionLabel = inCombat
-            ? game.i18n.localize('SR5.RCC.SimpleActionInCombat' as any)
-            : game.i18n.localize('SR5.RCC.SimpleAction' as any);
+            ? game.i18n.localize('SR5.RCC.SimpleActionInCombat')
+            : game.i18n.localize('SR5.RCC.SimpleAction');
 
         const content = `
             <div class="shadowrun5e chat-card matrix-card">
                 <header class="card-header flexrow" style="align-items: center; gap: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px;">
                     <i class="fas fa-sliders" style="font-size: 1.2em; color: #ff9800;"></i>
-                    <h3 class="item-name" style="margin: 0; font-size: 1.1em;">${game.i18n.localize('SR5.RCC.ReconfigureTitle' as any)}</h3>
+                    <h3 class="item-name" style="margin: 0; font-size: 1.1em;">${game.i18n.localize('SR5.RCC.ReconfigureTitle')}</h3>
                 </header>
                 <div class="card-content" style="padding: 6px 0;">
-                    <p style="margin: 4px 0;"><strong>${this.actor.name}</strong> ${game.i18n.localize('SR5.RCC.ReconfiguredMessage' as any)} (<em>${actionLabel}</em>):</p>
+                    <p style="margin: 4px 0;"><strong>${this.actor.name}</strong> ${game.i18n.localize('SR5.RCC.ReconfiguredMessage')} (<em>${actionLabel}</em>):</p>
                     <div style="display: flex; justify-content: space-around; margin-top: 6px; padding: 6px; background: rgba(0,0,0,0.25); border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">
-                        <span><i class="fas fa-wifi" style="color: #4caf50;"></i> ${game.i18n.localize('SR5.RCC.NoiseReduction' as any)}: <strong>${noiseReduction}</strong></span>
-                        <span><i class="fas fa-share-nodes" style="color: #2196f3;"></i> ${game.i18n.localize('SR5.RCC.Sharing' as any)}: <strong>${sharing}</strong></span>
+                        <span><i class="fas fa-wifi" style="color: #4caf50;"></i> ${game.i18n.localize('SR5.RCC.NoiseReduction')}: <strong>${noiseReduction}</strong></span>
+                        <span><i class="fas fa-share-nodes" style="color: #2196f3;"></i> ${game.i18n.localize('SR5.RCC.Sharing')}: <strong>${sharing}</strong></span>
                     </div>
                 </div>
             </div>
@@ -851,7 +850,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         await ChatMessage.create({
             speaker,
             content,
-            style: (CONST as any).CHAT_MESSAGE_STYLES?.OTHER ?? 0,
+            style: CONST.CHAT_MESSAGE_STYLES.OTHER,
         });
     }
 }

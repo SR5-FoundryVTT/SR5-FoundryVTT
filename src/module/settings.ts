@@ -121,8 +121,8 @@ export const registerSystemSettings = () => {
         },
         onChange: () => {
             for (const window of Object.values(ui.windows)) {
-                if ('render' in window && typeof window.render === 'function') {
-                    void (window as any).render();
+                if (window) {
+                    void window.render();
                 }
             }
         }

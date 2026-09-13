@@ -1,5 +1,6 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
 import { SwarmTileHooks } from './SwarmTileHooks';
+import { SR5Token } from './SR5Token';
 
 const Color = foundry.utils.Color;
 
@@ -12,8 +13,8 @@ export class SR5TokenRuler extends foundry.canvas.placeables.tokens.TokenRuler {
 
         try {
             SwarmTileHooks.clearSwarmRulerPreviews();
-            const token = (this as any).token;
-            if (token && typeof token._updateSwarmDragPosition === 'function') {
+            const token = this.token;
+            if (token instanceof SR5Token) {
                 token._updateSwarmDragPosition();
             }
         } catch (e) {}

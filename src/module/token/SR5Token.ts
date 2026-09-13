@@ -44,39 +44,38 @@ export class SR5Token extends foundry.canvas.placeables.Token {
 
     _swarmDragSprites: any[] = [];
 
+    private _getCompanionTiles(scene: Scene, primaryId: string, primaryActorUuid?: string | null): TileDocument[] {
+        return scene.tiles.filter(t => {
+            const isTile = Boolean(t.getFlag('shadowrun5e', 'isSwarmTile'));
+            if (!isTile) return false;
+            const pId = t.getFlag('shadowrun5e', 'swarmPrimaryTokenId');
+            const aUuid = t.getFlag('shadowrun5e', 'swarmActorUuid');
+            return pId === primaryId || (Boolean(primaryActorUuid) && aUuid === primaryActorUuid);
+        });
+    }
+
     override _onDragLeftStart(event: any) {
         super._onDragLeftStart(event);
 
         this._destroySwarmDragSprites();
 
-        const actor = this.actor as any;
-        if (!actor || actor.type !== 'vehicle') return;
+        const actor = this.actor;
+        if (!actor || !actor.isType('vehicle')) return;
 
-        const system = actor.system;
-        const isSwarm = Boolean(system?.swarm?.active ?? system?.isSwarm);
+        const isSwarm = Boolean(actor.system.swarm.active);
         if (!isSwarm) return;
 
-        const targetSwarmCount = Math.max(2, Number(system?.swarm?.count ?? system?.swarmCount) || 2);
+        const targetSwarmCount = Math.max(2, actor.system.swarm.count ?? 2);
         const desiredCompanions = targetSwarmCount - 1;
         if (desiredCompanions <= 0) return;
 
         const primaryId = this.document.id;
+        if (!primaryId) return;
         const primaryActorUuid = actor.uuid;
         const scene = this.document.parent as Scene | null;
         if (!scene || !canvas.ready) return;
 
-        const companionTiles = scene.tiles.filter(t => {
-            const getFlagFn = typeof (t as any).getFlag === 'function' ? (t as any).getFlag.bind(t) : null;
-            const isTile = Boolean(
-                (getFlagFn ? getFlagFn(SYSTEM_NAME, 'isSwarmTile') : undefined) ??
-                (getFlagFn ? getFlagFn('shadowrun5e', 'isSwarmTile') : undefined) ??
-                (t.flags as any)?.[SYSTEM_NAME]?.isSwarmTile
-            );
-            if (!isTile) return false;
-            const pId = (getFlagFn ? getFlagFn(SYSTEM_NAME, 'swarmPrimaryTokenId') : undefined) ?? (t.flags as any)?.[SYSTEM_NAME]?.swarmPrimaryTokenId;
-            const aUuid = (getFlagFn ? getFlagFn(SYSTEM_NAME, 'swarmActorUuid') : undefined) ?? (t.flags as any)?.[SYSTEM_NAME]?.swarmActorUuid;
-            return pId === primaryId || aUuid === primaryActorUuid;
-        });
+        const companionTiles = this._getCompanionTiles(scene, primaryId, primaryActorUuid);
 
         let subRatio = 1.0;
         if (targetSwarmCount === 2) subRatio = 0.38;
@@ -232,26 +231,16 @@ export class SR5Token extends foundry.canvas.placeables.Token {
     }
 
     _restoreSwarmTileAlpha() {
-        const actor = this.actor as any;
-        if (!actor || actor.type !== 'vehicle') return;
+        const actor = this.actor;
+        if (!actor || !actor.isType('vehicle')) return;
 
         const primaryId = this.document.id;
+        if (!primaryId) return;
         const primaryActorUuid = actor.uuid;
         const scene = this.document.parent as Scene | null;
         if (!scene || !canvas.ready) return;
 
-        const companionTiles = scene.tiles.filter(t => {
-            const getFlagFn = typeof (t as any).getFlag === 'function' ? (t as any).getFlag.bind(t) : null;
-            const isTile = Boolean(
-                (getFlagFn ? getFlagFn(SYSTEM_NAME, 'isSwarmTile') : undefined) ??
-                (getFlagFn ? getFlagFn('shadowrun5e', 'isSwarmTile') : undefined) ??
-                (t.flags as any)?.[SYSTEM_NAME]?.isSwarmTile
-            );
-            if (!isTile) return false;
-            const pId = (getFlagFn ? getFlagFn(SYSTEM_NAME, 'swarmPrimaryTokenId') : undefined) ?? (t.flags as any)?.[SYSTEM_NAME]?.swarmPrimaryTokenId;
-            const aUuid = (getFlagFn ? getFlagFn(SYSTEM_NAME, 'swarmActorUuid') : undefined) ?? (t.flags as any)?.[SYSTEM_NAME]?.swarmActorUuid;
-            return pId === primaryId || aUuid === primaryActorUuid;
-        });
+        const companionTiles = this._getCompanionTiles(scene, primaryId, primaryActorUuid);
 
         for (const tileDoc of companionTiles) {
             const tileObject = (tileDoc as any).object || (canvas.tiles as any)?.get?.(tileDoc.id);
@@ -265,34 +254,23 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         const preview = (this as any)._preview || (this as any).preview || this;
         if (!preview) return;
 
-        const actor = this.actor as any;
-        if (!actor || actor.type !== 'vehicle') return;
+        const actor = this.actor;
+        if (!actor || !actor.isType('vehicle')) return;
 
-        const system = actor.system;
-        const isSwarm = Boolean(system?.swarm?.active ?? system?.isSwarm);
+        const isSwarm = Boolean(actor.system.swarm.active);
         if (!isSwarm) return;
 
-        const targetSwarmCount = Math.max(2, Number(system?.swarm?.count ?? system?.swarmCount) || 2);
+        const targetSwarmCount = Math.max(2, actor.system.swarm.count ?? 2);
         const desiredCompanions = targetSwarmCount - 1;
         if (desiredCompanions <= 0) return;
 
         const primaryId = this.document.id;
+        if (!primaryId) return;
         const primaryActorUuid = actor.uuid;
         const scene = this.document.parent as Scene | null;
         if (!scene || !canvas.ready) return;
 
-        const companionTiles = scene.tiles.filter(t => {
-            const getFlagFn = typeof (t as any).getFlag === 'function' ? (t as any).getFlag.bind(t) : null;
-            const isTile = Boolean(
-                (getFlagFn ? getFlagFn(SYSTEM_NAME, 'isSwarmTile') : undefined) ??
-                (getFlagFn ? getFlagFn('shadowrun5e', 'isSwarmTile') : undefined) ??
-                (t.flags as any)?.[SYSTEM_NAME]?.isSwarmTile
-            );
-            if (!isTile) return false;
-            const pId = (getFlagFn ? getFlagFn(SYSTEM_NAME, 'swarmPrimaryTokenId') : undefined) ?? (t.flags as any)?.[SYSTEM_NAME]?.swarmPrimaryTokenId;
-            const aUuid = (getFlagFn ? getFlagFn(SYSTEM_NAME, 'swarmActorUuid') : undefined) ?? (t.flags as any)?.[SYSTEM_NAME]?.swarmActorUuid;
-            return pId === primaryId || aUuid === primaryActorUuid;
-        });
+        const companionTiles = this._getCompanionTiles(scene, primaryId, primaryActorUuid);
 
         if (companionTiles.length === 0) return;
 
@@ -368,34 +346,23 @@ export class SR5Token extends foundry.canvas.placeables.Token {
     }
 
     _updateSwarmCompanionPositions() {
-        const actor = this.actor as any;
-        if (!actor || actor.type !== 'vehicle') return;
+        const actor = this.actor;
+        if (!actor || !actor.isType('vehicle')) return;
 
-        const system = actor.system;
-        const isSwarm = Boolean(system?.swarm?.active ?? system?.isSwarm);
+        const isSwarm = Boolean(actor.system.swarm.active);
         if (!isSwarm) return;
 
-        const targetSwarmCount = Math.max(2, Number(system?.swarm?.count ?? system?.swarmCount) || 2);
+        const targetSwarmCount = Math.max(2, actor.system.swarm.count ?? 2);
         const desiredCompanions = targetSwarmCount - 1;
         if (desiredCompanions <= 0) return;
 
         const primaryId = this.document.id;
+        if (!primaryId) return;
         const primaryActorUuid = actor.uuid;
         const scene = this.document.parent as Scene | null;
         if (!scene || !canvas.ready) return;
 
-        const companionTiles = scene.tiles.filter(t => {
-            const getFlagFn = typeof (t as any).getFlag === 'function' ? (t as any).getFlag.bind(t) : null;
-            const isTile = Boolean(
-                (getFlagFn ? getFlagFn(SYSTEM_NAME, 'isSwarmTile') : undefined) ??
-                (getFlagFn ? getFlagFn('shadowrun5e', 'isSwarmTile') : undefined) ??
-                (t.flags as any)?.[SYSTEM_NAME]?.isSwarmTile
-            );
-            if (!isTile) return false;
-            const pId = (getFlagFn ? getFlagFn(SYSTEM_NAME, 'swarmPrimaryTokenId') : undefined) ?? (t.flags as any)?.[SYSTEM_NAME]?.swarmPrimaryTokenId;
-            const aUuid = (getFlagFn ? getFlagFn(SYSTEM_NAME, 'swarmActorUuid') : undefined) ?? (t.flags as any)?.[SYSTEM_NAME]?.swarmActorUuid;
-            return pId === primaryId || aUuid === primaryActorUuid;
-        });
+        const companionTiles = this._getCompanionTiles(scene, primaryId, primaryActorUuid);
 
         if (companionTiles.length === 0) return;
 
@@ -431,20 +398,17 @@ export class SR5Token extends foundry.canvas.placeables.Token {
 
         for (let i = 0; i < companionTiles.length && i < desiredCompanions; i++) {
             const tileDoc = companionTiles[i];
-            const tileObject = (tileDoc as any).object || (canvas.tiles as any)?.get?.(tileDoc.id);
+            const tileObject = tileDoc.object || (tileDoc.id ? canvas.tiles?.get(tileDoc.id) : undefined);
             if (tileObject) {
                 const targetX = coords[i].x;
                 const targetY = coords[i].y;
 
                 // Update in-memory document & shape coordinates for Foundry v14
-                if (!(tileDoc as any).shape) {
-                    (tileDoc as any).shape = { x: targetX, y: targetY };
-                } else {
-                    (tileDoc as any).shape.x = targetX;
-                    (tileDoc as any).shape.y = targetY;
+                if ('shape' in tileDoc && tileDoc.shape && typeof tileDoc.shape === 'object') {
+                    Object.assign(tileDoc.shape, { x: targetX, y: targetY });
                 }
-                (tileDoc as any).x = targetX;
-                (tileDoc as any).y = targetY;
+                tileDoc.x = targetX;
+                tileDoc.y = targetY;
 
                 tileObject.x = targetX;
                 tileObject.y = targetY;
@@ -458,11 +422,7 @@ export class SR5Token extends foundry.canvas.placeables.Token {
                 if (tileObject.position && typeof tileObject.position.set === 'function') {
                     tileObject.position.set(targetX, targetY);
                 }
-                if ((tileDoc as any).shape && typeof tileObject._refreshPosition === 'function') {
-                    try {
-                        tileObject._refreshPosition();
-                    } catch (e) {}
-                } else if (typeof tileObject.refresh === 'function') {
+                if (typeof tileObject.refresh === 'function') {
                     try {
                         tileObject.refresh();
                     } catch (e) {}

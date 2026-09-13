@@ -31,7 +31,7 @@ export class SR5TokenDocument extends TokenDocument {
      */
     protected override async _preDelete(...args: Parameters<TokenDocument["_preDelete"]>) {
         // Disconnect from any networks before a token actor is deleted (skip visual swarm companions).
-        const isSwarmCompanion = Boolean((this.flags?.shadowrun5e as any)?.isSwarmCompanion);
+        const isSwarmCompanion = Boolean(this.getFlag('shadowrun5e', 'isSwarmCompanion'));
         if (this.actor?.isToken && !isSwarmCompanion) {
             await StorageFlow.deleteStorageReferences(this.actor);
         }

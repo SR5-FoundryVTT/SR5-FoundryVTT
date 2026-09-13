@@ -182,7 +182,17 @@ declare module "fvtt-types/configuration" {
         Actor: {
             shadowrun5e: {
                 overwatchScore?: number;
+                jumpedInVehicleUuid?: string;
+                jumpedInVehicle?: string;
+                jumpedInEffectId?: string;
             }
+        };
+        ActiveEffect: {
+            shadowrun5e: {
+                isJumpedInEffect?: boolean;
+                driverUuid?: string;
+                riggerInterfaceItemId?: string | null;
+            };
         };
         ChatMessage: {
             shadowrun5e: {
@@ -207,6 +217,7 @@ declare module "fvtt-types/configuration" {
                 lastComplexFormLevel?: ComplexFormLevelType;
                 lastFireRange?: FireRangeType;
                 embeddedItems: Item.Source[];
+                jumpedInEffectId?: string;
             };
         };
         Macro: {
@@ -220,7 +231,21 @@ declare module "fvtt-types/configuration" {
                 isSwarmCompanion?: boolean;
                 swarmPrimaryTokenId?: string;
             };
-        }
+        };
+        TokenDocument: {
+            shadowrun5e: {
+                TokenUseRoutingLib?: boolean;
+                isSwarmCompanion?: boolean;
+                swarmPrimaryTokenId?: string;
+            };
+        };
+        Tile: {
+            shadowrun5e: {
+                isSwarmTile?: boolean;
+                swarmPrimaryTokenId?: string;
+                swarmActorUuid?: string;
+            };
+        };
         User: {
             shadowrun5e: {
                 showApplication?: boolean;

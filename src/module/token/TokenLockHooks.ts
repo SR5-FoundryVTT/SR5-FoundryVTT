@@ -11,7 +11,7 @@ export const TokenLockHooks = {
     /**
      * Set or clear the jumped-in state and canvas token lock for a driver actor.
      */
-    setJumpedInState: async (driver: SR5Actor, vehicle: SR5Actor | null, isJumpedIn: boolean) => {
+    setJumpedInState: async (driver: SR5Actor | null, vehicle: SR5Actor | null, isJumpedIn: boolean) => {
         if (!driver) return;
 
         const driverInstances = RiggerFlow.getActorInstances(driver);
@@ -20,7 +20,7 @@ export const TokenLockHooks = {
             const vehicleInstances = RiggerFlow.getActorInstances(vehicle);
 
             for (const d of driverInstances) {
-                await (d as any).setFlag(SYSTEM_NAME, 'jumpedInVehicle', vehicle.name || 'Vehicle');
+                await d.setFlag(SYSTEM_NAME, 'jumpedInVehicle', vehicle.name || 'Vehicle');
                 await d.toggleStatusEffect('sr5jumpedIn', { active: true });
             }
 
@@ -37,7 +37,7 @@ export const TokenLockHooks = {
             }
         } else {
             for (const d of driverInstances) {
-                await (d as any).unsetFlag(SYSTEM_NAME, 'jumpedInVehicle');
+                await d.unsetFlag(SYSTEM_NAME, 'jumpedInVehicle');
                 await d.toggleStatusEffect('sr5jumpedIn', { active: false });
             }
 
@@ -67,8 +67,8 @@ export const TokenLockHooks = {
         const actor = tokenDoc.actor as SR5Actor | null;
         if (!actor) return;
 
-        const vehicleName = ((actor as any).getFlag?.(SYSTEM_NAME, 'jumpedInVehicle') as string | undefined) ||
-                            ((actor as any).baseActor?.getFlag?.(SYSTEM_NAME, 'jumpedInVehicle') as string | undefined);
+        const vehicleName = (actor.getFlag(SYSTEM_NAME, 'jumpedInVehicle') as string | undefined) ||
+                            (actor.token?.baseActor?.getFlag(SYSTEM_NAME, 'jumpedInVehicle') as string | undefined);
 
         if (vehicleName) {
             ui.notifications?.warn(game.i18n.format('SR5.Warnings.TokenMovementLockedJumpedIn', {
@@ -96,10 +96,11 @@ export const TokenLockHooks = {
                 vehicle: vehicleName
             });
 
-            if ((canvas as any).interface?.createScrollingText && (tokenDoc as any).object?.center) {
-                (canvas as any).interface.createScrollingText((tokenDoc as any).object.center, msg, {
-                    anchor: (CONST as any).TEXT_ANCHOR_POINTS.TOP,
-                    direction: (CONST as any).TEXT_ANCHOR_POINTS.TOP,
+            const center = tokenDoc.object?.center;
+            if (canvas.interface?.createScrollingText && center) {
+                canvas.interface.createScrollingText(center, msg, {
+                    anchor: CONST.TEXT_ANCHOR_POINTS.TOP,
+                    direction: CONST.TEXT_ANCHOR_POINTS.TOP,
                     fill: 0xffaa00,
                     stroke: 0x000000,
                     strokeThickness: 4,

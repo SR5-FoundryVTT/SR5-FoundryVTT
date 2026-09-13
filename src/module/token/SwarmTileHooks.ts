@@ -4,25 +4,9 @@ import { SYSTEM_NAME } from '@/module/constants';
 let isProcessingSwarm = false;
 
 const getSwarmTileFlags = (tile: TileDocument): { isSwarmTile: boolean; swarmPrimaryTokenId: string | undefined; swarmActorUuid: string | undefined } => {
-    const getFlagFn = typeof (tile as any).getFlag === 'function' ? (tile as any).getFlag.bind(tile) : null;
-    const isTile = Boolean(
-        (getFlagFn ? getFlagFn(SYSTEM_NAME, 'isSwarmTile') : undefined) ??
-        (getFlagFn ? getFlagFn('shadowrun5e', 'isSwarmTile') : undefined) ??
-        (tile.flags as any)?.[SYSTEM_NAME]?.isSwarmTile ??
-        (tile.flags as any)?.shadowrun5e?.isSwarmTile
-    );
-    const primaryId = (
-        (getFlagFn ? getFlagFn(SYSTEM_NAME, 'swarmPrimaryTokenId') : undefined) ??
-        (getFlagFn ? getFlagFn('shadowrun5e', 'swarmPrimaryTokenId') : undefined) ??
-        (tile.flags as any)?.[SYSTEM_NAME]?.swarmPrimaryTokenId ??
-        (tile.flags as any)?.shadowrun5e?.swarmPrimaryTokenId
-    ) as string | undefined;
-    const actorUuid = (
-        (getFlagFn ? getFlagFn(SYSTEM_NAME, 'swarmActorUuid') : undefined) ??
-        (getFlagFn ? getFlagFn('shadowrun5e', 'swarmActorUuid') : undefined) ??
-        (tile.flags as any)?.[SYSTEM_NAME]?.swarmActorUuid ??
-        (tile.flags as any)?.shadowrun5e?.swarmActorUuid
-    ) as string | undefined;
+    const isTile = Boolean(tile.getFlag(SYSTEM_NAME, 'isSwarmTile'));
+    const primaryId = tile.getFlag(SYSTEM_NAME, 'swarmPrimaryTokenId');
+    const actorUuid = tile.getFlag(SYSTEM_NAME, 'swarmActorUuid');
 
     return {
         isSwarmTile: isTile,
@@ -88,14 +72,11 @@ const animateSwarmTile = (
     const setTilePos = (x: number, y: number) => {
         try {
             if (tileDoc) {
-                if (!(tileDoc as any).shape) {
-                    (tileDoc as any).shape = { x, y };
-                } else {
-                    (tileDoc as any).shape.x = x;
-                    (tileDoc as any).shape.y = y;
+                if ('shape' in tileDoc && tileDoc.shape && typeof tileDoc.shape === 'object') {
+                    Object.assign(tileDoc.shape, { x, y });
                 }
-                (tileDoc as any).x = x;
-                (tileDoc as any).y = y;
+                tileDoc.x = x;
+                tileDoc.y = y;
             }
             tileObject.x = x;
             tileObject.y = y;
@@ -269,9 +250,9 @@ export const SwarmTileHooks = {
         const actor = primaryToken.actor as SR5Actor | null;
         if (!actor || !actor.isType('vehicle')) return;
 
-        const system = actor.system as any;
-        const isSwarm = Boolean(system.swarm?.active ?? system.isSwarm);
-        const targetSwarmCount = isSwarm ? Math.max(2, Number(system.swarm?.count ?? system.swarmCount) || 2) : 1;
+        const system = actor.system;
+        const isSwarm = Boolean(system.swarm.active);
+        const targetSwarmCount = isSwarm ? Math.max(2, system.swarm.count ?? 2) : 1;
         const desiredCompanions = targetSwarmCount - 1;
 
         const primaryId = primaryToken.id || undefined;
@@ -332,7 +313,16 @@ export const SwarmTileHooks = {
                     const idsToDelete = existingCompanionTiles.map(t => t.id).filter(Boolean) as string[];
                     await scene.deleteEmbeddedDocuments('Tile', idsToDelete);
                     if (system.swarm) {
-                        await (actor as any).update({ 'system.swarm.tiles.uuids': [], 'system.swarm.tiles.image': companionImage });
+                        await actor.update({
+                            system: {
+                                swarm: {
+                                    tiles: {
+                                        uuids: [],
+                                        image: companionImage
+                                    }
+                                }
+                            }
+                        });
                     }
                 }
                 return;
@@ -470,9 +460,15 @@ export const SwarmTileHooks = {
 
             // Store tile IDs in DataModel
             if (system.swarm) {
-                await (actor as any).update({
-                    'system.swarm.tiles.uuids': currentActiveTileIds,
-                    'system.swarm.tiles.image': companionImage
+                await actor.update({
+                    system: {
+                        swarm: {
+                            tiles: {
+                                uuids: currentActiveTileIds,
+                                image: companionImage
+                            }
+                        }
+                    }
                 });
             }
         } finally {
@@ -515,19 +511,19 @@ export const SwarmTileHooks = {
         }
     },
 
-    onUpdateActor: async (actorDoc: any, updateData: any) => {
+    onUpdateActor: async (actorDoc: SR5Actor, updateData: any) => {
         if (!game.user?.isGM || isProcessingSwarm) return;
-        if (actorDoc.type !== 'vehicle') return;
+        if (!actorDoc.isType('vehicle')) return;
 
-        const system = actorDoc.system as any;
-        const isSwarm = Boolean(system.swarm?.active ?? system.isSwarm);
+        const system = actorDoc.system;
+        const isSwarm = Boolean(system.swarm.active);
 
         // Convert condition monitor damage to reduced swarm count
-        const physTrack = system.track?.physical;
+        const physTrack = system.track.physical;
         if (isSwarm && physTrack && updateData?.system?.track?.physical?.value !== undefined) {
-            const maxConditionPerDrone = 8 + Math.ceil((system.attributes?.body?.value || 0) / 2);
+            const maxConditionPerDrone = 8 + Math.ceil((system.attributes.body.value || 0) / 2);
             const currentDamage = physTrack.value || 0;
-            const currentCount = Number(system.swarm?.count ?? system.swarmCount) || 1;
+            const currentCount = Number(system.swarm.count) || 1;
 
             if (currentDamage >= maxConditionPerDrone && currentCount > 1) {
                 const destroyedDrones = Math.floor(currentDamage / maxConditionPerDrone);
@@ -539,17 +535,12 @@ export const SwarmTileHooks = {
 
                     isProcessingSwarm = true;
                     try {
-                        if (system.swarm) {
-                            await actorDoc.update({
-                                'system.swarm.count': newCount,
-                                'system.track.physical.value': remainingDamage
-                            });
-                        } else {
-                            await actorDoc.update({
-                                'system.swarmCount': newCount,
-                                'system.track.physical.value': remainingDamage
-                            });
-                        }
+                        await actorDoc.update({
+                            system: {
+                                swarm: { count: newCount },
+                                track: { physical: { value: remainingDamage } }
+                            }
+                        });
                     } finally {
                         isProcessingSwarm = false;
                     }
@@ -563,8 +554,7 @@ export const SwarmTileHooks = {
         const primaryTokens = scene.tokens.filter(t => {
             if (!t.actor) return false;
             const actorId = t.actor.id;
-            const baseActorId = (t.actor as any).baseActor?.id || actorId;
-            return t.actorId === actorDoc.id || actorId === actorDoc.id || baseActorId === actorDoc.id || t.actor.uuid === actorDoc.uuid;
+            return t.actorId === actorDoc.id || actorId === actorDoc.id || t.actor.uuid === actorDoc.uuid;
         });
         for (const token of primaryTokens) {
             await SwarmTileHooks.syncSwarmTiles(token);
@@ -585,11 +575,11 @@ export const SwarmTileHooks = {
         const actor = (token.actor || tokenDoc.actor) as SR5Actor | null;
         if (!actor || !actor.isType('vehicle')) return;
 
-        const system = actor.system as any;
-        const isSwarm = Boolean(system.swarm?.active ?? system.isSwarm);
+        const system = actor.system;
+        const isSwarm = Boolean(system.swarm.active);
         if (!isSwarm) return;
 
-        const targetSwarmCount = Math.max(2, Number(system.swarm?.count ?? system.swarmCount) || 2);
+        const targetSwarmCount = Math.max(2, system.swarm.count ?? 2);
         const desiredCompanions = targetSwarmCount - 1;
         if (desiredCompanions <= 0) return;
 

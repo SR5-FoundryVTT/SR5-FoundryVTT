@@ -9,6 +9,7 @@ import { RiggerFlow } from '@/module/flows/RiggerFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { MatrixTargetingFlow } from '@/module/flows/MatrixTargetingFlow';
 import { DamageApplicationFlow } from '@/module/actor/flows/DamageApplicationFlow';
+import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 
 export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -300,7 +301,7 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
             assert.equal(rcc.getRating(), 5);
 
             // Update sharing so total sharing (5) + noise_reduction (2) = 7 > 5
-            await rcc.update({ system: { sharing: 5 } } as any);
+            await rcc.update({ system: { sharing: 5 } });
 
             assert.equal(rcc.getRating(), 7);
         });
@@ -348,22 +349,22 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
             assert.equal(vehicle.system.controlMode, 'rigger');
             assert.equal(vehicle.getVehicleDriver()?.uuid, driver.uuid);
 
-            const jumpedEffect = vehicle.effects.find(e => (e.flags as any)?.shadowrun5e?.isJumpedInEffect === true);
+            const jumpedEffect = vehicle.effects.find(e => e.getFlag('shadowrun5e', 'isJumpedInEffect') === true);
             assert.notEqual(jumpedEffect, undefined);
 
-            const logicChange = (jumpedEffect?.system as any)?.changes?.find((c: any) => c.key === 'system.attributes.logic.value');
+            const logicChange = (jumpedEffect as SR5ActiveEffect)?.system.changes?.find(c => c.key === 'system.attributes.logic.value');
             assert.notEqual(logicChange, undefined);
             assert.equal(logicChange?.type, 'upgrade');
 
-            const intuitionChange = (jumpedEffect?.system as any)?.changes?.find((c: any) => c.key === 'system.attributes.intuition.value');
+            const intuitionChange = (jumpedEffect as SR5ActiveEffect)?.system.changes?.find(c => c.key === 'system.attributes.intuition.value');
             assert.notEqual(intuitionChange, undefined);
             assert.equal(intuitionChange?.type, 'upgrade');
 
-            const pilotAircraftChange = (jumpedEffect?.system as any)?.changes?.find((c: any) => c.key === 'system.skills.active.pilot_aircraft.value');
+            const pilotAircraftChange = (jumpedEffect as SR5ActiveEffect)?.system.changes?.find(c => c.key === 'system.skills.active.pilot_aircraft.value');
             assert.notEqual(pilotAircraftChange, undefined);
             assert.equal(pilotAircraftChange?.value, '5');
 
-            const gunneryChange = (jumpedEffect?.system as any)?.changes?.find((c: any) => c.key === 'system.skills.active.gunnery.value');
+            const gunneryChange = (jumpedEffect as SR5ActiveEffect)?.system.changes?.find(c => c.key === 'system.skills.active.gunnery.value');
             assert.notEqual(gunneryChange, undefined);
             assert.equal(gunneryChange?.value, '5');
 
@@ -371,7 +372,7 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
             await RiggerFlow.jumpOut(driver, vehicle);
             assert.equal(vehicle.system.controlMode, 'autopilot');
             assert.equal(vehicle.getVehicleDriver()?.uuid, driver.uuid);
-            const jumpedEffectAfter = vehicle.effects.find(e => (e.flags as any)?.shadowrun5e?.isJumpedInEffect === true);
+            const jumpedEffectAfter = vehicle.effects.find(e => e.getFlag('shadowrun5e', 'isJumpedInEffect') === true);
             assert.isTrue(jumpedEffectAfter?.disabled === true, 'Jumped-in effect should be disabled upon jumping out');
 
             // Test jump out for drone across different vehicle types (driver is unassigned for all drone types)
@@ -411,11 +412,11 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
 
             await RiggerFlow.jumpIn(driver, vehicle);
 
-            const jumpedEffect = vehicle.effects.find(e => (e.flags as any)?.shadowrun5e?.isJumpedInEffect === true);
+            const jumpedEffect = vehicle.effects.find(e => e.getFlag('shadowrun5e', 'isJumpedInEffect') === true);
             assert.notEqual(jumpedEffect, undefined);
 
             // Should NOT contain duplicate handling/speed changes in jumped-in effect
-            const changes = (jumpedEffect?.system as any)?.changes || [];
+            const changes = (jumpedEffect as SR5ActiveEffect)?.system.changes || [];
             const hasHandlingChange = changes.some((c: any) => c.key === 'system.vehicle_stats.handling.mod');
             const hasSpeedChange = changes.some((c: any) => c.key === 'system.vehicle_stats.speed.mod');
 
@@ -456,15 +457,23 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
                 }
             }, { parent: driver } as any);
 
-            assert.equal((device.system.technology as any).condition_monitor.value, 4);
+            assert.equal(device.getCondition()?.value, 4);
 
             await DamageApplicationFlow.addMatrixDamage(driver, {
-                type: { base: 'matrix', value: 'matrix' },
                 base: -2,
-                value: -2
-            } as any);
+                value: -2,
+                changes: [],
+                attribute: '',
+                base_formula_operator: 'add',
+                type: { base: 'matrix', value: 'matrix' },
+                element: { base: '', value: '' },
+                ap: { base: 0, value: 0, changes: [], attribute: '', base_formula_operator: 'add' },
+                biofeedback: '',
+                source: { actorId: '', itemId: '', itemName: '', itemType: '' },
+                normal_weapon: false
+            });
 
-            assert.equal((device.system.technology as any).condition_monitor.value, 2);
+            assert.equal(device.getCondition()?.value, 2);
         });
 
         it('OpposedActiveSensorLockTest applies sr5sensorLock status effect on defender upon processFailure', async () => {
@@ -512,9 +521,9 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
 
             await RiggerActionFlows.handleEWarNoiseReduction(fakeActiveTest);
 
-            const effect = rigger.effects.find((e: any) => e.name === 'E-War Noise Reduction');
+            const effect = rigger.effects.find(e => e.name === 'E-War Noise Reduction');
             assert.isDefined(effect);
-            assert.equal((effect as any).duration.rounds, 1);
+            assert.equal(effect?.duration.rounds, 1);
         });
     });
 };

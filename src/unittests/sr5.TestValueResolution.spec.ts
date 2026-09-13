@@ -1,5 +1,6 @@
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { SR5Item } from "@/module/item/SR5Item";
+import { SR5ActiveEffect } from "@/module/effect/SR5ActiveEffect";
 import { BruteForceTest } from "@/module/tests/BruteForceTest";
 import { TestCreator } from "@/module/tests/TestCreator";
 import { SR5TestFactory } from "./utils";
@@ -157,10 +158,10 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             assert.equal(vehicle.system.controlMode, 'rigger');
             assert.equal(vehicle.getVehicleDriver()?.uuid, driver.uuid);
 
-            const jumpedEffect = vehicle.effects.find(e => (e.flags as any)?.shadowrun5e?.isJumpedInEffect === true);
+            const jumpedEffect = vehicle.effects.find(e => e.getFlag('shadowrun5e', 'isJumpedInEffect') === true);
             assert.notEqual(jumpedEffect, undefined);
 
-            const logicChange = (jumpedEffect?.system as any)?.changes?.find((c: any) => c.key === 'system.attributes.logic.value');
+            const logicChange = (jumpedEffect as SR5ActiveEffect)?.system.changes?.find(c => c.key === 'system.attributes.logic.value');
             assert.equal(logicChange?.value, '6');
             assert.equal(logicChange?.type, 'upgrade');
 
@@ -178,7 +179,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             });
             const vehicle = await factory.createActor({ type: 'vehicle', system: { vehicle_stats: { pilot: { base: 2 } } } });
             await vehicle.addVehicleDriver(driver.uuid);
-            await vehicle.update({ 'system.controlMode': 'manual' } as any);
+            await vehicle.update({ system: { controlMode: 'manual' } });
 
             assert.equal(vehicle.hasDriver(), true);
             assert.equal(vehicle.getVehicleDriver()?.uuid, driver.uuid);

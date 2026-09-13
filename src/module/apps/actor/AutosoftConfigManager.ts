@@ -10,7 +10,6 @@ import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicati
 const { fromUuidSync } = foundry.utils;
 
 export interface AutosoftConfigManagerContext extends HandlebarsApplicationMixin.RenderContext {
-    item: object;
     autosoftType: string;
     autosoftTypes: Record<string, string>;
     targetActors: Array<{ uuid: string; name: string; img: string }>;
@@ -34,7 +33,7 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
         options = {}
     ) {
         super(options);
-        const sys = autosoftItem.system as any;
+        const sys = autosoftItem.system;
         this.selectedAutosoftType = sys.autosoftType || 'clearsight';
         this.targetModel = sys.targetModel || '';
         this.selectedTargetWeaponUuid = sys.targetWeapon || '';
@@ -59,7 +58,6 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
 
     override async _prepareContext(options: Parameters<ApplicationV2['_prepareContext']>[0]) {
         const context = await super._prepareContext(options);
-        context.item = this.autosoftItem;
         context.autosoftType = this.selectedAutosoftType;
         context.autosoftTypes = SR5.autosoftTypes;
         context.targetModel = this.targetModel;
@@ -108,9 +106,9 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
 
         // Prepare item data for update & transfer
         const itemData = this.autosoftItem.toObject();
-        (itemData.system as any).autosoftType = this.selectedAutosoftType;
-        (itemData.system as any).targetModel = this.targetModel;
-        (itemData.system as any).targetWeapon = this.selectedTargetWeaponUuid;
+        itemData.system.autosoftType = this.selectedAutosoftType;
+        itemData.system.targetModel = this.targetModel;
+        itemData.system.targetWeapon = this.selectedTargetWeaponUuid;
 
         // Create on target actor
         await targetActor.createEmbeddedDocuments('Item', [itemData]);
@@ -138,22 +136,30 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
     ) {
         const root = this.element;
 
-        root.querySelector<HTMLSelectElement>('[name="autosoftType"]')?.addEventListener('change', (e: any) => {
-            this.selectedAutosoftType = e.target.value;
-            void this.render();
+        root.querySelector<HTMLSelectElement>('[name="autosoftType"]')?.addEventListener('change', (e: Event) => {
+            if (e.target instanceof HTMLSelectElement) {
+                this.selectedAutosoftType = e.target.value;
+                void this.render();
+            }
         });
 
-        root.querySelector<HTMLSelectElement>('[name="targetActorUuid"]')?.addEventListener('change', (e: any) => {
-            this.selectedTargetActorUuid = e.target.value;
-            void this.render();
+        root.querySelector<HTMLSelectElement>('[name="targetActorUuid"]')?.addEventListener('change', (e: Event) => {
+            if (e.target instanceof HTMLSelectElement) {
+                this.selectedTargetActorUuid = e.target.value;
+                void this.render();
+            }
         });
 
-        root.querySelector<HTMLSelectElement>('[name="targetWeaponUuid"]')?.addEventListener('change', (e: any) => {
-            this.selectedTargetWeaponUuid = e.target.value;
+        root.querySelector<HTMLSelectElement>('[name="targetWeaponUuid"]')?.addEventListener('change', (e: Event) => {
+            if (e.target instanceof HTMLSelectElement) {
+                this.selectedTargetWeaponUuid = e.target.value;
+            }
         });
 
-        root.querySelector<HTMLInputElement>('[name="targetModel"]')?.addEventListener('input', (e: any) => {
-            this.targetModel = e.target.value;
+        root.querySelector<HTMLInputElement>('[name="targetModel"]')?.addEventListener('input', (e: Event) => {
+            if (e.target instanceof HTMLInputElement) {
+                this.targetModel = e.target.value;
+            }
         });
 
         return super._onRender(context, options);

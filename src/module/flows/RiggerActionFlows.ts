@@ -3,6 +3,23 @@ import { SuccessTest } from '@/module/tests/SuccessTest';
 import { OpposedTest } from '@/module/tests/OpposedTest';
 import { ActiveSensorLockFlow } from './ActiveSensorLockFlow';
 import { DamageApplicationFlow } from '@/module/actor/flows/DamageApplicationFlow';
+import type { DamageType } from '@/module/types/item/Action';
+
+function createPhysicalDamage(value: number): DamageType {
+    return {
+        base: value,
+        value,
+        changes: [],
+        attribute: '',
+        base_formula_operator: 'add',
+        type: { base: 'physical', value: 'physical' },
+        element: { base: '', value: '' },
+        ap: { base: 0, value: 0, changes: [], attribute: '', base_formula_operator: 'add' },
+        biofeedback: '',
+        source: { actorId: '', itemId: '', itemName: '', itemType: '' },
+        normal_weapon: false
+    };
+}
 
 /**
  * Handles Rigger & Vehicle Action outcome flows and state/status/active effect applications.
@@ -52,7 +69,8 @@ export const RiggerActionFlows = {
     },
 
     /**
-     * E-War Noise Reduction outcome: On success, apply temporary noise reduction active effect.
+     * Electronic Warfare: Noise Reduction outcome.
+     * When successful, applies temporary ActiveEffect providing noise reduction equal to net hits.
      */
     async handleEWarNoiseReduction(test: SuccessTest) {
         if (test.opposing) return;
@@ -69,11 +87,14 @@ export const RiggerActionFlows = {
                 name: game.i18n.localize('SR5.Action.EwarNoiseReduction') || 'E-War Noise Reduction',
                 img: 'systems/shadowrun5e/dist/icons/redist/waveform.svg',
                 origin: test.actor.uuid,
-                duration: { rounds: 1, expiry: 'roundStart' },
-                changes: [
-                    { key: 'system.matrix.noise_reduction', mode: 2, value: String(netHits) }
-                ]
-            } as any]);
+                duration: { value: 1, units: 'rounds', expiry: 'roundStart' },
+                system: {
+                    targets: [{ id: 'actor', applyTo: 'actor' }],
+                    changes: [
+                        { key: 'system.matrix.noise_reduction', type: 'add', value: String(netHits) }
+                    ]
+                }
+            }]);
 
             ui.notifications?.info(game.i18n.format('SR5.Rigger.EWarNoiseReductionSuccess', {
                 actor: test.actor.name,
@@ -98,7 +119,7 @@ export const RiggerActionFlows = {
             const netHits = test.againstNetHits?.value ?? Math.max(1, test.against.hits.value - test.hits.value);
 
             if (attacker && defender) {
-                const attackerBody = (attacker as any).system?.attributes?.body?.value ?? (attacker as any).system?.body ?? 4;
+                const attackerBody = attacker.findAttribute('body')?.value ?? 4;
                 const rammingDamage = attackerBody + netHits;
 
                 ui.notifications?.info(game.i18n.format('SR5.Rigger.RammingSuccess', {
@@ -108,11 +129,7 @@ export const RiggerActionFlows = {
                 }) || `${attacker.name} rammed ${defender.name} dealing ${rammingDamage} physical damage!`);
 
                 // Apply physical damage to defender vehicle
-                await DamageApplicationFlow.addPhysicalDamage(defender, {
-                    type: { base: 'physical', value: 'physical' },
-                    base: rammingDamage,
-                    value: rammingDamage
-                } as any);
+                await DamageApplicationFlow.addPhysicalDamage(defender, createPhysicalDamage(rammingDamage));
             }
         }
     },
@@ -133,11 +150,7 @@ export const RiggerActionFlows = {
                 damage: String(impactDamage)
             }) || `${test.actor.name} failed emergency exit and suffers ${impactDamage} impact damage!`);
 
-            await DamageApplicationFlow.addPhysicalDamage(test.actor, {
-                type: { base: 'physical', value: 'physical' },
-                base: impactDamage,
-                value: impactDamage
-            } as any);
+            await DamageApplicationFlow.addPhysicalDamage(test.actor, createPhysicalDamage(impactDamage));
         }
     }
 };

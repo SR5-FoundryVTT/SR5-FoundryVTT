@@ -11,9 +11,12 @@ export const ActiveSensorLockFlow = {
     async applySensorLock(attacker: SR5Actor, target: SR5Actor | SR5Token | SR5TokenDocument, netHits: number) {
         if (!attacker || !target || netHits <= 0) return;
 
-        const targetActor = (target instanceof SR5Actor)
-            ? target
-            : ((target as any).actor as SR5Actor);
+        let targetActor: SR5Actor | null = null;
+        if (target instanceof SR5Actor) {
+            targetActor = target;
+        } else if (target instanceof SR5Token || target instanceof SR5TokenDocument) {
+            targetActor = target.actor;
+        }
 
         if (!targetActor) return;
 
@@ -58,9 +61,11 @@ export const ActiveSensorLockFlow = {
             const netHits = test.netHits?.value ?? test.hits.value;
             if (!attacker) return;
 
-            const targets = test.targets && test.targets.length > 0 ? test.targets : (test as any).icon ? [(test as any).icon] : [];
+            const targets = test.targets ?? [];
             for (const target of targets) {
-                await this.applySensorLock(attacker, target as any, netHits);
+                if (target instanceof SR5Actor || target instanceof SR5TokenDocument) {
+                    await this.applySensorLock(attacker, target, netHits);
+                }
             }
         }
     }

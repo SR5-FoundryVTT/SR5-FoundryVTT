@@ -1474,16 +1474,18 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     _prepareCarriedVehicles(inventoriesSheet: InventoriesSheetData) {
         if (!this.actor.isType('character')) return;
 
-        const ownedVehicles = game.actors.contents.filter(a => {
-            if (!a.isType('vehicle')) return false;
-            const isOwner = a.isOwner || (a as SR5Actor).system.driver === this.actor.uuid;
-            if (!isOwner) return false;
-            const sys = (a as SR5Actor).system as any;
-            const isDrone = sys.isDrone;
-            const category = sys.category;
-            const body = sys.attributes?.body?.value ?? 0;
-            return isDrone || ['micro', 'mini', 'small', 'medium', 'anthro'].includes(category) || body <= 6;
-        }) as SR5Actor[];
+        const ownedVehicles: SR5Actor<'vehicle'>[] = [];
+        for (const a of game.actors.contents) {
+            if (!a.isType('vehicle')) continue;
+            const isOwner = a.isOwner || a.system.driver === this.actor.uuid;
+            if (!isOwner) continue;
+            const isDrone = a.system.isDrone;
+            const category = a.system.category;
+            const body = a.system.attributes.body.value ?? 0;
+            if (isDrone || ['micro', 'mini', 'small', 'medium', 'anthro'].includes(category) || body <= 6) {
+                ownedVehicles.push(a);
+            }
+        }
 
         if (ownedVehicles.length === 0) return;
 

@@ -117,7 +117,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
         data.swarmInfo = RiggingRules.getSwarmPilotInfo(this.actor);
 
-        if (data.vehicle.master && data.vehicle.master.system.category === 'rcc') {
+        if (data.vehicle.master && data.vehicle.master.isType('device') && data.vehicle.master.system.category === 'rcc') {
             const info = RiggingRules.getRCCSharingInfo(data.vehicle.master);
             data.rccInfo = {
                 ...info,
@@ -312,7 +312,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
                     equipped: !isCurrentlyEquipped
                 }
             }
-        } as any);
+        });
         void this.render();
     }
 }

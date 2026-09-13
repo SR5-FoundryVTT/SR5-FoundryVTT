@@ -100,21 +100,21 @@ export default class Sr5Tour extends foundry.nue.Tour {
         }
 
         // 2. Step-by-step modifications for RiggerSwarm and Autosofts tours
-        if (this.id === "RiggerSwarm") {
+        if (this.id === "RiggerSwarm" && this.actor?.isType('vehicle')) {
             if (stepId === "DroneAttributes" || stepId === "EnableSwarm") {
-                await this.actor.update({ "system.swarm.active": false, "system.swarm.count": 1 } as any);
+                await this.actor.update({ system: { swarm: { active: false, count: 1 } } });
                 if (this.actor.sheet) {
                     (this.actor.sheet as any)._mode = 'edit';
                     await (this.actor.sheet as any).render(true);
                 }
             } else if (stepId === "EnableSwarmActive") {
-                await this.actor.update({ "system.swarm.active": true, "system.swarm.count": 1 } as any);
+                await this.actor.update({ system: { swarm: { active: true, count: 1 } } });
                 if (this.actor.sheet) {
                     (this.actor.sheet as any)._mode = 'edit';
                     await (this.actor.sheet as any).render(true);
                 }
             } else if (stepId === "SwarmCount") {
-                await this.actor.update({ "system.swarm.active": true, "system.swarm.count": 4 } as any);
+                await this.actor.update({ system: { swarm: { active: true, count: 4 } } });
                 if (this.actor.sheet) {
                     (this.actor.sheet as any)._mode = 'edit';
                     await (this.actor.sheet as any).render(true);
@@ -184,25 +184,25 @@ export default class Sr5Tour extends foundry.nue.Tour {
                     // Equip only 1 autosoft so warning banner is OFF in step 4
                     let count = 0;
                     for (const item of this.actor.items) {
-                        if (item.type === "program" && (item.system as any)?.type === "autosoft") {
+                        if (item.isType('program') && item.system.type === "autosoft") {
                             count++;
                             const shouldEquip = count === 1;
                             if (item.isEquipped() !== shouldEquip) {
-                                await item.update({ "system.technology.equipped": shouldEquip } as any, { render: false });
+                                await item.update({ system: { technology: { equipped: shouldEquip } } }, { render: false });
                             }
                         }
                     }
                 } else if (stepId === "DroneSlotLimits") {
                     // Equip 3 autosofts so runningCount = 3 > maxSlots (2), triggering the warning banner in step 5!
                     for (const item of this.actor.items) {
-                        if (item.type === "program" && (item.system as any)?.type === "autosoft") {
+                        if (item.isType('program') && item.system.type === "autosoft") {
                             if (!item.isEquipped()) {
-                                await item.update({ "system.technology.equipped": true } as any, { render: false });
+                                await item.update({ system: { technology: { equipped: true } } }, { render: false });
                             }
                         }
                     }
                 } else if (stepId === "RCCOverrideHierarchy") {
-                    const rccItem = this.actor.items.find(i => i.type === "device" && (i.system as any)?.category === "rcc");
+                    const rccItem = this.actor.items.find(i => i.isType('device') && i.system.category === "rcc");
                     if (rccItem && (!this.actor.master || this.actor.master.id !== rccItem.id)) {
                         await MatrixNetworkFlow.addSlave(rccItem, this.actor, { triggerUpdate: false });
                     }
@@ -254,9 +254,15 @@ export default class Sr5Tour extends foundry.nue.Tour {
                     await this.tourItem.sheet.close();
                 }
 
-                let existingRcc: any = this.actor.items.find(i => i.type === "device" && (i.system as any)?.category === "rcc");
+                let existingRcc: SR5Item<'device'> | undefined;
+                for (const i of this.actor.items) {
+                    if (i.isType('device') && i.system.category === "rcc") {
+                        existingRcc = i;
+                        break;
+                    }
+                }
                 if (!existingRcc) {
-                    const [createdRcc] = (await this.actor.createEmbeddedDocuments("Item", [
+                    const [createdRcc] = await this.actor.createEmbeddedDocuments("Item", [
                         {
                             name: "Triangulator RCC (Rating 5)",
                             type: "device",
@@ -271,8 +277,8 @@ export default class Sr5Tour extends foundry.nue.Tour {
                                 }
                             }
                         }
-                    ], { render: false })) as any[];
-                    existingRcc = createdRcc;
+                    ], { render: false });
+                    existingRcc = createdRcc && createdRcc.isType('device') ? createdRcc : undefined;
                 }
 
                 if (existingRcc && (!this.actor.master || this.actor.master.id !== existingRcc.id)) {
@@ -286,9 +292,11 @@ export default class Sr5Tour extends foundry.nue.Tour {
 
                 if (existingRcc && (existingRcc.system.sharing !== targetSharing || existingRcc.system.noise_reduction !== targetNoiseRed)) {
                     await existingRcc.update({
-                        "system.sharing": targetSharing,
-                        "system.noise_reduction": targetNoiseRed
-                    } as any, { render: false });
+                        system: {
+                            sharing: targetSharing,
+                            noise_reduction: targetNoiseRed
+                        }
+                    }, { render: false });
                 }
 
                 if (this.actor?.sheet) {

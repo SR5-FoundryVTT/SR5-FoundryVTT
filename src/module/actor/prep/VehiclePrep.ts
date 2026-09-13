@@ -49,8 +49,8 @@ export class VehiclePrep {
     static prepareVehicleStats(system: Actor.SystemOfType<'vehicle'>) {
         const { vehicle_stats, isDrone } = system;
 
-        const isSwarmActive = Boolean(system.swarm?.active ?? (system as any).isSwarm);
-        const swarmCount = isSwarmActive ? Math.max(1, Number(system.swarm?.count ?? (system as any).swarmCount) || 1) : 1;
+        const isSwarmActive = Boolean(system.swarm.active);
+        const swarmCount = isSwarmActive ? Math.max(1, system.swarm.count ?? 1) : 1;
 
         if (isSwarmActive && swarmCount > 1) {
             const swarmBonus = swarmCount - 1;

@@ -171,7 +171,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     hasActionCategory(category: Shadowrun.ActionCategories) {
         const action = this.asType('action');
         if (!action) return false;
-        return (action.system as any).action?.categories?.includes(category) ?? false;
+        return action.system.action?.categories?.includes(category) ?? false;
     }
 
     /**
@@ -676,7 +676,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @returns The action result, or undefined if not applicable.
      */
     getActionResult(): ActionResultType | undefined {
-        return this.isType('action') ? (this.system as any).result : undefined;
+        return this.isType('action') ? this.system.result : undefined;
     }
 
     /**
@@ -1584,10 +1584,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             UpdateSkillFlow.injectSkillCategoryDefaults(changed, this);
         }
 
-        if (this.isType('device') && (this.system as any).category === 'rcc') {
+        if (this.isType('device') && this.system.category === 'rcc') {
             const sys = changed.system as Record<string, any> | undefined;
-            const newSharing = sys?.sharing !== undefined ? Number(sys.sharing) : Number((this.system as any).sharing || 0);
-            const newNoiseRed = sys?.noise_reduction !== undefined ? Number(sys.noise_reduction) : Number((this.system as any).noise_reduction || 0);
+            const newSharing = sys?.sharing !== undefined ? Number(sys.sharing) : Number(this.system.sharing || 0);
+            const newNoiseRed = sys?.noise_reduction !== undefined ? Number(sys.noise_reduction) : Number(this.system.noise_reduction || 0);
             const sum = newSharing + newNoiseRed;
 
             const currentRating = sys?.technology?.rating !== undefined
@@ -1626,8 +1626,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     >(embeddedName: EmbeddedName, id: string, options?: Options): Item.Embedded.GetReturn<EmbeddedName, Options> {
         const nameStr = embeddedName as string;
         if (nameStr === 'Item' || nameStr === 'items') {
-            return this.getOwnedItem(id) as any;
+            return this.getOwnedItem(id) as Item.Embedded.GetReturn<EmbeddedName, Options>;
         }
-        return super.getEmbeddedDocument(embeddedName, id, options) as any;
+        return super.getEmbeddedDocument(embeddedName, id, options);
     }
 }
