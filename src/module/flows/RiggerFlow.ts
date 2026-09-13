@@ -155,7 +155,7 @@ export const RiggerFlow = {
         `;
 
         await ChatMessage.create({
-            speaker: ChatMessage.getSpeaker({ actor: driver }),
+            speaker: ChatMessage.getSpeaker({ actor: driver as any }),
             content,
             style: CONST.CHAT_MESSAGE_STYLES.OTHER
         });

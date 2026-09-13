@@ -10,7 +10,7 @@ import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicati
 const { fromUuidSync } = foundry.utils;
 
 export interface AutosoftConfigManagerContext extends HandlebarsApplicationMixin.RenderContext {
-    item: SR5Item<'program'>;
+    item: object;
     autosoftType: string;
     autosoftTypes: Record<string, string>;
     targetActors: Array<{ uuid: string; name: string; img: string }>;
@@ -42,7 +42,7 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
         // Default initial target actor if available
         const targets = this._getEligibleTargetActors();
         if (targets.length > 0) {
-            this.selectedTargetActorUuid = targets[0].uuid;
+            this.selectedTargetActorUuid = targets[0].uuid ?? '';
         }
     }
 
@@ -66,7 +66,7 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
 
         const eligibleActors = this._getEligibleTargetActors();
         context.targetActors = eligibleActors.map(a => ({
-            uuid: a.uuid,
+            uuid: a.uuid ?? '',
             name: a.name || '',
             img: a.img || ''
         }));

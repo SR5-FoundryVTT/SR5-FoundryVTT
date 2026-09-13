@@ -826,7 +826,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     }
 
     protected async _sendRccReconfigureMessage(sharing: number, noiseReduction: number) {
-        const speaker = ChatMessage.getSpeaker({ actor: this.actor });
+        const speaker = ChatMessage.getSpeaker({ actor: this.actor as any });
         const inCombat = this.actor.inCombat;
         const actionLabel = inCombat
             ? game.i18n.localize('SR5.RCC.SimpleActionInCombat' as any)
