@@ -17,12 +17,13 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
 
         it('visibility checks', async () => {
             const spirit = await factory.createActor({ type: 'spirit' });
-            assert.strictEqual(spirit.system.visibilityChecks.astral.astralActive, true);
-            assert.strictEqual(spirit.system.visibilityChecks.astral.hasAura, true);
-            assert.strictEqual(spirit.system.visibilityChecks.astral.affectedBySpell, false);
-            assert.strictEqual(spirit.system.visibilityChecks.meat.hasHeat, false);
-            assert.strictEqual(spirit.system.visibilityChecks.matrix.hasIcon, false);
-            assert.strictEqual(spirit.system.visibilityChecks.matrix.runningSilent, false);
+            assert.strictEqual(spirit.system.visibilityChecks.targets.astral.astralActive, true);
+            assert.strictEqual(spirit.system.visibilityChecks.targets.astral.hasAura, true);
+            assert.strictEqual(spirit.system.visibilityChecks.targets.astral.affectedBySpell, false);
+            assert.strictEqual(spirit.system.visibilityChecks.targets.physical.active, false);
+            assert.strictEqual(spirit.system.visibilityChecks.targets.physical.thermographic, 'none');
+            assert.strictEqual(spirit.system.visibilityChecks.targets.matrix.hasIcon, false);
+            assert.strictEqual(spirit.system.visibilityChecks.targets.matrix.runningSilent, false);
         });
 
 

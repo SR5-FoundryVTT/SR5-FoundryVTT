@@ -25,6 +25,45 @@ export const MagicData = () => ({
     initiation: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 });
 
+export const CharacterMagicData = () => ({
+    ...MagicData(),
+    type: new StringField({
+        required: true,
+        initial: 'mundane',
+        choices: {
+            mundane: 'SR5.Vision.MagicalTypes.Mundane',
+            magician: 'SR5.Vision.MagicalTypes.Magician',
+            aspected_magician: 'SR5.Vision.MagicalTypes.AspectedMagician',
+            adept: 'SR5.Vision.MagicalTypes.Adept',
+            mystic_adept: 'SR5.Vision.MagicalTypes.MysticAdept',
+        },
+        label: 'SR5.Vision.MagicalType',
+        hint: 'SR5.Vision.MagicalTypeHint',
+    }),
+    astralPerceptionOverride: new StringField({
+        required: true,
+        initial: 'default',
+        choices: {
+            default: 'SR5.Vision.OverrideModes.Default',
+            allow: 'SR5.Vision.OverrideModes.Allow',
+            deny: 'SR5.Vision.OverrideModes.Deny',
+        },
+        label: 'SR5.Vision.AstralPerceptionOverride',
+        hint: 'SR5.Vision.AstralPerceptionOverrideHint',
+    }),
+    astralProjectionOverride: new StringField({
+        required: true,
+        initial: 'default',
+        choices: {
+            default: 'SR5.Vision.OverrideModes.Default',
+            allow: 'SR5.Vision.OverrideModes.Allow',
+            deny: 'SR5.Vision.OverrideModes.Deny',
+        },
+        label: 'SR5.Vision.AstralProjectionOverride',
+        hint: 'SR5.Vision.AstralProjectionOverrideHint',
+    }),
+});
+
 export const PhysicalCombatValues = () => ({
     recoil: new ModifiableField(ModifiableValueSchema()),
     recoil_compensation: new ModifiableField(ModifiableValueSchema()),

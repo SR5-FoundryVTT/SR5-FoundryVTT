@@ -9,6 +9,8 @@
         }
     },
     "SETTINGS": {
+        "AutomaticTokenSenses": "Gérer automatiquement les sens des jetons",
+        "AutomaticTokenSensesDescription": "Actualise les modes de détection gérés par le système lorsque les données d'acteur, d'objet, d'effet ou de jeton changent. Un jeton peut être exclu avec le drapeau shadowrun5e.AutomaticTokenSenses.",
         "ApplyLimitsDescription": "Est-ce que des limites doivent être appliquées aux lancés",
         "ApplyLimitsName": "Appliquer des limites aux lancés",
         "EnforceExtendedTestIntervalDescription": "N'autoriser le prochain lancer d'un test étendu qu'une fois son intervalle écoulé en temps de jeu.",
@@ -1537,9 +1539,95 @@
         },
         "Vision": {
             "AstralPerception": "Perception astrale",
+            "AstralRegions": {
+                "Barrier": { "Label": "Barrière astrale" },
+                "Ward": { "Label": "Protection astrale" },
+                "BlockSight": "Bloquer la vision astrale",
+                "BlockSightHint": "Empêche la vision astrale de traverser la limite de cette région.",
+                "BlockMovement": "Bloquer le déplacement astral",
+                "BlockMovementHint": "Empêche les formes astrales de traverser la limite de cette région.",
+                "MovementBlocked": "Une barrière astrale bloque ce déplacement.",
+                "Force": "Puissance",
+                "ForceHint": "La Puissance de la barrière de mana. Les tests d'analyse astrale effectués à travers elle subissent une pénalité de réserve de dés égale à cette valeur.",
+                "ForcePenalty": "Puissance de la barrière astrale",
+                "AllowedActors": "Acteurs autorisés",
+                "AllowedActorsHint": "Le créateur de la barrière et ceux qu'il laisse passer. Ces acteurs ignorent la barrière pour la vision et le déplacement."
+            },
+            "EnvironmentalRegions": {
+                "Environment": {
+                    "Label": "Environnement SR5"
+                },
+                "Level": {
+                    "None": "Aucun",
+                    "Light": "Léger",
+                    "Moderate": "Modéré",
+                    "Heavy": "Fort"
+                },
+                "BackgroundCount": {
+                    "Label": "Indice de perturbation astrale",
+                    "Hint": "L’indice le plus élevé des régions superposées s’applique aux actions magiques.",
+                    "Contribution": "Perturbation astrale régionale"
+                },
+                "MatrixNoise": {
+                    "Label": "Bruit matriciel",
+                    "Hint": "Les indices des régions superposées s’additionnent.",
+                    "Contribution": "Bruit matriciel régional"
+                },
+                "Visibility": {
+                    "Label": "Visibilité",
+                    "Hint": "Conditions de visibilité dans cette région.",
+                    "Contribution": "Visibilité régionale"
+                },
+                "Light": {
+                    "Label": "Lumière / Éblouissement",
+                    "Hint": "Conditions de lumière ou d’éblouissement dans cette région.",
+                    "Contribution": "Lumière / éblouissement régional"
+                },
+                "Wind": {
+                    "Label": "Vent",
+                    "Hint": "Conditions de vent dans cette région.",
+                    "Contribution": "Vent régional"
+                }
+            },
+            "CannotPerceiveAstrally": "Cet acteur ne peut pas utiliser la perception astrale.",
+            "ToggleAstralPerception": "Activer/désactiver la perception astrale",
+            "BeginAstralProjection": "Commencer la projection astrale",
+            "ReturnFromAstralProjection": "Retourner dans son corps",
+            "AstralFormName": "{name} — Forme astrale",
+            "CannotProjectAstrally": "Cet acteur ne peut pas utiliser la projection astrale.",
+            "CannotControlAstralProjection": "Vous ne possédez pas la projection astrale de cet acteur.",
+            "AlreadyProjectingAstrally": "Cet acteur est déjà en projection astrale.",
+            "AstralToggleFailed": "Impossible de basculer la vision astrale. Voir la console pour plus de détails.",
+            "AstralPerceptionOverride": "Forçage de la perception astrale",
+            "AstralPerceptionOverrideHint": "Forçage MJ déterminant si cet acteur peut utiliser la perception astrale.",
+            "AstralProjectionOverride": "Forçage de la projection astrale",
+            "AstralProjectionOverrideHint": "Forçage MJ déterminant si cet acteur peut utiliser la projection astrale.",
             "AugmentedReality": "Réalité Augmentée",
             "LowLight": "Vision dans l'obsucrité",
-            "ThermographicVision": "Vision thermographique"
+            "MagicalType": "Type magique",
+            "MagicalTypeHint": "Détermine l'accès par défaut de l'acteur à la perception et à la projection astrales.",
+            "MagicalTypes": {
+                "Adept": "Adepte",
+                "AspectedMagician": "Magicien spécialisé",
+                "Magician": "Magicien",
+                "Mundane": "Ordinaire",
+                "MysticAdept": "Adepte mystique"
+            },
+            "OverrideModes": {
+                "Allow": "Autoriser",
+                "Default": "Utiliser le type magique",
+                "Deny": "Refuser"
+            },
+            "ThermographicSignature": "Signature thermographique",
+            "ThermographicSignatureHint": "Détermine l’apparence de cet acteur lorsqu’il est détecté par vision thermographique.",
+            "ThermographicSignatures": {
+                "None": "Aucune",
+                "Cold": "Froide",
+                "Warm": "Chaude",
+                "Hot": "Très chaude"
+            },
+            "ThermographicVision": "Vision thermographique",
+            "Ultrasound": "Ultrasons"
         },
         "Walk": "Marcher",
         "Warnings": {
@@ -1637,6 +1725,7 @@
         "WoundTolerance": "Tolérance blessures",
         "Wounds": "Blessures",
         "StatusEffects": {
+            "AstralPerception": "Perception astrale",
             "Running": "Course",
             "Sprinting": "Sprint"
         }

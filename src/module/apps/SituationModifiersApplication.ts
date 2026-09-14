@@ -17,6 +17,11 @@ interface SituationalModifiersTemplateData extends HandlebarsApplicationMixin.Re
     targetName: string
     modifiers: Record<string, unknown>
     environmentalLevels: EnvironmentalModifierLevels
+    regionalModifiers: {
+        noise: number
+        background_count: number
+        environmental: Record<'visibility' | 'light' | 'wind', number>
+    }
 }
 
 /**
@@ -159,7 +164,11 @@ class MagicModifiersHandler extends ModifiersHandler {
     async handleClearMagicModifiers(event: Event) {
         event.preventDefault();
 
-        this.app.modifiers = await DocumentSituationModifiers.clearTypeOn(this.app.target, 'background_count');
+        this.app.modifiers = await DocumentSituationModifiers.clearTypeOn(
+            this.app.target,
+            'background_count',
+            this.app.modifiers.sourceToken,
+        );
         await this.app.render();
     }
 }
@@ -302,7 +311,8 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
             return;
         }
 
-        void new SituationModifiersApplication(target).render({ force: true });
+        const sourceToken = target instanceof SR5Actor ? target.getToken() : null;
+        void new SituationModifiersApplication(target, {}, sourceToken).render({ force: true });
     }
     
     // Manage modifiers stored on this target document. This might not be the document meant for those modifiers to be applied to.
@@ -313,11 +323,11 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
     // Instance handlers contain all functionality for modifier categories as not to clutter the general application.
     handlers: ModifiersHandler[]
 
-    constructor(target: ModifiableDocumentTypes, options = {}) {
+    constructor(target: ModifiableDocumentTypes, options = {}, sourceToken?: TokenDocument | null) {
         super(options);
         
         this.target = target;
-        this.modifiers = this._getModifiers();
+        this.modifiers = DocumentSituationModifiers.fromDocument(this.target, sourceToken);
         this.handlers = this._prepareHandlers();
     }
 
@@ -349,7 +359,12 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
             targetName: this.target.name || 'Unknown target',
 
             modifiers: this.modifiers as unknown as Record<string, unknown>,
-            environmentalLevels: this.modifiers.environmental.levels
+            environmentalLevels: this.modifiers.environmental.levels,
+            regionalModifiers: {
+                noise: this.modifiers.regionalModifierFor('noise'),
+                background_count: this.modifiers.regionalModifierFor('background_count'),
+                environmental: this.modifiers.regional.physical,
+            },
         };
     }
 
@@ -458,7 +473,7 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
     }
 
     _getModifiers(): DocumentSituationModifiers {
-        return DocumentSituationModifiers.fromDocument(this.target);
+        return DocumentSituationModifiers.fromDocument(this.target, this.modifiers?.sourceToken);
     }
 
     get _targetTypeLabel(): string {
@@ -504,7 +519,7 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
         if (!token) return;
 
         const actor = token.actor as SR5Actor;
-        const modifiers = actor.getSituationModifiers();
+        const modifiers = actor.getSituationModifiers(token.document);
         modifiers.applyAll();
 
         // Setup and connect tokenHUD elements.
@@ -540,7 +555,7 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
             event.preventDefault();
 
             if (!token?.actor) return;
-            const app = new SituationModifiersApplication(token.actor);
+            const app = new SituationModifiersApplication(token.actor, {}, token.document);
             await app.render({ force: true });
         }
     }

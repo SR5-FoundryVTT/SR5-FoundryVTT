@@ -15,6 +15,12 @@
                 <button type="button" data-action="applyModifierDelta" data-delta="3">+3</button>
             </div>
         </div>
+        {{#if regionalModifiers.noise}}
+        <div class="form-group">
+            <label>{{localize "SR5.Vision.EnvironmentalRegions.MatrixNoise.Contribution"}}</label>
+            <span>{{regionalModifiers.noise}}</span>
+        </div>
+        {{/if}}
         <h2>{{localize "SR5.SituationalModifiersApplication.Category.Magic"}}</h2>
         <div class="form-group">
             <label for="modifiers-magic-total">{{localize "SR5.SituationalModifiersApplication.Magic.BackgroundCount"}}: {{modifiers.background_count.total}}</label>
@@ -27,7 +33,31 @@
                 <button type="button" data-action="applyModifierDelta" data-delta="3">+3</button>
             </div>
         </div>
+        {{#if regionalModifiers.background_count}}
+        <div class="form-group">
+            <label>{{localize "SR5.Vision.EnvironmentalRegions.BackgroundCount.Contribution"}}</label>
+            <span>{{regionalModifiers.background_count}}</span>
+        </div>
+        {{/if}}
         <h2>{{localize "SR5.SituationalModifiersApplication.Category.Physical"}}</h2>
+        {{#if regionalModifiers.environmental.visibility}}
+        <div class="form-group">
+            <label>{{localize "SR5.Vision.EnvironmentalRegions.Visibility.Contribution"}}</label>
+            <span>{{regionalModifiers.environmental.visibility}}</span>
+        </div>
+        {{/if}}
+        {{#if regionalModifiers.environmental.light}}
+        <div class="form-group">
+            <label>{{localize "SR5.Vision.EnvironmentalRegions.Light.Contribution"}}</label>
+            <span>{{regionalModifiers.environmental.light}}</span>
+        </div>
+        {{/if}}
+        {{#if regionalModifiers.environmental.wind}}
+        <div class="form-group">
+            <label>{{localize "SR5.Vision.EnvironmentalRegions.Wind.Contribution"}}</label>
+            <span>{{regionalModifiers.environmental.wind}}</span>
+        </div>
+        {{/if}}
         {{#if modifiers.documentIsActor}}
         <div class="form-group">
             <label for="modifiers-recoil-total">{{localize "SR5.ModifierTypes.Recoil"}}: {{modifiers.applied.recoil.total}}</label>

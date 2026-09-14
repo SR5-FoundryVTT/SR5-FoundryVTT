@@ -9,6 +9,8 @@
         }
     },
     "SETTINGS": {
+        "AutomaticTokenSenses": "Gerenciar sentidos dos tokens automaticamente",
+        "AutomaticTokenSensesDescription": "Atualiza os modos de detecção gerenciados pelo sistema quando dados de ator, item, efeito ou token mudam. Tokens individuais podem ser excluídos com a flag shadowrun5e.AutomaticTokenSenses.",
         "ApplyLimitsDescription": "Os limites devem ser aplicados às rolagens",
         "ApplyLimitsName": "Aplicar Limites às Rolagens",
         "AutomateMultiDefenseModifier": "Automatizar modificadores de defesa",
@@ -2145,9 +2147,95 @@
         },
         "Vision": {
             "AstralPerception": "Percepção Astral",
+            "AstralRegions": {
+                "Barrier": { "Label": "Barreira astral" },
+                "Ward": { "Label": "Proteção astral" },
+                "BlockSight": "Bloquear visão astral",
+                "BlockSightHint": "Impede que a visão astral atravesse o limite desta Região.",
+                "BlockMovement": "Bloquear movimento astral",
+                "BlockMovementHint": "Impede que formas astrais atravessem o limite desta Região.",
+                "MovementBlocked": "Uma barreira astral bloqueia este movimento.",
+                "Force": "Força",
+                "ForceHint": "A Força da barreira de mana. Testes de Percepção Astral através dela sofrem uma penalidade na parada de dados igual a este valor.",
+                "ForcePenalty": "Força da barreira astral",
+                "AllowedActors": "Atores permitidos",
+                "AllowedActorsHint": "O criador da barreira e quem ele deixar passar. Esses atores ignoram a barreira tanto para visão quanto para movimento."
+            },
+            "EnvironmentalRegions": {
+                "Environment": {
+                    "Label": "Ambiente SR5"
+                },
+                "Level": {
+                    "None": "Nenhum",
+                    "Light": "Leve",
+                    "Moderate": "Moderado",
+                    "Heavy": "Pesado"
+                },
+                "BackgroundCount": {
+                    "Label": "Contagem de fundo",
+                    "Hint": "O maior índice entre Regiões sobrepostas se aplica a ações mágicas.",
+                    "Contribution": "Contagem de fundo regional"
+                },
+                "MatrixNoise": {
+                    "Label": "Ruído da Matrix",
+                    "Hint": "Os índices de Regiões sobrepostas são somados.",
+                    "Contribution": "Ruído da Matrix regional"
+                },
+                "Visibility": {
+                    "Label": "Visibilidade",
+                    "Hint": "Condição de visibilidade dentro desta Região.",
+                    "Contribution": "Visibilidade regional"
+                },
+                "Light": {
+                    "Label": "Luz / Ofuscamento",
+                    "Hint": "Condição de luz ou ofuscamento dentro desta Região.",
+                    "Contribution": "Luz / ofuscamento regional"
+                },
+                "Wind": {
+                    "Label": "Vento",
+                    "Hint": "Condição de vento dentro desta Região.",
+                    "Contribution": "Vento regional"
+                }
+            },
+            "CannotPerceiveAstrally": "Este ator não pode usar percepção astral.",
+            "ToggleAstralPerception": "Alternar Percepção Astral",
+            "BeginAstralProjection": "Iniciar Projeção Astral",
+            "ReturnFromAstralProjection": "Retornar ao Corpo",
+            "AstralFormName": "{name} — Forma Astral",
+            "CannotProjectAstrally": "Este ator não pode usar projeção astral.",
+            "CannotControlAstralProjection": "Você não possui a projeção astral deste ator.",
+            "AlreadyProjectingAstrally": "Este ator já está em projeção astral.",
+            "AstralToggleFailed": "Não foi possível alternar a visão astral. Veja o console para detalhes.",
+            "AstralPerceptionOverride": "Substituição de percepção astral",
+            "AstralPerceptionOverrideHint": "Substituição do MJ para permitir ou impedir que este ator use percepção astral.",
+            "AstralProjectionOverride": "Substituição de projeção astral",
+            "AstralProjectionOverrideHint": "Substituição do MJ para permitir ou impedir que este ator use projeção astral.",
             "AugmentedReality": "Realidade Aumentada",
             "LowLight": "Visão de Pouca Luz",
-            "ThermographicVision": "Visão Termográfica"
+            "MagicalType": "Tipo mágico",
+            "MagicalTypeHint": "Determina a elegibilidade padrão do ator para percepção e projeção astral.",
+            "MagicalTypes": {
+                "Adept": "Adepto",
+                "AspectedMagician": "Mago aspectado",
+                "Magician": "Mago",
+                "Mundane": "Mundano",
+                "MysticAdept": "Adepto místico"
+            },
+            "OverrideModes": {
+                "Allow": "Permitir",
+                "Default": "Usar tipo mágico",
+                "Deny": "Negar"
+            },
+            "ThermographicSignature": "Assinatura termográfica",
+            "ThermographicSignatureHint": "Define como este ator aparece quando detectado por visão termográfica.",
+            "ThermographicSignatures": {
+                "None": "Nenhuma",
+                "Cold": "Fria",
+                "Warm": "Morna",
+                "Hot": "Quente"
+            },
+            "ThermographicVision": "Visão Termográfica",
+            "Ultrasound": "Ultrassom"
         },
         "Walk": "Caminhar",
         "WalkingSpeed": "Caminhando",
@@ -2289,6 +2377,7 @@
         },
         "Wireless": "Conexão Sem Fio",
         "StatusEffects": {
+            "AstralPerception": "Percepção Astral",
             "Running": "Correndo",
             "Sprinting": "Corrida Veloz"
         }

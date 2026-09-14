@@ -9,6 +9,8 @@
         }
     },
     "SETTINGS": {
+        "AutomaticTokenSenses": "Automatically manage token senses",
+        "AutomaticTokenSensesDescription": "Refresh system-managed token detection modes when actor, item, effect, or token data changes. Individual tokens can opt out with the shadowrun5e.AutomaticTokenSenses flag.",
         "ApplyLimitsDescription": "Should Limits be applied to rolls",
         "ApplyLimitsName": "Apply Limits to Rolls",
         "AutomateMultiDefenseModifier": "Automate defense modifier",
@@ -2980,6 +2982,7 @@
             "Type": "Type"
         },
         "StatusEffects": {
+            "AstralPerception": "Astral Perception",
             "Running": "Running",
             "Sprinting": "Sprinting"
         },
@@ -3359,9 +3362,99 @@
         },
         "Vision": {
             "AstralPerception": "Astral Perception",
+            "CannotPerceiveAstrally": "This actor cannot use astral perception.",
+            "ToggleAstralPerception": "Toggle Astral Perception",
+            "BeginAstralProjection": "Begin Astral Projection",
+            "ReturnFromAstralProjection": "Return to Body",
+            "AstralFormName": "{name} — Astral Form",
+            "CannotProjectAstrally": "This actor cannot use astral projection.",
+            "CannotControlAstralProjection": "You do not own this actor's astral projection.",
+            "AlreadyProjectingAstrally": "This actor is already astrally projecting.",
+            "AstralToggleFailed": "Astral vision could not be toggled. See the console for details.",
+            "AstralPerceptionOverride": "Astral perception override",
+            "AstralPerceptionOverrideHint": "GM override for whether this actor may use astral perception.",
+            "AstralProjectionOverride": "Astral projection override",
+            "AstralProjectionOverrideHint": "GM override for whether this actor may use astral projection.",
             "AugmentedReality": "Augmented Reality",
             "LowLight": "Low-Light Vision",
-            "ThermographicVision": "Thermographic Vision"
+            "MagicalType": "Magical type",
+            "MagicalTypeHint": "Determines the actor's default astral perception and projection eligibility.",
+            "MagicalTypes": {
+                "Adept": "Adept",
+                "AspectedMagician": "Aspected magician",
+                "Magician": "Magician",
+                "Mundane": "Mundane",
+                "MysticAdept": "Mystic adept"
+            },
+            "OverrideModes": {
+                "Allow": "Allow",
+                "Default": "Use magical type",
+                "Deny": "Deny"
+            },
+            "ThermographicSignature": "Thermographic signature",
+            "ThermographicSignatureHint": "How this actor appears when detected by thermographic vision.",
+            "ThermographicSignatures": {
+                "None": "None",
+                "Cold": "Cold",
+                "Warm": "Warm",
+                "Hot": "Hot"
+            },
+            "ThermographicVision": "Thermographic Vision",
+            "Ultrasound": "Ultrasound",
+            "AstralRegions": {
+                "Barrier": {
+                    "Label": "Astral Barrier"
+                },
+                "Ward": {
+                    "Label": "Astral Ward"
+                },
+                "BlockSight": "Block astral sight",
+                "BlockSightHint": "Prevent astral sight from crossing this Region's boundary.",
+                "BlockMovement": "Block astral movement",
+                "BlockMovementHint": "Prevent astral forms from crossing this Region's boundary.",
+                "MovementBlocked": "An astral barrier blocks this movement.",
+                "Force": "Force",
+                "ForceHint": "The mana barrier's Force. Assensing tests through it receive a dice-pool penalty equal to this value.",
+                "ForcePenalty": "Astral barrier Force",
+                "AllowedActors": "Allowed actors",
+                "AllowedActorsHint": "The barrier's creator and anyone they let through. These actors ignore this barrier for both sight and movement."
+            },
+            "EnvironmentalRegions": {
+                "Environment": {
+                    "Label": "SR5 Environment"
+                },
+                "Level": {
+                    "None": "None",
+                    "Light": "Light",
+                    "Moderate": "Moderate",
+                    "Heavy": "Heavy"
+                },
+                "BackgroundCount": {
+                    "Label": "Background Count",
+                    "Hint": "Highest overlapping rating applies to magical actions.",
+                    "Contribution": "Regional background count"
+                },
+                "MatrixNoise": {
+                    "Label": "Matrix Noise",
+                    "Hint": "Ratings from overlapping Regions add together.",
+                    "Contribution": "Regional Matrix noise"
+                },
+                "Visibility": {
+                    "Label": "Visibility",
+                    "Hint": "Visibility condition inside this Region.",
+                    "Contribution": "Regional visibility"
+                },
+                "Light": {
+                    "Label": "Light / Glare",
+                    "Hint": "Light or glare condition inside this Region.",
+                    "Contribution": "Regional light / glare"
+                },
+                "Wind": {
+                    "Label": "Wind",
+                    "Hint": "Wind condition inside this Region.",
+                    "Contribution": "Regional wind"
+                }
+            }
         },
         "Walk": "Walk",
         "WalkingSpeed": "Walking",

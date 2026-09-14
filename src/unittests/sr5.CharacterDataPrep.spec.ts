@@ -37,12 +37,13 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
 
         it('visibility checks', async () => {
             const character = await factory.createActor({ type: 'character', system: { metatype: 'human' } });
-            assert.strictEqual(character.system.visibilityChecks.astral.hasAura, true);
-            assert.strictEqual(character.system.visibilityChecks.astral.astralActive, false);
-            assert.strictEqual(character.system.visibilityChecks.astral.affectedBySpell, false);
-            assert.strictEqual(character.system.visibilityChecks.meat.hasHeat, true);
-            assert.strictEqual(character.system.visibilityChecks.matrix.hasIcon, true);
-            assert.strictEqual(character.system.visibilityChecks.matrix.runningSilent, false);
+            assert.strictEqual(character.system.visibilityChecks.targets.astral.hasAura, true);
+            assert.strictEqual(character.system.visibilityChecks.targets.astral.astralActive, false);
+            assert.strictEqual(character.system.visibilityChecks.targets.astral.affectedBySpell, false);
+            assert.strictEqual(character.system.visibilityChecks.targets.physical.active, true);
+            assert.strictEqual(character.system.visibilityChecks.targets.physical.thermographic, 'warm');
+            assert.strictEqual(character.system.visibilityChecks.targets.matrix.hasIcon, true);
+            assert.strictEqual(character.system.visibilityChecks.targets.matrix.runningSilent, false);
         });
 
         it('applies nested armor modifications to character armor value', async () => {
