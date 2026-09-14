@@ -157,6 +157,14 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     }
 
     /**
+     * Remove all changes originating from the given source (e.g. an ActiveEffect uuid).
+     * @param {string} source - The source identifier stored on the change entries.
+     */
+    removeFromSource(source: string): void {
+        this._field.changes = this._field.changes.filter(part => part.source !== source);
+    }
+
+    /**
      * Calculate the total value by applying changes in priority order.
      * @param {{min?: number, max?: number, decimal?: boolean}} [options] - Optional bounds to enforce on the final value.
      * @param {number} [options.min] - If provided, enforces a minimum value (adds an `SR5.EnforcedMinimum` change).
@@ -330,6 +338,18 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
         list: F, ...args: Parameters<ModifiableValue<F>["remove"]>
     ): void {
         new ModifiableValue(list).remove(...args);
+    }
+
+    /**
+     * Static helper to remove changes by source from the given list.
+     * @template F
+     * @param {F} list - The modifiable list object.
+     * @param {...any} args - Arguments forwarded to instance `removeFromSource` (source).
+     */
+    static removeFromSource<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<ModifiableValue<F>["removeFromSource"]>
+    ): void {
+        new ModifiableValue(list).removeFromSource(...args);
     }
 
     /**
