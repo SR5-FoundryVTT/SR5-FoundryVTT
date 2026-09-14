@@ -37,6 +37,7 @@ import { SkillFieldType } from '@/module/types/template/Skills';
 import { CreateItemFlow } from '@/module/item/flows/CreateItemFlow';
 import { ActorSkillFlow } from '../flows/ActorSkillFlow';
 import { ModifiableValueType } from '@/module/types/template/Base';
+import { isElementInstance } from '@/module/utils/dom';
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -721,7 +722,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     static async #favoriteItem(this: SR5BaseActorSheet, event: PointerEvent) {
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const uuid = SheetFlow.closestUuid(event.target);
         const itemId = SheetFlow.closestItemId(event.target);
 
@@ -917,7 +918,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static #toggleInventoryVisibility(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const listHeader = event.target?.closest<HTMLElement>('.list-item-header');
         const type = listHeader?.dataset?.itemType;
         if (!type) return;
@@ -938,7 +939,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #createEffect(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const effect = [{
             name: game.i18n.localize("SR5.ActiveEffect.New"),
             origin: this.actor.uuid,
@@ -949,7 +950,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #editEffect(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const id = SheetFlow.closestEffectId(event.target);
         const item = this.actor.effects.get(id);
         if (item) {
@@ -966,7 +967,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #toggleEffect(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const id = SheetFlow.closestEffectId(event.target);
         const item = this.actor.effects.get(id);
@@ -985,7 +986,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #deleteEffect(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -998,7 +999,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     protected async _handleCreateItem(event: PointerEvent) {
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const type = SheetFlow.closestAction(event.target)!.dataset.itemType!;
 
         // Unhide section new item will be in
@@ -1083,13 +1084,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     static async #createItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         return this._handleCreateItem(event);
     }
 
     static async #editItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         let item = this.actor.items.get(id);
         if (!item) {
@@ -1102,7 +1103,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #moveItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         await this._moveItemToInventory(event.target);
     }
 
@@ -1115,7 +1116,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #deleteItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -1128,7 +1129,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #rollItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const iid = SheetFlow.closestUuid(event.target);
         const item = await fromUuid(iid);
 
@@ -1137,7 +1138,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     async _handleRollItem(item: SR5Item, event: PointerEvent) {
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         if (!Hooks.call('SR5_PreActorItemRoll', this.actor, item)) return;
         await item.castAction(event, this.actor);
     }
@@ -1149,7 +1150,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     static async #modifyConditionMonitor(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const target = event.target?.closest<HTMLElement>('[data-action="modifyConditionMonitor"]');
         if (!target) return;
@@ -1206,7 +1207,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     static async #clearConditionMonitor(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const track = event.target?.closest<HTMLElement>('[data-id]')?.dataset?.id;
 
@@ -1247,7 +1248,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     static async #rollConditionMonitor(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const track = event.target?.closest<HTMLElement>('[data-id]')?.dataset?.id;
 
         switch (track) {
@@ -1616,7 +1617,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     /** Setup untrained skill filter within getData */
     static async #filterUntrainedSkills(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
         event.target.closest<HTMLElement>('.active-skills-header')!
             .querySelector<HTMLElement>('.skill-rtg-label')!
@@ -1756,13 +1757,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     static async #editSkill(this: SR5BaseActorSheet, event: PointerEvent) {
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         await this._editSkill(event.target);
     }
 
     static async #rollSkill(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const closest = this._closestSkillTarget(event.target);
         const skillName = closest?.dataset.skillName;
         if (!skillName) return;
@@ -1772,7 +1773,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #rollSkillSpec(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const closest = this._closestSkillTarget(event.target);
         const skillName = closest?.dataset.skillName;
         if (skillName) {
@@ -1793,7 +1794,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #rollAttribute(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const attribute = event.target?.closest<HTMLElement>('[data-attribute-id]')?.dataset?.attributeId;
         if (attribute === 'rating') {
             await this.actor.rollDeviceRating();
@@ -1807,7 +1808,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.stopPropagation();
 
         if (!this.actor.isType('spirit')) return;
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const attributeId = event.target.closest<HTMLElement>('[data-attribute-id]')?.dataset.attributeId;
         if (!attributeId || attributeId === 'force') return;
@@ -1821,7 +1822,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.stopPropagation();
 
         if (!this.actor.isType('sprite')) return;
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const attributeId = event.target.closest<HTMLElement>('[data-attribute-id]')?.dataset.attributeId;
         if (!attributeId) return;
@@ -1866,7 +1867,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     static async #toggleItemVisible(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const uuid = SheetFlow.closestUuid(event.target);
         const itemId = SheetFlow.closestItemId(event.target);
         const effectId = SheetFlow.closestEffectId(event.target);
@@ -1891,7 +1892,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     static async #onToggleEquippedItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         const item = this.actor.items.get(id);
         if (!item) return;
@@ -1925,7 +1926,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     static async #toggleWirelessState(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const uuid = SheetFlow.closestUuid(event.target);
         const item = await fromUuid(uuid);
@@ -1971,7 +1972,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #reloadAmmo(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         const item = this.actor.items.get(id);
         if (item) return item.reloadAmmo(false);
@@ -1979,7 +1980,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #partialReloadAmmo(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         const item = this.actor.items.get(id);
         if (item) return item.reloadAmmo(true);
@@ -2013,7 +2014,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     async _onChangeSkillRating(event: Event) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLInputElement)) return;
+        if (!isElementInstance(event.target, HTMLInputElement)) return;
         const closest = this._closestSkillTarget(event.target);
         const skillId = closest?.dataset.skillId;
         if (!skillId) return;
@@ -2083,7 +2084,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     static async #clearFreshImports(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const allItems = this.actor.items;
         console.debug(`Shadowrun 5e | Clearing fresh import flags for ${allItems.size} owned items`, event);
@@ -2460,7 +2461,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     static async #toggleSkillDescription(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const id = this._closestSkillTarget(event.target)?.dataset.skillId;
         if (!id) return;
         if (this.expandedSkills.has(id)) {
@@ -2481,7 +2482,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #addItemQty(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         let item = this.actor.items.get(id);
         if (!item) {
@@ -2495,7 +2496,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     static async #removeItemQty(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         let item = this.actor.items.get(id);
         if (!item) {

@@ -2,6 +2,7 @@
  * Add a few system links to the settings sidebar menu for easier access and better visibility by users.
  */
 import { Translation } from './utils/strings';
+import { isElementInstance } from '@/module/utils/dom';
 
 export const RenderSettings = {
     /**
@@ -21,7 +22,7 @@ export const RenderSettings = {
             const systemInfo = systemRow?.cloneNode(false);
 
             // v13 => div element \ v12 => li element
-            if (!((systemInfo instanceof HTMLDivElement) || (systemInfo instanceof HTMLLIElement))) {
+            if (!((isElementInstance(systemInfo, HTMLDivElement)) || (isElementInstance(systemInfo, HTMLLIElement)))) {
                 throw Error("Unexpected error attach system information to settings sidebar");
             }
 

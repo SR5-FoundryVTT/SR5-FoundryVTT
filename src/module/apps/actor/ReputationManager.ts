@@ -2,6 +2,7 @@ import { DeepPartial } from 'fvtt-types/utils';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
+import { isElementInstance } from '@/module/utils/dom';
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
@@ -75,7 +76,7 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
     static async #increase(this: ReputationManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const type = event.target.closest<HTMLElement>('[data-type]')!.dataset.type;
         if (type === 'street_cred') {
             this.streetCredModifier += 1;
@@ -90,7 +91,7 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
     static async #reduce(this: ReputationManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const type = event.target.closest<HTMLElement>('[data-type]')!.dataset.type;
         if (type === 'street_cred') {
             this.streetCredModifier -= 1;
@@ -105,7 +106,7 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
     static async #submitChanges(this: ReputationManager, event: Event) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const updateData = {};
         if (this.streetCredModifier !== 0) {
