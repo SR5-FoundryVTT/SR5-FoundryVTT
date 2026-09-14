@@ -72,7 +72,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 system: { category: 'range' },
             }]);
 
-            await weapon.createNestedItem({
+            await weapon.createChildItems({
                 type: 'modification',
                 name: 'Nested Mod',
                 effects: [{
@@ -86,7 +86,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 }],
             } as Item.Source);
 
-            const nestedEffect = weapon.items[0]?.effects.contents[0];
+            const nestedEffect = weapon.childItems.contents[0]?.effects.contents[0];
             assert.exists(nestedEffect);
             assert.strictEqual(nestedEffect?.actor, actor);
         });

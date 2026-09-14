@@ -28,7 +28,7 @@ export const SkillSelectionFlow = {
      * @returns A sorted list of skills suitable for use in selection inputs.
      */
     async getSkillSelection(
-        actor?: SR5Actor,
+        actor?: SR5Actor | null,
         options: GetSkillSelectionOptions = {}
     ) {
         const skills = await PackItemFlow.getPackSkills();

@@ -26,8 +26,8 @@ export class SoakFlow {
             if (attacker) {
                 const item = attacker.items.find(item => item.id === damage.source?.itemId) as SR5Item;
                 if (item) {
-                    return item.items
-                        .filter(mod => mod.getTechnologyData()?.equipped)
+                    return item.childItems
+                        .filter(mod => !!mod.getTechnologyData()?.equipped)
                         .filter(tech => tech.name === game.i18n.localize("SR5.AmmoGelRounds")).length > 0;
                 }
             }
