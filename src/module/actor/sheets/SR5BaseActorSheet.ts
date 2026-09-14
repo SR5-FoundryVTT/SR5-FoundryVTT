@@ -882,7 +882,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             return null;
         }
 
-        if (item.isType('skill') && item.system.type === 'skill') {
+        if (item.isType('skill')) {
             await ActorSkillFlow.addSkill(this.actor, item.toObject() as Item.CreateData<'skill'>, { warnOnDuplicate: true });
             return null;
         }
