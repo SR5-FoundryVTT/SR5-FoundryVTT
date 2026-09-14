@@ -2,6 +2,7 @@ import { ValueOf } from 'fvtt-types/utils';
 import { SR5Combat } from '../combat/SR5Combat';
 import { InitiativeModeOptions, SR5Combatant } from '../combat/SR5Combatant';
 import CombatTracker = foundry.applications.sidebar.tabs.CombatTracker;
+import ContextMenu = foundry.applications.ux.ContextMenu;
 
 type InitiativeModeOption = {
     value: InitiativeModeOptions;
@@ -69,9 +70,9 @@ export class SR5CombatTracker extends CombatTracker {
         const options = super._getEntryContextOptions();
 
         options.splice(1, 0, {
-            name: game.i18n.localize('SR5.COMBAT.SeizeInitiative'),
-            icon: '<i class="fa-solid fa-angles-up"></i>',
-            condition: li => {
+            label: 'SR5.COMBAT.SeizeInitiative',
+            icon: 'fa-solid fa-angles-up',
+            visible: (li: HTMLElement) => {
                 const combatant = this._getCombatant(li);
                 if (!combatant) return false;
 
@@ -79,10 +80,10 @@ export class SR5CombatTracker extends CombatTracker {
                 // eslint-disable-next-line eqeqeq
                 return combatant.isOwner && edge != null && combatant.initiative != null;
             },
-            callback: li => {
-                void this._onSeizeInitiative(li);
+            onClick: (event: PointerEvent, li: HTMLElement) => {
+                void this._getCombatant(li)?.toggleSeizeInitiative();
             }
-        });
+        } as unknown as ContextMenu.Entry<HTMLElement>);
 
         return options;
     }
@@ -214,10 +215,6 @@ export class SR5CombatTracker extends CombatTracker {
         await combatant.update({ system: { acted: !combatant.system.acted } });
     }
 
-    private async _onSeizeInitiative(li: HTMLElement): Promise<void> {
-        await this._getCombatant(li)?.toggleSeizeInitiative();
-    }
-
     private async _onSetInitiativeMode(combatant: SR5Combatant, mode: InitiativeModeOptions): Promise<void> {
         const actor = combatant.actor;
         if (!actor || !combatant.isOwner) return;
@@ -232,9 +229,9 @@ export class SR5CombatTracker extends CombatTracker {
     // Utility & DOM Helpers
     // ==========================================
 
-    /** Helper to grab a combatant reliably from any child element of a list item */
+    /** Helper to grab a combatant from any element inside a combatant entry */
     private _getCombatant(element: HTMLElement): SR5Combatant | null {
-        const combatantElement = element.closest<HTMLElement>('.combatant[data-combatant-id]');
+        const combatantElement = element.closest<HTMLElement>('[data-combatant-id]');
         const combatantId = combatantElement?.dataset.combatantId;
         if (!combatantId) return null;
 
