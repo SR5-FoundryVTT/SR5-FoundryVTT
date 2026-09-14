@@ -9,6 +9,7 @@ import { Helpers } from '@/module/helpers';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { SR5 } from '@/module/config';
 import { TestCreator } from '@/module/tests/TestCreator';
+import { isElementInstance } from '@/module/utils/dom';
 
 const { ApplicationV2 } = foundry.applications.api;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -131,7 +132,7 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<NetworkMa
     static async #handleBruteForce(this: NetworkManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const targetUuid = SheetFlow.closestUuid(event.target);
         if (!targetUuid) return;
@@ -146,7 +147,7 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<NetworkMa
     static async #handleHackOnTheFly(this: NetworkManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const targetUuid = SheetFlow.closestUuid(event.target);
         if (!targetUuid) return;
@@ -161,7 +162,7 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<NetworkMa
     static async #handleMarkInvite(this: NetworkManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const uuid = SheetFlow.closestUuid(event.target);
         if(!uuid) return;
@@ -177,7 +178,7 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<NetworkMa
     static async #connectToNetwork(this: NetworkManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const uuid = SheetFlow.closestUuid(event.target);
         if(!uuid) return;
@@ -197,7 +198,7 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<NetworkMa
      */
     static async #connectToDriver(this: NetworkManager, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const driver = this.actor.getVehicleDriver();
         if (driver) {
             const device = driver.getMatrixDevice();

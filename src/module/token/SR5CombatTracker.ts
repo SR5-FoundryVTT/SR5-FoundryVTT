@@ -1,6 +1,7 @@
 import { ValueOf } from 'fvtt-types/utils';
 import { SR5Combat } from '../combat/SR5Combat';
 import { InitiativeModeOptions, SR5Combatant } from '../combat/SR5Combatant';
+import { isElementInstance } from '@/module/utils/dom';
 import CombatTracker = foundry.applications.sidebar.tabs.CombatTracker;
 import ContextMenu = foundry.applications.ux.ContextMenu;
 
@@ -124,7 +125,7 @@ export class SR5CombatTracker extends CombatTracker {
 
         this._closeExtraMenus();
 
-        const control = target instanceof HTMLButtonElement ? target : null;
+        const control = isElementInstance(target, HTMLButtonElement) ? target : null;
         if (control) control.disabled = true;
         
         try {
