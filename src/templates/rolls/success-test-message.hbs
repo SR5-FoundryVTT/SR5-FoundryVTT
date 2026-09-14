@@ -10,8 +10,8 @@
     {{#if (or speaker.source item)}}
     <div class="card-title card-header card-header--entities">
         <div class="container container--fluid">
-            {{#if speaker.source}}
             <div class="container__row">
+                {{#if speaker.source}}
                 <div class="container__col">
                     <div class="document">
                         {{!-- TODO: token id handling, why not uuid? ??? --}}
@@ -23,20 +23,23 @@
                         </h3>
                     </div>
                 </div>
-            </div>
-            {{/if}}
-            {{#if item}}
-            <div class="container__row">
-                <div class="container__col">
+                {{/if}}
+                {{#if item}}
+                <div class="container__col container__col--item">
                     <div class="document">
-                        <img src="{{item.img}}" data-tooltip="{{item.name}}" />
+                        <a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">
+                            <img src="{{item.img}}" data-tooltip="{{localizeContent item.name}}" />
+                        </a>
+                        {{!-- An action item usually carries the test's own name; the icon alone says it. --}}
+                        {{#ifne (localizeContent item.name) (localize title)}}
                         <h3 class="header-name">
                             <a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">{{localizeContent item.name}}</a>
                         </h3>
+                        {{/ifne}}
                     </div>
                 </div>
+                {{/if}}
             </div>
-            {{/if}}
         </div>
     </div>
     {{/if}}
@@ -47,22 +50,52 @@
                 <span class="test-code">
                     {{#if test.codeTerms.pool.length}}
                         {{#each test.codeTerms.pool as |term|}}
-                            <span class="test-code-term {{#if term.tooltipSource}}has-tooltip{{/if}}" {{#if term.tooltipSource}}data-tooltip-source="{{term.tooltipSource}}"{{/if}}>{{term.text}}</span>{{#unless @last}} + {{/unless}}
+                            <span class="test-code-term">{{term.text}}</span>{{#unless @last}} + {{/unless}}
                         {{/each}}
                     {{else}}
                         <span class="test-code-term">{{test.pool.value}}</span>
                     {{/if}}
-                    {{#if test.codeTerms.limit.length}}
-                        [{{#each test.codeTerms.limit as |term|}}<span class="test-code-term {{#if term.tooltipSource}}has-tooltip{{/if}}" {{#if term.tooltipSource}}data-tooltip-source="{{term.tooltipSource}}"{{/if}}>{{term.text}}</span>{{#unless @last}} + {{/unless}}{{/each}}]
+                    {{#if (and test.hasLimit test.codeTerms.limit.length)}}
+                        [{{#each test.codeTerms.limit as |term|}}<span class="test-code-term">{{term.text}}</span>{{#unless @last}} + {{/unless}}{{/each}}]
                     {{/if}}
                     {{#if test.codeTerms.threshold.length}}
-                        ({{#each test.codeTerms.threshold as |term|}}<span class="test-code-term {{#if term.tooltipSource}}has-tooltip{{/if}}" {{#if term.tooltipSource}}data-tooltip-source="{{term.tooltipSource}}"{{/if}}>{{term.text}}</span>{{#unless @last}} + {{/unless}}{{/each}})
+                        ({{#each test.codeTerms.threshold as |term|}}<span class="test-code-term">{{term.text}}</span>{{#unless @last}} + {{/unless}}{{/each}})
                     {{/if}}
                 </span>
             </div>
         </div>
         {{/if}}
         {{#unless test.autoSuccess}}
+        {{!-- Resolved pool, limit, and threshold values. --}}
+        <div class="card-content card-content--parameters {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
+            <span class="test-parameter" data-tooltip-source="pool"
+                  role="button" tabindex="0" aria-expanded="false">
+                <span class="test-parameter-content">
+                    <span class="test-parameter-label">{{localize test.pool.label}}</span>
+                    <span class="test-parameter-value">{{test.pool.value}}</span>
+                </span>
+            </span>
+            {{#if test.hasLimit}}
+            <span class="test-parameter" data-tooltip-source="limit"
+                  role="button" tabindex="0" aria-expanded="false">
+                <span class="test-parameter-content">
+                    <span class="test-parameter-label">{{localize test.limit.label}}</span>
+                    <span class="test-parameter-value">{{test.limit.value}}</span>
+                </span>
+            </span>
+            {{/if}}
+            {{#if test.hasThreshold}}
+            <span class="test-parameter" data-tooltip-source="threshold"
+                  role="button" tabindex="0" aria-expanded="false">
+                <span class="test-parameter-content">
+                    <span class="test-parameter-label">{{localize test.threshold.label}}</span>
+                    <span class="test-parameter-value">{{test.threshold.value}}</span>
+                </span>
+            </span>
+            {{/if}}
+            {{! Modifier breakdowns are added during hydration. }}
+            <div class="test-parameter-details"></div>
+        </div>
         <div class="card-content card-content--metrics {{#if showDescription}}show-description{{/if}} {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
             <div class="left-side">
                 {{#if test.opposing}}
@@ -71,58 +104,33 @@
                     <span class="value-result">{{test.against.netHits.value}}</span>
                 </div>
                 {{/if}}
-                {{#if test.hasLimit}}
-                <div class="test-value metric-row" data-tooltip-source="limit">
-                    <span class="value">{{localize test.limit.label}}:</span>
-                    <span class="value-result">{{test.limit.value}}</span>
-                </div>
-                {{/if}}
-                {{#if test.hasThreshold}}
-                <div class="test-value metric-row" data-tooltip-source="threshold">
-                    <span class="value">{{localize test.threshold.label}}:</span>
-                    <span class="value-result">{{test.threshold.value}}</span>
-                </div>
-                {{/if}}
-                {{#if test.opposing}}
-                <div class="test-value metric-row">
-                    <span class="value">{{localize "SR5.OpposingNetHits"}}:</span>
-                    <span class="value-result">{{test.againstNetHits.value}}</span>
-                </div>
-                {{/if}}
-            </div>
-            <div class="right-side">
-                <div class="test-value metric-row" data-tooltip-source="pool">
-                    <span class="value">{{localize test.pool.label}}:</span>
-                    <span class="value-result">{{test.pool.value}}</span>
-                </div>
+                {{! Extended tests show current hits opposite accumulated net hits. }}
+                {{#if test.extended}}
                 <div class="test-value metric-row">
                     <span class="value">{{localize test.hits.label}}:</span>
                     <span class="value-result">
                         {{test.hitsBreakdown}}
                     </span>
                 </div>
-                {{#if test.hasBuyHits}}
-                <div class="test-value metric-row">
-                    <span class="value">{{localize "SR5.BuyHits"}}:</span>
-                    <span class="value-result">{{test.boughtHits}}</span>
+                {{/if}}
+                {{#if previewTemplate}}
+                <div class="test-value metric-row metric-row--template">
+                    <span class="value" data-tooltip="SR5.PlaceTemplate">{{localize "SR5.PlaceTemplate"}}:</span>
+                    <span class="value-result"><i class="fas fa-bullseye roll place-template"></i></span>
                 </div>
                 {{/if}}
-                {{#if test.extended}}
+            </div>
+            <div class="right-side">
+                {{#if test.opposing}}
                 <div class="test-value metric-row">
-                    <span class="value">{{localize test.extendedHits.label}}:</span>
-                    <span class="value-result">{{test.extendedHits.value}}</span>
+                    <span class="value">{{localize "SR5.OpposingNetHits"}}:</span>
+                    <span class="value-result">{{test.againstNetHits.value}}</span>
                 </div>
                 {{/if}}
                 {{#if (and (not test.opposing) test.hasThreshold)}}
                 <div class="test-value metric-row">
                     <span class="value">{{localize test.netHits.label}}:</span>
                     <span class="value-result">{{test.netHits.value}}</span>
-                </div>
-                {{/if}}
-                {{#if previewTemplate}}
-                <div class="test-value metric-row metric-row--template">
-                    <span class="value" data-tooltip="SR5.PlaceTemplate">{{localize "SR5.PlaceTemplate"}}:</span>
-                    <span class="value-result"><i class="fas fa-bullseye roll place-template"></i></span>
                 </div>
                 {{/if}}
             </div>
@@ -220,12 +228,20 @@
             {{/if}}
         {{/if}}
         <div class="card-test-content card-test-content--status">
-            {{! Some tests will not determine an outcome, but a failure will always be a failure }}
+            {{! Show hits when no verdict is available. }}
             {{#unless test.showSuccessLabel}}
                 {{#unless test.failure}}
-                <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}}">
-                    <div class="glitch">{{localize "SR5.TestResults.Results"}}</div>
-                </div>
+                    {{#unless test.autoSuccess}}
+                    <div class="glitch-content clickable show-roll {{#if test.criticalGlitched}}glitch-content--critical{{/if}}">
+                        <div class="test-outcome">
+                            {{#if test.hasBuyHits}}<i class="test-outcome-bought-hits fa-solid fa-coins" role="img" data-tooltip="SR5.HitsBought" aria-label="{{localize 'SR5.HitsBought'}}"></i>{{/if}}
+                            <span class="test-outcome-hits" data-tooltip-source="hits"><span class="test-outcome-hits-value">{{test.outcomeHits.value}}</span> {{localize test.outcomeHits.label}}</span>
+                            {{#if test.criticalGlitched}}
+                            <span class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>{{localize "SR5.GlitchCritical"}}</span>
+                            {{/if}}
+                        </div>
+                    </div>
+                    {{/unless}}
                 {{/unless}}
             {{/unless}}
 
@@ -233,8 +249,9 @@
             {{#if test.canSucceed}}
                 {{#if test.showSuccessLabel}}
                 <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}}">
-                    <div class="glitch">
-                        {{localize test.successLabel}}
+                    <div class="test-outcome">
+                        {{#unless test.autoSuccess}}{{#if test.hasBuyHits}}<i class="test-outcome-bought-hits fa-solid fa-coins" role="img" data-tooltip="SR5.HitsBought" aria-label="{{localize 'SR5.HitsBought'}}"></i>{{/if}}<span class="test-outcome-hits" data-tooltip-source="hits"><span class="test-outcome-hits-value">{{test.outcomeHits.value}}</span> {{localize test.outcomeHits.label}}</span>{{/unless}}
+                        <span class="glitch">{{localize test.successLabel}}</span>
                     </div>
                 </div>
                 {{/if}}
@@ -243,22 +260,23 @@
             {{! Some tests will determine a failure state }}
             {{#if test.canFail}}
                 {{#if test.failure}}
-                <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}}">
-                    <div class="glitch">
-                        {{localize test.failureLabel}}
+                <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}} {{#if test.criticalGlitched}}glitch-content--critical{{/if}}">
+                    <div class="test-outcome">
+                        {{#unless test.autoSuccess}}{{#if test.hasBuyHits}}<i class="test-outcome-bought-hits fa-solid fa-coins" role="img" data-tooltip="SR5.HitsBought" aria-label="{{localize 'SR5.HitsBought'}}"></i>{{/if}}<span class="test-outcome-hits" data-tooltip-source="hits"><span class="test-outcome-hits-value">{{test.outcomeHits.value}}</span> {{localize test.outcomeHits.label}}</span>{{/unless}}
+                        {{#if test.criticalGlitched}}
+                        <span class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>{{localize "SR5.GlitchCritical"}}</span>
+                        {{else}}
+                            {{#if test.showsFailureOutcome}}
+                            <span class="glitch">{{localize test.failureLabel}}</span>
+                            {{/if}}
+                        {{/if}}
                     </div>
                 </div>
                 {{/if}}
             {{/if}}
 
             {{! In any case inform about glitched state }}
-            {{#if test.criticalGlitched}}
-            <div class="glitch-content glitch-content--critical">
-                <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>
-                    {{localize "SR5.GlitchCritical"}}
-                </div>
-            </div>
-            {{else}}
+            {{#unless test.criticalGlitched}}
                 {{#if test.glitched}}
                 <div class="glitch-content glitch-content--warning">
                     <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
@@ -266,16 +284,20 @@
                     </div>
                 </div>
                 {{/if}}
-            {{/if}}
+            {{/unless}}
         </div>
         <div class="card-rolls {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
-            {{#unless test.hasBuyHits}}
+            {{#if test.hasBuyHits}}
+                <div class="dice-roll-content dice-roll-content--bought-hits">
+                    {{localize "SR5.HitsBought"}}
+                </div>
+            {{else}}
                 {{#each test.rolls}}
                     {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs'
                     roll=this
                     }}
                 {{/each}}
-            {{/unless}}
+            {{/if}}
         </div>
         {{#if test.data.knockedDown}}
         <div class="card-content card-content--knockdown">
@@ -288,11 +310,6 @@
         </div>
         {{/if}}
     </div>
-    {{#if test.hasBuyHits}}
-    <div class="card-main-content">
-        <div class="card-content card-content--buyhits">{{localize "SR5.BuyHits"}}</div>
-    </div>
-    {{/if}}
     {{#if test.targets}}
     <div class="test-line test-line--targets">
         <span class="test-name {{#if roll}}test-roll{{/if}}">

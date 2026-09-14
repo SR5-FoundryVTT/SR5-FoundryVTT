@@ -90,6 +90,65 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(test.pool.value, 10);
         });
 
+        describe('outcome hits', () => {
+            // The verdict must use the same hits as the outcome calculation.
+            it('reports the rolled hits for a normal test', () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+
+                assert.isFalse(test.extended);
+                assert.strictEqual(test.outcomeHits, test.hits);
+            });
+
+            it('reports the accumulated hits for an extended test', () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+                test.data.extendedInterval = { value: 30, unit: 'minutes' };
+
+                assert.isTrue(test.extended);
+                assert.strictEqual(test.outcomeHits, test.extendedHits);
+            });
+        });
+
+        describe('outcome label visibility', () => {
+            // Zero hits is a definite failure even without a threshold.
+            it('shows a generic failure verdict without a threshold', () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+
+                assert.isFalse(test.hasThreshold);
+                assert.strictEqual(test.failureLabel, 'SR5.TestResults.Failure');
+                assert.isTrue(test.showsFailureOutcome);
+            });
+
+            it('never shows the Results placeholder, threshold or not', () => {
+                const test = TestCreator.fromPool(
+                    { pool: 10, threshold: 3 }, { showMessage: false, showDialog: false });
+                Object.defineProperty(test, 'failureLabel', { get: () => 'SR5.TestResults.Results' });
+
+                assert.isTrue(test.hasThreshold);
+                assert.isFalse(test.showsFailureOutcome);
+            });
+        });
+
+        describe('description control visibility', () => {
+            // The control toggles the description panel, so it must not outlive its content.
+            it('hides the control when there is nothing to show', async () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+
+                assert.isFalse(test._hasDescriptionContent(''));
+                assert.isFalse(test._hasDescriptionContent({ description: { value: '  ' } }));
+
+                const templateData = await test._prepareMessageTemplateData();
+                assert.isTrue(test._canShowDescription);
+                assert.isFalse(templateData.showDescription);
+            });
+
+            it('keeps the control for description text or properties', () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+
+                assert.isTrue(test._hasDescriptionContent({ description: { value: '<p>Text</p>' } }));
+                assert.isTrue(test._hasDescriptionContent({ properties: ['Semi-Auto'] }));
+            });
+        });
+
         describe('limit usage UI state', () => {
             const COMMON_PARTIAL = 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs';
 
@@ -412,6 +471,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             assert.isTrue(test.codeTerms.pool.every(term => {
                 return typeof term.tooltipSource === 'string' && term.tooltipSource.length > 0;
             }));
+            assert.isTrue(test.codeTerms.pool.every(term => typeof term.valueText === 'string'));
 
             assert.isTrue(test.codeTerms.threshold.every(term => !term.tooltipSource));
         });

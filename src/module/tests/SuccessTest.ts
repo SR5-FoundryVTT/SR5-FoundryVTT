@@ -23,6 +23,7 @@ import { SuccessTestEffectsFlow } from '../effect/flows/SuccessTestEffectsFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
+import { LinksHelpers } from '../utils/links';
 import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType, ResultActionType } from '../types/item/Action';
 import { ValueFieldType } from '../types/template/Base';
 import { DeepPartial } from "fvtt-types/utils";
@@ -52,6 +53,7 @@ export interface SuccessTestCodeTermTrace {
 
 export interface SuccessTestCodeTerm {
     text: string;
+    valueText?: string;
     tooltipSource?: string;
 }
 
@@ -446,23 +448,26 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         };
     }
 
-    /**
-     * Constructs UI display terms for a success test field by pairing 
-     * base changes with historical trace tooltips and appending the base value.
-     */
-    private _buildCodeTermsForField(valueField: ValueFieldType): SuccessTestCodeTerm[] {
-        const terms: SuccessTestCodeTerm[] = [];
+    /** Find a traced breakdown by its change name and value. */
+    traceSourceForChange(change: ValueFieldType['changes'][number]): string | undefined {
         const traces = this.data.codeTermTraces ?? [];
 
-        for (const change of valueField.changes.filter(change => ModifiableValue.isBaseChange(change))) {
-            // Last updated trace with matching name and value for this change.
-            const traceIndex = traces.findLastIndex(trace =>
-                trace.valueField.label === change.name && trace.valueField.value === change.value
-            );
+        const traceIndex = traces.findLastIndex(trace =>
+            trace.valueField.label === change.name && trace.valueField.value === change.value
+        );
 
+        return traceIndex >= 0 ? traces[traceIndex].tooltipSource : undefined;
+    }
+
+    /** Build rulebook-style formula terms; totals are shown separately. */
+    private _buildCodeTermsForField(valueField: ValueFieldType): SuccessTestCodeTerm[] {
+        const terms: SuccessTestCodeTerm[] = [];
+
+        for (const change of valueField.changes.filter(change => ModifiableValue.isBaseChange(change))) {
             terms.push({
-                text: `${game.i18n.localize(change.name as Translation)} ${change.value}`,
-                tooltipSource: traceIndex >= 0 ? traces[traceIndex].tooltipSource : undefined,
+                text: game.i18n.localize(change.name as Translation),
+                valueText: String(change.value),
+                tooltipSource: this.traceSourceForChange(change),
             });
         }
 
@@ -964,6 +969,16 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     get extendedHits(): ValueFieldType {
         // Return a default value field, for when no extended hits have been derived yet (or ever).
         return this.data.values.extendedHits || DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
+    }
+
+    /** Hits used to determine the outcome. */
+    get outcomeHits(): ValueFieldType {
+        return this.extended ? this.extendedHits : this.hits;
+    }
+
+    /** Hide the non-verdict "Results" label. */
+    get showsFailureOutcome(): boolean {
+        return this.failureLabel !== 'SR5.TestResults.Results';
     }
 
     get hasBuyHits(): boolean {
@@ -1814,6 +1829,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const linkedTokens = this.actor?.getActiveTokens(true) || [];
         const token = linkedTokens.length >= 1 ? linkedTokens[0] : undefined;
 
+        const description = await this.item?.getChatData() || '';
+
         return {
             title: this.data.title,
             test: this,
@@ -1830,8 +1847,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             resistActions: this._prepareResistActionsTemplateData(),
             resultActions: this._prepareResultActionsTemplateData(),
             previewTemplate: this._canPlaceBlastTemplate,
-            showDescription: this._canShowDescription,
-            description: await this.item?.getChatData() || '',
+            // Without content the toggle would open an empty panel, so drop the control with it.
+            showDescription: this._canShowDescription && this._hasDescriptionContent(description),
+            description,
             // Some message segments are only meant for the gm, when the gm is the one creating the message.
             // When this test doesn't use an actor, don't worry about hiding anything.
             applyGmOnlyContent: GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor),
@@ -1846,6 +1864,20 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get _canShowDescription(): boolean {
         return true;
+    }
+
+    /**
+     * Whether the description panel would show anything at all.
+     */
+    _hasDescriptionContent(description: unknown): boolean {
+        if (!description || typeof description !== 'object') return false;
+
+        const { description: text, properties } = description as {
+            description?: { value?: string },
+            properties?: unknown[]
+        };
+
+        return Boolean(text?.value?.trim()) || Boolean(properties?.length);
     }
 
     /**
@@ -2010,6 +2042,18 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     static async chatMessageListeners(message: ChatMessage, html, data) {
         await this._hydrateValueModifierTooltips(message, html);
 
+        $(html).find('.test-parameter').on('click', this._chatToggleParameterDetails.bind(this));
+        $(html).find('.test-parameter').on('keydown', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            event.currentTarget.click();
+        });
+        $(html).find('.modifier-source-link').on('click', this._chatOpenModifierSource.bind(this));
+        $(html).find('.modifier-source-link').on('keydown', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            event.currentTarget.click();
+        });
         $(html).find('.show-roll').on('click', this._chatToggleCardRolls.bind(this));
         $(html).find('.show-description').on('click', this._chatToggleCardDescription.bind(this));
         $(html).find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet.bind(Helpers));
@@ -2037,6 +2081,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         html: HTMLElement | JQuery,
         options: ValueModifierTooltipOptions = {}
     ) {
+        const valuesBySource = this._valueModifierSourcesForTest(test);
         const tooltipsBySource = await this._buildValueModifierTooltipsBySource(test, options);
 
         const valueModifiers = $(html).find<HTMLElement>('[data-tooltip-source]').toArray();
@@ -2045,27 +2090,80 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             const source = valueMod.dataset.tooltipSource;
             if (!source) continue;
 
-            const tooltipHtml = tooltipsBySource[source];
-            if (!tooltipHtml) continue;
+            // Card parameters use inline breakdowns instead of hover tooltips.
+            if (valueMod.classList.contains('test-parameter')) {
+                const value = valuesBySource[source];
+                if (value)
+                    await this._prepareParameterDetail(valueMod, test, value, source, tooltipsBySource, options);
+                continue;
+            }
 
-            valueMod.dataset.tooltipHtml = tooltipHtml;
-            valueMod.dataset.tooltipClass = 'sr5v2';
+            this._applyValueModifierTooltip(valueMod, tooltipsBySource[source]);
         }
+    }
+
+    private static _applyValueModifierTooltip(element: HTMLElement, tooltipHtml?: string) {
+        if (!tooltipHtml) return;
+
+        element.dataset.tooltipHtml = tooltipHtml;
+        element.dataset.tooltipClass = 'sr5v2';
+    }
+
+    /** Add a collapsed modifier breakdown to the shared parameter panel. */
+    private static async _prepareParameterDetail(
+        parameter: HTMLElement,
+        test: SuccessTest,
+        value: ValueFieldType,
+        source: string,
+        tooltipsBySource: Record<string, string | undefined>,
+        options: ValueModifierTooltipOptions = {}
+    ) {
+        const container = parameter.closest('.card-content--parameters')
+            ?.querySelector<HTMLElement>('.test-parameter-details');
+        if (!container) return;
+
+        const traceSources = value.changes.map(change => test.traceSourceForChange(change));
+
+        const html = await this._buildValueModifierPanelHtml(value, options, traceSources);
+        if (!html) return;
+
+        // Replace details when a message is hydrated again.
+        container.querySelector(`.test-parameter-detail[data-source="${source}"]`)?.remove();
+
+        const detail = container.ownerDocument.createElement('div');
+        detail.classList.add('test-parameter-detail');
+        detail.dataset.source = source;
+        detail.hidden = true;
+        detail.innerHTML = html;
+
+        // Hydrate tooltips added with the panel.
+        for (const row of detail.querySelectorAll<HTMLElement>('[data-tooltip-source]'))
+            this._applyValueModifierTooltip(row, tooltipsBySource[row.dataset.tooltipSource ?? '']);
+
+        container.append(detail);
+    }
+
+    /** Values keyed by tooltip source. */
+    private static _valueModifierSourcesForTest(test: SuccessTest): Record<string, ValueFieldType | undefined> {
+        const tooltipValues: Record<string, ValueFieldType | undefined> = {
+            pool: test.pool,
+            limit: test.hasLimit ? test.limit : undefined,
+            threshold: test.hasThreshold ? test.threshold : undefined,
+            hits: test.outcomeHits,
+        };
+
+        const traces = test.data.codeTermTraces ?? [];
+        for (const trace of traces)
+            tooltipValues[trace.tooltipSource] = trace.valueField;
+
+        return tooltipValues;
     }
 
     private static async _buildValueModifierTooltipsBySource(
         test: SuccessTest,
         options: ValueModifierTooltipOptions = {}
     ): Promise<Record<string, string | undefined>> {
-        const tooltipValues: Record<string, ValueFieldType | undefined> = {
-            pool: test.pool,
-            limit: test.hasLimit ? test.limit : undefined,
-            threshold: test.hasThreshold ? test.threshold : undefined,
-        };
-
-        const traces = test.data.codeTermTraces ?? [];
-        for (const trace of traces)
-            tooltipValues[trace.tooltipSource] = trace.valueField;
+        const tooltipValues = this._valueModifierSourcesForTest(test);
 
         const entries = await Promise.all(Object.entries(tooltipValues).map(async ([source, value]) => {
             return [source, value ? await this._buildValueModifierTooltipHtml(value, options) : undefined] as const;
@@ -2085,6 +2183,24 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         const content = tooltipHtml.trim();
         if (!content.length) return undefined;
+        if (!content.includes('value-modifier-name')) return undefined;
+
+        return content;
+    }
+
+    /** Render an inline modifier panel. */
+    static async _buildValueModifierPanelHtml(
+        value: ValueFieldType,
+        options: ValueModifierTooltipOptions = {},
+        traceSources: (string | undefined)[] = []
+    ): Promise<string | undefined> {
+        const panelHtml = await foundry.applications.handlebars.renderTemplate(
+            SheetFlow.templateBase('common/value-modifiers-panel'),
+            { value, card: options.card, traceSources }
+        );
+
+        const content = panelHtml.trim();
+        // Avoid empty panels.
         if (!content.includes('value-modifier-name')) return undefined;
 
         return content;
@@ -2128,18 +2244,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!item) return console.error("Shadowrun 5e | Item doesn't exist for uuid", uuid);
 
         void item.castAction(event);
-    }
-
-    static async chatLogListeners(chatLog: ChatLog, html: HTMLElement | JQuery, data: unknown) {
-        // setup chat listener messages for each message as some need the message context instead of ChatLog context.
-        const elements = $(html).find('.chat-message').toArray();
-
-        for (const element of elements) {
-            const id = $(element).data('messageId');
-            const message = game.messages?.get(id);
-            if (!message) continue;
-            await this.chatMessageListeners(message, element, message.toObject());
-        }
     }
 
     /**
@@ -2241,13 +2345,39 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return options;
     }
 
-    /**
-     * By default, roll results are hidden in a chat card.
-     *
-     * This will hide / show them, when called with a card event.
-     *
-     * @param event Called from within a card html element.
-     */
+    /** Toggle one parameter breakdown at a time. */
+    static _chatToggleParameterDetails(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const parameter = event.currentTarget as HTMLElement;
+        const line = parameter.closest<HTMLElement>('.card-content--parameters');
+        const container = line?.querySelector<HTMLElement>('.test-parameter-details');
+        const source = parameter.dataset.tooltipSource;
+        if (!line || !container || !source) return;
+
+        const detail = container.querySelector<HTMLElement>(`.test-parameter-detail[data-source="${source}"]`);
+        if (!detail) return;
+
+        const expand = detail.hidden;
+
+        for (const open of container.querySelectorAll<HTMLElement>('.test-parameter-detail')) open.hidden = true;
+        for (const other of line.querySelectorAll<HTMLElement>('.test-parameter'))
+            other.setAttribute('aria-expanded', 'false');
+
+        detail.hidden = !expand;
+        parameter.setAttribute('aria-expanded', String(expand));
+    }
+
+    static async _chatOpenModifierSource(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const source = (event.currentTarget as HTMLElement).dataset.source;
+        await LinksHelpers.openSource(source);
+    }
+
+    /** Toggle hidden roll results. */
     static async _chatToggleCardRolls(event: Event) {
         event.preventDefault();
         event.stopPropagation();
@@ -2282,14 +2412,18 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * By default, item descriptions are hidden in a chat card.
      *
      * This will hide / show them, when called with a card event.
-     * @param event A PointerEvent triggered anywhere from within a chat-card
+     * @param event A PointerEvent triggered by a description control in the current chat-message layout
      */
     static _chatToggleCardDescription(event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
         const currentTarget = event.currentTarget as HTMLElement;
-        const card = $(currentTarget).closest('.chat-card');
+        const target = $(currentTarget);
+        const containingCard = target.closest('.sr5.chat-card');
+        const card = containingCard.length
+            ? containingCard
+            : target.closest('.chat-message').find('.sr5-chat-card--merged').first();
         const element = card.find('.card-description');
         if (element.is(':visible')) element.slideUp(200);
         else element.slideDown(200);
