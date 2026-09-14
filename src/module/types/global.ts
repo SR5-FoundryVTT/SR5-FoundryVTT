@@ -235,11 +235,6 @@ declare module "fvtt-types/configuration" {
                 itemMacro?: boolean;
             }
         };
-        Token: {
-            shadowrun5e: {
-                TokenMovementPhaseMarkers?: MovementPhaseMarker[];
-            };
-        }
         User: {
             shadowrun5e: {
                 showApplication?: boolean;
@@ -260,6 +255,7 @@ declare module "fvtt-types/configuration" {
                     detectionModes: Record<string, { enabled: boolean; range: number | null }>;
                 };
                 astralProjection?: AstralProjectionState;
+                TokenMovementPhaseMarkers?: MovementPhaseMarker[];
             };
         };
     }
