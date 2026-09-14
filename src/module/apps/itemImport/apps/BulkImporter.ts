@@ -10,7 +10,7 @@ import { ArmorModImporter } from "../importer/ArmorModImporter";
 import { ComplexFormImporter } from "../importer/ComplexFormImporter";
 import { CritterImporter } from "../importer/CritterImporter";
 import { CritterPowerImporter } from "../importer/CritterPowerImporter";
-import { DataImporter } from "../importer/DataImporter";
+import { BulkImportMode, DataImporter } from "../importer/DataImporter";
 import { EchoesImporter } from "../importer/EchoesImporter";
 import { GearImporter } from "../importer/GearImporter";
 import { QualityImporter } from "../importer/QualityImporter";
@@ -32,8 +32,7 @@ interface ImporterContext extends AppV2.RenderContext {
     importDone: boolean;
     isImporting: boolean;
     zipFileName: string | undefined;
-    deleteCompendiums: boolean;
-    overrideDocuments: boolean;
+    importModes: { value: string; label: string; selected: boolean }[];
 
     // Progress
     progress: {
@@ -114,8 +113,13 @@ export class BulkImporter extends BaseClass {
     /**
      * UI and import behavior flags.
      */
-    private static overrideDocuments = true;
-    private static deleteCompendiums = false;
+    private static readonly importModes = [
+        { value: "add", label: "SR5.Import.BulkImporter.Modes.Add" },
+        { value: "update", label: "SR5.Import.BulkImporter.Modes.Update" },
+        { value: "replace", label: "SR5.Import.BulkImporter.Modes.Replace" },
+        { value: "clean", label: "SR5.Import.BulkImporter.Modes.Clean" },
+    ] as const satisfies { value: BulkImportMode; label: string }[];
+    private static importMode: BulkImportMode = "update";
     private static selectedLanguage = "";
     private static isImporting = false;
     private static importDone = false;
@@ -197,8 +201,11 @@ export class BulkImporter extends BaseClass {
             importDone: BulkImporter.importDone,
             isImporting: BulkImporter.isImporting,
             zipFileName: BulkImporter.zipFile?.name,
-            deleteCompendiums: BulkImporter.deleteCompendiums,
-            overrideDocuments: BulkImporter.overrideDocuments,
+            importModes: BulkImporter.importModes.map(mode => ({
+                value: mode.value,
+                label: game.i18n.localize(mode.label),
+                selected: mode.value === BulkImporter.importMode,
+            })),
             languages,
 
             // GitHub version info
@@ -337,7 +344,7 @@ export class BulkImporter extends BaseClass {
                 await game.packs.get("world." + compendium.pack)?.configure({ locked: false });
 
             // Optionally delete existing compendiums
-            if (BulkImporter.deleteCompendiums)
+            if (BulkImporter.importMode === "clean")
                 for (const compendium of Object.values(Constants.MAP_COMPENDIUM_CONFIG))
                     await game.packs.get("world." + compendium.pack)?.deleteCompendium();
 
@@ -348,7 +355,7 @@ export class BulkImporter extends BaseClass {
             await BulkImporter.loadTranslations(langCode, ZIP);
 
             // Configure shared importer settings
-            DataImporter.overrideDocuments = BulkImporter.overrideDocuments;
+            DataImporter.importMode = BulkImporter.importMode;
 
             // Set total progress count
             BulkImporter.progress.total = BulkImporter.Importers.length;
@@ -445,16 +452,12 @@ export class BulkImporter extends BaseClass {
         // Checkbox: Assign icons
         const setIcon = this.element.querySelector<HTMLSelectElement>("#setIcon");
 
-        // Checkbox: Delete compendiums before import
-        const deleteCompendiums = this.element.querySelector<HTMLSelectElement>("#deleteCompendiums");
-        deleteCompendiums?.addEventListener("change", (event) => {
-            BulkImporter.deleteCompendiums = (event.currentTarget as HTMLInputElement).checked;
-        });
-
-        // Checkbox: Override existing documents
-        const overrideDocuments = this.element.querySelector<HTMLSelectElement>("#overrideDocuments");
-        overrideDocuments?.addEventListener("change", (event) => {
-            BulkImporter.overrideDocuments = (event.currentTarget as HTMLInputElement).checked;
+        // Select: Import mode
+        const importMode = this.element.querySelector<HTMLSelectElement>("#importMode");
+        importMode?.addEventListener("change", (event) => {
+            const value = (event.currentTarget as HTMLSelectElement).value;
+            const mode = BulkImporter.importModes.find(mode => mode.value === value);
+            if (mode) BulkImporter.importMode = mode.value;
         });
 
         // Select: selectedLanguage

@@ -5,6 +5,7 @@ import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import { SR5Die } from "../rolls/SR5Die";
+import { SR5TokenDocument } from "../token/SR5TokenDocument";
 import SocketMessageData = Shadowrun.SocketMessageData;
 import BaseCombat = foundry.documents.BaseCombat;
 
@@ -72,30 +73,6 @@ export class SR5Combat extends Combat<"base"> {
         if (advanced) {
             void foundry.documents.ActiveEffect.registry.refresh('sr5ActionPhaseStart', { combat: this });
         }
-    }
-
-    /**
-     * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions.
-     */
-    static addCombatTrackerContextOptions(html: HTMLElement, options: any[]) {
-        const mapping = [
-            { value: 1, keySuffix: "One", icon: '<i class="fas fa-caret-down"></i>' },
-            { value: 5, keySuffix: "Five", icon: '<i class="fas fa-angle-down"></i>' },
-            { value: 10, keySuffix: "Ten", icon: '<i class="fas fa-angle-double-down"></i>' },
-        ] as const satisfies { value: number; keySuffix: string; icon: string }[];
-
-        for (const { value, keySuffix, icon } of mapping) {
-            options.push({
-                icon,
-                name: game.i18n.localize(`SR5.COMBAT.ReduceInitBy${keySuffix}`),
-                callback: async (li: JQuery) => {
-                    const combatant = game.combat?.combatants.get(li.data("combatant-id") as string);
-                    await combatant?.adjustInitiative(-value);
-                },
-            });
-        }
-
-        return options;
     }
 
     /**
@@ -218,6 +195,8 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
+        await this._recordCurrentMovementPhase();
+
         // Foundry nextRound mainly advances round/turn; SR5 also persists state, clears pass padding, and resets initiative pass.
         await this.createHistorySnapshot();
 
@@ -263,6 +242,8 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
+        await this._recordCurrentMovementPhase();
+
         // Foundry has no initiative pass concept; SR5 creates a pass transition and reduces initiatives for all combatants.
         // Determine if any combatant has enough initiative for another pass
         const nextTurn = this.turns.findIndex((c) => {
@@ -284,7 +265,7 @@ export class SR5Combat extends Combat<"base"> {
         // Add padding combatants for the new pass.
         // These will be sorted to the end of the initiative order and can be used to track pass
         // changes in the UI and prevent issues with combatants being added mid-pass.
-        const padData = this.turns.filter(c => !c.system.pad).map(() => ({ system: { pad: true } }));
+        const padData = this.turns.filter(c => !c.system.pad).map(() => ({ hidden: true, system: { pad: true } }));
         await this.createEmbeddedDocuments("Combatant", padData);
 
         updateData.combatants = this.combatants.map((c) => c.initPassUpdateData());
@@ -303,6 +284,8 @@ export class SR5Combat extends Combat<"base"> {
             SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'nextTurn' });
             return this;
         }
+
+        if (!passedPass) await this._recordCurrentMovementPhase();
 
         if (!passedPass && this.combatant?.actor) {
             void foundry.documents.ActiveEffect.registry.refresh('sr5ActionPhaseEnd', { combat: this });
@@ -339,6 +322,12 @@ export class SR5Combat extends Combat<"base"> {
             await this.combatant.turnUpdate(this.pass);
 
         return this;
+    }
+
+    /** Record the active combatant's endpoint before advancing out of an action phase. */
+    private async _recordCurrentMovementPhase(): Promise<void> {
+        if (!this.combatant?.token || this.combatant.system.pad || !this.id) return;
+        await this.combatant.token.recordMovementPhaseMarker(this.id, this.round, this.pass);
     }
 
     override async previousRound(): Promise<this> {

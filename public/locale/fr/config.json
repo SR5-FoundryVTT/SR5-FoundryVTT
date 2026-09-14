@@ -45,7 +45,9 @@
         "TokenMovementHistoryReset": "Moment de réinitialisation de l'historique de déplacement",
         "TokenMovementHistoryResetDescription": "Choisit quand l'historique de déplacement est effacé pour les combattants pendant le combat",
         "TokenMovementHistoryResetFirstActionPhase": "À ma première phase d'action",
-        "TokenMovementHistoryResetTurnStart": "Réinitialiser au début du tour"
+        "TokenMovementHistoryResetTurnStart": "Réinitialiser au début du tour",
+        "TokenRulerColorPhaseMarker": "Couleur du marqueur de phase de déplacement",
+        "TokenRulerColorPhaseMarkerDescription": "La couleur du point de passage qui marque la fin d'une phase d'action."
     },
     "SR5": {
         "AP": "PA",
@@ -284,6 +286,9 @@
         "BuyHits": "Acheter des succès",
         "COMBAT": {
             "CannotSeizeAgain": "Vous ne pouvez pas reprendre l'initiative avant le debut de votre prochain tour.",
+            "InitiativeChangedLabel": "Initiative mise a jour",
+            "InitiativeDecreased": "Initiative diminuee",
+            "InitiativeIncreased": "Initiative augmentee",
             "ModeAstral": "Astral",
             "ModeChangedLabel": "Mode d'initiative modifie",
             "ModeChangeNewInitiative": "Nouvelle initiative",
@@ -299,9 +304,6 @@
             "PreviousPass": "Passe precedente",
             "PreviousPhase": "Phase precedente",
             "PreviousTurn": "Tour precedent",
-            "ReduceInitByFive": "Initiative -5",
-            "ReduceInitByOne": "Initiative -1",
-            "ReduceInitByTen": "Initiative -10",
             "SeizeInitiative": "Saisir l'initiative",
             "SeizedInitiative": "Initiative saisie",
             "ToggleActedStatusGMOnly": "Basculer le statut a agi (MJ uniquement)",

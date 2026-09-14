@@ -67,6 +67,15 @@ const SRStatus = [
                     ],
                 },
                 {
+                    // Running grants +2 physical defense.
+                    id: 'defense',
+                    applyTo: 'test_all',
+                    conditions: [
+                        { type: 'tests', mode: 'include', values: ['PhysicalDefenseTest'] },
+                        { type: 'categories', mode: 'include', values: ['defense'] },
+                    ],
+                },
+                {
                     // +4 raw on melee attacks = net +2 after the general -2 penalty.
                     id: 'melee',
                     applyTo: 'test_all',
@@ -79,12 +88,14 @@ const SRStatus = [
                     id: 'targetRanged',
                     applyTo: 'test_target',
                     conditions: [
-                        { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest'] },
+                        { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest', 'SpellCastingTest'] },
+                        { type: 'categories', mode: 'include', values: ['attack_ranged', 'attack_thrown'] },
                     ],
                 },
             ],
             changes: [
                 { key: "data.pool", type: "add", value: "-2", target: 'penalty' },
+                { key: "data.pool", type: "add", value: "2", target: 'defense' },
                 { key: "data.pool", type: "add", value: "4",  target: 'melee' },
                 { key: "data.pool", type: "add", value: "-2", target: 'targetRanged' },
             ],
@@ -106,6 +117,15 @@ const SRStatus = [
                     ],
                 },
                 {
+                    // Running grants +2 physical defense.
+                    id: 'defense',
+                    applyTo: 'test_all',
+                    conditions: [
+                        { type: 'tests', mode: 'include', values: ['PhysicalDefenseTest'] },
+                        { type: 'categories', mode: 'include', values: ['defense'] },
+                    ],
+                },
+                {
                     // +4 raw on melee attacks = net +2 after the general -2 penalty.
                     id: 'melee',
                     applyTo: 'test_all',
@@ -118,12 +138,14 @@ const SRStatus = [
                     id: 'targetRanged',
                     applyTo: 'test_target',
                     conditions: [
-                        { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest'] },
+                        { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest', 'SpellCastingTest'] },
+                        { type: 'categories', mode: 'include', values: ['attack_ranged', 'attack_thrown'] },
                     ],
                 },
             ],
             changes: [
                 { key: "data.pool", type: "add", value: "-2", target: 'penalty' },
+                { key: "data.pool", type: "add", value: "2", target: 'defense' },
                 { key: "data.pool", type: "add", value: "4",  target: 'melee' },
                 { key: "data.pool", type: "add", value: "-4", target: 'targetRanged' },
             ],

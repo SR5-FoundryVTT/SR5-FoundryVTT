@@ -2,6 +2,7 @@ import { DeepPartial } from 'fvtt-types/utils';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
+import { isElementInstance } from '@/module/utils/dom';
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
@@ -56,7 +57,7 @@ export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<Karm
     static async #increaseKarma(this: KarmaManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const amount = Number(event.target.closest<HTMLElement>('[data-amount]')!.dataset.amount);
         this.karmaModifier += amount;
         if (this.getModifiedKarma() < 0) {
@@ -68,7 +69,7 @@ export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<Karm
     static async #reduceKarma(this: KarmaManager, event: Event) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const amount = Number(event.target.closest<HTMLElement>('[data-amount]')?.dataset.amount);
         this.karmaModifier -= amount;
         if (this.getModifiedKarma() < 0) {
@@ -80,7 +81,7 @@ export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<Karm
     static async #submitChanges(this: KarmaManager, event: Event) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         if (this.getModifiedKarma() < 0) {
             this.karmaModifier = -this.getModifiedKarma();
         }

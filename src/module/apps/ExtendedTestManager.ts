@@ -11,6 +11,7 @@ import { intervalToSeconds, unitLabel } from '@/module/utils/timeUnits';
 import { FolderSelectOption, SelectableDocument, documentSelectOptions } from '@/module/utils/folderOptions';
 import { ExtendedTestRecord } from '@/module/types/flows/ExtendedTest';
 import { ExtendedTestConfigDialog } from '@/module/apps/dialogs/ExtendedTestConfigDialog';
+import { isElementInstance } from '@/module/utils/dom';
 
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
@@ -391,7 +392,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
     }
 
     static #recordId(event: Event, target?: HTMLElement): string | undefined {
-        const actionTarget = target ?? (event.target instanceof HTMLElement ? event.target : null);
+        const actionTarget = target ?? (isElementInstance(event.target, HTMLElement) ? event.target : null);
         return actionTarget?.closest<HTMLElement>('[data-record-id]')?.dataset.recordId;
     }
 

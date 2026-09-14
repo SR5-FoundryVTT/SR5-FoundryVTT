@@ -3,6 +3,7 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { DeepPartial } from 'fvtt-types/utils';
 import { SR5_APPV2_CSS_CLASS, SYSTEM_NAME } from "../constants";
 import { ModifiableDocumentTypes, DocumentSituationModifiers } from "../rules/DocumentSituationModifiers";
+import { isElementInstance } from '@/module/utils/dom';
 
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
@@ -77,7 +78,7 @@ class EnvironmentalModifiersHandler extends ModifiersHandler {
 
         // Retrieve data from HTML datasets.
         const element = target?.closest<HTMLElement>('button.env-modifier[data-category][data-value]')
-            ?? (event.target instanceof HTMLElement ? event.target.closest<HTMLElement>('button.env-modifier[data-category][data-value]') : null);
+            ?? (isElementInstance(event.target, HTMLElement) ? event.target.closest<HTMLElement>('button.env-modifier[data-category][data-value]') : null);
         if (!element) return;
 
         const categoryData = element.dataset.category;
@@ -196,7 +197,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
         // Expect the element group to siblings.
         // Triggering DOMElement should contain the delta...
         const triggerElement = target?.closest<HTMLElement>('[data-delta]')
-            ?? (event.target instanceof HTMLElement ? event.target.closest<HTMLElement>('[data-delta]') : null);
+            ?? (isElementInstance(event.target, HTMLElement) ? event.target.closest<HTMLElement>('[data-delta]') : null);
         if (!triggerElement || !Object.hasOwn(triggerElement.dataset, 'delta'))
             return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
 
@@ -383,7 +384,7 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
     async _handleSourceInputChange(event: Event) {
         event.preventDefault();
 
-        if (!(event.currentTarget instanceof HTMLInputElement)) return;
+        if (!isElementInstance(event.currentTarget, HTMLInputElement)) return;
 
         const sourceKey = event.currentTarget.name;
         if (!sourceKey) {
@@ -411,7 +412,7 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
         // Expect the element group to siblings.
         // Triggering DOMElement should contain the delta...
         const triggerElement = target?.closest<HTMLElement>('[data-delta]')
-            ?? (event.target instanceof HTMLElement ? event.target.closest<HTMLElement>('[data-delta]') : null);
+            ?? (isElementInstance(event.target, HTMLElement) ? event.target.closest<HTMLElement>('[data-delta]') : null);
         if (!triggerElement || !Object.hasOwn(triggerElement.dataset, 'delta'))
             return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
 
