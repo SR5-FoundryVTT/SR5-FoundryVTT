@@ -113,7 +113,6 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
     }
 
     async select(): Promise<SuccessTestData> {
-        // @ts-expect-error The window option is not typed in fvtt-types yet
         await this.render({ force: true, window: { windowId: TestDialog._focusedWindowId() } });
 
         if (this._selectionPromise === undefined || this.selection === undefined)
@@ -124,7 +123,6 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
 
     /** The detached window the user is interacting with, so the dialog opens next to the sheet that triggered it. */
     static _focusedWindowId(): string | undefined {
-        // @ts-expect-error detached is not typed in fvtt-types yet
         const { detached } = foundry.applications;
         const id = (detached.focused as { id?: string } | null)?.id;
         return id && detached.windows.has(id) ? id : undefined;
