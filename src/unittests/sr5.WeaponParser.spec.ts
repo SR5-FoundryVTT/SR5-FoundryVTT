@@ -18,6 +18,12 @@ class TestCritterParser extends CritterParser {
     }
 }
 
+class TestWeaponParserBase extends WeaponParserBase {
+    public override getSystem(jsonData: any) {
+        return super.getSystem(jsonData);
+    }
+}
+
 class TestItemAmmoParser extends ItemAmmoParser {
     public override getSystem(jsonData: any) {
         return super.getSystem(jsonData);
@@ -201,6 +207,26 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
         });
     })
 
+    describe("Item Import Weapon Values", () => {
+        const weaponParser = new TestWeaponParserBase();
+
+        it("Keeps imported weapons flagged as normal weapons", () => {
+            const system = weaponParser.getSystem(mockXmlData({
+                name: 'AK-98',
+                category: 'Assault Rifles',
+                type: 'Ranged',
+                damage: '10P',
+                ap: '-2',
+                accuracy: '5',
+                conceal: '6',
+            }));
+
+            assert.strictEqual(system.action.damage.base, 10);
+            assert.strictEqual(system.action.damage.ap.base, -2);
+            assert.strictEqual(system.action.damage.normal_weapon, true);
+        });
+    });
+
     describe("Actor Import Weapon Damage Values", () => {
         const actorWeaponParser = new ActorWeaponParser();
 
@@ -326,6 +352,7 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(system.action.damage.base, 2);
             assert.strictEqual(system.action.damage.attribute, 'strength');
             assert.strictEqual(system.action.damage.ap.base, 1);
+            assert.strictEqual(system.action.damage.normal_weapon, true);
             assert.strictEqual(system.melee.reach, 1);
         });
     });

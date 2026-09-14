@@ -65,7 +65,12 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         if (!spell) return [];
 
         switch (spell.system.category) {
-            case 'combat': return ['spell_combat'];
+            case 'combat':
+                if (spell.system.combat.type === 'indirect' && spell.system.range === 'los')
+                    return ['spell_combat', 'attack', 'attack_ranged'];
+
+                return ['spell_combat'];
+
             case 'detection': return ['spell_detection'];
             case 'health': return ['spell_healing'];
             case 'illusion': return ['spell_illusion'];

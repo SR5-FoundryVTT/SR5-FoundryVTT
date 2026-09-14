@@ -66,7 +66,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
                 await item.update({ system: { category: 'combat', combat: { type: 'indirect' } } });
                 assert.equal(item.system.action.test, 'SpellCastingTest');
                 assert.equal(item.system.action.followed.test, 'DrainTest');
-                assert.equal(item.system.action.opposed.test, 'CombatSpellDefenseTest');
+                assert.equal(item.system.action.opposed.test, 'PhysicalDefenseTest');
                 assert.equal(item.system.action.opposed.resist.test, 'PhysicalResistTest');
             });
             it('Correctly add default tests to melee weapons', async () => {

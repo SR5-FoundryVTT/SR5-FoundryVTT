@@ -5,13 +5,13 @@ import {MeleeAttackData} from "./MeleeAttackTest";
 import {TestCreator} from "./TestCreator";
 import {DefenseTest, DefenseTestData} from "./DefenseTest";
 import ModifierTypes = Shadowrun.ModifierTypes;
-import { FLAGS, SYSTEM_NAME } from "../constants";
 import { Translation } from '../utils/strings';
 import { ActiveDefenseRules } from "../rules/ActiveDefenseRules";
 import { DeepPartial } from "fvtt-types/utils";
 import { TestOptions } from "./SuccessTest";
 import { MinimalActionType } from "../types/item/Action";
-import { SR5Item } from "../item/SR5Item";
+import { CombatSpellRules } from "../rules/CombatSpellRules";
+import { SpellCastingTestData } from "./SpellCastingTest";
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
     // Dialog input for cover modifier
@@ -44,6 +44,15 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.hbs';
     }
 
+    override prepareBaseValues() {
+        super.prepareBaseValues();
+        const spell = this.against.item?.asType('spell');
+        if (spell?.system.category === 'combat' && spell.system.combat.type === 'indirect') {
+            const casting = this.data.against as SpellCastingTestData;
+            this.data.incomingDamage = CombatSpellRules.calculateIndirectDamage(this.data.incomingDamage, casting.force);
+        }
+    }
+
     static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
         return { attribute: 'reaction', attribute2: 'intuition' };
     }
@@ -72,7 +81,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         const weapon = this.against.item;
         if (weapon === undefined) return;
         
-        this.data.activeDefenses = ActiveDefenseRules.availableActiveDefenses(weapon as SR5Item<'weapon'>, actor);
+        this.data.activeDefenses = ActiveDefenseRules.availableActiveDefenses(weapon, actor);
 
         // Filter available active defenses by available ini score.
         this._filterActiveDefenses();

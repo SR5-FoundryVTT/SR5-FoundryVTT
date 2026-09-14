@@ -6,6 +6,7 @@ import { DeepPartial } from "fvtt-types/utils";
 import { SR5Actor } from "@/module/actor/SR5Actor";
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 import { OverwatchStorage } from "../../storage/OverwatchStorage";
+import { isElementInstance } from '@/module/utils/dom';
 
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
@@ -100,7 +101,7 @@ export class OverwatchScoreTracker extends HandlebarsApplicationMixin(Applicatio
 
     // returns the actor that this event is acting on
     _getActorFromEvent(event: Event, target?: HTMLElement): SR5Actor | null {
-        const actionTarget = target ?? (event.target instanceof HTMLElement ? event.target : null);
+        const actionTarget = target ?? (isElementInstance(event.target, HTMLElement) ? event.target : null);
         if (!actionTarget) return null;
 
         const uuid = actionTarget.closest<HTMLElement>('.list-item')?.dataset.uuid;
@@ -139,7 +140,7 @@ export class OverwatchScoreTracker extends HandlebarsApplicationMixin(Applicatio
     }
 
     async _setOverwatchScore(event: Event) {
-        if (!(event.currentTarget instanceof HTMLInputElement)) return;
+        if (!isElementInstance(event.currentTarget, HTMLInputElement)) return;
 
         const actor = this._getActorFromEvent(event, event.currentTarget);
         const amount = Number.parseInt(event.currentTarget.value, 10);
@@ -153,7 +154,7 @@ export class OverwatchScoreTracker extends HandlebarsApplicationMixin(Applicatio
         event.preventDefault();
         event.stopPropagation();
 
-        const actionTarget = target ?? (event.target instanceof HTMLElement ? event.target : null);
+        const actionTarget = target ?? (isElementInstance(event.target, HTMLElement) ? event.target : null);
         if (!actionTarget) return;
 
         const actor = this._getActorFromEvent(event, actionTarget);

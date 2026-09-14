@@ -2,6 +2,7 @@ import { DeepPartial } from 'fvtt-types/utils';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
+import { isElementInstance } from '@/module/utils/dom';
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
@@ -37,7 +38,7 @@ export class NuyenManager extends HandlebarsApplicationMixin(ApplicationV2)<Nuye
     static async #increaseNuyen(this: NuyenManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const amount = Number(event.target.closest<HTMLElement>('[data-amount]')!.dataset.amount);
         this.nuyenModifier += amount;
         await this.render();
@@ -46,7 +47,7 @@ export class NuyenManager extends HandlebarsApplicationMixin(ApplicationV2)<Nuye
     static async #reduceNuyen(this: NuyenManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const amount = Number(event.target.closest<HTMLElement>('[data-amount]')!.dataset.amount);
         this.nuyenModifier -= amount;
         await this.render();
@@ -55,7 +56,7 @@ export class NuyenManager extends HandlebarsApplicationMixin(ApplicationV2)<Nuye
     static async #submitChanges(this: NuyenManager, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const currentNuyen = this.getNuyen();
         const modifiedNuyen = currentNuyen + this.nuyenModifier;
         await this.actor.update({system: { nuyen: modifiedNuyen }});

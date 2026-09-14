@@ -94,7 +94,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
         system.subcategory = category.toLowerCase();
 
         system.action.skill = this.getSkill(jsonData);
-        system.action.damage = this.parseDamageData(jsonData.damage._TEXT, jsonData.ap._TEXT);
+        system.action.damage = this.parseDamageData(jsonData.damage._TEXT, jsonData.ap._TEXT, system.action.damage.normal_weapon);
 
         if (jsonData.accuracy?._TEXT) {
             let accuracy: string = jsonData.accuracy._TEXT;
@@ -111,8 +111,8 @@ export class WeaponParserBase extends Parser<'weapon'> {
         return system;
     }
 
-    public parseDamageData(damageText: string | number, apText: string | number): DamageType {
-        const partialDamageData: Partial<DamageType> = {};
+    public parseDamageData(damageText: string | number, apText: string | number, normalWeapon = false): DamageType {
+        const partialDamageData: Partial<DamageType> = { normal_weapon: normalWeapon };
         const parsedDamageText = String(damageText).trim();
 
         const attributeDamage = /^(?:\((.+)\)|(.+?))([PSM])?(?:\(([a-zA-Z]+)\))?(?:\s+\(-?\d+\/m\))?$/i.exec(parsedDamageText);
