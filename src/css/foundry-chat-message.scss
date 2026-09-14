@@ -937,6 +937,18 @@
                         }
                     }
                 }
+
+                &.initiative-change-card {
+                    .initiative-mode-icon {
+                        &.is-positive i {
+                            color: var(--sr5-card-success);
+                        }
+
+                        &.is-negative i {
+                            color: var(--sr5-card-failure);
+                        }
+                    }
+                }
             }
         }
 

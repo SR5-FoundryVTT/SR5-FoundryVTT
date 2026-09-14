@@ -6,6 +6,7 @@ import { Helpers } from '@/module/helpers';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { SheetFlow } from '@/module/flows/SheetFlow';
+import { isElementInstance } from '@/module/utils/dom';
 
 interface VehicleSheetDataFields extends MatrixActorSheetData {
     isVehicle: boolean;
@@ -171,7 +172,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
      */
     static async #connectToDriver(this: SR5VehicleActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const driver = this.actor.getVehicleDriver();
         if (driver) {
             const device = driver.getMatrixDevice();
@@ -219,7 +220,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
     static async #rollVehicleAttribute(this: SR5VehicleActorSheet, event: PointerEvent) {
         event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const attribute = event.target?.closest<HTMLElement>('[data-attribute-id]')?.dataset?.attributeId;
         if (!attribute) return;
