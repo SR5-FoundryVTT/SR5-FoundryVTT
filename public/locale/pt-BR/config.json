@@ -63,6 +63,8 @@
         "TokenRulerColorRunningDescription": "A cor para a distância dentro da taxa de corrida.",
         "TokenRulerColorSprinting": "Cor de Movimento de Arrancada do Token",
         "TokenRulerColorSprintingDescription": "A cor para a distância acima da taxa de corrida, onde o arrancada é necessário.",
+        "TokenRulerColorPhaseMarker": "Cor do marcador de fase de movimento do Token",
+        "TokenRulerColorPhaseMarkerDescription": "A cor do ponto de passagem que marca o fim de uma fase de ação.",
         "TokenRulerColorWalking": "Cor de Movimento de Caminhada do Token",
         "TokenRulerColorWalkingDescription": "A cor para a distância dentro da taxa de caminhada.",
         "TokenRulerOpacity": "Opacidade do Movimento do Token",
@@ -367,6 +369,9 @@
         "BuyHits": "Comprar Acertos",
         "COMBAT": {
             "CannotSeizeAgain": "Voce nao pode tomar a iniciativa novamente ate o inicio do seu proximo turno.",
+            "InitiativeChangedLabel": "Iniciativa Atualizada",
+            "InitiativeDecreased": "Iniciativa diminuida",
+            "InitiativeIncreased": "Iniciativa aumentada",
             "ModeAstral": "Astral",
             "ModeChangedLabel": "Modo de Iniciativa Alterado",
             "ModeChangeNewInitiative": "Nova iniciativa",
@@ -382,9 +387,6 @@
             "PreviousPass": "Passagem Anterior",
             "PreviousPhase": "Fase Anterior",
             "PreviousTurn": "Turno Anterior",
-            "ReduceInitByFive": "Iniciativa -5",
-            "ReduceInitByOne": "Iniciativa -1",
-            "ReduceInitByTen": "Iniciativa -10",
             "SeizeInitiative": "Tomar a Iniciativa",
             "SeizedInitiative": "Iniciativa Tomada",
             "ToggleActedStatusGMOnly": "Alternar status de Ja Agiu (Somente GM)",
@@ -887,7 +889,15 @@
                 "Title": "Importador de Ator"
             },
             "BulkImporter": {
-                "Title": "Importador em Massa"
+                "Title": "Importador em Massa",
+                "Mode": "Modo de importação:",
+                "TranslationLanguage": "Idioma da tradução:",
+                "Modes": {
+                    "Add": "Adicionar itens ausentes",
+                    "Update": "Atualizar itens (manter descrição)",
+                    "Replace": "Substituir itens",
+                    "Clean": "Limpar e importar novamente"
+                }
             },
             "Spirit": {
                 "SpiritTypeNotFound": "O tipo de espírito não foi encontrado. Por favor, abra uma questão no github com seu json de exportação chummer."

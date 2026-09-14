@@ -10,10 +10,10 @@ export type ActiveDefenseData = Record<string, { label: Translation, value: numb
 export const ActiveDefenseRules = {
     /**
      * What active defenses are available for the given item? Based on SR5#190 'Active Defenses'
-     * @param weapon The equipped weapon used for the attack.
+     * @param item The equipped item used for the attack.
      * @param actor The actor performing the attack.
      */
-    availableActiveDefenses: (weapon: SR5Item<'weapon'>, actor: SR5Actor): ActiveDefenseData => {
+    availableActiveDefenses: (item: SR5Item, actor: SR5Actor): ActiveDefenseData => {
         // General purpose active defenses. ()
         const activeDefenses: ActiveDefenseData = {
             full_defense: {
@@ -23,7 +23,7 @@ export const ActiveDefenseRules = {
             },
         };
 
-        if (!weapon.isMeleeWeapon()) return activeDefenses;
+        if (!item.isMeleeWeapon()) return activeDefenses;
 
         // Melee weapon specific active defenses.
         activeDefenses['dodge'] = {
@@ -38,8 +38,8 @@ export const ActiveDefenseRules = {
         };
         activeDefenses['parry'] = {
             label: 'SR5.Parry',
-            weapon: weapon.name || '',
-            value: actor.findActiveSkill(weapon.system.action.skill)?.value,
+            weapon: item.name || '',
+            value: actor.findActiveSkill(item.system.action.skill)?.value,
             initMod: -5,
         };
 

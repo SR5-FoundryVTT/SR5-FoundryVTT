@@ -896,7 +896,10 @@ export const SR5 = {
      */
     opposedTests: {
         'spell': {
-            'combat': 'CombatSpellDefenseTest'
+            'combat': {
+                'direct': 'CombatSpellDefenseTest',
+                'indirect': 'PhysicalDefenseTest'
+            }
         }
     },
 
@@ -908,7 +911,10 @@ export const SR5 = {
      */
     opposedResistTests: {
         'spell': {
-            'combat': 'PhysicalResistTest'
+            'combat': {
+                'direct': '',
+                'indirect': 'PhysicalResistTest'
+            }
         }
     },
 

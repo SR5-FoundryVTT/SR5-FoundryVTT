@@ -4,6 +4,7 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { NuyenManager } from '@/module/apps/actor/NuyenManager';
 import { KarmaManager } from '@/module/apps/actor/KarmaManager';
 import { ReputationManager } from '@/module/apps/actor/ReputationManager';
+import { isElementInstance } from '@/module/utils/dom';
 
 
 export interface CharacterSheetData extends MatrixActorSheetData {
@@ -189,7 +190,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
      * Inject special case handling for call in action items, only usable by character actors.
      */
     protected override async _handleCreateItem(event: PointerEvent) {
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const type = event.target.dataset.itemType;
         if (type === 'summoning' || type === 'compilation') {
             event.preventDefault();

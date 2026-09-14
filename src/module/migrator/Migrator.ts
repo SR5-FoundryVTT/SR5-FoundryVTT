@@ -20,6 +20,7 @@ import { Version0_35_1 } from './versions/Version0_35_1';
 import { Version0_35_2 } from './versions/Version0_35_2';
 import { Version0_36_0 } from './versions/Version0_36_0';
 import { Version0_37_0 } from './versions/Version0_37_0';
+import { Version0_37_4 } from './versions/Version0_37_4';
 import { Version0_38_0 } from './versions/Version0_38_0';
 import { VersionMigration, MigratableDocument, MigratableDocumentName, MigratableDocumentType } from "./VersionMigration";
 
@@ -72,6 +73,7 @@ export class Migrator {
         new Version0_35_2(),
         new Version0_36_0(),
         new Version0_37_0(),
+        new Version0_37_4(),
         new Version0_38_0(),
     ] as const;
 
@@ -301,6 +303,24 @@ export class Migrator {
         });
     }
 
+    /** Max serialized length per update request, well below Foundry's 100MB socket message limit. */
+    private static readonly MAX_BATCH_LENGTH = 10_000_000;
+
+    /** Split documents into batches of at most MAX_BATCH_LENGTH serialized length. */
+    private static *batchBySize<T>(docs: T[]): Generator<T[]> {
+        let batch: T[] = [], length = 0;
+        for (const doc of docs) {
+            const docLength = JSON.stringify(doc).length;
+            if (batch.length && length + docLength > this.MAX_BATCH_LENGTH) {
+                yield batch;
+                batch = []; length = 0;
+            }
+            batch.push(doc);
+            length += docLength;
+        }
+        if (batch.length) yield batch;
+    }
+
     /**
      * Update documents of a specific type.
      */
@@ -310,14 +330,18 @@ export class Migrator {
         parent: NonNullable<Parameters<Doc['implementation']['updateDocuments']>[1]>['parent'] = null
     ) {
         this.updateProgressbar();
-        try {
-            return await cls.implementation.updateDocuments(
-                docs.filter(d => d._stats?.systemVersion === this._migrationMark) as any,
-                // Save migrated data silently (no hooks/renders) to avoid intermediate state issues.
-                { parent: parent as any, diff: false, recursive: false, noHook: true, render: false }
-            );
-        } catch (error) {
-            console.error(`Failed migration update for ${cls.documentName} documents (parent: ${parent?.uuid ?? 'none'}).`, error);
+        const migratedDocs = docs.filter(d => d._stats?.systemVersion === this._migrationMark);
+
+        for (const batch of this.batchBySize(migratedDocs)) {
+            try {
+                await cls.implementation.updateDocuments(
+                    batch as any,
+                    // Save migrated data silently (no hooks/renders) to avoid intermediate state issues.
+                    { parent: parent as any, diff: false, recursive: false, noHook: true, render: false }
+                );
+            } catch (error) {
+                console.error(`Failed migration update for ${cls.documentName} documents (parent: ${parent?.uuid ?? 'none'}).`, error);
+            }
         }
     }
 
@@ -363,23 +387,27 @@ export class Migrator {
         /* Tokens */
         for (const scene of game.scenes) {
             this.updateProgressbar();
-            try {
-                await TokenDocument.implementation.updateDocuments(
-                    scene.tokens.map(token => {
-                        const data = token.toObject();
+            const tokens = scene.tokens.map(token => {
+                const data = token.toObject();
 
-                        // Foundry uses the parent token ID as the ActorDelta ID.
-                        // Provide it upfront to avoid ActorDeltaField._updateDiff assigning _id to the cleaned update value.
-                        if (!token.actorLink && data.delta && !data.delta._id)
-                            data.delta._id = token.id;
+                // Foundry uses the parent token ID as the ActorDelta ID.
+                // Provide it upfront to avoid ActorDeltaField._updateDiff assigning _id to the cleaned update value.
+                if (!token.actorLink && data.delta && !data.delta._id)
+                    data.delta._id = token.id;
 
-                        return data;
-                    }),
-                    // Save migrated data silently (no hooks/renders) to avoid intermediate state issues.
-                    { parent: scene, diff: false, recursive: false, noHook: true, render: false }
-                );
-            } catch (error) {
-                console.error(`Failed migration update for Token documents in ${scene.uuid}.`, error);
+                return data;
+            });
+
+            for (const batch of this.batchBySize(tokens)) {
+                try {
+                    await TokenDocument.implementation.updateDocuments(
+                        batch,
+                        // Save migrated data silently (no hooks/renders) to avoid intermediate state issues.
+                        { parent: scene, diff: false, recursive: false, noHook: true, render: false }
+                    );
+                } catch (error) {
+                    console.error(`Failed migration update for Token documents in ${scene.uuid}.`, error);
+                }
             }
         }
 

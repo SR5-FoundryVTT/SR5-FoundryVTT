@@ -27,18 +27,16 @@
   <!-- Import Settings -->
   <fieldset class="import-settings">
     <legend>Import Settings</legend>
-    <label class="import-setting">
-      <input type="checkbox" id="deleteCompendiums" {{#if isImporting}}disabled{{else}}{{#if
-        importDone}}disabled{{/if}}{{/if}} {{#if deleteCompendiums}}checked{{/if}} />
-      <span>Clear previously imported data before import</span>
-    </label>
-    <label class="import-setting">
-      <input type="checkbox" id="overrideDocuments" {{#if isImporting}}disabled{{else}}{{#if
-        importDone}}disabled{{/if}}{{/if}} {{#if overrideDocuments}}checked{{/if}} />
-      <span>Override previously imported documents in compendiums</span>
+    <label class="import-setting-select">
+      <span>{{localize "SR5.Import.BulkImporter.Mode"}}</span>
+      <select id="importMode" {{#if isImporting}}disabled{{else}}{{#if importDone}}disabled{{/if}}{{/if}}>
+        {{#each importModes as |mode|}}
+          <option value="{{mode.value}}" {{#if mode.selected}}selected{{/if}}>{{mode.label}}</option>
+        {{/each}}
+      </select>
     </label>
     <label class="import-setting-select">
-      <span>Translation Language:</span>
+      <span>{{localize "SR5.Import.BulkImporter.TranslationLanguage"}}</span>
       <select id="selectedLanguage" {{#if isImporting}}disabled{{else}}{{#if importDone}}disabled{{/if}}{{/if}}>
         {{#each languages as |lang|}}
           <option value="{{lang.value}}" {{#if lang.selected}}selected{{/if}}>{{lang.label}}</option>
