@@ -69,7 +69,7 @@ export class SR5CombatTracker extends CombatTracker {
         const options = super._getEntryContextOptions();
 
         options.splice(1, 0, {
-            name: game.i18n.localize('SR5.COMBAT.SeizeInitiative'),
+            label: game.i18n.localize('SR5.COMBAT.SeizeInitiative'),
             icon: '<i class="fa-solid fa-angles-up"></i>',
             condition: li => {
                 const combatant = this._getCombatant(li);
@@ -226,6 +226,27 @@ export class SR5CombatTracker extends CombatTracker {
         if (!availableModes.includes(mode)) return;
 
         await actor.setInitiativeMode(mode);
+    }
+
+    /**
+     * Handles manual edits of a combatant's initiative input in the tracker.
+     */
+    protected override _onUpdateInitiative(event: Event): void {
+        const input = event.target as HTMLInputElement | null;
+        const combatant = input && this._getCombatant(input);
+        const previousInit = combatant?.initiative ?? null;
+
+        const result: unknown = super._onUpdateInitiative(event);
+        if (!combatant || previousInit === null || !(result instanceof Promise)) return;
+
+        void result.then((updated: unknown) => {
+            if (!(updated instanceof SR5Combatant)) return;
+
+            const currentInit = updated.initiative;
+            if (currentInit !== null && currentInit !== previousInit) {
+                void combatant._postInitiativeChangeCard(previousInit, currentInit);
+            }
+        });
     }
 
     // ==========================================

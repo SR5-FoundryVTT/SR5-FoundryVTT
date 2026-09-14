@@ -49,7 +49,7 @@ export interface DiceSoNice {
      * @returns {Promise<boolean>} when resolved true if the animation was displayed, false if not.
      */
     showForRoll: (
-        roll: Roll,
+        roll: Roll.Implementation,
         user: User,
         synchronize: boolean,
         whisper: User[] | string[] | null,

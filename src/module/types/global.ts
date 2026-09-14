@@ -8,7 +8,7 @@ import { SR5Combatant } from "../combat/SR5Combatant";
 import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
 import { SR5Token } from "../token/SR5Token";
-import { SR5TokenDocument } from "../token/SR5TokenDocument";
+import { MovementPhaseMarker, SR5TokenDocument } from "../token/SR5TokenDocument";
 
 import { Translation } from '../utils/strings';
 
@@ -49,7 +49,6 @@ import { SpritePower } from './item/SpritePower';
 import { Weapon } from './item/Weapon';
 import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from "./flags/ItemFlags";
 
-import { RoutingLib } from "../integrations/routingLibIntegration";
 import SR5CompendiaSettings from "../settings/SR5CompendiaSettings";
 import AstralPerceptionDetectionMode from "../vision/astralPerception/astralPerceptionDetectionMode";
 import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDetectionMode";
@@ -66,6 +65,7 @@ declare module "fvtt-types/configuration" {
         Combat: typeof SR5Combat;
         Combatant: typeof SR5Combatant;
         Item: typeof SR5Item<Item.ConfiguredSubType>;
+        Token: typeof SR5TokenDocument;
         Roll: typeof SR5Roll;
         Sheet: typeof foundry.appv1.api.FormApplication;
     }
@@ -108,6 +108,13 @@ declare module "fvtt-types/configuration" {
 
     interface SystemNameConfig {
         name: "shadowrun5e";
+    }
+
+    namespace CONFIG.ActiveEffect {
+        interface ExpiryEvents {
+            sr5MyActionStart: string;
+            sr5MyActionEnd: string;
+        }
     }
 
     namespace CONFIG.Canvas {
@@ -216,7 +223,7 @@ declare module "fvtt-types/configuration" {
         };
         Token: {
             shadowrun5e: {
-                TokenUseRoutingLib?: boolean;
+                TokenMovementPhaseMarkers?: MovementPhaseMarker[];
             };
         }
         User: {
@@ -244,7 +251,6 @@ declare module "fvtt-types/configuration" {
             sr5_processTagifyElements: any;
             // Fired on all clients on global data storage changes, with the changed keys.
             'sr5e.storageChanged': (changedKeys: string[]) => void;
-            "routinglib.ready": () => void;
             SR5_CastItemAction: (arg0: SR5Item) => void;
             SR5_PreActorItemRoll: (arg0: SR5Actor, arg1: SR5Item) => void;
             getSceneControlButtons: (arg0: any) => void;
@@ -285,6 +291,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.TokenRulerColorWalking": foundry.data.fields.ColorField<{ initial: '00FF00' }>;
         "shadowrun5e.TokenRulerColorRunning": foundry.data.fields.ColorField<{ initial: '0000FF' }>;
         "shadowrun5e.TokenRulerColorSprinting": foundry.data.fields.ColorField<{ initial: 'FF0000' }>;
+        "shadowrun5e.TokenRulerColorPhaseMarker": foundry.data.fields.ColorField<{ initial: 'FFFF00' }>;
         "shadowrun5e.TokenRulerOpacity": foundry.data.fields.NumberField<{ nullable: false, initial: 0.5, min: 0, max: 1, step: 0.01 }>;
         "shadowrun5e.CompendiaSettingsMenu": typeof SR5CompendiaSettings;
         "shadowrun5e.GeneralActionsPack": string;
@@ -310,8 +317,6 @@ type _NormalizeNever<T> = [T] extends [never] ? unknown : T;
 type _NormalizeEmptyEntries<T> = [T] extends [never[]] ? [string, unknown][] : T;
 
 declare global {
-    var routinglib: RoutingLib | null;
-
     interface Game {
         dice3d: DiceSoNice | undefined;
     }

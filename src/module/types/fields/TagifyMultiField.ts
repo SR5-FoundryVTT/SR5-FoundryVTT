@@ -12,9 +12,6 @@ type TagifyElement<Choices extends StringField.Choices | undefined> = StringFiel
 type TagifyAssignment<Choices extends StringField.Choices | undefined> =
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     ArrayField.AssignmentType<ArrayField.AssignmentElementType<TagifyElement<Choices>>, ArrayField.DefaultOptions>;
-/** The initialized type ArrayField derives for the given element field — re-stated so the `_toInput` override stays compatible. */
-type TagifyInitialized<Choices extends StringField.Choices | undefined> =
-    ArrayField.InitializedType<ArrayField.InitializedElementType<TagifyElement<Choices>>, ArrayField.DefaultOptions>;
 
 /**
  * Create an ArrayField that can be used with the Tagify system
@@ -63,7 +60,7 @@ export class TagifyMultiField<
      * - we need to use the hook in TagifyHooks to actually setup tagify as the sheet needs to be rendered first
      * - this is currently done in the _postRender function of SR5ActiveEffectConfig
      */
-    override _toInput(config: DataField.ToInputConfig<TagifyInitialized<Choices>> & { options?: TagifyList }) {
+    override _toInput(config: DataField.ToInputConfig<this> & { options?: TagifyList }) {
         const options = this._normalizeOptions(config.options);
         const selectedValues = Array.isArray(config.value) ? config.value : [];
 

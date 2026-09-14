@@ -482,9 +482,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         }, { once: true });
 
         this._valueEditor = editor;
-        // @ts-expect-error fvtt-types does not expose ApplicationV2 window.windowId yet.
         const windowId = this.window?.windowId;
-        // @ts-expect-error fvtt-types is missing the AppV2 render options overload here.
         void editor.render({
             force: true,
             window: windowId ? { windowId } : undefined,
@@ -537,7 +535,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      */
     prepareChangeTypes() {
         return Object.entries(SR5ActiveEffect.CHANGE_TYPES)
-            .map(([type, { label }]) => ({ type, label: game.i18n.localize(label) }))
+            .map(([type, config]) => ({ type, label: game.i18n.localize(config!.label) }))
             .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang))
             .reduce((types, { type, label }) => {
                 types[type] = label;
@@ -548,7 +546,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
 
     prepareChangePriorityPlaceholders() {
         return Object.entries(SR5ActiveEffect.CHANGE_TYPES).reduce((placeholders, [type, data]) => {
-            placeholders[type] = String(data.defaultPriority ?? '');
+            placeholders[type] = String(data?.defaultPriority ?? '');
             return placeholders;
         }, {} as Record<string, string>);
     }
