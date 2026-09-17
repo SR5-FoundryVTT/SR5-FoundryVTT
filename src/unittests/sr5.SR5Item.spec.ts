@@ -242,6 +242,94 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             assert.deepEqual(hiddenIds, ['child']);
         });
 
+        it('carries linked children along when an actor item is dropped on the items sidebar', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [
+                { name: '#QUENCH Sidebar Rifle', type: 'weapon', system: { category: 'range' } },
+            ]) as SR5Item[];
+            await actor.createEmbeddedDocuments('Item', [
+                { name: '#QUENCH Sidebar APDS', type: 'ammo', system: { parentId: weapon.id } } as any,
+            ]);
+
+            const created = await (ui.items as any)._createDroppedEntry(weapon) as SR5Item;
+            try {
+                const ammo = game.items.find(item => item.name === '#QUENCH Sidebar APDS') as SR5Item | undefined;
+                assert.exists(ammo);
+                assert.strictEqual(ammo?.system.parentId, created.id);
+                assert.strictEqual(ammo?.folder?.id ?? null, created.folder?.id ?? null);
+            } finally {
+                await created.delete();
+            }
+        });
+
+        it('unlinks a world child dropped onto the items sidebar root', async () => {
+            const weapon = await factory.createItem({ type: 'weapon', system: { category: 'range' } });
+            const ammo = await factory.createItem({ type: 'ammo' });
+            await ammo.update({ system: { parentId: weapon.id } } as any);
+
+            await (ui.items as any)._handleDroppedEntry(null, { type: 'Item', uuid: ammo.uuid });
+
+            assert.isNull(game.items.get(ammo.id!)?.system.parentId);
+        });
+
+        it('prepares compendium parents against their children when loaded', async () => {
+            const CompendiumCollection = foundry.documents.collections.CompendiumCollection;
+            const pack = await CompendiumCollection.createCompendium({
+                type: 'Item',
+                label: '#QUENCH Linked',
+                name: `quench-linked-${foundry.utils.randomID(8).toLowerCase()}`,
+                packageType: 'world',
+            } as any) as foundry.documents.collections.CompendiumCollection<'Item'>;
+
+            try {
+                const [weapon] = await SR5Item.createDocuments([
+                    { name: 'Rifle', type: 'weapon', system: { category: 'range', action: { limit: { base: 5 } } } },
+                ] as any, { pack: pack.collection });
+                await SR5Item.createDocuments([
+                    { name: 'Smartgun', type: 'modification', system: { type: 'weapon', parentId: weapon!.id, mod_weapon: { accuracy: 2 }, technology: { equipped: true } } },
+                ] as any, { pack: pack.collection });
+
+                // Drop cached documents, so the parent is constructed fresh like on a new load.
+                pack.clear();
+                const loaded = await pack.getDocument(weapon!.id!) as SR5Item<'weapon'>;
+
+                assert.strictEqual(loaded.system.action.limit.value, 7);
+            } finally {
+                await pack.deleteCompendium();
+            }
+        });
+
+        it('replaces rather than piles up linked children when a compendium item is imported again', async () => {
+            const CompendiumCollection = foundry.documents.collections.CompendiumCollection;
+            const pack = await CompendiumCollection.createCompendium({
+                type: 'Item',
+                label: '#QUENCH Reimport',
+                name: `quench-reimport-${foundry.utils.randomID(8).toLowerCase()}`,
+                packageType: 'world',
+            } as any) as foundry.documents.collections.CompendiumCollection<'Item'>;
+
+            let importedId: string | undefined;
+            try {
+                const [weapon] = await SR5Item.createDocuments([
+                    { name: '#QUENCH Reimport Rifle', type: 'weapon', system: { category: 'range' } },
+                ] as any, { pack: pack.collection });
+                await SR5Item.createDocuments([
+                    { name: '#QUENCH Reimport APDS', type: 'ammo', system: { parentId: weapon!.id } },
+                ] as any, { pack: pack.collection });
+
+                const first = await game.items.importFromCompendium(pack, weapon!.id!);
+                const second = await game.items.importFromCompendium(pack, weapon!.id!);
+                importedId = second?.id ?? first?.id;
+
+                assert.strictEqual(second?.id, first?.id);
+                const children = game.items.filter(item => item.system.parentId === second?.id);
+                assert.lengthOf(children, 1);
+            } finally {
+                if (importedId) await game.items.get(importedId)?.delete();
+                await pack.deleteCompendium();
+            }
+        });
+
         describe('Testing related data injection', () => {
             it('Correctly adds defense tests without resist tests to direct combat spells', async () => {
                 const item = await factory.createItem({type: 'spell'});

@@ -31,6 +31,15 @@ export abstract class VersionMigration {
     migrateActor(_actor: any): void {}
     handlesActor(_actor: Readonly<any>) { return this.migrates.Actor; }
 
+    /**
+     * Migrate the source of an unlinked token's ActorDelta.
+     *
+     * Deltas have no _stats, so this runs on every load regardless of TargetVersion and must be
+     * idempotent: already migrated delta data has to pass through unchanged.
+     */
+    migrateActorDelta(_delta: any): void {}
+    handlesActorDelta(_delta: Readonly<any>) { return this.migrates.ActorDelta; }
+
     migrateCombat(_combat: any): void {}
     handlesCombat(_combat: Readonly<any>) { return this.migrates.Combat; }
 
@@ -50,11 +59,12 @@ export abstract class VersionMigration {
      * Flags which migration methods have been overridden in the subclass.
      * Used to determine support for each document type.
      */
-    private readonly migrates: Record<MigratableDocumentName | 'World', boolean>;
+    private readonly migrates: Record<MigratableDocumentName | 'ActorDelta' | 'World', boolean>;
     constructor() {
         const proto = Object.getPrototypeOf(this);
         this.migrates = {
             Actor: proto.migrateActor !== VersionMigration.prototype.migrateActor,
+            ActorDelta: proto.migrateActorDelta !== VersionMigration.prototype.migrateActorDelta,
             ActiveEffect: proto.migrateActiveEffect !== VersionMigration.prototype.migrateActiveEffect,
             Combat: proto.migrateCombat !== VersionMigration.prototype.migrateCombat,
             Combatant: proto.migrateCombatant !== VersionMigration.prototype.migrateCombatant,

@@ -18,6 +18,24 @@ interface CompendiumItemEntry {
  */
 export class SR5ItemCompendium extends foundry.applications.sidebar.apps.Compendium<typeof SR5Item> {
     /**
+     * Prepare Item documents loaded from any compendium against their linked children.
+     *
+     * Core constructs every CompendiumCollection itself, including packs created at runtime, so
+     * there is no collection class to configure and loading is wrapped once on the prototype.
+     */
+    static registerLinkedDocumentLoading() {
+        const prototype = foundry.documents.collections.CompendiumCollection.prototype as any;
+        const getDocuments = prototype.getDocuments;
+        prototype.getDocuments = async function (this: foundry.documents.collections.CompendiumCollection<any>, ...args: unknown[]) {
+            const documents = await getDocuments.apply(this, args);
+            if (this.documentName === 'Item') {
+                await SR5Item.prepareLoadedPackItems(this as foundry.documents.collections.CompendiumCollection<'Item'>, documents);
+            }
+            return documents;
+        };
+    }
+
+    /**
      * Dropping an item which already lives in this pack onto the directory takes it out of its
      * container. Core only routes drops through _createDroppedEntry for entries which don't exist
      * yet, so unlinking has to happen here, before the usual sorting runs.
@@ -38,21 +56,12 @@ export class SR5ItemCompendium extends foundry.applications.sidebar.apps.Compend
         root.updateSource({ system: { parentId: null } });
         const created = (await collection.importDocument(root, { dialog: true } as any))!;
 
-        const contents = await entry.loadContents();
-        if (contents.size === 0) return created;
-
-        const itemData = await SR5Item.createWithLinkedItems(Array.from(contents.values()), {
-            parentId: created.id,
-            parent: created,
-            transformAll: item => item.toCompendium(collection, {
+        await SR5Item.createLinkedContents(created as SR5Item, entry, {
+            pack: collection.collection,
+            transform: item => item.toCompendium(collection, {
                 clearSort: false,
                 keepId: true,
             }),
-        });
-        for (const data of itemData) data.folder = created.folder?.id ?? null;
-        await Item.implementation.createDocuments(itemData, {
-            pack: collection.collection,
-            keepId: true,
         });
 
         return created;

@@ -110,6 +110,39 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
+     * Copy everything linked below source under a freshly created copy of it, in the copy's folder.
+     *
+     * @param created The new parent, already stored in its collection.
+     * @param source The item created was copied from.
+     * @param options.pack The compendium created lives in, if any.
+     * @param options.transform Turns each linked item into creation data for the target collection.
+     */
+    static async createLinkedContents(
+        created: SR5Item,
+        source: SR5Item,
+        { pack, transform }: { pack?: string; transform: LinkedItemTransformer }
+    ): Promise<void> {
+        // Imports keep ids, so created may be an existing document that was replaced in place.
+        // Its former linked items belong to the replaced version and would otherwise pile up.
+        const replaced = await created.loadContents();
+        if (replaced.size > 0) {
+            await SR5Item.deleteDocuments(Array.from(replaced.keys()), { pack } as any);
+        }
+
+        const contents = await source.loadContents();
+        if (contents.size === 0) return;
+
+        const itemData = await SR5Item.createWithLinkedItems(Array.from(contents.values()), {
+            parentId: created.id,
+            parent: created,
+            transformAll: transform,
+        });
+        for (const data of itemData) data.folder = created.folder?.id ?? null;
+
+        await Item.implementation.createDocuments(itemData, { pack, keepId: true });
+    }
+
+    /**
      * Delete everything linked below the given items via system.parentId as well.
      */
     static override async deleteDocuments(
@@ -942,6 +975,46 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         this.reset();
         if (this.isEmbedded) this.prepareRelationshipData();
         if (render) this.render(false);
+    }
+
+    // Compendium items currently loading their children, guarding against cyclic parentId data.
+    private static readonly _loadingPackChildren = new Set<string>();
+
+    /**
+     * Prepare compendium items which have linked children against those children.
+     *
+     * Compendium children can only be loaded asynchronously, so a freshly loaded parent would
+     * otherwise show values without its mods and ammo until something refreshed it.
+     */
+    static async prepareLoadedPackItems(
+        pack: foundry.documents.collections.CompendiumCollection<'Item'>,
+        documents: readonly SR5Item[]
+    ): Promise<void> {
+        // Packs created after world load don't index parentId until asked; shared with the compendium app.
+        const indexed = pack as { _sr5Reindexing?: Promise<unknown> };
+        indexed._sr5Reindexing ??= pack.getIndex({ fields: ['system.parentId'] as any });
+        await indexed._sr5Reindexing;
+
+        const parentIds = new Set<string>();
+        for (const entry of pack.index) {
+            const parentId = getProperty(entry, 'system.parentId');
+            if (typeof parentId === 'string' && parentId) parentIds.add(parentId);
+        }
+        if (parentIds.size === 0) return;
+
+        for (const document of documents) {
+            if (!document.id || !parentIds.has(document.id)) continue;
+
+            const key = document.uuid ?? document.id;
+            if (SR5Item._loadingPackChildren.has(key)) continue;
+
+            SR5Item._loadingPackChildren.add(key);
+            try {
+                await document.refreshLinkedData({ render: false });
+            } finally {
+                SR5Item._loadingPackChildren.delete(key);
+            }
+        }
     }
 
     private _prepareChildItemData(item: Item.Source): Item.Source | null {

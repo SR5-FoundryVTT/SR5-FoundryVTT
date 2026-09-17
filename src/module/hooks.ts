@@ -10,6 +10,7 @@ import { getSRStatus } from './statusEffects';
 import { SR5Actor } from './actor/SR5Actor';
 import { SR5Item } from './item/SR5Item';
 import { SR5ItemCompendium } from './item/SR5ItemCompendium';
+import { SR5ItemDirectory } from './item/SR5ItemDirectory';
 import { SR5Items } from './item/SR5Items';
 import { SR5ItemSheet } from './item/SR5ItemSheet';
 import { SR5Token } from './token/SR5Token';
@@ -95,6 +96,7 @@ import { IconAssign } from './apps/iconAssigner/IconAssign';
 import { CombatTrackerDockIntegration } from './integrations/combatTrackerDockIntegration';
 import { initDiceSoNice } from './rolls/DiceSoNice';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
+import { SR5ActorDelta } from './token/SR5ActorDelta';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
 
 import { CombatDM } from './types/combat/Combat';
@@ -393,6 +395,7 @@ ___________________
         CONFIG.Item.documentClass = SR5Item;
         // @ts-expect-error fvtt-types doesn't allow custom combatTracker yet
         CONFIG.ui.combat = SR5CombatTracker;
+        CONFIG.ui.items = SR5ItemDirectory;
         CONFIG.Combat.documentClass = SR5Combat;
         CONFIG.Combatant.documentClass = SR5Combatant;
         CONFIG.ChatMessage.documentClass = SR5ChatMessage;
@@ -400,6 +403,7 @@ ___________________
 
         CONFIG.Token.objectClass = SR5Token;
         CONFIG.Token.documentClass = SR5TokenDocument;
+        CONFIG.ActorDelta.documentClass = SR5ActorDelta as unknown as typeof ActorDelta;
         CONFIG.Token.rulerClass = SR5TokenRuler;
         CONFIG.Token.movement.actions['run'] = {
             label: 'SR5.MovementTypes.Run',
@@ -558,6 +562,7 @@ ___________________
     }
 
     static setup() {
+        SR5ItemCompendium.registerLinkedDocumentLoading();
         for (const pack of game.packs) {
             if (pack.metadata.type === 'Item') pack.applicationClass = SR5ItemCompendium;
         }

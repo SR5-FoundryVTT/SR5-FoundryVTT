@@ -24,18 +24,10 @@ export class SR5Items extends foundry.documents.collections.Items {
         const source = await pack.getDocument(id) as SR5Item | undefined;
         if (!source) return created;
 
-        const contents = await source.loadContents();
-        if (contents.size === 0) return created;
-
         const fromOptions = foundry.utils.mergeObject({ clearSort: false }, options);
-        const itemData = await SR5Item.createWithLinkedItems(Array.from(contents.values()), {
-            parentId: created.id,
-            parent: created,
-            transformAll: item => this.fromCompendium(item, fromOptions),
+        await SR5Item.createLinkedContents(created as SR5Item, source, {
+            transform: item => this.fromCompendium(item, fromOptions),
         });
-        for (const data of itemData) data.folder = created.folder?.id ?? null;
-
-        await Item.implementation.createDocuments(itemData, { keepId: true });
         return created;
     }
 }

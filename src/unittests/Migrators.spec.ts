@@ -2,6 +2,7 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SR5TestFactory } from './utils';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { Migrator } from '@/module/migrator/Migrator';
+import { MigrationStorage } from '@/module/migrator/MigrationStorage';
 import { VersionMigration } from '@/module/migrator/VersionMigration';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 import { Version0_36_0 } from 'src/module/migrator/versions/Version0_36_0';
@@ -1073,6 +1074,177 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.exists(mod);
             assert.strictEqual(mod.system.parentId, armor._id);
             assert.strictEqual(mod.system.type, 'armor');
+        });
+
+        /** A weapon source with legacy ammo and a mod stored in flags, the way 0.37 kept them. */
+        const legacyWeapon = (id = foundry.utils.randomID(16)): any => ({
+            _id: id,
+            name: 'Ares Alpha',
+            type: 'weapon',
+            system: DataDefaults.baseSystemData('weapon'),
+            flags: {
+                [SYSTEM_NAME]: {
+                    [FLAGS.EmbeddedItems]: [
+                        { _id: foundry.utils.randomID(16), name: 'APDS', type: 'ammo', system: DataDefaults.baseSystemData('ammo') },
+                        { _id: foundry.utils.randomID(16), name: 'Gas Vent', type: 'modification', system: DataDefaults.baseSystemData('modification') },
+                    ],
+                },
+            },
+        });
+        const childIds = (items: any[], parentId: string) => items
+            .filter(item => item.system?.parentId === parentId)
+            .map(item => item._id)
+            .sort();
+
+        it('derives lifted child ids from their legacy entry, so repeated lifts agree', () => {
+            const migrator = new Version0_38_0();
+            const weapon = legacyWeapon();
+            const first: any = { items: [foundry.utils.deepClone(weapon)] };
+            const second: any = { items: [foundry.utils.deepClone(weapon)] };
+
+            migrator.migrateActor(first);
+            migrator.migrateActor(second);
+
+            const ids = childIds(first.items, weapon._id);
+            assert.lengthOf(ids, 2);
+            assert.deepEqual(childIds(second.items, weapon._id), ids);
+            for (const id of ids) assert.match(id, /^[A-Za-z0-9]{16}$/);
+        });
+
+        it('gives copies of the same legacy entry under different parents different ids', () => {
+            const migrator = new Version0_38_0();
+            const weapon = legacyWeapon();
+            const twin = foundry.utils.deepClone(weapon);
+            twin._id = foundry.utils.randomID(16);
+            const actor: any = { items: [weapon, twin] };
+
+            migrator.migrateActor(actor);
+
+            const ids = [...childIds(actor.items, weapon._id), ...childIds(actor.items, twin._id)];
+            assert.lengthOf(ids, 4);
+            assert.lengthOf(new Set(ids), 4);
+        });
+
+        it('lifts legacy children inside a token delta to the ids the base actor lifts', () => {
+            const migrator = new Version0_38_0();
+            const weapon = legacyWeapon();
+            const base: any = { items: [foundry.utils.deepClone(weapon)] };
+            const delta: any = { _id: foundry.utils.randomID(16), items: [foundry.utils.deepClone(weapon)] };
+
+            migrator.migrateActor(base);
+            migrator.migrateActorDelta(delta);
+
+            const deltaParent = delta.items.find((item: any) => item._id === weapon._id);
+            assert.isUndefined(deltaParent.flags[SYSTEM_NAME][FLAGS.EmbeddedItems]);
+            assert.deepEqual(childIds(delta.items, weapon._id), childIds(base.items, weapon._id));
+            assert.isTrue(delta.items.filter((item: any) => item.system?.parentId).every((item: any) => item._stats.systemVersion === '0.0.0'));
+        });
+
+        it('leaves already migrated delta data unchanged when migrated again', () => {
+            const delta: any = { _id: foundry.utils.randomID(16), items: [legacyWeapon()] };
+            Migrator.migrateActorDelta(delta);
+            const migrated = foundry.utils.deepClone(delta);
+
+            Migrator.migrateActorDelta(delta);
+
+            assert.deepEqual(delta, migrated);
+        });
+
+        it('migrates token deltas through the registered ActorDelta class', () => {
+            const delta: any = { _id: foundry.utils.randomID(16), items: [legacyWeapon()] };
+
+            CONFIG.ActorDelta.documentClass.migrateData(delta);
+
+            assert.lengthOf(delta.items, 3);
+        });
+
+        it('keeps a token override of a legacy parent over the base children and hides children the token removed', async () => {
+            const weapon = legacyWeapon();
+            const base = await factory.createActor({ type: 'character', prototypeToken: { actorLink: false } });
+            const baseSource: any = base.toObject();
+            baseSource.items.push(foundry.utils.deepClone(weapon));
+            new Version0_38_0().migrateActor(baseSource);
+            await base.update(baseSource, { diff: false, recursive: false, noHook: true, render: false });
+
+            // The token changed the ammo quantity and removed the mod while both were still legacy flag data.
+            const tokenWeapon = foundry.utils.deepClone(weapon);
+            const [ammo] = tokenWeapon.flags[SYSTEM_NAME][FLAGS.EmbeddedItems];
+            ammo.system.technology.quantity = 7;
+            tokenWeapon.flags[SYSTEM_NAME][FLAGS.EmbeddedItems] = [ammo];
+
+            const scene = await factory.createScene({});
+            const tokenData = (await base.getTokenDocument({ actorLink: false })).toObject() as any;
+            tokenData.delta = { items: [tokenWeapon] };
+            const [token] = await scene.createEmbeddedDocuments('Token', [tokenData]) as TokenDocument.Stored[];
+
+            // The tombstone step MigrateWorld runs per scene, without sweeping the whole world.
+            const updates = (Version0_38_0 as any).deltaTombstoneUpdates(scene);
+            await MigrationStorage.updateTokens(scene, updates);
+
+            const actor = scene.tokens.get(token.id)!.actor!;
+            const children = actor.items.filter(item => item.system.parentId === weapon._id);
+            assert.deepEqual(children.map(item => item.name), ['APDS']);
+            assert.strictEqual(children[0].system.technology?.quantity, 7);
+        });
+
+        it('keeps world item chains linked and next to their parent when lifted', async () => {
+            const folder = await Folder.create({ name: '#QUENCH lift', type: 'Item' });
+            const backpack = await factory.createItem({
+                type: 'container',
+                name: '#QUENCH Backpack',
+                folder: folder!.id,
+                flags: {
+                    [SYSTEM_NAME]: {
+                        [FLAGS.EmbeddedItems]: [{
+                            _id: foundry.utils.randomID(16),
+                            name: '#QUENCH Pouch',
+                            type: 'container',
+                            system: DataDefaults.baseSystemData('container'),
+                            flags: {
+                                [SYSTEM_NAME]: {
+                                    [FLAGS.EmbeddedItems]: [{
+                                        _id: foundry.utils.randomID(16),
+                                        name: '#QUENCH Rope',
+                                        type: 'equipment',
+                                        system: DataDefaults.baseSystemData('equipment'),
+                                    }],
+                                },
+                            },
+                        }],
+                    },
+                },
+            } as any);
+
+            try {
+                await (new Version0_38_0() as any).liftLegacyChildrenFromItems([backpack.toObject()], null);
+
+                const pouch = game.items.find(item => item.name === '#QUENCH Pouch');
+                const rope = game.items.find(item => item.name === '#QUENCH Rope');
+                assert.exists(pouch);
+                assert.exists(rope);
+                assert.strictEqual(pouch!.system.parentId, backpack.id);
+                assert.strictEqual(rope!.system.parentId, pouch!.id);
+                assert.strictEqual(pouch!.folder?.id, folder!.id);
+                assert.strictEqual(rope!.folder?.id, folder!.id);
+            } finally {
+                await backpack.delete();
+                await folder!.delete();
+            }
+        });
+
+        it('does not add an embedded items flag to items which have none', () => {
+            const item: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Plain Gear',
+                type: 'equipment',
+                system: DataDefaults.baseSystemData('equipment'),
+                flags: {},
+                _stats: { systemVersion: '0.37.0' },
+            };
+
+            Migrator.migrate('Item', item);
+
+            assert.notProperty(item.flags[SYSTEM_NAME] ?? {}, FLAGS.EmbeddedItems);
         });
     });
 
