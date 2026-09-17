@@ -389,7 +389,6 @@ body.theme-light,
                 justify-content: start;
                 align-items: center;
                 flex-flow: column nowrap;
-                gap: .25rem;
 
                 .sheet-header-resource-container {
                     box-sizing: border-box;
@@ -408,7 +407,7 @@ body.theme-light,
                     }
 
                     .sheet-header-resource-value {
-                        flex: 0 0 4rem;
+                        flex: 0 0 5rem;
                         justify-content: center;
                     }
 

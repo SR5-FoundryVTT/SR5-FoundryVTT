@@ -59,7 +59,7 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
         duration: preparedDuration,
     } as unknown as SR5ActiveEffect, { restartPending });
 
-    const waitUntil = async (condition: () => boolean, timeout = 1000) => {
+    const waitUntil = async (condition: () => boolean, timeout = 3000) => {
         const started = Date.now();
         while (!condition() && Date.now() - started < timeout) {
             await new Promise(resolve => setTimeout(resolve, 25));
