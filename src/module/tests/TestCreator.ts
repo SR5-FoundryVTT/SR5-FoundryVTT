@@ -486,7 +486,7 @@ export const TestCreator = {
      */
     _prepareTestDataWithActionForActor: function(action: ActionRollType, actor: SR5Actor, data: SuccessTestData, againstData?: SuccessTestData) {
         // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
-        const rollData = actor.getRollData({againstData: againstData ?? data.following?.against, copySystem: true});
+        const rollData = actor.getRollData({action, againstData: againstData ?? data.following?.against, copySystem: true});
 
         const pool = new ModifiableValue(data.pool);
 

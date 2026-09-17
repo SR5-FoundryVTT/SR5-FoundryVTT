@@ -1,5 +1,5 @@
 import { SR } from '../../constants';
-import { SituationModifier } from './SituationModifier';
+import { SituationModifier, SituationalModifierApplyOptions } from './SituationModifier';
 import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifiersSourceData = Shadowrun.EnvironmentalModifiersSourceData;
 import EnvironmentalModifiersData = Shadowrun.EnvironmentalModifiersData;
@@ -15,6 +15,19 @@ export class EnvironmentalModifier extends SituationModifier {
     
     get levels(): EnvironmentalModifierLevels {
         return SR.combat.environmental.levels;
+    }
+
+    override _applyRegionalModifiers(options: SituationalModifierApplyOptions): void {
+        const regional = this.modifiers?.regional.physical;
+        if (!regional) return;
+
+        const applicable = options.applicable?.length ? new Set(options.applicable) : null;
+        for (const category of ['visibility', 'light', 'wind'] as const) {
+            if (applicable && !applicable.has(category)) continue;
+            const regionValue = regional[category];
+            if (regionValue >= this.levels.good) continue;
+            this.applied.active[category] = Math.min(this.applied.active[category] ?? this.levels.good, regionValue);
+        }
     }
 
     /**

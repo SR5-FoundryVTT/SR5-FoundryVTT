@@ -143,6 +143,14 @@ import { Skill } from './types/item/Skill';
 import { SR5SkillSheet } from './item/sheets/SR5SkillSheet';
 import { SkillGroupFlow } from './actor/flows/SkillGroupFlow';
 import { OpposedMatrixTest } from './tests/OpposedMatrixTest';
+import { PerceptionFlow } from './vision/PerceptionFlow';
+import { VisionHUD } from './apps/VisionHUD';
+import { AstralProjectionFlow } from './vision/astralProjection/AstralProjectionFlow';
+import { ActorRollDataFlow } from './actor/flows/ActorRollDataFlow';
+import { AstralRegionFlow } from './vision/astralRegions/AstralRegionFlow';
+import { registerAstralRegionBehaviors } from './vision/astralRegions/AstralRegionBehavior';
+import { EnvironmentalRegionFlow } from './vision/environmentalRegions/EnvironmentalRegionFlow';
+import { registerEnvironmentalRegionBehaviors } from './vision/environmentalRegions/EnvironmentalRegionBehavior';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -169,6 +177,7 @@ export class HooksManager {
         Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory.bind(HooksManager));
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory.bind(HooksManager));
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));
+        Hooks.on('renderTokenHUD', VisionHUD.onRenderTokenHUD.bind(VisionHUD));
         Hooks.on('moveToken', SR5TokenDocument.moveToken.bind(SR5Token));
         Hooks.on('createItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('updateItem', (item, data, options, userId) => { void HooksManager.updateIcConnectedToHostItem(item, data, options, userId); });
@@ -183,6 +192,12 @@ export class HooksManager {
         Hooks.on('updateWorldTime', foundry.utils.debounce(() => { void ExtendedTestDueFlow.announceDue(); }, 250));
 
         Hooks.on('renderChatLog', HooksManager.chatLogListeners.bind(HooksManager));
+
+        PerceptionFlow.registerHooks();
+        AstralProjectionFlow.registerHooks();
+        ActorRollDataFlow.registerHooks();
+        AstralRegionFlow.registerHooks();
+        EnvironmentalRegionFlow.registerHooks();
 
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();
@@ -436,6 +451,9 @@ ___________________
 
         CONFIG.Combat.dataModels["base"] = CombatDM;
         CONFIG.Combatant.dataModels["base"] = CombatantDM;
+
+        registerAstralRegionBehaviors();
+        registerEnvironmentalRegionBehaviors();
 
         CONFIG.Item.dataModels["action"] = Action;
         CONFIG.Item.dataModels["ammo"] = Ammo;
@@ -722,6 +740,7 @@ ___________________
             [FLAGS.UnsetDataStorage]: [DataStorage._handleUnsetDataStorageSocketMessage.bind(DataStorage)],
             [FLAGS.UpdateDocumentsAsGM]: [SocketMessageFlow.handleUpdateDocumentsAsGMMessage.bind(SocketMessage)],
             [FLAGS.ApplyExtendedTestRoll]: [ExtendedTestFlow._handleApplyRollSocketMessage.bind(ExtendedTestFlow)],
+            [FLAGS.AstralProjectionOperation]: [AstralProjectionFlow.handleSocketMessage.bind(AstralProjectionFlow)],
         } as const;
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData, senderId?: string) => {
@@ -764,9 +783,11 @@ ___________________
 
     static configureVision() {
         //register detection modes
+        VisionConfigurator.configurePhysicalSight()
         VisionConfigurator.configureAstralPerception()
         VisionConfigurator.configureThermographicVision()
         VisionConfigurator.configureLowlight()
+        VisionConfigurator.configureUltrasound()
         VisionConfigurator.configureAR()
     }
 

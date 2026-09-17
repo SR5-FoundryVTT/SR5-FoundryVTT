@@ -38,6 +38,12 @@ import { shadowrunDataStorage } from './sr5.DataStorage.spec';
 import { Quench, QuenchRegisterBatchFunction, QuenchRegisterBatchOptions } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
 import { shadowrunMatrixDamageResist } from '@/unittests/sr5.MatrixDamageResist.spec';
+import { shadowrunVisionFoundation } from '@/unittests/sr5.VisionFoundation.spec';
+import { shadowrunVisionPhysical } from '@/unittests/sr5.VisionPhysical.spec';
+import { shadowrunVisionAstralPerception } from '@/unittests/sr5.VisionAstralPerception.spec';
+import { shadowrunVisionProjection } from '@/unittests/sr5.VisionProjection.spec';
+import { shadowrunVisionAstralRegions } from '@/unittests/sr5.VisionAstralRegions.spec';
+import { shadowrunVisionEnvironmentalRegions } from '@/unittests/sr5.VisionEnvironmentalRegions.spec';
 
 const QUENCH_TIMEOUT_MS = 5000;
 
@@ -70,6 +76,24 @@ export const quenchRegister = (quench: Quench) => {
 
     registerBatch(quench, 'shadowrun5e.rules.matrix', shadowrunMatrix, {
         displayName: 'SHADOWRUN5e: Matrix Rules Test',
+    });
+    registerBatch(quench, 'shadowrun5e.vision.foundation', shadowrunVisionFoundation, {
+        displayName: 'SHADOWRUN5e: Vision Foundation',
+    });
+    registerBatch(quench, 'shadowrun5e.vision.physical', shadowrunVisionPhysical, {
+        displayName: 'SHADOWRUN5e: Physical Vision',
+    });
+    registerBatch(quench, 'shadowrun5e.vision.astral_perception', shadowrunVisionAstralPerception, {
+        displayName: 'SHADOWRUN5e: Astral Perception',
+    });
+    registerBatch(quench, 'shadowrun5e.vision.projection', shadowrunVisionProjection, {
+        displayName: 'SHADOWRUN5e: Astral Projection',
+    });
+    registerBatch(quench, 'shadowrun5e.vision.astral_regions', shadowrunVisionAstralRegions, {
+        displayName: 'SHADOWRUN5e: Astral Regions',
+    });
+    registerBatch(quench, 'shadowrun5e.vision.environmental_regions', shadowrunVisionEnvironmentalRegions, {
+        displayName: 'SHADOWRUN5e: Environmental Regions',
     });
     registerBatch(quench, 'shadowrun5e.apps.matrix_opposed_device_dialog', shadowrunMatrixOpposedDeviceDialog, {
         displayName: 'SHADOWRUN5e: Matrix Opposed Device Dialog Test',

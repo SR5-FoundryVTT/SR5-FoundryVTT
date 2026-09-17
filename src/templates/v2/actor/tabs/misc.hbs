@@ -18,6 +18,19 @@
                         </div>
                     {{/if}}
                     {{#if awakened}}
+                        {{#if systemFields.magic.fields.type}}
+                            <div class="list-item">
+                                <div class="list-item-start">
+                                    <label data-tooltip="{{systemFields.magic.fields.type.hint}}">
+                                        {{systemFields.magic.fields.type.label}}
+                                    </label>
+                                </div>
+                                <div class="list-item-col">
+                                    {{formInput systemFields.magic.fields.type value=source.system.magic.type
+                                                classes="short" rootId=rootId localize=true }}
+                                </div>
+                            </div>
+                        {{/if}}
                         <div class="list-item">
                             <div class="list-item-start">
                                 <label data-tooltip="{{systemFields.magic.fields.attribute.hint}}">
@@ -27,6 +40,32 @@
                             <div class="list-item-col">
                                 {{formInput systemFields.magic.fields.attribute value=source.system.magic.attribute
                                                 classes="short" rootId=rootId disabled=@root.isPlayMode localize=true }}
+                            </div>
+                        </div>
+                    {{/if}}
+                    {{#if (and isCharacter isGM)}}
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{systemFields.magic.fields.astralPerceptionOverride.hint}}">
+                                    {{systemFields.magic.fields.astralPerceptionOverride.label}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.magic.fields.astralPerceptionOverride
+                                            value=source.system.magic.astralPerceptionOverride
+                                            classes="short" rootId=rootId localize=true }}
+                            </div>
+                        </div>
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{systemFields.magic.fields.astralProjectionOverride.hint}}">
+                                    {{systemFields.magic.fields.astralProjectionOverride.label}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.magic.fields.astralProjectionOverride
+                                            value=source.system.magic.astralProjectionOverride
+                                            classes="short" rootId=rootId localize=true }}
                             </div>
                         </div>
                     {{/if}}
@@ -41,6 +80,20 @@
                                 {{formInput systemFields.technomancer.fields.attribute
                                             value=source.system.technomancer.attribute
                                             rootId=rootId disabled=@root.isPlayMode localize=true }}
+                            </div>
+                        </div>
+                    {{/if}}
+                    {{#if systemFields.visibilityChecks.fields.targets.fields.physical.fields.thermographic}}
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{systemFields.visibilityChecks.fields.targets.fields.physical.fields.thermographic.hint}}">
+                                    {{systemFields.visibilityChecks.fields.targets.fields.physical.fields.thermographic.label}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.visibilityChecks.fields.targets.fields.physical.fields.thermographic
+                                            value=source.system.visibilityChecks.targets.physical.thermographic
+                                            classes="short" rootId=rootId localize=true }}
                             </div>
                         </div>
                     {{/if}}

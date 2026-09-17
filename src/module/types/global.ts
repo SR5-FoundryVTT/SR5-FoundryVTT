@@ -55,6 +55,13 @@ import AstralPerceptionDetectionMode from "../vision/astralPerception/astralPerc
 import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDetectionMode";
 import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
+import UltrasoundDetectionMode from '../vision/ultrasoundVision/ultrasoundDetectionMode';
+import type { AstralProjectionState } from '../vision/astralProjection/AstralProjectionFlow';
+import type {
+    AstralBarrierRegionBehavior,
+    AstralWardRegionBehavior,
+} from '../vision/astralRegions/AstralRegionBehavior';
+import type { EnvironmentalRegionBehavior } from '../vision/environmentalRegions/EnvironmentalRegionBehavior';
 import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
 
@@ -123,6 +130,7 @@ declare module "fvtt-types/configuration" {
             astralPerception: AstralPerceptionDetectionMode;
             thermographic: ThermographicVisionDetectionMode;
             lowlight: LowlightVisionDetectionMode;
+            ultrasound: UltrasoundDetectionMode;
             augmentedReality: AugmentedRealityVisionDetectionMode;
         }
 
@@ -155,6 +163,11 @@ declare module "fvtt-types/configuration" {
         };
         Combatant: {
             base: typeof CombatantDM;
+        };
+        RegionBehavior: {
+            'shadowrun5e.astralBarrier': typeof AstralBarrierRegionBehavior;
+            'shadowrun5e.astralWard': typeof AstralWardRegionBehavior;
+            'shadowrun5e.environment': typeof EnvironmentalRegionBehavior;
         };
         Item: {
             action: typeof Action;
@@ -222,11 +235,6 @@ declare module "fvtt-types/configuration" {
                 itemMacro?: boolean;
             }
         };
-        Token: {
-            shadowrun5e: {
-                TokenMovementPhaseMarkers?: MovementPhaseMarker[];
-            };
-        }
         User: {
             shadowrun5e: {
                 showApplication?: boolean;
@@ -238,6 +246,17 @@ declare module "fvtt-types/configuration" {
             shadowrun5e: {
                 modifier?: Shadowrun.SituationModifiersSourceData;
             }
+        };
+        Token: {
+            shadowrun5e: {
+                AutomaticTokenSenses?: boolean;
+                astralPerceptionVision?: {
+                    sight: Record<string, unknown>;
+                    detectionModes: Record<string, { enabled: boolean; range: number | null }>;
+                };
+                astralProjection?: AstralProjectionState;
+                TokenMovementPhaseMarkers?: MovementPhaseMarker[];
+            };
         };
     }
 
@@ -308,6 +327,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.EnforceExtendedTestInterval": boolean;
         "shadowrun5e.ExtendedTestDueMessage": boolean;
         "shadowrun5e.WorldTimeInitialized": boolean;
+        "shadowrun5e.AutomaticTokenSenses": boolean;
         "shadowrun5e.TokenMovementHistoryReset": 'firstActionPhase' | 'turnStart';
     }
 }

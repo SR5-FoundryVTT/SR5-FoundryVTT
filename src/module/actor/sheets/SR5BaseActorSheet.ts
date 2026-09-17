@@ -110,6 +110,7 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
     isSpirit: boolean;
     isCritter: boolean;
     isVehicle: boolean;
+    isGM: boolean;
     awakened: boolean;
     emerged: boolean;
     canAlterSpecial: boolean;
@@ -409,6 +410,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Remap Foundry default v8/v10 mappings to better match systems legacy foundry versions mapping accross it's templates.
         // NOTE: If this is changed, you'll have to match changes on all actor sheets.
         const data = await super._prepareContext(options) as T;
+        data.isGM = game.user?.isGM ?? false;
         data.actor = this.actor;
 
         // Sheet related general purpose fields. These aren't persistent.
