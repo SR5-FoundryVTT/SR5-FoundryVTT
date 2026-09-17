@@ -395,6 +395,7 @@ ___________________
         CONFIG.Item.documentClass = SR5Item;
         // @ts-expect-error fvtt-types doesn't allow custom combatTracker yet
         CONFIG.ui.combat = SR5CombatTracker;
+        // @ts-expect-error fvtt-types doesn't allow custom combatTracker yet
         CONFIG.ui.items = SR5ItemDirectory;
         CONFIG.Combat.documentClass = SR5Combat;
         CONFIG.Combatant.documentClass = SR5Combatant;
