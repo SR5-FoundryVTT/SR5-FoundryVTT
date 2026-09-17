@@ -2,15 +2,53 @@
 @use 'config/mixins';
 @use 'config/variables';
 
+@mixin chat-card-title {
+    @include mixins.systemFonts;
+    color: var(--sr5-card-accent, var(--sr5-theme-label));
+    font-size: var(--font-size-14);
+    letter-spacing: 0.02em;
+}
+
+@mixin chat-card-control {
+    flex: 0 0 auto;
+    // Sized by its icon: a fixed box would stretch the row it sits in and drop the
+    // icon below the sibling controls that flow on the first line.
+    padding: 0 0.15rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--sr5-card-text-soft, var(--sr5-theme-text-secondary));
+    background: none;
+    border: none;
+    transition: color 120ms ease;
+
+    &:hover,
+    &:focus-visible {
+        color: var(--sr5-card-accent, var(--sr5-theme-label));
+        outline: none;
+    }
+}
+
 .chat-message {
-    background: var(--sr5-theme-surface-elevated);
-    border: 1px solid var(--sr5-theme-chat-border);
+    --sr5-message-header-bg: var(--sr5-theme-chat-bg);
+    background: var(--sr5-theme-chat-body-bg);
+    border: none;
     color: var(--sr5-theme-text-primary);
     box-shadow: none;
 
+    &.whisper {
+        --sr5-message-header-bg: var(--sr5-theme-chat-whisper-bg);
+    }
+
+    &.blind {
+        --sr5-message-header-bg: var(--sr5-theme-chat-blind-bg);
+    }
+
     .message-header {
+        background: var(--sr5-message-header-bg);
         color: var(--sr5-theme-text-secondary);
-        border-bottom: 1px solid var(--sr5-theme-chat-border);
+        border-bottom: 1px solid var(--sr5-theme-chat-divider);
     }
 
     .message-content {
@@ -18,10 +56,141 @@
     }
 }
 
+// SR5 cards use the Foundry message shell as their single visual card. The system
+// header is promoted into this shell at render time. Its chat texture is limited to
+// the header, leaving the body edge-to-edge on the standard card surface.
+.chat-message:has(.sr5.chat-card),
+.chat-message.sr5-chat-message {
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--sr5-theme-chat-card-border);
+    border-radius: 6px;
+
+    .message-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: 'title metadata';
+        align-items: center;
+        gap: 0.12rem 0.45rem;
+        padding: 0.45rem 0.5rem 0.35rem;
+        line-height: 1.2;
+
+        .message-sender {
+            grid-area: title;
+            min-width: 0;
+            overflow: hidden;
+            color: var(--sr5-theme-label);
+            font-size: var(--font-size-14);
+            font-weight: 700;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            .whisper-to {
+                display: block;
+                overflow: hidden;
+                color: var(--sr5-theme-text-secondary);
+                font-size: var(--font-size-11);
+                font-weight: 400;
+                text-overflow: ellipsis;
+            }
+        }
+
+        .message-metadata {
+            grid-area: metadata;
+            align-self: start;
+            min-width: max-content;
+            color: var(--sr5-theme-text-muted);
+        }
+
+        .flavor-text {
+            grid-column: 1 / -1;
+            order: 2;
+            margin: 0.15rem 0 0;
+            color: var(--sr5-theme-text-secondary);
+        }
+
+        .sr5-message-system-header {
+            @include chat-card-title;
+            grid-area: title;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            padding: 0;
+            overflow: hidden;
+            font-weight: 700;
+            background: transparent;
+            border: none;
+
+            .test-name {
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+
+        .card-control {
+            @include chat-card-control;
+            // Foundry's own metadata controls render their icon on the top edge of
+            // the line box rather than its centre; match them, not the line.
+            align-items: flex-start;
+        }
+
+        .sr5-message-header-detail {
+            grid-column: 1 / -1;
+            order: 1;
+            margin: 0.2rem 0 0;
+            padding: 0;
+            color: var(--sr5-theme-text-primary);
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+    }
+
+    &.sr5-chat-message--has-system-title .message-header {
+        grid-template-areas:
+            'title metadata'
+            'sender metadata';
+
+        .message-sender {
+            grid-area: sender;
+            color: var(--sr5-theme-text-secondary);
+            font-size: var(--font-size-11);
+            font-weight: 400;
+        }
+    }
+
+    .message-content {
+        width: 100%;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .sr5.chat-card.sr5-chat-card--merged {
+        width: 100%;
+        margin: 0;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .message-content > .initiative-mode-change-card {
+        padding: 0;
+
+        .initiative-mode-change-row-secondary {
+            margin: 0;
+            padding: 0.35rem 0.45rem;
+            border-top: none;
+        }
+    }
+}
+
 
 .sr5 {
     &.chat-card {
-        background: var(--sr5-theme-chat-card-bg);
+        background: var(--sr5-theme-surface-elevated);
         background-repeat: repeat;
         background-size: 100% 20px auto;
         color: var(--sr5-theme-text-primary);
@@ -63,7 +232,8 @@
                 font-size: var(--font-size-12);
             }
         }
-        .card-header:first-of-type {
+        &:not(.sr5-chat-card--merged) > .card-header:first-child,
+        > .card-header--title {
             color: var(--sr5-theme-label);
             border-color: var(--sr5-theme-chat-card-border);
         }
@@ -197,34 +367,32 @@
             border-bottom-color: var(--sr5-card-border);
 
             .test-name {
-                @include mixins.systemFonts;
-                color: var(--sr5-card-accent);
-                font-size: var(--font-size-14);
-                letter-spacing: 0.02em;
+                @include chat-card-title;
             }
 
             .card-control {
-                flex: 0 0 auto;
-                width: 24px;
-                height: 24px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                border: 1px solid var(--sr5-card-border-soft);
-                border-radius: 5px;
-                color: var(--sr5-card-text-soft);
-                background: var(--sr5-theme-surface-elevated-strong);
-                transition: border-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
-
-                &:hover {
-                    color: var(--sr5-card-accent);
-                    border-color: var(--sr5-card-accent);
-                    box-shadow: 0 0 8px var(--sr5-theme-accent-glow);
-                }
+                @include chat-card-control;
             }
         }
 
         .card-header--entities {
+            .container__row {
+                display: flex;
+                flex-flow: row wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.2rem 0.6rem;
+            }
+
+            .container__col {
+                flex: 0 1 auto;
+                min-width: 0;
+            }
+
+            .container__col--item .document {
+                flex-direction: row-reverse;
+            }
+
             .container__row + .container__row {
                 padding-top: 0.2rem;
                 border-top: 1px dashed var(--sr5-card-border-soft);
@@ -402,8 +570,97 @@
             margin-top: 0.35rem;
         }
 
+        // Resolved pool, limit, and threshold values.
+        .card-content--parameters {
+            display: flex;
+            flex-flow: row wrap;
+            gap: 0 0.6rem;
+            margin-top: 0.2rem;
+            @include mixins.systemFonts;
+            font-size: var(--font-size-12);
+
+            .test-parameter[data-tooltip-source] {
+                cursor: var(--cursor-pointer);
+            }
+
+            .test-parameter-content {
+                border-bottom: 1px solid transparent;
+            }
+
+            .test-parameter[aria-expanded='true'] .test-parameter-content {
+                border-bottom-color: var(--sr5-card-text);
+            }
+
+            .test-parameter-label {
+                color: var(--sr5-card-text-soft);
+                margin-right: 0.3rem;
+            }
+
+            .test-parameter-value {
+                color: var(--sr5-card-accent);
+                font-weight: bold;
+            }
+
+            // Visual separator between parameters.
+            .test-parameter + .test-parameter::before {
+                content: '·';
+                margin-right: 0.6rem;
+                color: var(--sr5-card-border-soft);
+            }
+
+            // Shared full-width modifier panel.
+            .test-parameter-details {
+                flex: 0 0 100%;
+                // Allow long modifier names to truncate.
+                min-width: 0;
+                margin-top: 0.35rem;
+
+                // Hide when every breakdown is collapsed.
+                &:not(:has(.test-parameter-detail:not([hidden]))) {
+                    display: none;
+                }
+            }
+
+            // Inline panel styled as part of the card.
+            .value-modifiers-panel {
+                padding: 0.25rem 0.35rem;
+                background: var(--sr5-card-surface-soft);
+                border: 1px solid var(--sr5-card-border-soft);
+                border-radius: 4px;
+
+                .list-item.has-tooltip {
+                    cursor: var(--cursor-pointer);
+
+                    // Keep the row as Foundry's tooltip target.
+                    > * {
+                        pointer-events: none;
+                    }
+                }
+            }
+        }
+
+        // Ordinary tests may have no remaining metric rows.
+        .card-content--metrics:not(:has(.metric-row)) {
+            display: none;
+        }
+
+        // Hide empty outcome containers.
+        .glitch-content:not(:has(.test-outcome-hits, .glitch)) {
+            display: none;
+        }
+
+        .card-test-content--status:not(:has(.test-outcome-hits, .glitch)) {
+            display: none;
+        }
+
         .card-content--metrics {
             cursor: pointer;
+
+            // Handlebars whitespace prevents using :empty.
+            .left-side:not(:has(*)),
+            .right-side:not(:has(*)) {
+                display: none;
+            }
 
             .metric-row--template .value-result {
                 color: var(--sr5-card-accent);
@@ -423,13 +680,6 @@
 
         .card-content--results {
             margin-bottom: 0.35rem;
-        }
-
-        .card-content--buyhits {
-            margin-bottom: 0.35rem;
-            justify-content: center;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
         }
 
         .card-description {
@@ -467,7 +717,6 @@
         }
 
         .test-line {
-            margin-top: 0.25rem;
             display: flex;
             flex-flow: row nowrap;
             justify-content: space-between;
@@ -499,6 +748,43 @@
 
         .test-line--targets {
             margin: 0.35rem 0.45rem 0;
+        }
+
+        // Adjacent bands stack flush: the seam collapses and the lower band drops its
+        // top border, so the two edges read as one hairline. Corners square where
+        // bands meet, leaving a run rounded only at its ends.
+        $card-bands: '.card-content', '.card-test-content', '.card-description';
+
+        @each $band in $card-bands {
+            // The run opens flush against the header block above it.
+            .card-main-content > #{$band}:first-child {
+                margin-top: 0;
+                border-top: none;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+            }
+
+            // The status band has no box of its own; its chips carry the border.
+            #{$band} + .card-test-content .glitch-content {
+                border-top: none;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+            }
+
+            @each $next in $card-bands {
+                #{$band}:has(+ #{$next}) {
+                    margin-bottom: 0;
+                    border-bottom-left-radius: 0;
+                    border-bottom-right-radius: 0;
+                }
+
+                #{$band} + #{$next} {
+                    margin-top: 0;
+                    border-top: none;
+                    border-top-left-radius: 0;
+                    border-top-right-radius: 0;
+                }
+            }
         }
 
         .card-test-content {
@@ -557,6 +843,42 @@
             .glitch[data-glitch]:hover:after {
                 opacity: 0.55;
             }
+        }
+
+        // Keep "4 HITS - SUCCESS" on one text flow.
+        .test-outcome {
+            text-align: center;
+
+            .glitch {
+                display: inline;
+            }
+        }
+
+        .test-outcome-hits {
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: var(--font-size-11);
+            font-weight: 700;
+            color: var(--sr5-card-text);
+
+            &[data-tooltip-source] {
+                cursor: var(--cursor-pointer);
+            }
+
+            .test-outcome-hits-value {
+                font-size: var(--font-size-14);
+                color: var(--sr5-card-accent);
+            }
+
+            // Add a separator only before a verdict.
+            &:has(+ .glitch)::after {
+                content: ' -';
+            }
+        }
+
+        .test-outcome-bought-hits {
+            margin-right: 0.3rem;
+            color: var(--sr5-card-accent);
         }
 
         .glitch-content--critical {
@@ -621,6 +943,14 @@
                     filter: sepia(0.5) hue-rotate(60deg);
                 }
             }
+
+            &--bought-hits {
+                color: var(--sr5-card-accent);
+                font-size: var(--font-size-11);
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+            }
         }
 
         .card-buttons {
@@ -643,10 +973,15 @@
             .left-side {
                 flex: 1;
                 min-width: 0;
+                flex-flow: row wrap;
+                align-items: center;
+                column-gap: 0.9rem;
             }
 
             .test-value {
                 align-items: center;
+                flex: 1 1 auto;
+                min-width: 0;
             }
 
             .test-value--damage-pair {
