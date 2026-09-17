@@ -124,11 +124,11 @@ export const registerItemLineHelpers = () => {
     })
 
     Handlebars.registerHelper('ammoOptions', function (item: SR5Item, options) {
-        return item.items.filter(i => i.isType('ammo')).map(i => ({ label: i.name, value: i.id }));
+        return item.childItems.filter(i => i.isType('ammo')).map(i => ({ label: i.name, value: i.id }));
     })
 
     Handlebars.registerHelper('hasAmmo', function (item: SR5Item, options) {
-        return item.items.filter(i => i.isType('ammo')).length > 0;
+        return item.childItems.filter(i => i.isType('ammo')).length > 0;
     })
 
     Handlebars.registerHelper('matrixIconType', function (icon: SR5Item | SR5Actor, options) {

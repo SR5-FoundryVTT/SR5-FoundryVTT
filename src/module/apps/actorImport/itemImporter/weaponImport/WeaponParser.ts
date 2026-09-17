@@ -280,11 +280,11 @@ export class WeaponParser extends Parser<'weapon'> {
         return category;
     }
 
-    override async getEmbeddedItems(itemData: ExtractItemType<'weapons', 'weapon'>): Promise<Item.Source[]> {
+    override async getEmbeddedItems(itemData: ExtractItemType<'weapons', 'weapon'>): Promise<Item.CreateData[]> {
         return [
             ...(await new AccessoryParser().parseItems(itemData.accessories?.accessory)),
             ...(await new ClipParser(itemData).parseItems(itemData.clips?.clip)),
-        ] as Item.Source[];
+        ] as Item.CreateData[];
     }
 
     handleMeleeWeapon(system: BlankItem<'weapon'>['system'], itemData: ExtractItemType<'weapons', 'weapon'>) {

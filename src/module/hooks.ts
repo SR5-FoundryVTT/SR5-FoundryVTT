@@ -9,6 +9,9 @@ import { FLAGS, SR, SYSTEM_NAME, SYSTEM_SOCKET } from './constants';
 import { getSRStatus } from './statusEffects';
 import { SR5Actor } from './actor/SR5Actor';
 import { SR5Item } from './item/SR5Item';
+import { SR5ItemCompendium } from './item/SR5ItemCompendium';
+import { SR5ItemDirectory } from './item/SR5ItemDirectory';
+import { SR5Items } from './item/SR5Items';
 import { SR5ItemSheet } from './item/SR5ItemSheet';
 import { SR5Token } from './token/SR5Token';
 import { SR5ActiveEffect } from "./effect/SR5ActiveEffect";
@@ -93,6 +96,7 @@ import { IconAssign } from './apps/iconAssigner/IconAssign';
 import { CombatTrackerDockIntegration } from './integrations/combatTrackerDockIntegration';
 import { initDiceSoNice } from './rolls/DiceSoNice';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
+import { SR5ActorDelta } from './token/SR5ActorDelta';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
 
 import { CombatDM } from './types/combat/Combat';
@@ -112,6 +116,7 @@ import { Armor } from './types/item/Armor';
 import { Bioware } from './types/item/Bioware';
 import { CallInAction } from './types/item/CallInAction';
 import { ComplexForm } from './types/item/ComplexForm';
+import { Container } from './types/item/Container';
 import { Contact } from './types/item/Contact';
 import { CritterPower } from './types/item/CritterPower';
 import { Cyberware } from './types/item/Cyberware';
@@ -163,6 +168,7 @@ export class HooksManager {
         });
         Hooks.once('aipSetup', AutocompleteInlineHooksFlow.aipSetupHook);
 
+        Hooks.once('setup', HooksManager.setup.bind(HooksManager));
         Hooks.on('ready', HooksManager.ready.bind(HooksManager));
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop.bind(HooksManager));
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
@@ -385,9 +391,12 @@ ___________________
 
         // Register document classes
         CONFIG.Actor.documentClass = SR5Actor;
+        CONFIG.Item.collection = SR5Items as typeof CONFIG.Item.collection;
         CONFIG.Item.documentClass = SR5Item;
         // @ts-expect-error fvtt-types doesn't allow custom combatTracker yet
         CONFIG.ui.combat = SR5CombatTracker;
+        // @ts-expect-error fvtt-types doesn't allow custom combatTracker yet
+        CONFIG.ui.items = SR5ItemDirectory;
         CONFIG.Combat.documentClass = SR5Combat;
         CONFIG.Combatant.documentClass = SR5Combatant;
         CONFIG.ChatMessage.documentClass = SR5ChatMessage;
@@ -395,6 +404,7 @@ ___________________
 
         CONFIG.Token.objectClass = SR5Token;
         CONFIG.Token.documentClass = SR5TokenDocument;
+        CONFIG.ActorDelta.documentClass = SR5ActorDelta as unknown as typeof ActorDelta;
         CONFIG.Token.rulerClass = SR5TokenRuler;
         CONFIG.Token.movement.actions['run'] = {
             label: 'SR5.MovementTypes.Run',
@@ -424,7 +434,7 @@ ___________________
         CONFIG.SR5 = SR5;
 
         CONFIG.Actor.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");
-        CONFIG.Item.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");
+        CONFIG.Item.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport", "system.parentId");
 
         CONFIG.ActiveEffect.dataModels["base"] = ActiveEffectDM;
 
@@ -444,6 +454,7 @@ ___________________
         CONFIG.Item.dataModels["bioware"] = Bioware;
         CONFIG.Item.dataModels["call_in_action"] = CallInAction;
         CONFIG.Item.dataModels["complex_form"] = ComplexForm;
+        CONFIG.Item.dataModels["container"] = Container;
         CONFIG.Item.dataModels["contact"] = Contact;
         CONFIG.Item.dataModels["critter_power"] = CritterPower;
         CONFIG.Item.dataModels["cyberware"] = Cyberware;
@@ -551,8 +562,35 @@ ___________________
         DataStorage.validate();
     }
 
+    static setup() {
+        SR5ItemCompendium.registerLinkedDocumentLoading();
+        for (const pack of game.packs) {
+            if (pack.metadata.type === 'Item') pack.applicationClass = SR5ItemCompendium;
+        }
+    }
+
+    /**
+     * Re-prepare world items which own linked children.
+     *
+     * World items derive their data from their children during prepareBaseData, but documents are
+     * constructed one at a time, so any parent built before its children saw an empty collection.
+     */
+    static prepareLinkedWorldItems() {
+        const parentIds = new Set<string>();
+        for (const item of game.items ?? []) {
+            const parentId = item.system.parentId;
+            if (parentId) parentIds.add(parentId);
+        }
+
+        for (const parentId of parentIds) {
+            game.items?.get(parentId)?.reset();
+        }
+    }
+
     static async ready() {
         await IconAssign.refreshIconFiles();
+
+        HooksManager.prepareLinkedWorldItems();
 
         if (game.user?.isGM) {
             Migrator.BeginMigration();

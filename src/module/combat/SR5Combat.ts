@@ -105,7 +105,7 @@ export class SR5Combat extends Combat<"base"> {
 
     // Foundry's Combat interface defines nextCombatant as a getter, but SR5's initiative flow
     // doesn't have a single "next" combatant due to initiative passes.
-    override get nextCombatant(): undefined { return undefined; }
+    override get nextCombatant(): null { return null; }
 
 
     // =========================================================

@@ -62,6 +62,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             'ammo',
             'armor',
             'bioware',
+            'container',
             'cyberware',
             'device',
             'equipment',
