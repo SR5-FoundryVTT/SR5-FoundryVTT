@@ -30,6 +30,8 @@ interface SR5SkillSheetData extends SR5BaseItemSheetData {
     canEditSkillAttribute: boolean
     // Whether the skill can be native, based on the skill category.
     canBeNative: boolean
+    // Whether the skill type can be changed; locked for actor owned skills.
+    canChangeSkillType: boolean
     // Taken directly from an owning actor to show the derived value.
     skillValue?: number
     // Whether this skill has a derived value as an actor owned skill.
@@ -133,6 +135,7 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         context.showCompendiumWarning = !this.document.pack;
         context.canEditSkillAttribute = this.canEditSkillAttribute();
         context.canBeNative = this.canBeNative();
+        context.canChangeSkillType = !this.document.actor;
         context.skillValue = this.getActorSkillValue();
         context.hasSkillValue = context.skillValue !== undefined;
         context.sourceSkillSet = await this.getSourceSkillSet();
