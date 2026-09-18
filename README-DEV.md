@@ -305,6 +305,41 @@ Any item can contain the action template allowing it to cast it as a Shadowrun 5
 
 # Extending compendium contents
 
+## Refresh repository sources from a running world
+
+Before packaging a release, use `npm run update:pack-sources` to export migrated and sanitized
+documents from every live system compendium declared in `system.json` into their matching `packs/_source` files.
+The running system must use the repository's current bundle, version, and migration registry.
+Live compendium edits are authoritative for matching documents; review the resulting Git diff.
+
+```sh
+npm run update:pack-sources
+npm run update:pack-sources -- sr5e-general-actions
+npm run update:pack-sources -- --check
+npm run validate:packs
+```
+
+The command uses `.env.local` and shell overrides for `FOUNDRY_URL` (default
+`http://localhost:30000`), `FOUNDRY_USER` (default `Gamemaster`), and `FOUNDRY_PASSWORD`.
+It runs headlessly; `FOUNDRY_BROWSER_CHANNEL=msedge` selects installed Edge, which is also
+the fallback when Playwright Chromium is missing. In PowerShell, use `npm.cmd` if `npm`
+consumes `--check`, or invoke `node scripts/update-pack-sources.mjs --check` directly.
+
+By default the command writes validated changes. `--check` writes nothing and exits with status 1
+when changes are needed (or validation fails). In PowerShell, npm records `--check` as
+`npm_config_check=true`; the exporter recognizes this form as well as the normal command-line flag.
+Documents match by pack and ID, so renamed entries retain their existing source paths and `_key`.
+Missing/duplicate matches fail before writes; extra live entries are reported without adding files.
+Folders are preserved. All selected exports are validated before writing changed files.
+Embedded document compilation keys are preserved by ID or generated for new embedded documents.
+Existing property order is retained. The first export can still change many files because Foundry
+updates core metadata and adds schema defaults. Review those changes before release packaging.
+Completed migration markers use the greater of the loaded system version and the latest registered
+migration version, after outstanding migrations and validation succeed.
+No world documents or live compendiums are updated, and no LevelDB packs are rebuilt.
+Stop Foundry before subsequently running `npm run build:db` or `npm run package`.
+The exporter stays separate from normal builds because it requires a running world.
+
 FoundryVTT uses nedb to implement their compendiums, internally called packs. These nedb's are build from scratch on each release and need source document json files to be built from.
 
 If changes are to be made on compendium items, you can either make those directly within their source file underneath `./packs/_source` or using Foundry GUI. To make these changes persistent, extract compendium content to their source using `node ./utils/packs.mjs package unpack`. Since source documents are stored using their name, be careful when changing that and compare their on disk name with expectations. Reserved filesystem basenames are exported with a leading `_` for portability, while the internal Foundry document name in the JSON stays unchanged.
