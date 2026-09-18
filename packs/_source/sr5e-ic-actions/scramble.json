@@ -12,10 +12,9 @@
     },
     "importFlags": {
       "name": "",
-      "type": "",
-      "subType": "",
-      "isImported": false,
-      "isFreshImport": false
+      "isFreshImport": false,
+      "category": "",
+      "sourceid": ""
     },
     "action": {
       "attribute": "rating",
@@ -24,10 +23,9 @@
       "limit": {
         "value": 0,
         "base": 0,
-        "mod": [],
-        "override": null,
         "attribute": "attack",
-        "base_formula_operator": "add"
+        "base_formula_operator": "add",
+        "changes": []
       },
       "mod": 0,
       "skill": "",
@@ -56,8 +54,6 @@
       "damage": {
         "value": 0,
         "base": 0,
-        "mod": [],
-        "override": null,
         "attribute": "",
         "base_formula_operator": "add",
         "type": {
@@ -71,12 +67,13 @@
         "ap": {
           "value": 0,
           "base": 0,
-          "mod": [],
-          "override": null,
           "attribute": "",
-          "base_formula_operator": "add"
+          "base_formula_operator": "add",
+          "changes": []
         },
-        "biofeedback": "none"
+        "biofeedback": "",
+        "changes": [],
+        "normal_weapon": false
       },
       "opposed": {
         "test": "MatrixDefenseTest",
@@ -106,7 +103,8 @@
       },
       "alt_mod": 0,
       "dice_pool_mod": [],
-      "roll_mode": ""
+      "roll_mode": "",
+      "initiative_mod": 0
     },
     "result": {
       "success": {
@@ -117,6 +115,25 @@
     }
   },
   "effects": [],
-  "flags": {},
-  "_key": "!items!uAmdnncqLNM7CkDG"
+  "flags": {
+    "shadowrun5e": {
+      "embeddedItems": []
+    }
+  },
+  "_key": "!items!uAmdnncqLNM7CkDG",
+  "_stats": {
+    "compendiumSource": null,
+    "coreVersion": "14.367",
+    "createdTime": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "lastModifiedBy": null,
+    "modifiedTime": null,
+    "systemId": "shadowrun5e",
+    "systemVersion": "0.37.4"
+  },
+  "ownership": {
+    "default": 0
+  },
+  "sort": 0
 }
