@@ -487,7 +487,7 @@ async function main() {
     const viewport = headless ? { width: 1024, height: 768 } : null;
     if (!headless) args.push('--start-maximized');
 
-    const browser = await chromium.launch({ headless, args });
+    const browser = await chromium.launch({ headless, args, channel: process.env.FOUNDRY_BROWSER_CHANNEL || undefined });
     try {
         const context = await browser.newContext({ baseURL: url, viewport });
         const page = await context.newPage();
