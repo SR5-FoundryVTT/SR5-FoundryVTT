@@ -41,7 +41,10 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": "academic"
+      "knowledgeType": "academic",
+      "limit": {
+        "attribute": ""
+      }
     },
     "group": {
       "skills": [],
@@ -49,15 +52,37 @@
     },
     "set": {
       "skills": [],
-      "groups": []
+      "groups": [],
+      "default": {
+        "type": ""
+      }
+    },
+    "source": {
+      "uuid": ""
     }
   },
   "effects": [],
   "folder": null,
-  "flags": {},
+  "flags": {
+    "shadowrun5e": {
+      "embeddedItems": []
+    }
+  },
   "ownership": {
     "default": 0
   },
   "_id": "Par854NwRkJwta54",
-  "_key": "!items!Par854NwRkJwta54"
+  "_key": "!items!Par854NwRkJwta54",
+  "_stats": {
+    "compendiumSource": null,
+    "coreVersion": "14.367",
+    "createdTime": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "lastModifiedBy": null,
+    "modifiedTime": null,
+    "systemId": "shadowrun5e",
+    "systemVersion": "0.37.4"
+  },
+  "sort": 0
 }

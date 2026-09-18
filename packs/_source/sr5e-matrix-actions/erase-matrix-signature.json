@@ -28,12 +28,8 @@
         "value": 0,
         "base": 0,
         "attribute": "attack",
-        "mod": [],
-        "mode": null,
-        "override": null,
-        "downgrade": null,
-        "upgrade": null,
-        "base_formula_operator": "add"
+        "base_formula_operator": "add",
+        "changes": []
       },
       "threshold": {
         "value": 0,
@@ -57,13 +53,9 @@
         "ap": {
           "value": 0,
           "base": 0,
-          "mod": [],
-          "mode": null,
-          "override": null,
-          "downgrade": null,
-          "upgrade": null,
           "attribute": "",
-          "base_formula_operator": "add"
+          "base_formula_operator": "add",
+          "changes": []
         },
         "base_formula_operator": "add",
         "attribute": "",
@@ -73,12 +65,9 @@
           "itemType": "",
           "itemName": ""
         },
-        "mod": [],
-        "mode": null,
-        "override": null,
-        "downgrade": null,
-        "upgrade": null,
-        "biofeedback": ""
+        "biofeedback": "",
+        "changes": [],
+        "normal_weapon": false
       },
       "opposed": {
         "type": "",
@@ -118,7 +107,8 @@
           "owner": false,
           "marks": 0
         }
-      }
+      },
+      "initiative_mod": 0
     },
     "result": {
       "success": {
@@ -129,13 +119,31 @@
     },
     "importFlags": {
       "name": "",
-      "type": "",
-      "subType": "",
       "isFreshImport": false,
-      "isImported": false
+      "category": "",
+      "sourceid": ""
     }
   },
   "folder": null,
-  "flags": {},
-  "_key": "!items!h3BIx7VKwI6c2Ufy"
+  "flags": {
+    "shadowrun5e": {
+      "embeddedItems": []
+    }
+  },
+  "_key": "!items!h3BIx7VKwI6c2Ufy",
+  "_stats": {
+    "compendiumSource": null,
+    "coreVersion": "14.367",
+    "createdTime": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "lastModifiedBy": null,
+    "modifiedTime": null,
+    "systemId": "shadowrun5e",
+    "systemVersion": "0.37.4"
+  },
+  "ownership": {
+    "default": 0
+  },
+  "sort": 0
 }
