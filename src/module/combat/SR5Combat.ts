@@ -75,30 +75,6 @@ export class SR5Combat extends Combat<"base"> {
     }
 
     /**
-     * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions.
-     */
-    static addCombatTrackerContextOptions(html: HTMLElement, options: any[]) {
-        const mapping = [
-            { value: 1, keySuffix: "One", icon: '<i class="fas fa-caret-down"></i>' },
-            { value: 5, keySuffix: "Five", icon: '<i class="fas fa-angle-down"></i>' },
-            { value: 10, keySuffix: "Ten", icon: '<i class="fas fa-angle-double-down"></i>' },
-        ] as const satisfies { value: number; keySuffix: string; icon: string }[];
-
-        for (const { value, keySuffix, icon } of mapping) {
-            options.push({
-                icon,
-                name: game.i18n.localize(`SR5.COMBAT.ReduceInitBy${keySuffix}`),
-                callback: async (li: JQuery) => {
-                    const combatant = game.combat?.combatants.get(li.data("combatant-id") as string);
-                    await combatant?.adjustInitiative(-value);
-                },
-            });
-        }
-
-        return options;
-    }
-
-    /**
      * Handles socket messages to trigger combat functions remotely.
      */
     static async _handleSocketMessage(message: SocketMessageData) {
