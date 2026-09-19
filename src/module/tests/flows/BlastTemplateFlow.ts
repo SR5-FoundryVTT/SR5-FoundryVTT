@@ -84,7 +84,9 @@ export class BlastTemplateFlow {
         return this.test.item?.hasBlastTemplate ?? false;
     }
 
-    /** Whether this template preview should show scatter direction arrows (SR5#182). */
+    /**
+     * Whether this template preview should show scatter direction arrows (SR5#182).
+     */
     get canScatter(): boolean {
         return this.options.canScatter?.() ?? false;
     }

@@ -55,7 +55,9 @@ const lightenColor = (color: number): number => {
     return (lighten(red) << 16) | (lighten(green) << 8) | lighten(blue);
 };
 
-/** Handles placement of fixed-width shotgun range bands. */
+/**
+ * Handles placement of fixed-width shotgun range bands.
+ */
 export class ShotgunTemplateFlow {
     #preview?: PIXI.Container;
     #graphics?: PIXI.Graphics;

@@ -49,7 +49,9 @@ const SCATTER_DIRECTION_BEARINGS: Record<ScatterDirection, number> = {
     12: 180,
 };
 
-/** All scatter directions of the 2d6 scatter diagram, in diagram order. */
+/**
+ * All scatter directions of the 2d6 scatter diagram, in diagram order.
+ */
 export const SCATTER_DIRECTIONS: ScatterDirection[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 /**
@@ -112,7 +114,8 @@ export const ScatterRules = {
     scatterDiceFormula: () => '2d6',
 
     /**
-     * Distance dice according to SR5#182 'Scatter Table'.
+     * Distance dice according to SR5#182 'Scatter Table' and
+     * SR5#283 'Combat Spells' 'Indirect'
      * Result is distance in meters.
      */
     distanceDiceFormula: (kind: ScatterKind) => {
@@ -127,7 +130,6 @@ export const ScatterRules = {
                 return '4d6';
             case 'missile_launcher':
                 return '5d6';
-            // TODO: tamif/2005 check spell distance formula page reference
             case 'spell':
                 return '2d6';
         }

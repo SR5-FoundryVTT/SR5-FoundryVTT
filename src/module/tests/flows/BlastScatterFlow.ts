@@ -22,7 +22,9 @@ type ScatterMessageData = {
     item: SuccessTest['item']
 };
 
-/** Resolves SR5 grenade and indirect combat spell scatter after a failed test. */
+/**
+ * Resolves SR5 grenade and indirect combat spell scatter after a failed test.
+ */
 export const BlastScatterFlow = {
     handledTests: new WeakSet<SuccessTest>(),
 
@@ -30,7 +32,6 @@ export const BlastScatterFlow = {
      * Will be called both after all success full tests and for post test template placements through chat message. 
      */
     async handle(test: SuccessTest): Promise<void> {
-        // TODO: tamif/2005 Why do we need a set to track handled tests? 
         //      Is the same instance of an import used across references when using a const object?
         //      Should we use a class instead to avoid having to complicate things with sets...
         if (this.handledTests.has(test)) return;

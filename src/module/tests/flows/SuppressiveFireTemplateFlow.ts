@@ -34,7 +34,9 @@ type RegionLayerV14 = typeof canvas.regions & {
     _cancelPlacement?: () => void
 };
 
-/** Handles the placement of a suppressive-fire cone with a selected outer width. */
+/**
+ * Handles the placement of a suppressive-fire cone with a selected outer width.
+ */
 export class SuppressiveFireTemplateFlow {
     #placement?: Promise<foundry.documents.RegionDocument | null>;
     #placedRegionId?: string;
