@@ -3,7 +3,6 @@ import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { ModifiableValue } from "@/module/mods/ModifiableValue";
-import { TestDialog } from "../module/apps/dialogs/TestDialog";
 import { FLAGS, SYSTEM_NAME } from "../module/constants";
 import { SpellCastingTest } from "@/module/tests/SpellCastingTest";
 import { SuccessTest } from "@/module/tests/SuccessTest";

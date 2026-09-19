@@ -25,20 +25,10 @@ type RegionPlacementEvent = PIXI.FederatedPointerEvent & {
     getLocalPosition: (displayObject: PIXI.DisplayObject) => Point
 };
 
-// TODO: fvtt-types v14 RegionLayer lacks the placeRegion, preview, and _cancelPlacement declarations.
 type RegionLayerV14 = typeof canvas.regions & {
     preview: PIXI.Container
-    placeRegion: (data: Record<string, unknown>, options: {
-        create: boolean
-        allowRotation: boolean
-        _destroyPreview?: boolean
-        onMove: (args: { position: Point, shape: RegionShape }) => false
-        preConfirm?: (args: { event: RegionPlacementEvent, shape: RegionShape }) => void
-    }) => Promise<foundry.documents.RegionDocument | null>
-    _cancelPlacement?: () => void
 };
 
-// TODO: fvtt-types v14 omits the Region createEmbeddedDocuments controlObject option.
 type RegionCreateEmbeddedDocuments = (
     embeddedName: 'Region',
     data: object[],
@@ -277,16 +267,18 @@ export class BlastTemplateFlow {
         }, {
             create: persistOnConfirm,
             allowRotation: false,
+            // @ts-expect-error #TODO fvtt-types v14 PlacementOptions omits the internal _destroyPreview option.
             _destroyPreview: persistOnConfirm,
             onMove: ({position, shape}) => {
-                this.#updateCircle(shape, position);
+                this.#updateCircle(shape as RegionShape, position);
                 return false;
             },
             preConfirm: persistOnConfirm ? undefined : ({event, shape}) => {
-                this.#updateCircle(shape, event.getLocalPosition(regions));
-                const token = this.#getTokenAtPoint(event);
+                const placementEvent = event as RegionPlacementEvent;
+                this.#updateCircle(shape as RegionShape, placementEvent.getLocalPosition(regions));
+                const token = this.#getTokenAtPoint(placementEvent);
                 if (token?.id) {
-                    canvas.tokens?.setTargets([token.id], {mode: event.shiftKey ? 'acquire' : 'replace'});
+                    canvas.tokens?.setTargets([token.id], {mode: placementEvent.shiftKey ? 'acquire' : 'replace'});
                     this.selectTarget(token, dialog!);
                 }
             },
@@ -415,6 +407,7 @@ export class BlastTemplateFlow {
         for (const token of canvas.tokens?.placeables ?? []) {
             if (!token.visible || !token.renderable) continue;
 
+            // @ts-expect-error #TODO fvtt-types v14 BaseGrid.measurePath is typed with never instead of concrete grid waypoints.
             const distance = canvas.grid!.measurePath([
                 this.#center,
                 token.center,
