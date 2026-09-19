@@ -49,6 +49,15 @@
     },
     "SR5": {
         "AP": "PA",
+        "Scatter": {
+            "Title": "Dispersion",
+            "Grenade": "Dispersion de grenade",
+            "Spell": "Dispersion de sort de combat indirect",
+            "Rolls": "Jets de dispersion",
+            "Direction": "Direction",
+            "Distance": "Distance",
+            "RolledDistance": "Distance obtenue"
+        },
         "Accessory": "Accessoire",
         "Accuracy": "Précision",
         "Action": "Action",
@@ -436,6 +445,9 @@
         "DmgTypeMatrix": "Matrice",
         "DmgTypePhysical": "Physique",
         "DmgTypeStun": "Etourdi.",
+        "DmgCodeMatrix": "M",
+        "DmgCodePhysical": "P",
+        "DmgCodeStun": "E",
         "Dodge": "Esquiver",
         "DontApplyWounds": "Ne pas appliquer les blessures",
         "Drain": "Drain",
@@ -1367,6 +1379,23 @@
         "StunTrack": "Suivi Etourdi",
         "Successes": "Succès",
         "Suppressing": "Suppression",
+        "SuppressiveFire": {
+            "Label": "Tir de suppression",
+            "Mode": "Mode de suppression",
+            "Modes": {
+                "Double": "Double (20 m)",
+                "Enhanced": "Renforcé (5 m)",
+                "Normal": "Normal (10 m)"
+            }
+        },
+        "Shotgun": {
+            "Label": "Choke du fusil à pompe",
+            "Choke": {
+                "Narrow": "Étroit",
+                "Medium": "Moyen",
+                "Wide": "Large"
+            }
+        },
         "Target": "Cible",
         "TargetDevice": "Appareil",
         "TargetFile": "Fichier",
@@ -1478,6 +1507,7 @@
         },
         "Walk": "Marcher",
         "Warnings": {
+            "InvalidWeaponRanges": "Les portées d'arme doivent être croissantes et se terminer au-dessus de zéro.",
             "CantCombineBuyHitsWithEdge": "Acheter des succès ne peut pas être combiné avec Seconde chance.",
             "MissingSkillOnActor": "Le personnage selectionné ne connait pas cette compétence",
             "NegativeLimitValue": "Les valeurs des limites doivent être supérieures à 0",
@@ -1489,6 +1519,11 @@
             "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs."
         },
         "Tooltips": {
+            "RangedAttack": {
+                "ShowSuppressiveFireTemplate": "Placer le cône de tir de suppression",
+                "ShowShotgunTemplate": "Placer le cône de chevrotine",
+                "ShowWeaponRanges": "Aperçu des portées d'arme"
+            },
             "Actor": {
                 "RemoveAllNetworks": "Supprimer tous les réseaux",
                 "RemoveNetwork": "Supprimer le réseau"
@@ -1515,6 +1550,14 @@
                 "Melee": "Melée",
                 "Range": "Portée",
                 "Thrown": "Lancé"
+            },
+            "FIELDS": {
+                "thrown": {
+                    "thrown_type": {
+                        "hint": "Type d'arme lancée utilisé pour la distance de dispersion. Laissez vide pour les armes lancées sans explosion.",
+                        "label": "Type d'arme lancée"
+                    }
+                }
             },
             "Mod": "Mod",
             "Mode": {

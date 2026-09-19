@@ -40,6 +40,30 @@
                     {{selectOptions test.fireModeOptions selected=test.data.fireModeSelected}}
                 </select>
             </div>
+            {{#if test.canPlaceSuppressiveFireTemplate}}
+                <div class="form-group fire-mode-select-row suppressive-fire-select-row">
+                    <label>{{localize 'SR5.SuppressiveFire.Label'}}</label>
+                    <select name="test.data.suppressiveFireWidth">
+                        {{selectOptions test.suppressiveFireWidthOptions selected=test.data.suppressiveFireWidth}}
+                    </select>
+                    {{> 'systems/shadowrun5e/dist/templates/common/template-preview-button.hbs'
+                        id='show-suppressive-fire-template'
+                        actionClass='show-suppressive-fire-template'
+                        tooltip='SR5.Tooltips.RangedAttack.ShowSuppressiveFireTemplate' }}
+                </div>
+            {{/if}}
+            {{#if test.canPlaceShotgunTemplate}}
+                <div class="form-group fire-mode-select-row shotgun-select-row">
+                    <label>{{localize 'SR5.Shotgun.Label'}}</label>
+                    <select name="test.data.shotgunChoke">
+                        {{selectOptions test.shotgunChokeOptions selected=test.data.shotgunChoke}}
+                    </select>
+                    {{> 'systems/shadowrun5e/dist/templates/common/template-preview-button.hbs'
+                        id='show-shotgun-template'
+                        actionClass='show-shotgun-template'
+                        tooltip='SR5.Tooltips.RangedAttack.ShowShotgunTemplate' }}
+                </div>
+            {{/if}}
             {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/attack-range-dialog-fragment.hbs'}}
         </div>
         <div>

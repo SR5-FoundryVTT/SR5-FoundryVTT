@@ -119,11 +119,13 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs',
 
         // dialogs
+        'systems/shadowrun5e/dist/templates/common/template-preview-button.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-entry.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/attack-range-dialog-fragment.hbs',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/parts/blast-template-dialog-fragment.hbs',
 
         // Test chat messages and their parts
         'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',

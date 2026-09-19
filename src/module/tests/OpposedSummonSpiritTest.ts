@@ -253,5 +253,6 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
         const actor = await fromUuid<Actor>(this.data.summonedSpiritUuid);
         await actor?.delete();
         delete this.actor;
+        await super._cleanUpAfterDialogCancel();
     }
 }
