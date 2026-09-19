@@ -5,6 +5,7 @@ import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import { SR5Die } from "../rolls/SR5Die";
+import { SR5TokenDocument } from "../token/SR5TokenDocument";
 import SocketMessageData = Shadowrun.SocketMessageData;
 import BaseCombat = foundry.documents.BaseCombat;
 
@@ -24,7 +25,7 @@ type InitiativeSummaryRow = {
     document: TokenDocument | SR5Actor | null;
 
     // Dice So Nice animation support
-    roll: Roll;
+    roll: Roll.Implementation;
     combatant: SR5Combatant;
 };
 
@@ -75,30 +76,6 @@ export class SR5Combat extends Combat<"base"> {
     }
 
     /**
-     * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions.
-     */
-    static addCombatTrackerContextOptions(html: HTMLElement, options: any[]) {
-        const mapping = [
-            { value: 1, keySuffix: "One", icon: '<i class="fas fa-caret-down"></i>' },
-            { value: 5, keySuffix: "Five", icon: '<i class="fas fa-angle-down"></i>' },
-            { value: 10, keySuffix: "Ten", icon: '<i class="fas fa-angle-double-down"></i>' },
-        ] as const satisfies { value: number; keySuffix: string; icon: string }[];
-
-        for (const { value, keySuffix, icon } of mapping) {
-            options.push({
-                icon,
-                name: game.i18n.localize(`SR5.COMBAT.ReduceInitBy${keySuffix}`),
-                callback: async (li: JQuery) => {
-                    const combatant = game.combat?.combatants.get(li.data("combatant-id") as string);
-                    await combatant?.adjustInitiative(-value);
-                },
-            });
-        }
-
-        return options;
-    }
-
-    /**
      * Handles socket messages to trigger combat functions remotely.
      */
     static async _handleSocketMessage(message: SocketMessageData) {
@@ -128,7 +105,6 @@ export class SR5Combat extends Combat<"base"> {
 
     // Foundry's Combat interface defines nextCombatant as a getter, but SR5's initiative flow
     // doesn't have a single "next" combatant due to initiative passes.
-    // @ts-expect-error it will be correctly typed later
     override get nextCombatant(): undefined { return undefined; }
 
 
@@ -219,6 +195,8 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
+        await this._recordCurrentMovementPhase();
+
         // Foundry nextRound mainly advances round/turn; SR5 also persists state, clears pass padding, and resets initiative pass.
         await this.createHistorySnapshot();
 
@@ -264,6 +242,8 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
+        await this._recordCurrentMovementPhase();
+
         // Foundry has no initiative pass concept; SR5 creates a pass transition and reduces initiatives for all combatants.
         // Determine if any combatant has enough initiative for another pass
         const nextTurn = this.turns.findIndex((c) => {
@@ -285,7 +265,7 @@ export class SR5Combat extends Combat<"base"> {
         // Add padding combatants for the new pass.
         // These will be sorted to the end of the initiative order and can be used to track pass
         // changes in the UI and prevent issues with combatants being added mid-pass.
-        const padData = this.turns.filter(c => !c.system.pad).map(() => ({ system: { pad: true } }));
+        const padData = this.turns.filter(c => !c.system.pad).map(() => ({ hidden: true, system: { pad: true } }));
         await this.createEmbeddedDocuments("Combatant", padData);
 
         updateData.combatants = this.combatants.map((c) => c.initPassUpdateData());
@@ -304,6 +284,8 @@ export class SR5Combat extends Combat<"base"> {
             SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'nextTurn' });
             return this;
         }
+
+        if (!passedPass) await this._recordCurrentMovementPhase();
 
         if (!passedPass && this.combatant?.actor) {
             void foundry.documents.ActiveEffect.registry.refresh('sr5ActionPhaseEnd', { combat: this });
@@ -340,6 +322,12 @@ export class SR5Combat extends Combat<"base"> {
             await this.combatant.turnUpdate(this.pass);
 
         return this;
+    }
+
+    /** Record the active combatant's endpoint before advancing out of an action phase. */
+    private async _recordCurrentMovementPhase(): Promise<void> {
+        if (!this.combatant?.token || this.combatant.system.pad || !this.id) return;
+        await this.combatant.token.recordMovementPhaseMarker(this.id, this.round, this.pass);
     }
 
     override async previousRound(): Promise<this> {
@@ -421,7 +409,7 @@ export class SR5Combat extends Combat<"base"> {
         const messageGroups = {
             public: [] as InitiativeSummaryRow[],
             gm: [] as InitiativeSummaryRow[],
-        } satisfies Partial<Record<ChatMessage.MessageMode, InitiativeSummaryRow[]>>;
+        } satisfies Partial<Record<ChatMessage.Mode, InitiativeSummaryRow[]>>;
 
         for (const id of combatantIds) {
             const combatant = this.combatants.get(id) as SR5Combatant | undefined;
@@ -596,7 +584,7 @@ export class SR5Combat extends Combat<"base"> {
      * @param messageOptions - Base configuration options for the created ChatMessage documents.
      */
     private async _createInitiativeMessages(
-        messageGroups: Partial<Record<ChatMessage.MessageMode, InitiativeSummaryRow[]>>,
+        messageGroups: Partial<Record<ChatMessage.Mode, InitiativeSummaryRow[]>>,
         messageOptions: ChatMessage.CreateData,
     ) {
         let hasPlayedSound = false;
@@ -645,7 +633,7 @@ export class SR5Combat extends Combat<"base"> {
     private _buildInitiativeRow(
         combatant: SR5Combatant,
         initiative: number,
-        roll: Roll,
+        roll: Roll.Implementation,
     ): InitiativeSummaryRow {
         const { actor, token, name } = combatant;
         const initiativeData = actor?.system?.initiative;
@@ -686,7 +674,7 @@ export class SR5Combat extends Combat<"base"> {
         };
     }
 
-    private _extractRollResults(roll: Roll): number[] {
+    private _extractRollResults(roll: Roll.Implementation): number[] {
         return roll.dice.flatMap(d => d.results.filter(r => r.active).map(r => r.result));
     }
 
@@ -699,7 +687,7 @@ export class SR5Combat extends Combat<"base"> {
      * @param base - The combatant's base initiative score.
      * @returns A formatted HTML string representing the tooltip.
      */
-    private _buildInitiativeTooltipHtml(actor: SR5Actor | null, roll: Roll, base: number): string {
+    private _buildInitiativeTooltipHtml(actor: SR5Actor | null, roll: Roll.Implementation, base: number): string {
         const wounds = actor?.system.wounds?.value;
         const penalty = Math.abs((this.pass - SR.combat.FIRST_PASS) * SR.combat.PASS_PENALTY);
 

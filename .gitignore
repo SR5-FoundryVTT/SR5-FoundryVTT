@@ -4,8 +4,10 @@
 
 # Editor / IDE
 .idea
-.vscode
-.vscode/launch.json
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
 *.code-workspace
 
 # Node / dependencies / lock files
@@ -24,3 +26,4 @@ foundryconfig.json
 # Packs: ignore all built packs but keep source
 packs/*
 !packs/_source
+!packs/_source/**

@@ -160,7 +160,7 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         // Lower from more to less explicit values being given.
         // Don't let force go below one.
         data.force = Math.max(data.force || summoning.system.spirit.force || 1, 1);
-        data.preparedSpiritUuid ||= summoning.system.spirit.uuid;
+        data.preparedSpiritUuid ||= summoning.system.spirit.uuid ?? '';
         data.optionalPowerCount = Math.floor(data.force / 3);
         data.reagent ||= 0;
     }

@@ -1,8 +1,23 @@
 import { formatStrict } from '@/module/utils/strings';
 import { LinksHelpers } from '@/module/utils/links';
 import { SR5Item } from '@/module/item/SR5Item';
+import { isElementInstance } from '@/module/utils/dom';
 
 export const SheetFlow = {
+    async changeItemMatrixDamage(event: Pick<Event, 'currentTarget'>, item?: SR5Item) {
+        const input = event.currentTarget;
+        if (!isElementInstance(input, HTMLInputElement) || !Number.isFinite(input.valueAsNumber)) return;
+
+        if (!item) {
+            const uuid = input.closest<HTMLElement>('[data-uuid]')?.dataset.uuid;
+            const document = uuid ? await fromUuid(uuid) : undefined;
+            if (!(document instanceof SR5Item)) return;
+            item = document;
+        }
+
+        await item.setMatrixDamage(Math.max(0, Math.trunc(input.valueAsNumber)));
+    },
+
     _getCreateItemText(type: string): string {
         switch (type) {
             case 'lifestyle':
@@ -84,27 +99,27 @@ export const SheetFlow = {
     },
 
     closestItemId(target: EventTarget | null) {
-        if (!(target instanceof HTMLElement)) return '';
+        if (!isElementInstance(target, HTMLElement)) return '';
         return target?.closest<HTMLElement>('[data-item-id]')?.dataset?.itemId ?? '';
     },
 
     closestUuid(target: EventTarget | null) {
-        if (!(target instanceof HTMLElement)) return '';
+        if (!isElementInstance(target, HTMLElement)) return '';
         return target?.closest<HTMLElement>('[data-uuid]')?.dataset?.uuid ?? '';
     },
 
     closestEffectId(target: EventTarget | null) {
-        if (!(target instanceof HTMLElement)) return '';
+        if (!isElementInstance(target, HTMLElement)) return '';
         return target?.closest<HTMLElement>('[data-effect-id]')?.dataset?.effectId ?? '';
     },
 
     closestAction(target: EventTarget | null) {
-        if (!(target instanceof HTMLElement)) return null;
+        if (!isElementInstance(target, HTMLElement)) return null;
         return target?.closest<HTMLElement>('[data-action]');
     },
 
     closestSource(target: EventTarget | null) {
-        if (!(target instanceof HTMLElement)) return '';
+        if (!isElementInstance(target, HTMLElement)) return '';
         return target?.closest<HTMLElement>('[data-source]')?.dataset?.source ?? '';
     },
 
@@ -113,7 +128,7 @@ export const SheetFlow = {
      */
     _getSourceContextOption() {
         return {
-            name: "SR5.ContextOptions.Source",
+            label: "SR5.ContextOptions.Source",
             icon: "<i class='fas fa-page'></i>",
             condition: (target: HTMLElement) => {
                 const source = this.closestSource(target);

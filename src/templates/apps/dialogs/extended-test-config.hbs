@@ -46,7 +46,7 @@
                 {{else}}
                 <input type="number" id="etm-config-pool" name="dicePool" value="{{record.dicePool}}" min="0" step="1"/>
                 {{/if}}
-                <label for="etm-config-threshold">{{localize "SR5.Threshold"}}</label>
+                <label for="etm-config-threshold">{{localize "SR5.ExtendedTestManager.BaseThreshold"}}</label>
                 <input type="number" id="etm-config-threshold" name="threshold" value="{{record.threshold}}" min="0" step="1"/>
             </div>
         </div>
@@ -62,12 +62,18 @@
             </div>
         </div>
 
-        <div class="form-group toggle-checkbox-row">
-            <label for="etm-config-cumulative" data-tooltip="SR5.ExtendedTestManager.CumulativeModifierTooltip">
-                {{localize "SR5.ExtendedTestManager.CumulativeModifier"}}
-            </label>
-            <input type="checkbox" id="etm-config-cumulative" name="cumulativeModifier"
-                {{#if record.cumulativeModifier}}checked{{/if}}/>
+        <div class="form-group etm-config-cumulative">
+            <div class="etm-config-cumulative-controls">
+                <label class="etm-config-cumulative-toggle" for="etm-config-cumulative"
+                    data-tooltip="SR5.ExtendedTestManager.CumulativeModifierTooltip">
+                    <input type="checkbox" id="etm-config-cumulative" name="cumulativeModifier"
+                        {{#if record.cumulativeModifier}}checked{{/if}}/>
+                    {{localize "SR5.ExtendedTestManager.CumulativeModifier"}}
+                </label>
+                <label for="etm-config-cumulative-rolls">{{localize "SR5.ExtendedTestManager.CumulativeRollCount"}}</label>
+                <input type="number" id="etm-config-cumulative-rolls" name="cumulativeRollCount"
+                    value="{{record.cumulativeRollCount}}" min="0" step="1"/>
+            </div>
         </div>
 
         <div class="form-group toggle-checkbox-row">

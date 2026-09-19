@@ -108,6 +108,7 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
             accumulatedHits: 0,
             interval: { value: 1, unit: 'minutes' },
             cumulativeModifier: true,
+            cumulativeRollCount: 0,
             advanceTimeOnRoll: false,
         };
         context.isCreate = !record;
@@ -165,6 +166,7 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
                 unit: (data['interval.unit'] ?? 'minutes') as ExtendedIntervalUnit,
             },
             cumulativeModifier: Boolean(data.cumulativeModifier),
+            cumulativeRollCount: Math.max(Math.floor(Number(data.cumulativeRollCount) || 0), 0),
             advanceTimeOnRoll: Boolean(data.advanceTimeOnRoll),
             permissions: {
                 visibility: (data.visibility ?? 'gmAndOwner') as ExtendedTestVisibility,

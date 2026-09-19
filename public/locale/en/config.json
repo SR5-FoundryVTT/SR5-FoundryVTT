@@ -70,11 +70,12 @@
         "TokenRulerColorRunningDescription": "The color for distance within running rate.",
         "TokenRulerColorSprinting": "Token Movement Sprinting Color",
         "TokenRulerColorSprintingDescription": "The color for distance above running rate, where sprinting is necessary.",
+        "TokenRulerColorPhaseMarker": "Token Movement Phase Marker Color",
+        "TokenRulerColorPhaseMarkerDescription": "The color of the waypoint that marks the end of an action phase.",
         "TokenRulerColorWalking": "Token Movement Walking Color",
         "TokenRulerColorWalkingDescription": "The color for distance within walking rate.",
         "TokenRulerOpacity": "Token Movement Opacity",
         "TokenRulerOpacityDescription": "How opaque the token ruler measurements are displayed. (0 = fully transparent, 1 = fully opaque)",
-        "TokenUseRoutingLib": "Use RoutingLib",
         "UseDamageConditionDescription": "System marks tokens according to their condition monitor",
         "UseDamageConditionName": "Use system handling for token status effects",
         "UseImportIconOverridesDescription": "When importing items, use the same icons for some different item types when it makes sense. Uncheck if using custom icons.",
@@ -156,7 +157,7 @@
             "CannotAddTestViaItemToActor": "Cannot add an Active Effect of type 'Test via Item' to an Actor",
             "ValueEditor": "Edit Change Value",
             "FIELDS": {
-                "applyByTest": {
+                "appliedByTest": {
                     "label": "Apply-To Test via Item"
                 },
                 "conditionMode": {
@@ -677,6 +678,9 @@
         "BuyHits": "Buy Hits",
         "COMBAT": {
             "CannotSeizeAgain": "You cannot seize initiative again until the start of your next turn.",
+            "InitiativeChangedLabel": "Initiative Updated",
+            "InitiativeDecreased": "Initiative decreased",
+            "InitiativeIncreased": "Initiative increased",
             "ModeAstral": "Astral",
             "ModeChangedLabel": "Initiative Mode Updated",
             "ModeChangeNewInitiative": "New initiative",
@@ -692,9 +696,6 @@
             "PreviousPass": "Previous Pass",
             "PreviousPhase": "Previous Phase",
             "PreviousTurn": "Previous Turn",
-            "ReduceInitByFive": "Initiative -5",
-            "ReduceInitByOne": "Initiative -1",
-            "ReduceInitByTen": "Initiative -10",
             "SeizeInitiative": "Seize Initiative",
             "SeizedInitiative": "Seized Initiative",
             "ToggleActedStatusGMOnly": "Toggle Acted Status (GM Only)",
@@ -950,7 +951,7 @@
         "Content": {
             "Actions": {
                 "Armor": "Armor",
-                "Biofeedback Resist": "Biofeedback Resist",
+                "BiofeedbackResist": "Biofeedback Resist",
                 "BruteForce": "Brute Force",
                 "ChangeConfiguration": "Change Configuration",
                 "ChangeIcon": "Change Icon",
@@ -1108,6 +1109,7 @@
         "DamageValue": "Damage Value",
         "DefaultCategoryVisibility": "Show empty categories",
         "Defaulting": "Defaulting",
+        "Delete": "Delete",
         "Defender": "Defender",
         "DefenderNetHits": "Defender Net Hits",
         "Defense": "Defense",
@@ -1173,6 +1175,7 @@
         "DurationSustained": "Sustained",
         "Echo": "Echo",
         "Echoes": "Echoes",
+        "Edit": "Edit",
         "EditAmmo": "Edit Ammo",
         "EditItem": "Edit Item",
         "EditMod": "Edit Mod",
@@ -1190,6 +1193,8 @@
             "Label": "Element"
         },
         "Emerged": "Emerged",
+        "EnforcedMaximum": "Enforced Maximum",
+        "EnforcedMinimum": "Enforced Minimum",
         "EnvModifiersApplication": {
             "ClearModifiers": "Clear personal modifiers",
             "Extreme": "Combination of two or more conditions at the heavy level",
@@ -1243,6 +1248,7 @@
             "CantEditAppliedItemEffects": "You can't edit an active effect that's been applied by an item.",
             "CantExecuteTest": "You can't execute this test. This might be related to you being a player or lacking permissions.",
             "DefaultInventoryCantBeRemoved": "The default inventory can't be removed",
+            "LinkLockedReboot": "A link-locked actor cannot be rebooted",
             "InventoryAlreadyExists": "An inventory with this name already exists.",
             "KeyNotModifyableByActiveEffect": "The active effect mode 'modify' can only affect mod properties.",
             "MarkCouldNotBePlaced": "Internal Error: Your marks couldn't be placed.",
@@ -1281,12 +1287,14 @@
             "CanEdit": "Edit",
             "CanRoll": "Roll",
             "CanView": "View",
+            "BaseThreshold": "Base Threshold",
             "ConfirmCancel": "Cancel the extended test \"{name}\"? It ends the test, but a GM can reactivate it later.",
             "ConfirmDelete": "Delete the extended test \"{name}\"?",
             "CreateTest": "New Extended Test",
             "Creator": "Created by",
-            "CumulativeModifier": "Cumulative -1 dice pool modifier",
+            "CumulativeModifier": "Cumulative −1 dice pool modifier",
             "CumulativeModifierTooltip": "Reduce the dice pool by 1 for each roll performed. SR5 p. 48.",
+            "CumulativeRollCount": "Prior rolls",
             "Due": "Due",
             "DueTooltip": "Game time intervals elapsed since the last roll",
             "DueMessage": {
@@ -1483,7 +1491,15 @@
                 "Title": "Actor Importer"
             },
             "BulkImporter": {
-                "Title": "Bulk Importer"
+                "Title": "Bulk Importer",
+                "Mode": "Import Mode:",
+                "TranslationLanguage": "Translation Language:",
+                "Modes": {
+                    "Add": "Add missing items",
+                    "Update": "Update items (keep description)",
+                    "Replace": "Replace items",
+                    "Clean": "Clear and reimport"
+                }
             },
             "ImporterSourcesConfig": {
                 "Title": "Importer Sources Configuration"
@@ -1513,6 +1529,7 @@
         "Initiative": "Initiative",
         "InitiativeMod": "Initiative Modifier",
         "Internal": "Internal",
+        "Intervene": "Intervene",
         "InventoryRename": {
             "Cancel": "Cancel",
             "NewName": "New Name",
@@ -1936,7 +1953,8 @@
             "Item": {
                 "AvailabilityAdjustment": "Scale Availability w/ Rating",
                 "CostAdjustment": "Scale Cost w/ Rating",
-                "EssenceAdjustment": "Scale Essence w/ Rating"
+                "EssenceAdjustment": "Scale Essence w/ Rating",
+                "Network": "Network"
             },
             "MarkPlacement": {
                 "PlaceOnDevice": "Place on device",
@@ -2386,6 +2404,7 @@
         "ResultOverride": "Result Override",
         "RightClickToClear": "Right Click to Clear",
         "Ritual": {
+            "Anchored": "Anchored",
             "FIELDS": {
                 "descriptors": {
                     "hint": "Descriptors for the Ritual",
@@ -2395,7 +2414,11 @@
                     "hint": "Type of Ritual to Perform",
                     "label": "Ritual Type"
                 }
-            }
+            },
+            "MaterialLink": "Material Link",
+            "Minion": "Minion",
+            "Spell": "Spell",
+            "Spotter": "Spotter"
         },
         "Roll": "Roll",
         "RollArmor": "Armor",
@@ -2881,6 +2904,8 @@
                 "Wraith": "Wraith"
             }
         },
+        "SpiritType": "Spirit Type",
+        "SprintingBonus": "Sprinting Bonus",
         "Sprite": {
             "FIELDS": {
                 "level": {
@@ -3050,6 +3075,7 @@
             "RitualFailure": "The ritual was too strong for you",
             "RitualSuccess": "The ritual is sealed",
             "SoakBlockedByHardenedArmor": "Blocked By Hardened Armor",
+            "SpellResisted": "Spell Resisted",
             "SpiritSummonFailure": "Spirit fled!",
             "SpiritSummonSuccess": "Spirit summoned!",
             "SpriteCompilationFailure": "Sprite fled!",
@@ -3130,6 +3156,7 @@
         "ToggleActive": "Toggle Active",
         "ToggleEquip": "Toggle Equipped",
         "ToggleWireless": "Toggle Wireless",
+        "ToggleSection": "Toggle Section",
         "Tooltips": {
             "Actor": {
                 "AddOneService": "Add One Service",
@@ -3141,6 +3168,8 @@
                 "DisconnectNetwork": "Leave this host/grid",
                 "MarkTarget": "Place additional marks on this target",
                 "MatrixConnectionToggle": "Change Matrix Connection status: Augmented Reality, Cold Sim, or Hot Sim",
+                "RemoveAllNetworks": "Remove all networks",
+                "RemoveNetwork": "Remove network",
                 "MatrixRunningSilentToggle": "Change your matrix device between Running Silent and Displaying your Persona",
                 "Metatype": "As NPC the metatype will also apply attribute quick modifiers",
                 "MiscConfig": "Miscellaneous Settings & Modifiers",
@@ -3238,6 +3267,7 @@
                 "Extended": "Test will be thrown as an extended test until threshold is reached. Set the interval to zero to roll it as a normal test.",
                 "ExtendedInterval": "Game time between rolls. Zero rolls this as a normal, non extended test.",
                 "Limit": "Calculated limit value",
+                "LimitIgnored": "Limit is currently ignored for this test",
                 "Modifier": "Sum of all modifiers applied to dice pool",
                 "Pool": "Amount of dice to roll",
                 "PushTheLimit": "Apply push the limit edge rules",
@@ -3273,6 +3303,7 @@
         "UnderBarrel": "Under Barrel",
         "UseEdgeForInitiativeRoll": "Use edge rule blitz for initiative",
         "Value": "Value",
+        "VehicleStunImmunity": "Vehicle Immunity to Stun Damage",
         "Vehicle": {
             "Categories": {
                 "Anthro": "Anthromorphic",
@@ -3585,7 +3616,11 @@
             },
             "Reach": "Reach",
             "Reload": "Reload",
+            "ResetSpareReloads": "Reset Spare Reloads",
             "SpareReloads": "Spare Reloads",
+            "Thrown": {
+                "Range": "Thrown Weapon Range"
+            },
             "Type": "Type",
             "Weapon": "Weapon"
         },

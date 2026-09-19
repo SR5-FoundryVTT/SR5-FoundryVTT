@@ -485,11 +485,11 @@ export const SR5 = {
     },
 
     ritualSpellTypes: {
-        anchored: 'SR5.Spell.Ritual.Anchored',
-        material_link: 'SR5.Spell.Ritual.MaterialLink',
-        minion: 'SR5.Spell.Ritual.Minion',
-        spell: 'SR5.Spell.Ritual.Spell',
-        spotter: 'SR5.Spell.Ritual.Spotter',
+        anchored: 'SR5.Ritual.Anchored',
+        material_link: 'SR5.Ritual.MaterialLink',
+        minion: 'SR5.Ritual.Minion',
+        spell: 'SR5.Ritual.Spell',
+        spotter: 'SR5.Ritual.Spotter',
     },
 
     attributeRolls: {
@@ -889,7 +889,10 @@ export const SR5 = {
      */
     opposedTests: {
         'spell': {
-            'combat': 'CombatSpellDefenseTest'
+            'combat': {
+                'direct': 'CombatSpellDefenseTest',
+                'indirect': 'PhysicalDefenseTest'
+            }
         }
     },
 
@@ -901,7 +904,10 @@ export const SR5 = {
      */
     opposedResistTests: {
         'spell': {
-            'combat': 'PhysicalResistTest'
+            'combat': {
+                'direct': '',
+                'indirect': 'PhysicalResistTest'
+            }
         }
     },
 

@@ -235,29 +235,16 @@ async function joinWorld(page, user = 'Gamemaster') {
         );
     }
 
-    const select = page.locator('[name=userid]');
-    await select.waitFor({ timeout: 30000 });
-    try {
-        await select.selectOption({ label: user });
-    } catch (labelError) {
-        const options = await select.locator('option').evaluateAll((elements) =>
-            elements.map((option) => ({
-                value: option.value,
-                text: (option.textContent ?? '').trim(),
-            })),
-        );
-        const match = options.find((option) => option.text.toLowerCase() === user.toLowerCase());
-        if (!match) {
-            const available = options.map((option) => option.text).join(', ') || 'none';
-            throw new Error(
-                `User "${user}" is not available in the launched world (available users: ${available}). ` +
-                    `Selecting by label failed: ${labelError}`,
-            );
-        }
-        await select.selectOption(match.value);
+    const username = page.locator('[name=username]');
+    await username.waitFor({ timeout: 30000 });
+    await username.fill(user);
+
+    const password = process.env.FOUNDRY_PASSWORD;
+    if (password) {
+        await page.locator('[name=password]').fill(password);
     }
 
-    await Promise.all([page.waitForURL('**/game', { timeout: 60000 }), page.click('[name=join]')]);
+    await Promise.all([page.waitForURL('**/game', { timeout: 60000 }), page.click('button[name=join]')]);
     await waitForGameReady(page);
 }
 

@@ -26,7 +26,7 @@ export interface TestDialogListener {
 
 interface TestDialogContext extends HandlebarsApplicationMixin.RenderContext {
     test: any;
-    rollMode: ChatMessage.MessageMode;
+    rollMode: ChatMessage.Mode;
     rollModes: typeof CONFIG.ChatMessage.modes;
     config: typeof SR5;
     expandedPaths: string[];
@@ -114,7 +114,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
     }
 
     async select(): Promise<SuccessTestData> {
-        await this.render({ force: true });
+        await this.render({ force: true, window: { windowId: TestDialog._focusedWindowId() } });
 
         if (this._selectionPromise === undefined || this.selection === undefined)
             return this._emptySelection();
@@ -122,19 +122,26 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         return this._selectionPromise;
     }
 
+    /** The detached window the user is interacting with, so the dialog opens next to the sheet that triggered it. */
+    static _focusedWindowId(): string | undefined {
+        const { detached } = foundry.applications;
+        const id = (detached.focused as { id?: string } | null)?.id;
+        return id && detached.windows.has(id) ? id : undefined;
+    }
+
     _emptySelection(): SuccessTestData {
         return this.test.data;
     }
 
     override async close(options?: ApplicationV2.ClosingOptions): Promise<this> {
-        const closed = await super.close(options);
+        await super.close(options);
 
         if (this.canceled && !this._selectionSettled) {
             this._selectionSettled = true;
             this._selectionResolve(this.selection);
         }
 
-        return closed;
+        return this;
     }
 
     static async #roll(this: TestDialog, event: Event) {
@@ -231,8 +238,13 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             void this.render();
         });
 
-        html.find('.modifiable-value .form-fields input[type="number"]').on('keydown', ev => {
+        html.find('.modifiable-value .form-fields input[type="number"], .modifiable-value .form-fields input.limit-infinity, .modifiable-value .form-fields input.threshold-dash').on('keydown', ev => {
             if (ev.key === 'Enter') { ev.preventDefault(); ev.currentTarget.blur(); }
+        });
+
+        // Symbolic zero fields are pre-filled; select text so typing replaces the symbol.
+        html.find('input.limit-infinity:not([disabled]), input.threshold-dash:not([disabled])').on('focus', ev => {
+            (ev.currentTarget as HTMLInputElement).select();
         });
 
         html.find('.toggle-breakdown').on('click', event => {
@@ -302,22 +314,6 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
 
         await SuccessTest.hydrateValueModifierTooltipsForTest(this.test, html);
 
-        html.find('.roll-mode-button').on('click', event => {
-            event.preventDefault();
-
-            const button = event.currentTarget as HTMLElement;
-            const rollMode = button.dataset.rollMode;
-            if (!rollMode || !(rollMode in CONFIG.ChatMessage.modes)) return;
-
-            if (this.test.data.options?.rollMode === rollMode) return;
-
-            foundry.utils.setProperty(this.test, 'data.options.rollMode', rollMode as ChatMessage.MessageMode);
-            this.test.prepareBaseValues();
-            this.test.calculateBaseValues();
-            this.test.validateBaseValues();
-            void this.render();
-        });
-
         this._injectExternalActiveListeners(html);
     }
 
@@ -378,7 +374,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
 
         const context = { test: this.test };
 
-        for (const [key, value] of [...enabledEntries, ...otherEntries]) {
+        for (const [key, rawValue] of [...enabledEntries, ...otherEntries]) {
             const changeMatch = changePathPattern.exec(key);
             if (changeMatch) {
                 const path = `test.data.${changeMatch[1]}`;
@@ -389,21 +385,31 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                 if (!Number.isInteger(index) || !modValue.changes[index]) continue;
             }
 
+            let value = rawValue;
+            const symbolicZero = key === 'test.data.limit' ? '∞' : key === 'test.data.threshold' ? '-' : '';
+            if (symbolicZero) {
+                // Symbolic zero fields use text display but still submit numeric value changes.
+                if (rawValue === symbolicZero) value = 0;
+                else if (rawValue === '' || rawValue == null) value = null;
+                else if (!Number.isFinite(Number(rawValue))) continue;
+                else value = Number(rawValue);
+            }
+
             const valueField = foundry.utils.getProperty(context, key);
             if (!ModifiableValue.isModifiableValue(valueField)) {
                 foundry.utils.setProperty(context, key, value);
                 continue;
             }
 
-            // Don't apply an unneeded override.
-            if (valueField.value !== value) {
+            const numericValue = value as number | null;
+            if (numericValue == null) {
+                ModifiableValue.remove(valueField, 'SR5.ManualOverride');
+            } else if (valueField.value !== numericValue) {
                 ModifiableValue.addUnique(
-                    valueField,
-                    'SR5.ManualOverride',
-                    value as number | null,
+                    valueField, 'SR5.ManualOverride', numericValue,
                     { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
                 );
-            } 
+            }
         }
 
         this.test.prepareBaseValues();

@@ -614,6 +614,35 @@ body.theme-light .sr5v2.extended-test-manager:not(.theme-dark),
             gap: 0.5em;
         }
 
+        .etm-config-cumulative {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .etm-config-cumulative-controls {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(3.5em, 5em);
+            align-items: center;
+            gap: 0.5em;
+
+            label {
+                font-weight: normal;
+                white-space: nowrap;
+            }
+
+            .etm-config-cumulative-toggle {
+                display: flex;
+                align-items: center;
+                gap: 0.35em;
+                font-weight: bold;
+            }
+
+            input[type='checkbox'] {
+                width: 1.1em;
+                height: 1.1em;
+                margin: 0;
+            }
+        }
+
         .hint {
             font-size: var(--font-size-12);
             color: var(--etm-text-muted);

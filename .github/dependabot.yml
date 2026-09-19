@@ -1,23 +1,42 @@
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
+    - package-ecosystem: 'npm'
+      directory: '/'
+      schedule:
+          interval: 'weekly'
 
-    groups:
-      fvtt-types:
-        patterns:
-          - "fvtt-types"
+      open-pull-requests-limit: 10
 
-      everything:
-        patterns:
-          - "*"
-        exclude-patterns:
-          - "fvtt-types"
+      ignore:
+          - dependency-name: 'node'
+          - dependency-name: '@types/node'
 
-    labels:
-      - "dependencies"
+      groups:
+          fvtt-types:
+              patterns:
+                  - 'fvtt-types'
 
-    ignore:
-      - dependency-name: "@types/node"
+          other-dependencies-minor-and-patch:
+              patterns:
+                  - '*'
+              exclude-patterns:
+                  - 'fvtt-types'
+              update-types: ['minor', 'patch']
+
+          other-dependencies-major:
+              patterns:
+                  - '*'
+              exclude-patterns:
+                  - 'fvtt-types'
+              update-types: ['major']
+
+      labels:
+          - 'dependencies'
+
+    - package-ecosystem: 'github-actions'
+      directory: '/'
+      schedule:
+          interval: 'weekly'
+      labels:
+          - 'dependencies'
+          - 'github-actions'

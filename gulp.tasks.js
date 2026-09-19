@@ -7,18 +7,17 @@ const { finished } = require('stream/promises');
 const gulpsass = require('gulp-sass')(require('sass'));
 
 // Gulp
-const util = require('util');
 const gulp = require('gulp');
-var cp = require('child_process');
+const cp = require('child_process');
 const esbuild = require('esbuild');
 
 // Config
 const distName = 'dist';
 const destFolder = path.resolve(process.cwd(), distName);
 const jsBundle = 'bundle.js';
-const entryPoint = "./src/module/main.ts";
-const tsgoPackagePath = require.resolve('@typescript/native-preview/package.json');
-const tsgoScriptPath = path.join(path.dirname(tsgoPackagePath), 'bin', 'tsgo');
+const entryPoint = path.resolve(process.cwd(), 'src/module/main.ts');
+const typescriptPackagePath = require.resolve('typescript/package.json');
+const tscScriptPath = path.join(path.dirname(typescriptPackagePath), 'bin', 'tsc');
 
 /**
  * CLEAN
@@ -34,7 +33,7 @@ async function cleanDist() {
  * @param {string} env - 'prod' or 'dev' to set the environment variable for the build
  */
 async function buildJS(env) {
-    esbuild.build({
+    await esbuild.build({
         entryPoints: [entryPoint],
         bundle: true,
         keepNames: true, // esbuild doesn't guarantee names of classes, so we need to inject .name with the original cls name
@@ -46,35 +45,35 @@ async function buildJS(env) {
             'process.env.ENV': JSON.stringify(env),
         },
         plugins: [],
-    }).catch((err) => { console.error(err); });
+    });
 }
 
-function startTsgoWatch() {
-    const tsgoArgs = ['-p', 'tsconfig.json', '--noEmit', '--watch', '--preserveWatchOutput'];
-    const tsgo = cp.spawn(process.execPath, [tsgoScriptPath, ...tsgoArgs], {
+function startTypeCheckWatch() {
+    const tscArgs = ['-p', 'tsconfig.json', '--noEmit', '--watch', '--preserveWatchOutput'];
+    const tsc = cp.spawn(process.execPath, [tscScriptPath, ...tscArgs], {
         stdio: 'inherit',
         windowsHide: true,
     });
 
-    const stopTsgo = () => {
+    const stopTsc = () => {
         try {
             if (process.platform === 'win32')
-                cp.execFileSync('taskkill', ['/pid', String(tsgo.pid), '/t', '/f'], { stdio: 'ignore' });
+                cp.execFileSync('taskkill', ['/pid', String(tsc.pid), '/t', '/f'], { stdio: 'ignore' });
             else
-                tsgo.kill('SIGTERM');
+                tsc.kill('SIGTERM');
         } catch (_err) { /* Ignore errors when killing the process, as it might have already exited */ }
     };
 
-    process.once('exit', stopTsgo);
-    process.once('SIGINT', () => { stopTsgo(); process.exit(130); });
-    process.once('SIGTERM', () => { stopTsgo(); process.exit(143); });
+    process.once('exit', stopTsc);
+    process.once('SIGINT', () => { stopTsc(); process.exit(130); });
+    process.once('SIGTERM', () => { stopTsc(); process.exit(143); });
 
-    tsgo.on('error', (err) => {
-        console.error('Error running tsgo watch:', err);
+    tsc.on('error', (err) => {
+        console.error('Error running tsc watch:', err);
     });
 
-    tsgo.on('exit', (code) => {
-        if (code) console.error(`tsgo watch exited with code ${code}`);
+    tsc.on('exit', (code) => {
+        if (code) console.error(`tsc watch exited with code ${code}`);
     });
 }
 
@@ -97,15 +96,39 @@ async function copyAssets() {
  * @param {string} env - 'prod' or 'dev' to set the environment variable for the build
  */
 async function watch(env) {
-    function watchCopy(pattern, out) {
-        gulp.watch(pattern).on('change', () => gulp.src(pattern).pipe(gulp.dest(path.resolve(destFolder, out))));
+    function watchCopy(pattern, sourceRoot, outputRoot) {
+        const watcher = gulp.watch(pattern);
+        const copy = async (sourcePath) => {
+            const relativePath = path.relative(path.resolve(sourceRoot), path.resolve(sourcePath));
+            if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+                throw new Error(`Refusing to copy watched path outside ${sourceRoot}: ${sourcePath}`);
+            }
+            await fs.copy(sourcePath, path.resolve(destFolder, outputRoot, relativePath), { overwrite: true });
+        };
+        const remove = async (sourcePath) => {
+            const relativePath = path.relative(path.resolve(sourceRoot), path.resolve(sourcePath));
+            if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+                throw new Error(`Refusing to remove watched path outside ${sourceRoot}: ${sourcePath}`);
+            }
+            await fs.remove(path.resolve(destFolder, outputRoot, relativePath));
+        };
+        const run = (operation) => (sourcePath) => operation(sourcePath).catch((error) => console.error(error));
+
+        watcher.on('add', run(copy));
+        watcher.on('change', run(copy));
+        watcher.on('unlink', run(remove));
+        return watcher;
     }
 
-    gulp.watch('public/**/*').on('change', () => gulp.src('public/**/*', {encoding: false}).pipe(gulp.dest(destFolder)));
-    watchCopy('src/templates/**/*', 'templates');
-    watchCopy('src/module/tours/jsons/**/*', 'tours');
+    watchCopy('public/**/*', 'public', '');
+    watchCopy('src/templates/**/*', 'src/templates', 'templates');
+    watchCopy('src/module/tours/jsons/**/*', 'src/module/tours/jsons', 'tours');
 
-    gulp.watch('src/**/*.scss').on('change', async () => await buildSass());
+    const sassWatcher = gulp.watch('src/**/*.scss');
+    const rebuildSass = () => buildSass().catch((error) => console.error(error));
+    sassWatcher.on('add', rebuildSass);
+    sassWatcher.on('change', rebuildSass);
+    sassWatcher.on('unlink', rebuildSass);
 
     const context = await esbuild.context({
         entryPoints: [entryPoint],
@@ -119,9 +142,9 @@ async function watch(env) {
             'process.env.ENV': JSON.stringify(env),
         },
         plugins: [],
-    })
+    });
 
-    startTsgoWatch();
+    startTypeCheckWatch();
     await context.watch();
 }
 
@@ -132,39 +155,21 @@ const watchDev = () => watch('dev');
  * SASS
  */
 async function buildSass() {
-    return gulp
-        .src('src/css/bundle.scss')
-        .pipe(gulpsass().on('error', gulpsass.logError))
-        .pipe(gulp.dest(destFolder));
-}
-
-/**
- * FoundryVTT compendium/packs.
- * Create all needed packs from their source files.
- *
- * Since gulp tasks uses a commonJS file, while pack uses a es6 module, we have to use the node execution of packs.
- *
- * Rebuilding packs.mjs to be commonJS as well, would mean to deviate from the dnd5e source of it, which I avoid to
- * keep future changes on their side easier to merge.
- */
-async function buildPacks() {
-    try {
-        const { stderr } = await util.promisify(cp.exec)('npm run build:db');
-        if (stderr) console.error(stderr);
-        return Promise.resolve();
-    } catch (err) {
-        console.error('Error building packs:', err);
-        throw err;
-    }
+    await finished(
+        gulp
+            .src('src/css/bundle.scss')
+            .pipe(gulpsass().on('error', gulpsass.logError))
+            .pipe(gulp.dest(destFolder)),
+    );
 }
 
 exports.clean = cleanDist;
 exports.sass = buildSass;
 exports.assets = copyAssets;
-exports.build = gulp.series(copyAssets, buildSass, buildJSProd, buildPacks);
-exports.buildDev = gulp.series(copyAssets, buildSass, buildJSDev, buildPacks);
-exports.buildProd = gulp.series(copyAssets, buildSass, buildJSProd, buildPacks);
+exports.build = gulp.series(cleanDist, copyAssets, buildSass, buildJSProd);
+exports.buildDev = gulp.series(cleanDist, copyAssets, buildSass, buildJSDev);
+exports.buildProd = gulp.series(cleanDist, copyAssets, buildSass, buildJSProd);
 exports.watch = gulp.series(copyAssets, buildSass, watchDev);
 exports.watchProd = gulp.series(copyAssets, buildSass, watchProd);
 exports.watchDev = gulp.series(copyAssets, buildSass, watchDev);
-exports.rebuild = gulp.series(cleanDist, exports.build);
+exports.rebuild = exports.build;

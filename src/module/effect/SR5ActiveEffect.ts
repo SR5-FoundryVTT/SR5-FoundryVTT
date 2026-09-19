@@ -179,7 +179,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      */
     static redirectToNearModifiableValue(model: DataModel.Any, change: ActiveEffect.ChangeData) {
         // Move key up one hierarchy and check indirect match
-        const nodes = change.key.split('.');
+        const nodes = (change.key ?? '').split('.');
         const property = nodes.pop() ?? '';
         const indirectKey = nodes.join('.');
 
@@ -204,7 +204,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * for users not aware of system internal around ModifiableValue.
      */
     static alterChange(model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        if (!SR5ActiveEffect.getModifiableValue(model, change.key))
+        if (!SR5ActiveEffect.getModifiableValue(model, change.key ?? ''))
             SR5ActiveEffect.redirectToNearModifiableValue(model, change);
     }
 
@@ -334,7 +334,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param options Additional FoundryVTT options.
      */
     static override applyChange(
-        targetDoc: ActiveEffect.TargetDocument | DataModel.Any,
+        targetDoc: ActiveEffect.ChangeTarget | DataModel.Any,
         change: ActiveEffect.ChangeData,
         options: ActiveEffect.ApplyChangeOptions = {}
     ): Record<string, unknown> {
@@ -352,14 +352,14 @@ export class SR5ActiveEffect extends ActiveEffect {
         // TypedObjectField will otherwise create the missing property as a string,
         // which breaks data integrity and can result in errors like "undefined[object Object]".
         // For example, a change targeting "firstaid" instead of "first_aid" would trigger this case.
-        if (!foundry.utils.hasProperty(targetDoc, change.key))
+        if (!foundry.utils.hasProperty(targetDoc, change.key ?? ''))
             return {};
 
         // Resolve dynamic value references in change.
         const source = change.effect?.parent ?? targetDoc;
         SR5ActiveEffect.alterChange(targetDoc, change);
         SR5ActiveEffect.resolveDynamicChangeValue(source, change, targetDoc);
-        
+
         // Other cases should be directly applied to the data, without actor / schema handling.
         // This is used when applying effects to non-Actor objects, like tests. TokenDocument is
         // explicitly supported by Foundry v14's ActiveEffect.applyChange and must stay on the
@@ -375,7 +375,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Handle application for none-Document objects. This is typically used for SuccessTest instances.
      */
     private static _applyToObject(object: any, change: ActiveEffect.ChangeData): Record<string, unknown> {
-        const target = foundry.utils.getProperty(object, change.key);
+        const target = foundry.utils.getProperty(object, change.key ?? '');
         const targetType = foundry.utils.getType(target);
 
         // Cast the effect change value to the correct type
@@ -447,7 +447,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Roll.replaceFormulaData which substitutes strings unquoted and coerces booleans to 1/0.
         const value = DynamicValueEvaluator.evaluate(change.value, path => foundry.utils.getProperty(source, path));
 
-        const rendered = SR5ActiveEffect.renderValueForField(value, change.key, targetDoc);
+        const rendered = SR5ActiveEffect.renderValueForField(value, change.key ?? '', targetDoc);
         if (rendered !== undefined) change.value = rendered;
     }
 

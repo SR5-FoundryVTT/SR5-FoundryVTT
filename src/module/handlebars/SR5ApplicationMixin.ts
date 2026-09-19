@@ -7,6 +7,7 @@ import { SR5 } from '@/module/config';
 import { LinksHelpers } from '@/module/utils/links';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
+import { isElementInstance } from '@/module/utils/dom';
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
@@ -111,7 +112,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         }
 
         #isTrackableFormField(t: EventTarget | null): t is TrackableField {
-            return t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement;
+            return isElementInstance(t, HTMLInputElement) || isElementInstance(t, HTMLTextAreaElement) || isElementInstance(t, HTMLSelectElement);
         }
 
         #getFormFields() {
@@ -161,7 +162,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
                 if (!this.element?.contains(target)) return;
                 target.focus({ preventScroll: true });
 
-                if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
+                if (!(isElementInstance(target, HTMLInputElement) || isElementInstance(target, HTMLTextAreaElement))) return;
                 this.#selectAllFieldText(target);
             };
 
@@ -190,7 +191,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
                 // Select as soon as focus changes so quick typing doesn't insert at caret start.
                 if (event.type === 'focusin') {
                     const target = event.target;
-                    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+                    if (isElementInstance(target, HTMLInputElement) || isElementInstance(target, HTMLTextAreaElement)) {
                         queueMicrotask(() => {
                             if (document.activeElement === target) {
                                 this.#selectAllFieldText(target);

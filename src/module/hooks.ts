@@ -93,7 +93,7 @@ import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
 import { IconAssign } from './apps/iconAssigner/IconAssign';
-import { RoutingLibIntegration } from './integrations/routingLibIntegration';
+import { CombatTrackerDockIntegration } from './integrations/combatTrackerDockIntegration';
 import { initDiceSoNice } from './rolls/DiceSoNice';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
@@ -160,11 +160,7 @@ export class HooksManager {
             HooksManager.init();
 
             // Custom Module Integrations
-            // See src/module/integartions for more information.
-            if (game.modules.get('routinglib')?.active) {
-                RoutingLibIntegration.init();
-            }
-
+            // See src/module/integrations for more information.
             if (game.modules.get('dice-so-nice')?.active) {
                 initDiceSoNice();
             }
@@ -174,19 +170,17 @@ export class HooksManager {
         Hooks.on('ready', HooksManager.ready.bind(HooksManager));
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop.bind(HooksManager));
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
-        Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions.bind(SR5Combat));
         Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory.bind(HooksManager));
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory.bind(HooksManager));
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));
         Hooks.on('moveToken', SR5TokenDocument.moveToken.bind(SR5Token));
-        Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
-        Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('createItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('updateItem', (item, data, options, userId) => { void HooksManager.updateIcConnectedToHostItem(item, data, options, userId); });
         Hooks.on('updateItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('deleteItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
         Hooks.on('sr5_afterTestComplete', (test: SuccessTest) => { void BlastScatterFlow.handle(test); });
+        Hooks.on('renderChatMessageHTML', HooksManager.chatMessageListeners.bind(HooksManager));
         // Register and update managed extended tests from finished test rolls.
         Hooks.on('sr5_afterTestComplete', (test: SuccessTest) => { void ExtendedTestFlow.handleTestComplete(test); });
         // Announce extended tests game time has made rollable again. Debounced, as holding a
@@ -206,6 +200,10 @@ export class HooksManager {
                 DevHooks.registerHooks();
             });
         }
+
+        // Custom Module Integrations
+        // See src/module/integartions for more information.
+        CombatTrackerDockIntegration.registerHooks();
     }
 
     static init() {
@@ -393,6 +391,7 @@ ___________________
         // Register document classes
         CONFIG.Actor.documentClass = SR5Actor;
         CONFIG.Item.documentClass = SR5Item;
+        // @ts-expect-error fvtt-types doesn't allow custom combatTracker yet
         CONFIG.ui.combat = SR5CombatTracker;
         CONFIG.Combat.documentClass = SR5Combat;
         CONFIG.Combatant.documentClass = SR5Combatant;
@@ -420,6 +419,7 @@ ___________________
 
         // Register general SR5Roll for JSON serialization support.
         CONFIG.Dice.terms[SR5Die.DENOMINATION] = SR5Die;
+        // @ts-expect-error // fvtt-types doesn't allow custom rolls yet
         CONFIG.Dice.rolls.push(SR5Roll);
         // @ts-expect-error // Register the SR5Roll dnd5e style.
         CONFIG.Roll = SR5Roll;
@@ -568,7 +568,6 @@ ___________________
                 new ChangelogApplication().render(true);
         }
 
-        Hooks.on('renderChatMessage', HooksManager.chatMessageListeners.bind(HooksManager));
         Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks.bind(JournalEnrichers));
         HooksManager.registerSocketListeners();
     }
@@ -697,7 +696,7 @@ ___________________
      * @param data The update data given.
      * @param id The items id.
      */
-    static async updateIcConnectedToHostItem(item: SR5Item, data: Item.UpdateData, options: Item.Database.UpdateOptions, userId: string) {
+    static async updateIcConnectedToHostItem(item: SR5Item, data: Item.UpdateData, options: Item.Database.OnUpdateOptions, userId: string) {
         // Trigger type specific behaviour.
         if (item.isType('host'))
             await MatrixICFlow.handleUpdateItemHost(item);

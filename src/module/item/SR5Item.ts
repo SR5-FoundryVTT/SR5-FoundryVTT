@@ -305,7 +305,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     getActionTestName(): string {
         const testName = this.getRollName();
-        return testName || game.i18n.localize('SR5.ItemType.Action');
+        return testName || game.i18n.localize('SR5.ItemTypes.Action');
     }
 
     /**
@@ -787,7 +787,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             // will merge the _id into the existing effect and cause all kinds of issues.
             delete change._id;
 
-            mergeObject(effect, expandObject(change), { inplace: true });
+            effect.updateSource(expandObject(change));
             effect.render(false);
         }
 
@@ -1542,7 +1542,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const result = await super._preCreate(...args);
         if (result === false) return false;
 
-        UpdateActionFlow.injectActionTestsIntoChangeData(this.type, data, data, this);
+        const actionChanges = {};
+        UpdateActionFlow.injectActionTestsIntoChangeData(this.type, data, actionChanges, this);
+        this.updateSource(actionChanges);
         return result;
     }
 

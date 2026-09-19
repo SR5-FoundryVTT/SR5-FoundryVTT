@@ -88,7 +88,7 @@
             {{!-- Simple Initiative --}}
             {{else}}
             <input type="text" class="initiative-input" inputmode="numeric" pattern="^[+=\-]?\d*" value="{{initiative}}"
-                   aria-label="{{localize "COMBAT.InitiativeScore"}}" {{#unless @root.user.isGM}}readonly{{/unless}}>
+                   aria-label="{{localize "COMBATANT.FIELDS.initiative.label"}}" {{#unless isOwner}}readonly{{/unless}}>
 
             {{/if}}
 

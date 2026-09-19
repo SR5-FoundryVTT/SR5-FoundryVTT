@@ -6,6 +6,7 @@ import { IconAssign } from "../../iconAssigner/IconAssign";
 import { ImportHelper as IH } from "../helper/ImportHelper";
 import { TechnologyType } from "src/module/types/template/Technology";
 import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
+import TypeDataModel = foundry.abstract.TypeDataModel;
 
 export type SystemType<T extends SystemEntityType> = ReturnType<Parser<T>["getBaseSystem"]>;
 
@@ -13,7 +14,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
     protected abstract readonly parseType: SubType;
 
     private isActor(): this is Parser<SystemEntityType & Actor.SubType> {
-        return Object.keys(CONFIG.Actor.dataModels).includes(this.parseType);
+        return (Object.keys(CONFIG.Actor.dataModels) as string[]).includes(this.parseType);
     }
 
     protected getBonus(jsonData: ParseData) { return 'bonus' in jsonData ? jsonData.bonus : undefined; }
@@ -23,7 +24,8 @@ export abstract class Parser<SubType extends SystemEntityType> {
 
     private getSanitizedSystem(jsonData: ParseData) {
         const system = this.getSystem(jsonData);
-        const schema = CONFIG[this.isActor() ? "Actor" : "Item"].dataModels[this.parseType].schema;
+        const dataModels = CONFIG[this.isActor() ? "Actor" : "Item"].dataModels as Record<string, TypeDataModel.AnyConstructor>;
+        const schema = dataModels[this.parseType].schema;
         const correctionLogs = Sanitizer.sanitize(schema, system);
 
         if (correctionLogs) {

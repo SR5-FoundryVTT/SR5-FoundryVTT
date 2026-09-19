@@ -6,7 +6,6 @@ type TagifyList = TagifyOption[] | Record<string, string>;
 
 /** Default options with required: true, blank: true so callers don't have to pass them explicitly. */
 type TagifySelectDefaultOptions = Omit<StringField.DefaultOptions, 'required' | 'blank'> & { required: true; blank: true };
-type TagifyInitialized<Options extends StringField.Options<unknown>> = StringField.InitializedType<Options>;
 
 /**
  * A StringField that renders as a Tagify single-value select in edit mode.
@@ -37,7 +36,7 @@ export class TagifySelectField<
      * Override the _toInput function to return an input element setup for Tagify single-value select.
      * - TagifyHooks initializes the Tagify instance after render via the 'tagify-select' class
      */
-    override _toInput(config: DataField.ToInputConfig<TagifyInitialized<Options>> & { options?: TagifyList }): HTMLElement {
+    override _toInput(config: DataField.ToInputConfig<this> & { options?: TagifyList }): HTMLElement {
         const options = this._normalizeOptions(config.options);
 
         const input = document.createElement('input');

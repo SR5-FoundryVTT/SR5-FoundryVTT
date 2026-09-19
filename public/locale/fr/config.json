@@ -43,7 +43,9 @@
         "TokenMovementHistoryReset": "Moment de réinitialisation de l'historique de déplacement",
         "TokenMovementHistoryResetDescription": "Choisit quand l'historique de déplacement est effacé pour les combattants pendant le combat",
         "TokenMovementHistoryResetFirstActionPhase": "À ma première phase d'action",
-        "TokenMovementHistoryResetTurnStart": "Réinitialiser au début du tour"
+        "TokenMovementHistoryResetTurnStart": "Réinitialiser au début du tour",
+        "TokenRulerColorPhaseMarker": "Couleur du marqueur de phase de déplacement",
+        "TokenRulerColorPhaseMarkerDescription": "La couleur du point de passage qui marque la fin d'une phase d'action."
     },
     "SR5": {
         "AP": "PA",
@@ -77,6 +79,9 @@
             },
             "ValueEditor": "Modifier la valeur du changement",
             "FIELDS": {
+                "appliedByTest": {
+                    "label": "Appliqué par un test"
+                },
                 "conditionMode": {
                     "hint": "Inclure : le test doit correspondre à ces valeurs. Exclure : le test ne doit pas correspondre à ces valeurs."
                 },
@@ -277,6 +282,9 @@
         "BuyHits": "Acheter des succès",
         "COMBAT": {
             "CannotSeizeAgain": "Vous ne pouvez pas reprendre l'initiative avant le debut de votre prochain tour.",
+            "InitiativeChangedLabel": "Initiative mise a jour",
+            "InitiativeDecreased": "Initiative diminuee",
+            "InitiativeIncreased": "Initiative augmentee",
             "ModeAstral": "Astral",
             "ModeChangedLabel": "Mode d'initiative modifie",
             "ModeChangeNewInitiative": "Nouvelle initiative",
@@ -292,9 +300,6 @@
             "PreviousPass": "Passe precedente",
             "PreviousPhase": "Phase precedente",
             "PreviousTurn": "Tour precedent",
-            "ReduceInitByFive": "Initiative -5",
-            "ReduceInitByOne": "Initiative -1",
-            "ReduceInitByTen": "Initiative -10",
             "SeizeInitiative": "Saisir l'initiative",
             "SeizedInitiative": "Initiative saisie",
             "ToggleActedStatusGMOnly": "Basculer le statut a agi (MJ uniquement)",
@@ -409,6 +414,7 @@
         "DamageValue": "Valeur Dégâts",
         "DefaultCategoryVisibility": "Montrer les catégories vides",
         "Defaulting": "Par défaut",
+        "Delete": "Supprimer",
         "Defense": "Defense",
         "DefenseTest": "Test de défense",
         "DeleteConfirmationApplication": {
@@ -453,6 +459,7 @@
         "DurationInstant": "Instantané",
         "DurationPermanent": "Permanent",
         "DurationSustained": "Maintenu",
+        "Edit": "Modifier",
         "EditSkill": "Editer comp.",
         "Element": {
             "Acid": "Acide",
@@ -465,6 +472,8 @@
             "Label": "Élément"
         },
         "Emerged": "Émergé",
+        "EnforcedMaximum": "Maximum imposé",
+        "EnforcedMinimum": "Minimum imposé",
         "EnvModifiersApplication": {
             "ClearModifiers": "Effacer les modificateurs personnels",
             "Extreme": "Combinaison de plusieurs conditions à -6",
@@ -512,6 +521,7 @@
         "Equipment": "Équipement",
         "Equipped": "Équipé",
         "Errors": {
+            "LinkLockedReboot": "Un acteur verrouillé par lien ne peut pas être redémarré",
             "MissingSkill": "Le personnage n'a pas la compétence demandée",
             "SkillWithoutAttribute": "La compétence n'a pas d'attribut assigné"
         },
@@ -538,12 +548,14 @@
             "CanEdit": "Modifier",
             "CanRoll": "Lancer",
             "CanView": "Voir",
+            "BaseThreshold": "Seuil de base",
             "ConfirmCancel": "Annuler le test étendu \"{name}\" ? Cela met fin au test, mais un MJ pourra le réactiver.",
             "ConfirmDelete": "Supprimer le test étendu « {name} » ?",
             "CreateTest": "Nouveau test étendu",
             "Creator": "Créé par",
-            "CumulativeModifier": "Modificateur cumulatif de -1 à la réserve de dés",
+            "CumulativeModifier": "Modificateur cumulatif de −1 à la réserve de dés",
             "CumulativeModifierTooltip": "Réduit la réserve de dés de 1 à chaque lancer effectué. SR5 p. 48.",
+            "CumulativeRollCount": "Jets précédents",
             "Due": "Échéance",
             "DueTooltip": "Intervalles de temps de jeu écoulés depuis le dernier lancer",
             "DueMessage": {
@@ -876,6 +888,7 @@
         "KnowledgeSkillStreet": "Connaissances de la rue",
         "Labels": {
             "ActorSheet": {
+                "ConnectToDriver": "Se connecter au pilote",
                 "CritterPowers": "Pouvoirs",
                 "DeviceRating": "Indice d'appareil",
                 "DisabledOptionCritterPowers": "Pouvoirs Optionels - Désactivés",
@@ -893,11 +906,15 @@
                 "SpritePowers": "Pouvoirs",
                 "VehicleConfiguration": "Configuration véhicule"
             },
+            "Item": {
+                "Network": "Réseau"
+            },
             "Sheet": {
                 "RemoveImprovisedDevices": "Supprimer les appareils improvisés"
             }
         },
         "Languages": "Langues",
+        "Intervene": "Intervenir",
         "LastRoll": "Dernier lancé affiché",
         "Level": "Niveau",
         "License": "Permis",
@@ -1078,6 +1095,13 @@
         "ResultOverrideHits": "Succès",
         "ResultOverride": "Substitution du résultat",
         "RightClickToClear": "Click droit pour effacer",
+        "Ritual": {
+            "Anchored": "Ancré",
+            "MaterialLink": "Lien matériel",
+            "Minion": "Serviteur",
+            "Spell": "Sort",
+            "Spotter": "Observateur"
+        },
         "Roll": "Lancer",
         "RollArmor": "Armure",
         "RollComposure": "Sang-Froid",
@@ -1325,6 +1349,8 @@
             "ForceAppliesSetting": "Force applicable à",
             "ForceAppliesSettingHint": "Détermine quels attributs de l'esprit reçoivent le bonus de Force."
         },
+        "SpiritType": "Type d'esprit",
+        "SprintingBonus": "Bonus de sprint",
         "Sprite": {
             "Level": "Niveau",
             "LevelAppliesSettingHint": "Contrôle quels attributs de sprite reçoivent le bonus de Niveau.",
@@ -1412,10 +1438,12 @@
         },
         "ToggleBreakdown": "Afficher/masquer le détail",
         "ToggleEquip": "(Des)équiper",
+        "ToggleSection": "Afficher ou masquer la section",
         "Top": "Coté",
         "Total": "Total",
         "UnderBarrel": "Sous le canon",
         "Value": "Valeur",
+        "VehicleStunImmunity": "Immunité des véhicules aux dégâts étourdissants",
         "Vehicle": {
             "ChaseEnvironment": "Environnement de poursuite",
             "Clearsight": "Vue dégagée",
@@ -1485,6 +1513,7 @@
             "NegativeLimitValue": "Les valeurs des limites doivent être supérieures à 0",
             "RitualNotConcluded": "Le Rituel a échoué. En attente du jeu du rituel pour déterminer le drain.",
             "RitualNotEnoughReagents": "Pas assez de réactifs offerts.",
+            "SkillAlreadyExists": "La compétence {name} existe déjà sur l'acteur {actorName} ({actorUuid}). Utilisez chaque nom de compétence une seule fois par catégorie.",
             "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
             "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés",
             "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs."
@@ -1494,6 +1523,10 @@
                 "ShowSuppressiveFireTemplate": "Placer le cône de tir de suppression",
                 "ShowShotgunTemplate": "Placer le cône de chevrotine",
                 "ShowWeaponRanges": "Aperçu des portées d'arme"
+            },
+            "Actor": {
+                "RemoveAllNetworks": "Supprimer tous les réseaux",
+                "RemoveNetwork": "Supprimer le réseau"
             },
             "Test": {
                 "BuyHits": "Ne lance pas de dés. Achète des succès avec ⌊réserve de dés / 4⌋.",
@@ -1564,6 +1597,11 @@
             },
             "Reach": "Allonge",
             "Reload": "Recharger",
+            "ResetSpareReloads": "Réinitialiser les recharges de réserve",
+            "SpareReloads": "Recharges de réserve",
+            "Thrown": {
+                "Range": "Portée de l'arme de jet"
+            },
             "Type": "Type",
             "Weapon": "Arme"
         },

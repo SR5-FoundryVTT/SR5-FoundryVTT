@@ -23,7 +23,7 @@ export const MatrixRebootFlow = {
 
         // Link Locked actors can´t be rebooted. (SR5#229 ´Dumpshock & Link-Locking´)
         if (actor.isLinkLocked) {
-            ui.notifications?.error('SR5.Matrix.Error.LinkLockedReboot');
+            ui.notifications?.error('SR5.Errors.LinkLockedReboot');
             return;
         }
 
