@@ -27,6 +27,10 @@ function isInitiativeMode(value: unknown): value is InitiativeModeOptions {
 }
 
 export class SR5Combatant extends Combatant<"base"> {
+    override get visible(): boolean {
+        return !this.system.pad && super.visible;
+    }
+
     static override migrateData(source: any) {
         Migrator.migrate("Combatant", source);
         return super.migrateData(source);
