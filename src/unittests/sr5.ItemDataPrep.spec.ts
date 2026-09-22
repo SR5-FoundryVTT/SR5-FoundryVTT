@@ -5,6 +5,8 @@ import { RangePrep } from "../module/item/prep/functions/RangePrep";
 import { ActionPrep } from "../module/item/prep/functions/ActionPrep";
 import { TechnologyPrep } from "../module/item/prep/functions/TechnologyPrep";
 import { ArmorPrep } from "../module/item/prep/functions/ArmorPrep";
+import { ModifiableValue } from "../module/mods/ModifiableValue";
+import { Version0_38_0 } from "../module/migrator/versions/Version0_38_0";
 
 /**
  * Tests involving data preparation for SR5Item types.
@@ -140,8 +142,8 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
                 system: {
                     targets: [{ id: 'item', applyTo: 'item' }],
                     changes: [
-                        { key: 'system.technology.cost', value: '@system.technology.rating', type: 'multiply', priority: 1, target: 'item' },
-                        { key: 'system.technology.availability', value: '@system.technology.rating', type: 'multiply', priority: 1, target: 'item' },
+                        { key: 'system.technology.cost', value: '@system.technology.rating', type: 'multiply', priority: ModifiableValue.Priority.RATING, target: 'item' },
+                        { key: 'system.technology.availability', value: '@system.technology.rating', type: 'multiply', priority: ModifiableValue.Priority.RATING, target: 'item' },
                     ],
                 },
             }]);
@@ -405,6 +407,34 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(ware.system.technology.availability.value, 8);
             assert.strictEqual(ware.system.technology.availability.label, '8R');
             assert.strictEqual(ware.system.technology.cost.value, 120);
+        });
+
+        it('loads migrated rating effects on an unequipped item', async () => {
+            // A 0.37.0 item, where cost was a number, availability a string and both were multiplied by rating.
+            const legacy: any = {
+                type: 'device',
+                system: {
+                    technology: {
+                        rating: 4,
+                        equipped: false,
+                        cost: 100,
+                        availability: '3R',
+                        calculated: {
+                            cost: { value: 400, adjusted: true },
+                            availability: { value: '12R', adjusted: true },
+                        },
+                    },
+                },
+            };
+            new Version0_38_0().migrateItem(legacy);
+
+            const device = await factory.createItem<'device'>(legacy);
+            device.prepareData();
+
+            // The effects the migration wrote apply to the stored item, even while it is unequipped.
+            assert.strictEqual(device.system.technology.cost.value, 400);
+            assert.strictEqual(device.system.technology.availability.value, 12);
+            assert.strictEqual(device.system.technology.availability.label, '12R');
         });
     });
 

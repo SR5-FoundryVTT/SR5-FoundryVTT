@@ -1200,18 +1200,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return !foundry.utils.isEmpty(this.data.action);
     }
 
-    /**
-     * The test in the Shadowrun 5 notation of pool, limit and threshold. (e.g. "12 [5] (3)")
-     */
-    get description(): string {
-        const parts = [String(this.pool.value)];
-
-        if (this.hasLimit) parts.push(`[${this.limit.value}]`);
-        if (this.hasThreshold) parts.push(`(${this.threshold.value})`);
-
-        return parts.join(' ');
-    }
-
     get hasPushTheLimit(): boolean {
         return this.data.pushTheLimit;
     }

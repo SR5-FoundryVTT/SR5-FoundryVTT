@@ -5,9 +5,11 @@
             ({{@root.skillValue}})
         {{/if}}
     </label>
-    <label data-tooltip="{{systemFields.skill.fields.attribute.hint}}">
-        {{localizeOb item.system.skill.attribute @root.config.attributes}}
-    </label>
+    {{#if item.system.skill.attribute}}
+        <label data-tooltip="{{systemFields.skill.fields.attribute.hint}}">
+            {{localizeOb item.system.skill.attribute @root.config.attributes}}
+        </label>
+    {{/if}}
     {{#if item.system.skill.defaulting}}
         <label data-tooltip="{{systemFields.skill.fields.defaulting.hint}}">{{localize "SR5.CanDefault"}}</label>
     {{/if}}
