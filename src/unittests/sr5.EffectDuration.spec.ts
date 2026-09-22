@@ -251,7 +251,8 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
                 duration: { value: 1, units: 'minutes', expiry: null } as any,
             });
             const result = effect.isExpiryEvent('turnStart', ctx());
-            assert.isFalse(result, 'real_time effect should not expire on turnStart');
+            // Without an expiry, native lets the duration alone decide, so every event qualifies.
+            assert.isTrue(result, 'real_time effect should leave expiry to its duration on turnStart');
         });
     });
 
