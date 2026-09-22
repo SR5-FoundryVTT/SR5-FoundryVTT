@@ -1,9 +1,11 @@
 import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { VersionMigration } from '../VersionMigration';
 
 /** Migrate item-sheet data introduced for 0.38.0. */
 export class Version0_38_0 extends VersionMigration {
     readonly TargetVersion = '0.38.0';
+    private static readonly RATING_EFFECT_FLAG = 'ratingMultiplier';
 
     override migrateItem(item: any): void {
         Version0_38_0.ensureNestedDocumentIds(item);
@@ -11,15 +13,50 @@ export class Version0_38_0 extends VersionMigration {
         const technology = item.system?.technology;
         if (!technology || typeof technology !== 'object') return;
 
+        const calculated = technology.calculated;
+        const availabilityParsable = Version0_38_0.isAvailabilityParsable(technology.availability);
         technology.cost = Version0_38_0.migrateCost(technology.cost);
         technology.availability = Version0_38_0.migrateAvailability(technology.availability);
 
-        if (technology.calculated && typeof technology.calculated === 'object') {
-            if (!technology.essence && technology.calculated.essence) {
-                technology.essence = Version0_38_0.migrateEssence(technology.calculated.essence);
+        if (calculated && typeof calculated === 'object') {
+            if (calculated.cost?.adjusted) Version0_38_0.addRatingEffect(item, 'cost');
+            if (calculated.availability?.adjusted && availabilityParsable) Version0_38_0.addRatingEffect(item, 'availability');
+            if (!technology.essence && calculated.essence) {
+                technology.essence = Version0_38_0.migrateEssence(calculated.essence);
             }
             delete technology.calculated;
         }
+    }
+
+    /**
+     * Legacy string availability was only multiplied by rating when it parsed as Number-Letter.
+     */
+    private static isAvailabilityParsable(availability: unknown): boolean {
+        if (typeof availability !== 'string') return true;
+        return ItemAvailabilityFlow.parseAvailability(availability).isValid;
+    }
+
+    private static addRatingEffect(item: any, field: 'cost' | 'availability'): void {
+        item.effects ??= [];
+        if (item.effects.some((effect: any) => effect.flags?.shadowrun5e?.[Version0_38_0.RATING_EFFECT_FLAG] === field)) return;
+
+        const fieldLabel = field === 'cost' ? 'SR5.Cost' : 'SR5.Availability';
+        item.effects.push({
+            _id: foundry.utils.randomID(),
+            name: `${game.i18n.localize('SR5.Rating')} ${game.i18n.localize(fieldLabel)}`,
+            type: 'base',
+            flags: { shadowrun5e: { [Version0_38_0.RATING_EFFECT_FLAG]: field } },
+            system: {
+                targets: [{ id: 'item', applyTo: 'item' }],
+                changes: [{
+                    key: `system.technology.${field}`,
+                    type: 'multiply',
+                    value: '@system.technology.rating',
+                    priority: ModifiableValue.RATING_PRIORITY,
+                    target: 'item',
+                }],
+            },
+        });
     }
 
     private static migrateEssence(essence: unknown) {
@@ -57,7 +94,7 @@ export class Version0_38_0 extends VersionMigration {
         if (cost && typeof cost === 'object') {
             const data = cost as { base?: unknown; value?: unknown };
             const base = Version0_38_0.firstFiniteNumber(data.base, data.value, 0);
-            return { base, value: base, changes: [] };
+            return { base, value: base, changes: Array.isArray((cost as any).changes) ? (cost as any).changes : [] };
         }
 
         return { base: 0, value: 0, changes: [] };
@@ -85,6 +122,7 @@ export class Version0_38_0 extends VersionMigration {
 
             migrated.restriction = Version0_38_0.migrateRestriction(data.restriction, migrated.restriction);
             migrated.label = ItemAvailabilityFlow.composeValue(migrated.value, migrated.restriction);
+            migrated.changes = Array.isArray((availability as any).changes) ? (availability as any).changes : [];
             return migrated;
         }
 

@@ -239,10 +239,16 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         const technology = this.getTechnologyData();
         if (technology) {
+            ModifiableValue.calcTotal(technology.conceal);
             TechnologyPrep.prepareCost(technology);
             TechnologyPrep.prepareAvailability(technology);
             TechnologyPrep.calculateAttributes(this.system.attributes!);
         }
+
+        const action = this.getAction();
+        if (action) ActionPrep.calculateValues(action);
+        if (this.isRangedWeapon() && this.system.range.rc)
+            ModifiableValue.calcTotal(this.system.range.rc);
 
         if (this.isType('host'))
             HostPrep.prepareDerivedData(this.system);
@@ -250,8 +256,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     private applyItemActiveEffects() {
         for (const effect of allApplicableDocumentEffects(this, { applyTo: ['item'] })) {
-            if (effect.disabled || effect.isSuppressed) continue;
-
             const changes = effect.changesForApplyTo('item');
 
             // prepareData can run more than once without a reset() in between, and ModifiableField.applyChange
@@ -264,6 +268,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
                 const value = SR5ActiveEffect.getModifiableValue(this, altered.key ?? '');
                 if (value) ModifiableValue.removeFromSource(value, source);
             }
+
+            if (effect.disabled || effect.isSuppressed) continue;
 
             for (const change of changes) {
                 try {

@@ -76,6 +76,85 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(device.system.technology.cost.value, 150);
         });
 
+        it('recalculates concealment after applying an item effect', async () => {
+            const device = await factory.createItem({
+                type: 'device',
+                system: { technology: { conceal: { base: 2, value: 2 } } },
+            });
+            const [effect] = await device.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Concealment Modifier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [{ key: 'system.technology.conceal', value: '3', type: 'add', target: 'item' }],
+                },
+            }]);
+
+            device.prepareData();
+            assert.strictEqual(device.system.technology.conceal.value, 5);
+            device.prepareData();
+            assert.strictEqual(device.system.technology.conceal.value, 5);
+            await effect.update({ disabled: true });
+            device.prepareData();
+            assert.strictEqual(device.system.technology.conceal.value, 2);
+        });
+
+        it('recalculates weapon damage, AP, limit, and recoil after item effects', async () => {
+            const weapon = await factory.createItem({
+                type: 'weapon',
+                system: {
+                    category: 'range',
+                    action: {
+                        damage: { base: 4, ap: { base: -1 } },
+                        limit: { base: 5 },
+                    },
+                    range: { rc: { base: 2 } },
+                },
+            });
+            await weapon.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Weapon modifier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.action.damage', value: '2', type: 'add', target: 'item' },
+                        { key: 'system.action.damage.ap', value: '-1', type: 'add', target: 'item' },
+                        { key: 'system.action.limit', value: '1', type: 'add', target: 'item' },
+                        { key: 'system.range.rc', value: '3', type: 'add', target: 'item' },
+                    ],
+                },
+            }]);
+
+            weapon.prepareData();
+            assert.strictEqual(weapon.system.action.damage.value, 6);
+            assert.strictEqual(weapon.system.action.damage.ap.value, -2);
+            assert.strictEqual(weapon.system.action.limit.value, 6);
+            assert.strictEqual(weapon.system.range.rc.value, 5);
+        });
+
+        it('applies rating before ware grade and user cost modifiers', async () => {
+            const ware = await factory.createItem({
+                type: 'cyberware',
+                system: { grade: 'alpha', technology: { rating: 4, cost: { base: 100, value: 100 }, availability: { base: 3, restriction: 'restricted' } } },
+            });
+            await ware.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Rating multiplier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.technology.cost', value: '@system.technology.rating', type: 'multiply', priority: 1, target: 'item' },
+                        { key: 'system.technology.availability', value: '@system.technology.rating', type: 'multiply', priority: 1, target: 'item' },
+                    ],
+                },
+            }]);
+            ware.prepareData();
+
+            assert.strictEqual(ware.system.technology.cost.value, 100 * 4 * 1.2);
+            assert.strictEqual(ware.system.technology.availability.value, 3 * 4 + 2);
+            await ware.update({ system: { technology: { rating: 0 } } });
+            ware.prepareData();
+            assert.strictEqual(ware.system.technology.cost.value, 0);
+            assert.strictEqual(ware.system.technology.availability.value, 2);
+        });
+
         it('applies item-target active effect multipliers to technology cost', async () => {
             const device = await factory.createItem({
                 type: 'device',

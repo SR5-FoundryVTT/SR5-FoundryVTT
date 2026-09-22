@@ -7,6 +7,7 @@ import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 import { Version0_36_0 } from 'src/module/migrator/versions/Version0_36_0';
 import { Version0_37_0 } from 'src/module/migrator/versions/Version0_37_0';
 import { Version0_38_0 } from 'src/module/migrator/versions/Version0_38_0';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -928,6 +929,92 @@ export const Migrators = (context: QuenchBatchContext) => {
             });
             assert.deepEqual(item.system.technology.essence, { base: 0, value: 0 });
             assert.notProperty(item.system.technology, 'calculated');
+        });
+
+        it('retains independent rating multipliers as item effects without duplicating existing data', () => {
+            const migrator = new Version0_38_0();
+            const existingChange = { name: 'Existing', type: 'add', value: 5, priority: 20 };
+            const existingEffect = { _id: 'existing', name: 'Existing effect' };
+            const item: any = {
+                effects: [existingEffect],
+                system: {
+                    technology: {
+                        rating: 4,
+                        cost: { base: 100, value: 400, changes: [existingChange] },
+                        availability: '3R',
+                        calculated: {
+                            cost: { value: 400, adjusted: true },
+                            availability: { value: '3R', adjusted: false },
+                        },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+            migrator.migrateItem(item);
+
+            assert.deepEqual(item.system.technology.cost.changes, [existingChange]);
+            assert.strictEqual(item.system.technology.availability.restriction, 'restricted');
+            assert.strictEqual(item.effects.length, 2);
+            assert.strictEqual(item.effects[0], existingEffect);
+            const effect = item.effects[1];
+            assert.isString(effect._id);
+            assert.strictEqual(effect.flags.shadowrun5e.ratingMultiplier, 'cost');
+            assert.strictEqual(effect.system.targets[0].applyTo, 'item');
+            assert.strictEqual(effect.system.changes[0].value, '@system.technology.rating');
+            assert.strictEqual(effect.system.changes[0].priority, 1);
+            assert.isNotTrue(effect.system.onlyForEquipped);
+            assert.isNotTrue(effect.system.onlyForWireless);
+        });
+
+        it('migrates an availability-only rating multiplier and keeps existing changes', () => {
+            const migrator = new Version0_38_0();
+            const existingChange = { name: 'Existing', type: 'add', value: 2, priority: 20 };
+            const item: any = {
+                system: {
+                    technology: {
+                        rating: 0,
+                        cost: 100,
+                        availability: { base: 3, value: 12, restriction: 'forbidden', changes: [existingChange] },
+                        calculated: {
+                            cost: { adjusted: false },
+                            availability: { adjusted: true },
+                        },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+
+            assert.strictEqual(item.system.technology.availability.base, 3);
+            assert.strictEqual(item.system.technology.availability.restriction, 'forbidden');
+            assert.deepEqual(item.system.technology.availability.changes, [existingChange]);
+            assert.strictEqual(item.effects.length, 1);
+            assert.strictEqual(item.effects[0].flags.shadowrun5e.ratingMultiplier, 'availability');
+            assert.strictEqual(item.effects[0].name, `${game.i18n.localize('SR5.Rating')} ${game.i18n.localize('SR5.Availability')}`);
+            assert.strictEqual(item.effects[0].system.changes[0].priority, ModifiableValue.RATING_PRIORITY);
+        });
+
+        it('skips the availability rating multiplier when the legacy availability could not be parsed', () => {
+            const migrator = new Version0_38_0();
+            const item: any = {
+                system: {
+                    technology: {
+                        rating: 4,
+                        cost: 100,
+                        availability: '(Rating * 3)R',
+                        calculated: {
+                            cost: { adjusted: true },
+                            availability: { adjusted: true },
+                        },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+
+            assert.strictEqual(item.effects.length, 1);
+            assert.strictEqual(item.effects[0].flags.shadowrun5e.ratingMultiplier, 'cost');
         });
 
         it('migrates draft technology cost and availability objects into base/value fields', () => {

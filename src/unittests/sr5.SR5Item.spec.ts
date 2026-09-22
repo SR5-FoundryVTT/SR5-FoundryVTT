@@ -9,6 +9,35 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
     after(async () => { await factory.destroy(); });
 
     describe('SR5Items', () => {
+        it('edits and saves Matrix action marks and owner from Details', async () => {
+            const item = await factory.createItem({ type: 'action', system: { action: { categories: ['matrix'] } } });
+            const sheet = item.sheet as any;
+            sheet._mode = 'edit';
+            await sheet.render(true);
+
+            const marks = sheet.element.querySelector('[name="system.action.category.matrix.marks"]') as HTMLInputElement | null;
+            const owner = sheet.element.querySelector('[name="system.action.category.matrix.owner"]') as HTMLInputElement | null;
+            assert.isNotNull(marks);
+            assert.isNotNull(owner);
+            marks!.value = '2';
+            owner!.checked = true;
+            await sheet.submit();
+            await sheet.close();
+
+            await sheet.render(true);
+            assert.strictEqual(item.system.action.category.matrix.marks, 2);
+            assert.isTrue(item.system.action.category.matrix.owner);
+            assert.strictEqual((sheet.element.querySelector('[name="system.action.category.matrix.marks"]') as HTMLInputElement | null)?.value, '2');
+            await sheet.close();
+
+            const ordinary = await factory.createItem({ type: 'action' });
+            const ordinarySheet = ordinary.sheet as any;
+            ordinarySheet._mode = 'edit';
+            await ordinarySheet.render(true);
+            assert.isNull(ordinarySheet.element.querySelector('[name="system.action.category.matrix.marks"]'));
+            await ordinarySheet.close();
+        });
+
         it('create a naked item of any type', async () => {
             const item = await factory.createItem({type: 'action'});
 

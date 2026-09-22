@@ -16,6 +16,9 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     static readonly TOP_PRIORITY = Number.MAX_SAFE_INTEGER;
     // Manual modifiers should appear last, only before override.
     static readonly MANUAL_PRIORITY = Number.MAX_SAFE_INTEGER - 10;
+    // Technology rating multipliers apply before ware grade modifiers.
+    static readonly RATING_PRIORITY = 1;
+    static readonly GRADE_PRIORITY = 2;
 
     private readonly _field: Field;
 

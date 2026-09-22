@@ -68,7 +68,7 @@ export const WarePrep = {
         const actualEssence = Helpers.roundTo(floatEssence, 4);
 
         const cost = new ModifiableValue(system.technology.cost);
-        cost.addUnique('SR5.Grade', costMod, { type: 'multiply', priority: ModifiableValue.BASE_PRIORITY + 1 });
+        cost.addUnique('SR5.Grade', costMod, { type: 'multiply', priority: ModifiableValue.GRADE_PRIORITY });
         WarePrep.setAvailabilityGradeChange(system.technology.availability, availMod);
 
         system.technology.essence.base = actualEssence;
@@ -85,7 +85,7 @@ export const WarePrep = {
             enabled: true,
             invalidated: false,
             name: 'SR5.Grade',
-            priority: ModifiableValue.BASE_PRIORITY + 1,
+            priority: ModifiableValue.GRADE_PRIORITY,
             source: '',
             type: 'add',
             value,
