@@ -10,6 +10,7 @@ import { SR5ActiveEffect } from './SR5ActiveEffect';
 import { SR5ActiveEffectValueEditor } from './SR5ActiveEffectValueEditor';
 import { Translation } from '../utils/strings';
 import { EffectDurationStatus, prepareEffectDurationStatus } from './EffectDurationStatus';
+import { isElementInstance } from '@/module/utils/dom';
 
 /**
  * Data Object that gets provided to the templates for ActiveEffects
@@ -656,13 +657,13 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         // The combined regex as a boolean constant
         const isTargetOrApplyToChange = /^system\.(targets\.\d+\.(applyTo|name)|changes\.\d+\.target)$/.test(name);
 
-        if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement) && isTargetOrApplyToChange) {
+        if ((isElementInstance(target, HTMLInputElement) || isElementInstance(target, HTMLSelectElement)) && isTargetOrApplyToChange) {
             this._syncFormIntoClone();
             void this.render();
             return;
         }
 
-        if (target instanceof HTMLSelectElement && name.endsWith(".type")) {
+        if (isElementInstance(target, HTMLSelectElement) && name.endsWith(".type")) {
             const priorityInput = target.closest("li")?.querySelector<HTMLInputElement>(
                 `input[name="${name.replace(/\.type$/, ".priority")}"]`
             );
@@ -671,14 +672,14 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             }
         }
 
-        if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement)
+        if ((isElementInstance(target, HTMLInputElement) || isElementInstance(target, HTMLSelectElement))
             && (name === 'duration.value' || name === 'duration.units')) {
             this._syncFormIntoClone();
             void this.render();
             return;
         }
 
-        if (target instanceof HTMLSelectElement && name === 'duration.expiry') {
+        if (isElementInstance(target, HTMLSelectElement) && name === 'duration.expiry') {
             this._syncFormIntoClone();
             void this.render();
             return;

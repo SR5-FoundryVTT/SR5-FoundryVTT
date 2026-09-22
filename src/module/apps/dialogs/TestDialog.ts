@@ -113,12 +113,19 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
     }
 
     async select(): Promise<SuccessTestData> {
-        await this.render({ force: true });
+        await this.render({ force: true, window: { windowId: TestDialog._focusedWindowId() } });
 
         if (this._selectionPromise === undefined || this.selection === undefined)
             return this._emptySelection();
 
         return this._selectionPromise;
+    }
+
+    /** The detached window the user is interacting with, so the dialog opens next to the sheet that triggered it. */
+    static _focusedWindowId(): string | undefined {
+        const { detached } = foundry.applications;
+        const id = (detached.focused as { id?: string } | null)?.id;
+        return id && detached.windows.has(id) ? id : undefined;
     }
 
     _emptySelection(): SuccessTestData {

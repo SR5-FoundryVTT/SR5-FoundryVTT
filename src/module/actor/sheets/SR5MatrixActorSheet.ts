@@ -14,6 +14,7 @@ import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import ActorAttribute = Shadowrun.ActorAttribute;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
+import { isElementInstance } from '@/module/utils/dom';
 
 const { fromUuid, fromUuidSync } = foundry.utils;
 
@@ -338,7 +339,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     static async #toggleConnectedMatrixIcons(this: SR5MatrixActorSheet, event: PointerEvent) {
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
@@ -357,7 +358,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     static async #addAllEquippedWirelessDevicesToPAN(this: SR5MatrixActorSheet, event: PointerEvent) {
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         const matrixDevice = this.actor.getMatrixDevice();
         if (matrixDevice) {
             console.debug('Shadowrun5e | Adding all equipped wireless devices to actor PAN ->', event);
@@ -483,7 +484,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * @param event
      */
     override async _handleRollItem(item: SR5Item, event: PointerEvent): Promise<void> {
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         if (this.selectedMatrixTarget && item.hasActionCategory('matrix')) {
             const document = await fromUuid(this.selectedMatrixTarget) as SR5Actor | SR5Item;
             if (!document) return;
@@ -507,7 +508,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     static async #selectMatrixTarget(this: SR5MatrixActorSheet, event: PointerEvent) {
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
@@ -639,7 +640,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     static async #addOneMark(this: SR5MatrixActorSheet, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         if (this.actor.hasHost()) {
             ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
             return;
@@ -657,7 +658,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     static async #removeOneMark(this: SR5MatrixActorSheet, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
         if (this.actor.hasHost()) {
             ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
             return;
@@ -674,7 +675,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
 
     static async #deleteMarks(this: SR5MatrixActorSheet, event: PointerEvent) {
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         if (this.actor.hasHost()) {
             ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
@@ -697,7 +698,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
 
     static async #clearAllMarks(this: SR5MatrixActorSheet, event: PointerEvent) {
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         if (this.actor.hasHost()) {
             ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
@@ -719,7 +720,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     static async #connectToNetwork(this: SR5MatrixActorSheet, event: PointerEvent) {
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
@@ -737,7 +738,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     static async #disconnectNetwork(this: SR5MatrixActorSheet, event: PointerEvent) {
         event.stopPropagation();
-        if (!(event.target instanceof HTMLElement)) return;
+        if (!isElementInstance(event.target, HTMLElement)) return;
 
         await this.actor.disconnectNetwork();
         void this.render();
