@@ -2,174 +2,96 @@ import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
 import { ModifiableValuePriority } from '@/module/mods/ModifiableValue';
 import { VersionMigration } from '../VersionMigration';
 
-/** Migrate item-sheet data introduced for 0.38.0. */
+const { randomID } = foundry.utils;
+
+/** Migrate data changes from every branch that ships in 0.38.0. */
 export class Version0_38_0 extends VersionMigration {
     readonly TargetVersion = '0.38.0';
-    private static readonly RATING_EFFECT_FLAG = 'ratingMultiplier';
 
+    // Each branch contributing to 0.38.0 keeps its whole flow in its own migrate<Branch> method, called here.
     override migrateItem(item: any): void {
-        Version0_38_0.ensureNestedDocumentIds(item);
+        this.migrateItemSheetRework(item);
+    }
+
+    /**
+     * ItemSheetRework: ids for flag-stored nested items/effects, technology cost/availability/essence as
+     * base/value fields, and legacy "adjusted" rating multipliers as item Active Effects.
+     */
+    private migrateItemSheetRework(item: any): void {
+        Version0_38_0.assignNestedIds(item.flags?.shadowrun5e?.embeddedItems);
 
         const technology = item.system?.technology;
         if (!technology || typeof technology !== 'object') return;
 
+        // 0.37.0 stored cost as a number and availability as a '12R' string.
         const calculated = technology.calculated;
-        const availabilityParsable = Version0_38_0.isAvailabilityParsable(technology.availability);
-        technology.cost = Version0_38_0.migrateCost(technology.cost);
-        technology.availability = Version0_38_0.migrateAvailability(technology.availability);
+        const cost = typeof technology.cost === 'number' ? technology.cost : 0;
+        const availability = typeof technology.availability === 'string' ? technology.availability : '';
 
-        if (calculated && typeof calculated === 'object') {
-            if (calculated.cost?.adjusted) Version0_38_0.addRatingEffect(item, 'cost');
-            if (calculated.availability?.adjusted && availabilityParsable) Version0_38_0.addRatingEffect(item, 'availability');
-            if (!technology.essence && calculated.essence) {
-                technology.essence = Version0_38_0.migrateEssence(calculated.essence);
-            }
-            delete technology.calculated;
-        }
-    }
+        technology.cost = { base: cost, value: cost, changes: [] };
+        technology.availability = { ...ItemAvailabilityFlow.parseAvailabilityString(availability), changes: [] };
 
-    /**
-     * Legacy string availability was only multiplied by rating when it parsed as Number-Letter.
-     */
-    private static isAvailabilityParsable(availability: unknown): boolean {
-        if (typeof availability !== 'string') return true;
-        return ItemAvailabilityFlow.parseAvailability(availability).isValid;
-    }
+        if (!calculated || typeof calculated !== 'object') return;
 
-    private static addRatingEffect(item: any, field: 'cost' | 'availability'): void {
-        item.effects ??= [];
-        if (item.effects.some((effect: any) => effect.flags?.shadowrun5e?.[Version0_38_0.RATING_EFFECT_FLAG] === field)) return;
-
-        const fieldLabel = field === 'cost' ? 'SR5.Cost' : 'SR5.Availability';
-        item.effects.push({
-            _id: foundry.utils.randomID(),
-            name: `${game.i18n.localize('SR5.Rating')} ${game.i18n.localize(fieldLabel)}`,
-            type: 'base',
-            flags: { shadowrun5e: { [Version0_38_0.RATING_EFFECT_FLAG]: field } },
-            system: {
-                targets: [{ id: 'item', applyTo: 'item' }],
-                changes: [{
-                    key: `system.technology.${field}`,
-                    type: 'multiply',
-                    value: '@system.technology.rating',
-                    priority: ModifiableValuePriority.RATING,
-                    target: 'item',
-                }],
-            },
-        });
-    }
-
-    private static migrateEssence(essence: unknown) {
-        if (essence && typeof essence === 'object') {
-            const data = essence as { base?: unknown; value?: unknown };
-            const value = Version0_38_0.firstFiniteNumber(data.value, data.base, 0);
-            return { base: value, value };
+        // Essence moved out of the removed calculated block.
+        if (!technology.essence && calculated.essence) {
+            const essence = calculated.essence;
+            const value = typeof essence === 'object' ? Version0_38_0.firstFiniteNumber(essence.value, essence.base, 0) : 0;
+            technology.essence = { base: value, value };
         }
 
-        return { base: 0, value: 0 };
+        // "adjusted" multiplied cost/availability by rating; keep that as an item effect the user can see and remove.
+        const ratingEffectFlag = 'ratingMultiplier';
+        for (const field of ['cost', 'availability'] as const) {
+            if (!calculated[field]?.adjusted) continue;
+            // Availability was only multiplied by rating when it parsed as Number-Letter.
+            if (field === 'availability' && !ItemAvailabilityFlow.parseAvailability(availability).isValid) continue;
+
+            item.effects ??= [];
+            if (item.effects.some((effect: any) => effect.flags?.shadowrun5e?.[ratingEffectFlag] === field)) continue;
+
+            const fieldLabel = field === 'cost' ? 'SR5.Cost' : 'SR5.Availability';
+            item.effects.push({
+                _id: randomID(),
+                name: `${game.i18n.localize('SR5.Rating')} ${game.i18n.localize(fieldLabel)}`,
+                type: 'base',
+                flags: { shadowrun5e: { [ratingEffectFlag]: field } },
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [{
+                        key: `system.technology.${field}`,
+                        type: 'multiply',
+                        value: '@system.technology.rating',
+                        priority: ModifiableValuePriority.RATING,
+                        target: 'item',
+                    }],
+                },
+            });
+        }
+
+        delete technology.calculated;
     }
 
-    private static ensureNestedDocumentIds(item: any): void {
-        const embeddedItems = item.flags?.shadowrun5e?.embeddedItems;
-        if (!Array.isArray(embeddedItems)) return;
+    /** Nested items and their effects are stored in flags and need ids to be addressable as documents. */
+    private static assignNestedIds(items: unknown): void {
+        if (!Array.isArray(items)) return;
 
-        for (const embeddedItem of embeddedItems) {
-            embeddedItem._id ??= foundry.utils.randomID();
+        for (const nested of items) {
+            nested._id ??= randomID();
 
-            if (Array.isArray(embeddedItem.effects)) {
-                for (const effect of embeddedItem.effects) {
-                    effect._id ??= foundry.utils.randomID();
-                }
+            if (Array.isArray(nested.effects)) {
+                for (const effect of nested.effects) effect._id ??= randomID();
             }
 
-            Version0_38_0.ensureNestedDocumentIds(embeddedItem);
+            Version0_38_0.assignNestedIds(nested.flags?.shadowrun5e?.embeddedItems);
         }
     }
 
-    private static migrateCost(cost: unknown) {
-        if (typeof cost === 'number') {
-            return { base: cost, value: cost, changes: [] };
-        }
-
-        if (cost && typeof cost === 'object') {
-            const data = cost as { base?: unknown; value?: unknown };
-            const base = Version0_38_0.firstFiniteNumber(data.base, data.value, 0);
-            return { base, value: base, changes: Array.isArray((cost as any).changes) ? (cost as any).changes : [] };
-        }
-
-        return { base: 0, value: 0, changes: [] };
-    }
-
-    private static migrateAvailability(availability: unknown) {
-        if (typeof availability === 'string') {
-            return Version0_38_0.createAvailabilityFromString(availability);
-        }
-
-        if (availability && typeof availability === 'object') {
-            const data = availability as {
-                base?: unknown;
-                value?: unknown;
-                restriction?: unknown;
-            };
-
-            const base = Version0_38_0.firstString(data.base, data.value, '');
-            const migrated = Version0_38_0.createAvailabilityFromString(base);
-
-            if (typeof data.base === 'number') {
-                migrated.base = Number.isFinite(data.base) ? data.base : 0;
-                migrated.value = migrated.base;
-            }
-
-            migrated.restriction = Version0_38_0.migrateRestriction(data.restriction, migrated.restriction);
-            migrated.label = ItemAvailabilityFlow.composeValue(migrated.value, migrated.restriction);
-            migrated.changes = Array.isArray((availability as any).changes) ? (availability as any).changes : [];
-            return migrated;
-        }
-
-        return Version0_38_0.createAvailabilityFromString('');
-    }
-
-    private static migrateRestriction(restriction: unknown, fallback: 'none' | 'restricted' | 'forbidden'): 'none' | 'restricted' | 'forbidden' {
-        if (typeof restriction === 'string') return Version0_38_0.normalizeRestriction(restriction);
-
-        if (restriction && typeof restriction === 'object') {
-            const data = restriction as { base?: unknown; value?: unknown };
-            return Version0_38_0.normalizeRestriction(Version0_38_0.firstString(data.value, data.base, fallback));
-        }
-
-        return fallback;
-    }
-
-    private static firstFiniteNumber(...values: unknown[]) {
+    private static firstFiniteNumber(...values: unknown[]): number {
         for (const value of values) {
             const number = Number(value);
             if (Number.isFinite(number)) return number;
         }
         return 0;
-    }
-
-    private static firstString(...values: unknown[]) {
-        for (const value of values) {
-            if (typeof value === 'string') return value;
-            if (typeof value === 'number') return String(value);
-        }
-        return '';
-    }
-
-    private static createAvailabilityFromString(value: string): {
-        base: number;
-        value: number;
-        changes: any[];
-        restriction: 'none' | 'restricted' | 'forbidden';
-        label: string;
-    } {
-        const parsed = ItemAvailabilityFlow.parseAvailabilityString(value);
-        return { base: parsed.base, value: parsed.value, changes: [], restriction: parsed.restriction, label: parsed.label };
-    }
-
-    private static normalizeRestriction(value: string): 'none' | 'restricted' | 'forbidden' {
-        return ['none', 'restricted', 'forbidden'].includes(value)
-            ? value as 'none' | 'restricted' | 'forbidden'
-            : ItemAvailabilityFlow.restrictionFromSuffix(value);
     }
 }

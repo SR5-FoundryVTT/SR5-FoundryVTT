@@ -931,16 +931,15 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.notProperty(item.system.technology, 'calculated');
         });
 
-        it('retains independent rating multipliers as item effects without duplicating existing data', () => {
+        it('turns an adjusted cost into a rating multiplier effect and keeps existing effects', () => {
             const migrator = new Version0_38_0();
-            const existingChange = { name: 'Existing', type: 'add', value: 5, priority: 20 };
             const existingEffect = { _id: 'existing', name: 'Existing effect' };
             const item: any = {
                 effects: [existingEffect],
                 system: {
                     technology: {
                         rating: 4,
-                        cost: { base: 100, value: 400, changes: [existingChange] },
+                        cost: 100,
                         availability: '3R',
                         calculated: {
                             cost: { value: 400, adjusted: true },
@@ -951,9 +950,8 @@ export const Migrators = (context: QuenchBatchContext) => {
             };
 
             migrator.migrateItem(item);
-            migrator.migrateItem(item);
 
-            assert.deepEqual(item.system.technology.cost.changes, [existingChange]);
+            assert.deepEqual(item.system.technology.cost, { base: 100, value: 100, changes: [] });
             assert.strictEqual(item.system.technology.availability.restriction, 'restricted');
             assert.strictEqual(item.effects.length, 2);
             assert.strictEqual(item.effects[0], existingEffect);
@@ -967,15 +965,14 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.isNotTrue(effect.system.onlyForWireless);
         });
 
-        it('migrates an availability-only rating multiplier and keeps existing changes', () => {
+        it('migrates an availability-only rating multiplier', () => {
             const migrator = new Version0_38_0();
-            const existingChange = { name: 'Existing', type: 'add', value: 2, priority: 20 };
             const item: any = {
                 system: {
                     technology: {
                         rating: 0,
                         cost: 100,
-                        availability: { base: 3, value: 12, restriction: 'forbidden', changes: [existingChange] },
+                        availability: '3F',
                         calculated: {
                             cost: { adjusted: false },
                             availability: { adjusted: true },
@@ -988,7 +985,7 @@ export const Migrators = (context: QuenchBatchContext) => {
 
             assert.strictEqual(item.system.technology.availability.base, 3);
             assert.strictEqual(item.system.technology.availability.restriction, 'forbidden');
-            assert.deepEqual(item.system.technology.availability.changes, [existingChange]);
+            assert.deepEqual(item.system.technology.availability.changes, []);
             assert.strictEqual(item.effects.length, 1);
             assert.strictEqual(item.effects[0].flags.shadowrun5e.ratingMultiplier, 'availability');
             assert.strictEqual(item.effects[0].name, `${game.i18n.localize('SR5.Rating')} ${game.i18n.localize('SR5.Availability')}`);
@@ -1015,53 +1012,6 @@ export const Migrators = (context: QuenchBatchContext) => {
 
             assert.strictEqual(item.effects.length, 1);
             assert.strictEqual(item.effects[0].flags.shadowrun5e.ratingMultiplier, 'cost');
-        });
-
-        it('migrates draft technology cost and availability objects into base/value fields', () => {
-            const migrator = new Version0_38_0();
-            const item: any = {
-                system: {
-                    technology: {
-                        cost: { formula: '', value: 0, base: 200 },
-                        availability: { formula: '', value: '', base: '8F' },
-                    },
-                },
-            };
-
-            migrator.migrateItem(item);
-
-            assert.deepEqual(item.system.technology.cost, { base: 200, value: 200, changes: [] });
-            assert.deepEqual(item.system.technology.availability, {
-                base: 8,
-                value: 8,
-                changes: [],
-                restriction: 'forbidden',
-                label: '8F',
-            });
-        });
-
-        it('collapses an intermediate base/value restriction object into a plain string', () => {
-            const migrator = new Version0_38_0();
-            const item: any = {
-                system: {
-                    technology: {
-                        availability: {
-                            base: 6,
-                            value: 6,
-                            changes: [],
-                            restriction: { base: 'restricted', value: 'forbidden', changes: [] },
-                            label: '6R',
-                        },
-                    },
-                },
-            };
-
-            migrator.migrateItem(item);
-
-            assert.strictEqual(item.system.technology.availability.base, 6);
-            assert.strictEqual(item.system.technology.availability.value, 6);
-            assert.strictEqual(item.system.technology.availability.restriction, 'forbidden');
-            assert.strictEqual(item.system.technology.availability.label, '6F');
         });
     });
 };
