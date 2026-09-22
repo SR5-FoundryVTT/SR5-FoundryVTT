@@ -1,6 +1,6 @@
 import { SR5 } from '../../config';
 import { Translation } from '../../utils/strings';
-import { ModifiableValue } from "@/module/mods/ModifiableValue";
+import { ModifiableValue, ModifiableValuePriority } from "@/module/mods/ModifiableValue";
 import { FLAGS, SYSTEM_NAME } from '../../constants';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 import { AnyMutableObject, DeepPartial } from 'fvtt-types/utils';
@@ -353,7 +353,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         ModifiableValue.add(valueField, name, safeValue, {
             type: 'add',
             enabled: true,
-            priority: ModifiableValue.MANUAL_PRIORITY,
+            priority: ModifiableValuePriority.MANUAL,
         });
 
         this.test.prepareBaseValues();
@@ -406,7 +406,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             } else if (valueField.value !== numericValue) {
                 ModifiableValue.addUnique(
                     valueField, 'SR5.ManualOverride', numericValue,
-                    { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
+                    { type: 'override', priority: ModifiableValuePriority.TOP }
                 );
             }
         }

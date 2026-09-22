@@ -1,7 +1,7 @@
 import { SR } from "../../constants";
 import { Helpers } from "../../helpers";
 import type { SR5Item } from "../SR5Item";
-import { ModifiableValue } from "@/module/mods/ModifiableValue";
+import { ModifiableValue, ModifiableValuePriority } from "@/module/mods/ModifiableValue";
 import { AvailabilityValueType } from "@/module/types/template/Technology";
 
 
@@ -68,7 +68,7 @@ export const WarePrep = {
         const actualEssence = Helpers.roundTo(floatEssence, 4);
 
         const cost = new ModifiableValue(system.technology.cost);
-        cost.addUnique('SR5.Grade', costMod, { type: 'multiply', priority: ModifiableValue.GRADE_PRIORITY });
+        cost.addUnique('SR5.Grade', costMod, { type: 'multiply', priority: ModifiableValuePriority.GRADE });
         WarePrep.setAvailabilityGradeChange(system.technology.availability, availMod);
 
         system.technology.essence.base = actualEssence;
@@ -85,7 +85,7 @@ export const WarePrep = {
             enabled: true,
             invalidated: false,
             name: 'SR5.Grade',
-            priority: ModifiableValue.GRADE_PRIORITY,
+            priority: ModifiableValuePriority.GRADE,
             source: '',
             type: 'add',
             value,

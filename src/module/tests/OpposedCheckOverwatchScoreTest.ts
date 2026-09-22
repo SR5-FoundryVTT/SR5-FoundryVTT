@@ -2,7 +2,7 @@ import { MatrixRules } from '@/module/rules/MatrixRules';
 import { CheckOverwatchScoreTest } from '@/module/tests/CheckOverwatchScoreTest';
 import { Translation } from '@/module/utils/strings';
 import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
-import { ModifiableValue } from '@/module/mods/ModifiableValue';
+import { ModifiableValue, ModifiableValuePriority } from '@/module/mods/ModifiableValue';
 
 /**
  * Implement the opposing test for Check Overwatch Score, pg238
@@ -20,7 +20,7 @@ export class OpposedCheckOverwatchScoreTest extends OpposedMatrixTest {
         const fixedPool = MatrixRules.checkOverwatchScoreOpposingDicePool();
         this.data.pool.base = fixedPool.base;
         ModifiableValue.addUnique(
-            this.data.pool, 'SR5.Content.Actions.CheckOverwatchScore', fixedPool.base, { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
+            this.data.pool, 'SR5.Content.Actions.CheckOverwatchScore', fixedPool.base, { type: 'override', priority: ModifiableValuePriority.TOP }
         );
 
         // get the overwatch score at the start so it isn't affected by the roll

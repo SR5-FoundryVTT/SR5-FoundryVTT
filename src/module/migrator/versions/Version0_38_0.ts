@@ -1,5 +1,5 @@
 import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
-import { ModifiableValue } from '@/module/mods/ModifiableValue';
+import { ModifiableValuePriority } from '@/module/mods/ModifiableValue';
 import { VersionMigration } from '../VersionMigration';
 
 /** Migrate item-sheet data introduced for 0.38.0. */
@@ -52,7 +52,7 @@ export class Version0_38_0 extends VersionMigration {
                     key: `system.technology.${field}`,
                     type: 'multiply',
                     value: '@system.technology.rating',
-                    priority: ModifiableValue.RATING_PRIORITY,
+                    priority: ModifiableValuePriority.RATING,
                     target: 'item',
                 }],
             },

@@ -6,20 +6,25 @@ export type ChangeOptionsType = Partial<Omit<ChangeEntryType, 'name' | 'value' |
         & { type?: ChangeEntryType['type']; };
 
 /**
+ * Well-known priorities for ModifiableValue changes; changes apply in ascending priority order.
+ */
+export enum ModifiableValuePriority {
+    // Use finite sentinels so priorities survive chat flag serialization.
+    BASE = Number.MIN_SAFE_INTEGER,
+    // Technology rating multipliers apply before ware grade modifiers.
+    RATING = 1,
+    GRADE = 2,
+    // Manual modifiers should appear last, only before override.
+    MANUAL = Number.MAX_SAFE_INTEGER - 10,
+    TOP = Number.MAX_SAFE_INTEGER,
+}
+
+/**
  * A class for managing a list of named parts with generic values.
  * This class provides methods for adding, removing, and querying parts,
  * as well as calculating the total of numerical parts.
  */
 export class ModifiableValue<Field extends ModifiableValueType = ModifiableValueType> {
-    // Use finite sentinels so priorities survive chat flag serialization.
-    static readonly BASE_PRIORITY = Number.MIN_SAFE_INTEGER;
-    static readonly TOP_PRIORITY = Number.MAX_SAFE_INTEGER;
-    // Manual modifiers should appear last, only before override.
-    static readonly MANUAL_PRIORITY = Number.MAX_SAFE_INTEGER - 10;
-    // Technology rating multipliers apply before ware grade modifiers.
-    static readonly RATING_PRIORITY = 1;
-    static readonly GRADE_PRIORITY = 2;
-
     private readonly _field: Field;
 
     get changes() {
@@ -84,7 +89,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
         value: number,
         options: Omit<ChangeOptionsType, 'type' | 'priority'> = {}
     ): void {
-        return this.add(name, value, { type: 'add', priority: ModifiableValue.BASE_PRIORITY, ...options });
+        return this.add(name, value, { type: 'add', priority: ModifiableValuePriority.BASE, ...options });
     }
 
     /**
@@ -128,7 +133,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
         value: number | undefined | null,
         options: Omit<ChangeOptionsType, 'type' | 'priority'> = {}
     ): void {
-        return this.addUnique(name, value, { type: 'add', priority: ModifiableValue.BASE_PRIORITY, ...options });
+        return this.addUnique(name, value, { type: 'add', priority: ModifiableValuePriority.BASE, ...options });
     }
 
     /**
@@ -226,13 +231,13 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
 
         if (options?.max != null && this._field.value > options.max) {
             this._markPreviousChangesMasked(this._field.changes.length);
-            this.addUnique('SR5.EnforcedMaximum', options.max, { type: 'downgrade', priority: ModifiableValue.TOP_PRIORITY });
+            this.addUnique('SR5.EnforcedMaximum', options.max, { type: 'downgrade', priority: ModifiableValuePriority.TOP });
             this._field.value = options.max;
         }
 
         if (options?.min != null && this._field.value < options.min) {
             this._markPreviousChangesMasked(this._field.changes.length);
-            this.addUnique('SR5.EnforcedMinimum', options.min, { type: 'upgrade', priority: ModifiableValue.TOP_PRIORITY });
+            this.addUnique('SR5.EnforcedMinimum', options.min, { type: 'upgrade', priority: ModifiableValuePriority.TOP });
             this._field.value = options.min;
         }
 
@@ -271,7 +276,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
      * @returns {boolean} True if the change is the base change.
      */
     static isBaseChange(change: ModifiableValueType['changes'][number]): boolean {
-        return change.priority === ModifiableValue.BASE_PRIORITY;
+        return change.priority === ModifiableValuePriority.BASE;
     }
 
     /**
@@ -280,7 +285,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
      * @returns {boolean} True if the change should expose manual editing controls in the test dialog.
      */
     static isManualChange(change: ModifiableValueType['changes'][number]): boolean {
-        return change.priority === ModifiableValue.MANUAL_PRIORITY;
+        return change.priority === ModifiableValuePriority.MANUAL;
     }
 
     /**

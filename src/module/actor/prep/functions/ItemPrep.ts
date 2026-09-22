@@ -1,5 +1,5 @@
 import { SR5Item } from 'src/module/item/SR5Item';
-import { ModifiableValue } from '@/module/mods/ModifiableValue';
+import { ModifiableValue, ModifiableValuePriority } from '@/module/mods/ModifiableValue';
 import { SR5 } from '@/module/config';
  
 export class ItemPrep {
@@ -27,7 +27,7 @@ export class ItemPrep {
                 } else {
                     ModifiableValue.add(
                         armor.rating, item.name, normalArmor,
-                        { type: 'upgrade', priority: ModifiableValue.BASE_PRIORITY }
+                        { type: 'upgrade', priority: ModifiableValuePriority.BASE }
                     );
                 }
             }
@@ -38,7 +38,7 @@ export class ItemPrep {
                 } else {
                     ModifiableValue.add(
                         armor.hardened, item.name, hardenedArmor,
-                        { type: 'upgrade', priority: ModifiableValue.BASE_PRIORITY }
+                        { type: 'upgrade', priority: ModifiableValuePriority.BASE }
                     );
                 }
             }

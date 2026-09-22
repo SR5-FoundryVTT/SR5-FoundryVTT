@@ -1,5 +1,5 @@
 import { SR5Actor } from '../../SR5Actor';
-import { ModifiableValue } from '@/module/mods/ModifiableValue';
+import { ModifiableValue, ModifiableValuePriority } from '@/module/mods/ModifiableValue';
 import { InitiativeType } from '@/module/types/template/Initiative';
 import { SR5 } from '@/module/config';
 
@@ -65,7 +65,7 @@ export class InitiativePrep {
         // Apply blitz ini rules.
         if (initiative.blitz) {
             ModifiableValue.addUnique(initiative.current.dice, "SR5.Blitz", 5,
-                { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
+                { type: 'override', priority: ModifiableValuePriority.TOP }
             );
         }
         ModifiableValue.calcTotal(initiative.current.dice, {min: 0, max: 5});
