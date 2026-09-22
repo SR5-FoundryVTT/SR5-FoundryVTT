@@ -18,6 +18,35 @@
                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
     </div>
 </div>
+{{#if (isType item 'action' 'critter_power')}}
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label data-tooltip="{{systemFields.action.fields.categories.hint}}">{{systemFields.action.fields.categories.label}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput systemFields.action.fields.categories value=source.system.action.categories options=config.actionCategories
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        </div>
+    </div>
+{{/if}}
+{{#if (isMatrixAction item)}}
+    <div class="list-item">
+        <div class="list-item-start skinny"><label>{{localize "SR5.Marks"}}</label></div>
+        <div class="list-item-col">
+            {{formInput systemFields.action.fields.category.fields.matrix.fields.marks
+                        value=source.system.action.category.matrix.marks
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="list-item-start skinny"><label>{{localize "SR5.Owner"}}</label></div>
+        <div class="list-item-col">
+            {{formInput systemFields.action.fields.category.fields.matrix.fields.owner
+                        value=source.system.action.category.matrix.owner
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+        </div>
+    </div>
+{{/if}}
 {{#if system.action.type}}
     <div class="list-item">
         <div class="list-item-start skinny">
@@ -51,17 +80,6 @@
             </div>
             <div class="list-item-col">
                 {{formInput systemFields.action.fields.initiative_mod value=source.system.action.initiative_mod
-                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-            </div>
-        </div>
-    {{/if}}
-    {{#if (isType item 'action' 'critter_power')}}
-        <div class="list-item">
-            <div class="list-item-start skinny">
-                <label data-tooltip="{{systemFields.action.fields.categories.hint}}">{{systemFields.action.fields.categories.label}}</label>
-            </div>
-            <div class="list-item-col">
-                {{formInput systemFields.action.fields.categories value=source.system.action.categories options=config.actionCategories
                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
             </div>
         </div>
@@ -145,24 +163,6 @@
             </div>
         </div>
     {{/ifne}}{{/ifne}}
-{{/if}}
-{{#if (isMatrixAction item)}}
-    <div class="list-item">
-        <div class="list-item-start skinny"><label>{{localize "SR5.Marks"}}</label></div>
-        <div class="list-item-col">
-            {{formInput systemFields.action.fields.category.fields.matrix.fields.marks
-                        value=source.system.action.category.matrix.marks
-                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-        </div>
-    </div>
-    <div class="list-item">
-        <div class="list-item-start skinny"><label>{{localize "SR5.Owner"}}</label></div>
-        <div class="list-item-col">
-            {{formInput systemFields.action.fields.category.fields.matrix.fields.owner
-                        value=source.system.action.category.matrix.owner
-                        rootId=@root.rootId disabled=@root.isPlayMode}}
-        </div>
-    </div>
 {{/if}}
 <div class="list-item list-item-header">
     <div class="list-item-start skinny">
