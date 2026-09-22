@@ -6,7 +6,11 @@
   "effects": [],
   "folder": null,
   "sort": 0,
-  "flags": {},
+  "flags": {
+    "shadowrun5e": {
+      "embeddedItems": []
+    }
+  },
   "system": {
     "description": {
       "value": "",
@@ -28,7 +32,9 @@
       "limit": {
         "value": 0,
         "base": 0,
-        "attribute": ""
+        "attribute": "",
+        "base_formula_operator": "add",
+        "changes": []
       },
       "threshold": {
         "value": 0,
@@ -51,7 +57,10 @@
         "base": 0,
         "ap": {
           "value": 0,
-          "base": 0
+          "base": 0,
+          "attribute": "",
+          "base_formula_operator": "add",
+          "changes": []
         },
         "base_formula_operator": "add",
         "attribute": "",
@@ -61,12 +70,9 @@
           "itemType": "",
           "itemName": ""
         },
-        "itemSource": {
-          "actorId": "",
-          "itemId": "",
-          "itemType": "",
-          "itemName": ""
-        }
+        "biofeedback": "",
+        "changes": [],
+        "normal_weapon": false
       },
       "opposed": {
         "type": "",
@@ -98,17 +104,29 @@
         "wounds",
         "global",
         "composure"
-      ]
+      ],
+      "alt_mod": 0,
+      "category": {
+        "matrix": {
+          "marks": 0,
+          "owner": false
+        }
+      },
+      "dice_pool_mod": [],
+      "initiative_mod": 0
     },
     "result": {
-      "success": {}
+      "success": {
+        "matrix": {
+          "placeMarks": false
+        }
+      }
     },
     "importFlags": {
       "name": "",
-      "type": "",
-      "subType": "",
       "isFreshImport": false,
-      "isImported": false
+      "category": "",
+      "sourceid": ""
     }
   },
   "ownership": {
@@ -116,13 +134,14 @@
   },
   "_stats": {
     "systemId": "shadowrun5e",
-    "systemVersion": "0.13.0",
-    "coreVersion": "12.331",
+    "systemVersion": "0.37.4",
+    "coreVersion": "14.367",
     "createdTime": null,
-    "modifiedTime": 1697732282270,
+    "modifiedTime": null,
     "lastModifiedBy": null,
     "compendiumSource": null,
-    "duplicateSource": null
+    "duplicateSource": null,
+    "exportSource": null
   },
   "_key": "!items!oOKa7tt1wZIo20Eu"
 }
