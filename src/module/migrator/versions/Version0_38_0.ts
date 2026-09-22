@@ -21,41 +21,35 @@ export class Version0_38_0 extends VersionMigration {
         Version0_38_0.assignNestedIds(item.flags?.shadowrun5e?.embeddedItems);
 
         const technology = item.system?.technology;
-        if (!technology || typeof technology !== 'object') return;
+        if (!technology) return;
 
-        // 0.37.0 stored cost as a number and availability as a '12R' string.
+        // 0.37.0 stored cost as a number and availability as a '12R' string, read the same way its prep did.
         const calculated = technology.calculated;
-        const cost = typeof technology.cost === 'number' ? technology.cost : 0;
-        const availability = typeof technology.availability === 'string' ? technology.availability : '';
+        const cost = Number(technology.cost ?? 0) || 0;
+        const availability = String(technology.availability ?? '');
 
         technology.cost = { base: cost, value: cost, changes: [] };
         technology.availability = { ...ItemAvailabilityFlow.parseAvailabilityString(availability), changes: [] };
 
-        if (!calculated || typeof calculated !== 'object') return;
+        if (!calculated) return;
 
         // Essence moved out of the removed calculated block.
-        if (!technology.essence && calculated.essence) {
-            const essence = calculated.essence;
-            const value = typeof essence === 'object' ? Version0_38_0.firstFiniteNumber(essence.value, essence.base, 0) : 0;
-            technology.essence = { base: value, value };
-        }
+        const essence = calculated.essence?.value ?? 0;
+        technology.essence ??= { base: essence, value: essence };
 
         // "adjusted" multiplied cost/availability by rating; keep that as an item effect the user can see and remove.
-        const ratingEffectFlag = 'ratingMultiplier';
         for (const field of ['cost', 'availability'] as const) {
             if (!calculated[field]?.adjusted) continue;
             // Availability was only multiplied by rating when it parsed as Number-Letter.
             if (field === 'availability' && !ItemAvailabilityFlow.parseAvailability(availability).isValid) continue;
 
-            item.effects ??= [];
-            if (item.effects.some((effect: any) => effect.flags?.shadowrun5e?.[ratingEffectFlag] === field)) continue;
-
             const fieldLabel = field === 'cost' ? 'SR5.Cost' : 'SR5.Availability';
+            item.effects ??= [];
             item.effects.push({
                 _id: randomID(),
                 name: `${game.i18n.localize('SR5.Rating')} ${game.i18n.localize(fieldLabel)}`,
                 type: 'base',
-                flags: { shadowrun5e: { [ratingEffectFlag]: field } },
+                flags: { shadowrun5e: { ratingMultiplier: field } },
                 system: {
                     targets: [{ id: 'item', applyTo: 'item' }],
                     changes: [{
@@ -85,13 +79,5 @@ export class Version0_38_0 extends VersionMigration {
 
             Version0_38_0.assignNestedIds(nested.flags?.shadowrun5e?.embeddedItems);
         }
-    }
-
-    private static firstFiniteNumber(...values: unknown[]): number {
-        for (const value of values) {
-            const number = Number(value);
-            if (Number.isFinite(number)) return number;
-        }
-        return 0;
     }
 }

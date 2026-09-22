@@ -16,22 +16,20 @@
             {{> "systems/shadowrun5e/dist/templates/v2/item/footer/skill.hbs" item=item }}
         {{else if (isType item 'call_in_action')}}
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/call_in_action.hbs" item=item }}
-        {{else if (eq item.type 'contact')}}
+        {{else if (isType item 'contact')}}
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/contact.hbs" item=item }}
-        {{else if (isType item 'complex_form')}}
-            {{> "systems/shadowrun5e/dist/templates/v2/item/footer/complex_form.hbs" item=item }}
-        {{else if (eq item.type 'critter_power')}}
-            {{> "systems/shadowrun5e/dist/templates/v2/item/footer/critter_power.hbs" item=item }}
-        {{else if (eq item.type 'lifestyle')}}
+        {{else if (isType item 'critter_power')}}
+            {{#if system.rating}}
+                <label>{{localize "SR5.Rating"}}&nbsp;{{system.rating}}</label>
+            {{/if}}
+        {{else if (isType item 'lifestyle')}}
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/lifestyle.hbs" item=item }}
-        {{else if (eq item.type 'quality')}}
+        {{else if (isType item 'quality')}}
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/quality.hbs" item=item }}
-        {{else if (eq item.type 'ritual')}}
-            {{> "systems/shadowrun5e/dist/templates/v2/item/footer/ritual.hbs" item=item }}
-        {{else if (eq item.type 'spell')}}
-            {{> "systems/shadowrun5e/dist/templates/v2/item/footer/spell.hbs" item=item }}
-        {{else if (isType item 'sprite_power')}}
-            {{> "systems/shadowrun5e/dist/templates/v2/item/footer/sprite_power.hbs" item=item }}
+        {{else if (isType item 'spell')}}
+            {{#if system.category}}
+                <label>{{localizeOb system.category @root.config.spellCategories}}</label>
+            {{/if}}
         {{else if (isType item 'program')}}
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/program.hbs" item=item }}
         {{else if (isType item 'device')}}
@@ -46,20 +44,13 @@
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/adept_power.hbs" item=item }}
         {{/if}}
 
-        {{#if (eq item.type 'grid')}}
-            {{#unless (empty system.category)}}
+        {{#if (isType item 'grid')}}
+            {{#if system.category}}
                 <label data-tooltip="{{systemFields.category.hint}}">{{localizeOb system.category @root.config.gridCategories}}</label>
-            {{/unless}}
-            <label>
-                {{#if system.matrix.visible}}
-                    {{localize "SR5.Labels.Sheet.Visible"}}
-                {{else}}
-                    {{localize "SR5.Labels.Sheet.NotVisible"}}
-                {{/if}}
-            </label>
+            {{/if}}
         {{/if}}
 
-        {{#if (eq item.type 'host')}}
+        {{#if (isType item 'host')}}
             {{#if system.rating}}
                 <label>{{localize "SR5.Rating"}}&nbsp;{{system.rating}}</label>
             {{/if}}
@@ -68,6 +59,9 @@
                     <label>{{localize (lookup @root.config.matrixAttributes att.att)}}&nbsp;{{att.value}}</label>
                 {{/if}}
             {{/each}}
+        {{/if}}
+
+        {{#if (isType item 'grid' 'host')}}
             <label>
                 {{#if system.matrix.visible}}
                     {{localize "SR5.Labels.Sheet.Visible"}}
@@ -77,15 +71,13 @@
             </label>
         {{/if}}
 
-        {{#if (eq item.type 'modification')}}
+        {{#if (isType item 'modification')}}
             {{#if system.type}}
-                {{#unless (empty system.type)}}
                 <label data-tooltip="{{systemFields.type.hint}}">{{localizeOb system.type @root.config.modificationTypes}}&nbsp;{{localize "SR5.Weapon.Mod"}}</label>
-                {{/unless}}
             {{/if}}
         {{/if}}
 
-        {{#if (eq item.type 'weapon')}}
+        {{#if (isType item 'weapon')}}
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/action.hbs" item=item }}
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/weapon.hbs" item=item }}
         {{/if}}
@@ -95,9 +87,7 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/item-properties/technology.hbs" item=item }}
                 {{#if (isType item 'bioware' 'cyberware')}}
                     {{#if system.grade}}
-                        {{#unless (empty system.grade)}}
                         <label>{{localizeOb system.grade @root.config.cyberwareGrades}}</label>
-                        {{/unless}}
                     {{/if}}
                     {{> "systems/shadowrun5e/dist/templates/v2/item-properties/essence.hbs" item=item }}
                 {{/if}}

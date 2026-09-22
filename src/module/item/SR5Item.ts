@@ -261,7 +261,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             // prepareData can run more than once without a reset() in between, and ModifiableField.applyChange
             // only pushes entries. Clear this effect's prior contributions from each targeted ModifiableValue
             // before re-applying, so repeated passes don't double them.
-            const source = effect.uuid ?? effect.id ?? effect.name;
+            const source = ModifiableValue.effectSource(effect);
             for (const change of changes) {
                 const altered = { ...change } as unknown as ActiveEffect.ChangeData;
                 SR5ActiveEffect.alterChange(this, altered);

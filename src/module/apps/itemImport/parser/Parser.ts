@@ -81,11 +81,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
 
     private setTechnology(technology: TechnologyType, jsonData: ParseData) {
         if ('avail' in jsonData && jsonData.avail) {
-            const availability = ItemAvailabilityFlow.parseAvailabilityString(jsonData.avail._TEXT || '');
-            technology.availability.base = availability.base;
-            technology.availability.value = availability.value;
-            technology.availability.restriction = availability.restriction;
-            technology.availability.label = availability.label;
+            Object.assign(technology.availability, ItemAvailabilityFlow.parseAvailabilityString(jsonData.avail._TEXT || ''));
         }
         technology.cost.base = 'cost' in jsonData && jsonData.cost ? Number(jsonData.cost._TEXT) || 0 : 0;
         // Chummer's data files store the item's *maximum* rating in <rating>. An item starts out at

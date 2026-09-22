@@ -361,6 +361,14 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     }
 
     /**
+     * The source identifier stored on change entries an effect applies, matched by `removeFromSource`.
+     * @param effect - The effect applying the changes.
+     */
+    static effectSource(effect: { uuid?: string | null; id?: string | null; name: string }): string {
+        return effect.uuid ?? effect.id ?? effect.name;
+    }
+
+    /**
      * Static helper to add or remove a unique change based on the presence of a value.
      * If `value` is provided, it adds/updates the change;
      * if `value` is falsy, it removes the change with the given name.
