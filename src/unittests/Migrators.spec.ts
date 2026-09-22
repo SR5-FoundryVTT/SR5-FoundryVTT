@@ -7,7 +7,7 @@ import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 import { Version0_36_0 } from 'src/module/migrator/versions/Version0_36_0';
 import { Version0_37_0 } from 'src/module/migrator/versions/Version0_37_0';
 import { Version0_38_0 } from 'src/module/migrator/versions/Version0_38_0';
-import { ModifiableValuePriority } from '@/module/mods/ModifiableValue';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -989,7 +989,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(item.effects.length, 1);
             assert.strictEqual(item.effects[0].flags.shadowrun5e.ratingMultiplier, 'availability');
             assert.strictEqual(item.effects[0].name, `${game.i18n.localize('SR5.Rating')} ${game.i18n.localize('SR5.Availability')}`);
-            assert.strictEqual(item.effects[0].system.changes[0].priority, ModifiableValuePriority.RATING);
+            assert.strictEqual(item.effects[0].system.changes[0].priority, ModifiableValue.Priority.RATING);
         });
 
         it('skips the availability rating multiplier when the legacy availability could not be parsed', () => {

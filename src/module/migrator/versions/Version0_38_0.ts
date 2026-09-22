@@ -1,5 +1,5 @@
 import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
-import { ModifiableValuePriority } from '@/module/mods/ModifiableValue';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { VersionMigration } from '../VersionMigration';
 
 const { randomID } = foundry.utils;
@@ -56,7 +56,7 @@ export class Version0_38_0 extends VersionMigration {
                         key: `system.technology.${field}`,
                         type: 'multiply',
                         value: '@system.technology.rating',
-                        priority: ModifiableValuePriority.RATING,
+                        priority: ModifiableValue.Priority.RATING,
                         target: 'item',
                     }],
                 },

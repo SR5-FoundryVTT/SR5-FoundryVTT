@@ -2,7 +2,7 @@ import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
 import { DataDefaults } from "@/module/data/DataDefaults";
-import { ModifiableValue, ModifiableValuePriority } from "@/module/mods/ModifiableValue";
+import { ModifiableValue } from "@/module/mods/ModifiableValue";
 import { TestDialog } from "../module/apps/dialogs/TestDialog";
 import { FLAGS, SYSTEM_NAME } from "../module/constants";
 import { SpellCastingTest } from "@/module/tests/SpellCastingTest";
@@ -307,14 +307,14 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
             ModifiableValue.add(valueField, 'Custom Modifier', 3, {
                 type: 'add',
-                priority: ModifiableValuePriority.MANUAL,
+                priority: ModifiableValue.Priority.MANUAL,
             });
 
             const createdChange = valueField.changes.find(change => change.name === 'Custom Modifier');
             if (!createdChange) assert.fail('Expected manual-priority modifier to exist');
             if (!createdChange) return;
 
-            assert.strictEqual(createdChange.priority, ModifiableValuePriority.MANUAL);
+            assert.strictEqual(createdChange.priority, ModifiableValue.Priority.MANUAL);
             assert.isTrue(ModifiableValue.isManualChange(createdChange));
         });
 
