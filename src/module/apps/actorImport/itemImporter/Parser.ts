@@ -100,13 +100,8 @@ export abstract class Parser<T extends ItemSystems> {
         if (itemData.maxrating != null)
             technology.max_rating = Number(itemData.maxrating) || 0;
 
-        if (itemData.avail != null) {
-            const availability = ItemAvailabilityFlow.parseAvailabilityString(itemData.avail);
-            technology.availability.base = availability.base;
-            technology.availability.value = availability.value;
-            technology.availability.restriction = availability.restriction;
-            technology.availability.label = availability.label;
-        }
+        if (itemData.avail != null)
+            Object.assign(technology.availability, ItemAvailabilityFlow.parseAvailabilityString(itemData.avail));
 
         if (itemData.qty != null)
             technology.quantity = Number(itemData.qty) || 0;

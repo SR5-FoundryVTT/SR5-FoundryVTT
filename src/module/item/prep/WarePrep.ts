@@ -2,7 +2,6 @@ import { SR } from "../../constants";
 import { Helpers } from "../../helpers";
 import type { SR5Item } from "../SR5Item";
 import { ModifiableValue } from "@/module/mods/ModifiableValue";
-import { AvailabilityValueType } from "@/module/types/template/Technology";
 
 
 /**
@@ -54,8 +53,8 @@ export const WarePrep = {
 
         if (grade === 'standard') {
             system.technology.essence.base = system.essence;
-            new ModifiableValue(system.technology.cost).remove('SR5.Grade');
-            WarePrep.removeAvailabilityGradeChange(system.technology.availability);
+            ModifiableValue.remove(system.technology.cost, 'SR5.Grade');
+            ModifiableValue.remove(system.technology.availability, 'SR5.Grade');
             return;
         }
 
@@ -67,35 +66,9 @@ export const WarePrep = {
         const floatEssence = Number(system.essence || 0) * essenceMod;
         const actualEssence = Helpers.roundTo(floatEssence, 4);
 
-        const cost = new ModifiableValue(system.technology.cost);
-        cost.addUnique('SR5.Grade', costMod, { type: 'multiply', priority: ModifiableValue.BASE_PRIORITY + 1 });
-        WarePrep.setAvailabilityGradeChange(system.technology.availability, availMod);
+        ModifiableValue.addUnique(system.technology.cost, 'SR5.Grade', costMod, { type: 'multiply', priority: ModifiableValue.Priority.GRADE });
+        ModifiableValue.setUnique(system.technology.availability, 'SR5.Grade', availMod, { type: 'add', priority: ModifiableValue.Priority.GRADE });
 
         system.technology.essence.base = actualEssence;
-    },
-
-    setAvailabilityGradeChange(availability: AvailabilityValueType, value: number) {
-        const index = availability.changes.findIndex(change => change.name === 'SR5.Grade');
-        if (!value) {
-            if (index !== -1) availability.changes.splice(index, 1);
-            return;
-        }
-
-        const change = {
-            enabled: true,
-            invalidated: false,
-            name: 'SR5.Grade',
-            priority: ModifiableValue.BASE_PRIORITY + 1,
-            source: '',
-            type: 'add',
-            value,
-        };
-
-        if (index === -1) availability.changes.push(change);
-        else availability.changes[index] = change;
-    },
-
-    removeAvailabilityGradeChange(availability: AvailabilityValueType) {
-        availability.changes = availability.changes.filter(change => change.name !== 'SR5.Grade');
     },
 }

@@ -433,7 +433,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Resolves the individual components and the human-readable representation of this success test.
      * Provides the formatted UI terms for the test's pool, limit, and threshold. 
-     * Additionally, generates the common Shadowrun 5 description string (e.g., "Automatics + Agility + 3 (3) [2 + Physical]") 
+     * Additionally, generates the common Shadowrun 5 description string (e.g., "Automatics + Agility + 3 [2 + Physical] (3)")
      * to provide information about value sources.
      *
      * @returns An object containing the term arrays (`pool`, `limit`, `threshold`), the formatted `description` string.
@@ -1198,16 +1198,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get hasAction(): boolean {
         return !foundry.utils.isEmpty(this.data.action);
-    }
-
-    /**
-     * TODO: This method results in an ugly description.
-     */
-    get description(): string {
-        const poolPart = this.pool.value;
-        const thresholdPart = this.hasThreshold ? `(${this.threshold.value})` : '';
-        const limitPart = this.hasLimit ? `[${this.limit.value}]` : '';
-        return `${poolPart} ${thresholdPart} ${limitPart}`
     }
 
     get hasPushTheLimit(): boolean {

@@ -46,7 +46,7 @@ export const ItemAvailabilityFlow = {
 
     parseAvailabilityString(avail: string) {
         const parsed = ItemAvailabilityFlow.parseAvailability(avail);
-        if (!parsed.isValid || typeof parsed.availability !== 'number') {
+        if (!parsed.isValid) {
             return {
                 base: 0,
                 value: 0,
