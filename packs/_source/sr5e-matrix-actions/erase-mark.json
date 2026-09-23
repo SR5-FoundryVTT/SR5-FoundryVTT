@@ -1,7 +1,11 @@
 {
   "name": "Erase Mark",
   "type": "action",
-  "flags": {},
+  "flags": {
+    "shadowrun5e": {
+      "embeddedItems": []
+    }
+  },
   "img": "systems/shadowrun5e/dist/icons/cross-mark.svg",
   "effects": [],
   "_id": "NjAyfCxoU0zvmbcO",
@@ -29,7 +33,8 @@
         "value": 0,
         "base": 0,
         "attribute": "attack",
-        "mod": []
+        "base_formula_operator": "add",
+        "changes": []
       },
       "threshold": {
         "value": 0,
@@ -53,7 +58,9 @@
         "ap": {
           "value": 0,
           "base": 0,
-          "mod": []
+          "attribute": "",
+          "base_formula_operator": "add",
+          "changes": []
         },
         "base_formula_operator": "add",
         "attribute": "",
@@ -63,7 +70,9 @@
           "itemType": "",
           "itemName": ""
         },
-        "mod": []
+        "biofeedback": "",
+        "changes": [],
+        "normal_weapon": false
       },
       "opposed": {
         "type": "custom",
@@ -103,17 +112,21 @@
         "wounds"
       ],
       "alt_mod": 0,
-      "dice_pool_mod": []
+      "dice_pool_mod": [],
+      "initiative_mod": 0
     },
     "result": {
-      "success": {}
+      "success": {
+        "matrix": {
+          "placeMarks": false
+        }
+      }
     },
     "importFlags": {
       "name": "",
-      "type": "",
-      "subType": "",
       "isFreshImport": false,
-      "isImported": false
+      "category": "",
+      "sourceid": ""
     }
   },
   "ownership": {
@@ -123,13 +136,14 @@
   "sort": 0,
   "_stats": {
     "systemId": "shadowrun5e",
-    "systemVersion": "0.13.0",
-    "coreVersion": "12.331",
+    "systemVersion": "0.37.4",
+    "coreVersion": "14.367",
     "createdTime": null,
-    "modifiedTime": 1697731069234,
+    "modifiedTime": null,
     "lastModifiedBy": null,
     "compendiumSource": null,
-    "duplicateSource": null
+    "duplicateSource": null,
+    "exportSource": null
   },
   "_key": "!items!NjAyfCxoU0zvmbcO"
 }

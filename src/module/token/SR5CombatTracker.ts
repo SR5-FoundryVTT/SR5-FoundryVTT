@@ -13,7 +13,6 @@ type InitiativeModeOption = {
 };
 
 type SR5TurnContext = CombatTracker.TurnContext & {
-    pad?: boolean;
     modeClass?: string;
     modeIcon?: string;
     modeTitle?: string;
@@ -100,7 +99,6 @@ export class SR5CombatTracker extends CombatTracker {
         const modeConfig = SR5Combat.INITIATIVE_MODE_CONFIG[mode];
         const modeOptions = this._prepareInitiativeModeOptions(combatant);
 
-        turn.pad = combatant.system.pad;
         turn.modeClass = modeConfig.cls;
         turn.modeIcon = modeConfig.icon;
         turn.modeTitle = game.i18n.format('SR5.COMBAT.ModeTitle', { mode: game.i18n.localize(modeConfig.label) });
@@ -224,6 +222,27 @@ export class SR5CombatTracker extends CombatTracker {
         if (!availableModes.includes(mode)) return;
 
         await actor.setInitiativeMode(mode);
+    }
+
+    /**
+     * Handles manual edits of a combatant's initiative input in the tracker.
+     */
+    protected override _onUpdateInitiative(event: Event): void {
+        const input = event.target as HTMLInputElement | null;
+        const combatant = input && this._getCombatant(input);
+        const previousInit = combatant?.initiative ?? null;
+
+        const result: unknown = super._onUpdateInitiative(event);
+        if (!combatant || previousInit === null || !(result instanceof Promise)) return;
+
+        void result.then((updated: unknown) => {
+            if (!(updated instanceof SR5Combatant)) return;
+
+            const currentInit = updated.initiative;
+            if (currentInit !== null && currentInit !== previousInit) {
+                void combatant._postInitiativeChangeCard(previousInit, currentInit);
+            }
+        });
     }
 
     // ==========================================

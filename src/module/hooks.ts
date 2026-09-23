@@ -91,7 +91,6 @@ import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
 import { IconAssign } from './apps/iconAssigner/IconAssign';
 import { RoutingLibIntegration } from './integrations/routingLibIntegration';
-import { CombatTrackerDockIntegration } from './integrations/combatTrackerDockIntegration';
 import { initDiceSoNice } from './rolls/DiceSoNice';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
@@ -171,7 +170,6 @@ export class HooksManager {
         Hooks.on('ready', HooksManager.ready.bind(HooksManager));
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop.bind(HooksManager));
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
-        Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions.bind(SR5Combat));
         Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory.bind(HooksManager));
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory.bind(HooksManager));
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));
@@ -203,10 +201,6 @@ export class HooksManager {
                 DevHooks.registerHooks();
             });
         }
-
-        // Custom Module Integrations
-        // See src/module/integartions for more information.
-        CombatTrackerDockIntegration.registerHooks();
     }
 
     static init() {
