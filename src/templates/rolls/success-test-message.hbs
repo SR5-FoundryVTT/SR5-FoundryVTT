@@ -58,7 +58,7 @@
                     {{#if (and test.hasLimit test.codeTerms.limit.length)}}
                         [{{#each test.codeTerms.limit as |term|}}<span class="test-code-term">{{term.text}}</span>{{#unless @last}} + {{/unless}}{{/each}}]
                     {{/if}}
-                    {{#if test.codeTerms.threshold.length}}
+                    {{#if (and test.hasThreshold test.codeTerms.threshold.length)}}
                         ({{#each test.codeTerms.threshold as |term|}}<span class="test-code-term">{{term.text}}</span>{{#unless @last}} + {{/unless}}{{/each}})
                     {{/if}}
                 </span>
@@ -234,8 +234,7 @@
                     {{#unless test.autoSuccess}}
                     <div class="glitch-content clickable show-roll {{#if test.criticalGlitched}}glitch-content--critical{{/if}}">
                         <div class="test-outcome">
-                            {{#if test.hasBuyHits}}<i class="test-outcome-bought-hits fa-solid fa-coins" role="img" data-tooltip="SR5.HitsBought" aria-label="{{localize 'SR5.HitsBought'}}"></i>{{/if}}
-                            <span class="test-outcome-hits" data-tooltip-source="hits"><span class="test-outcome-hits-value">{{test.outcomeHits.value}}</span> {{localize test.outcomeHits.label}}</span>
+                            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/test-outcome-hits.hbs'}}
                             {{#if test.criticalGlitched}}
                             <span class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>{{localize "SR5.GlitchCritical"}}</span>
                             {{/if}}
@@ -248,10 +247,14 @@
             {{! Some tests will determine an outcome and success state }}
             {{#if test.canSucceed}}
                 {{#if test.showSuccessLabel}}
-                <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}}">
+                <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}} {{#if test.criticalGlitched}}glitch-content--critical{{/if}}">
                     <div class="test-outcome">
-                        {{#unless test.autoSuccess}}{{#if test.hasBuyHits}}<i class="test-outcome-bought-hits fa-solid fa-coins" role="img" data-tooltip="SR5.HitsBought" aria-label="{{localize 'SR5.HitsBought'}}"></i>{{/if}}<span class="test-outcome-hits" data-tooltip-source="hits"><span class="test-outcome-hits-value">{{test.outcomeHits.value}}</span> {{localize test.outcomeHits.label}}</span>{{/unless}}
+                        {{#unless test.autoSuccess}}{{> 'systems/shadowrun5e/dist/templates/rolls/parts/test-outcome-hits.hbs'}}{{/unless}}
+                        {{#if test.criticalGlitched}}
+                        <span class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>{{localize "SR5.GlitchCritical"}}</span>
+                        {{else}}
                         <span class="glitch">{{localize test.successLabel}}</span>
+                        {{/if}}
                     </div>
                 </div>
                 {{/if}}
@@ -262,7 +265,7 @@
                 {{#if test.failure}}
                 <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}} {{#if test.criticalGlitched}}glitch-content--critical{{/if}}">
                     <div class="test-outcome">
-                        {{#unless test.autoSuccess}}{{#if test.hasBuyHits}}<i class="test-outcome-bought-hits fa-solid fa-coins" role="img" data-tooltip="SR5.HitsBought" aria-label="{{localize 'SR5.HitsBought'}}"></i>{{/if}}<span class="test-outcome-hits" data-tooltip-source="hits"><span class="test-outcome-hits-value">{{test.outcomeHits.value}}</span> {{localize test.outcomeHits.label}}</span>{{/unless}}
+                        {{#unless test.autoSuccess}}{{> 'systems/shadowrun5e/dist/templates/rolls/parts/test-outcome-hits.hbs'}}{{/unless}}
                         {{#if test.criticalGlitched}}
                         <span class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>{{localize "SR5.GlitchCritical"}}</span>
                         {{else}}

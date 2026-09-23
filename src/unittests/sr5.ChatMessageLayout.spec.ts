@@ -1,6 +1,7 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SR5ChatMessage } from '@/module/chatMessage/SR5ChatMessage';
 import { SuccessTest } from '@/module/tests/SuccessTest';
+import { TestCreator } from '@/module/tests/TestCreator';
 
 function createMessage(content: string, { whisper = false, canDelete = true } = {}): HTMLElement {
     const wrapper = document.createElement('div');
@@ -164,22 +165,23 @@ export const shadowrunChatMessageLayoutTesting = (context: QuenchBatchContext) =
         });
 
         describe('parameter modifier panels', () => {
-            // Reproduce the hydrated parameter markup.
-            function createParameters(): HTMLElement {
+            // Render the real card and hydrate it the way chatMessageListeners does, so these tests
+            // fail if the template stops emitting the parameter band.
+            const renderCard = async (test): Promise<HTMLElement> => {
                 const wrapper = document.createElement('div');
-                wrapper.innerHTML = `
-                    <div class="card-content card-content--parameters">
-                        <span class="test-parameter" data-tooltip-source="pool"
-                              role="button" tabindex="0" aria-expanded="false">Pool 6</span>
-                        <span class="test-parameter" data-tooltip-source="limit"
-                              role="button" tabindex="0" aria-expanded="false">Limit 5</span>
-                        <div class="test-parameter-details">
-                            <div class="test-parameter-detail" data-source="pool" hidden>pool mods</div>
-                            <div class="test-parameter-detail" data-source="limit" hidden>limit mods</div>
-                        </div>
-                    </div>
-                `;
-                const line = wrapper.firstElementChild as HTMLElement;
+                wrapper.innerHTML = await foundry.applications.handlebars.renderTemplate(
+                    'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',
+                    await test._prepareMessageTemplateData());
+                await SuccessTest.hydrateValueModifierTooltipsForTest(test, wrapper, { card: true });
+                return wrapper;
+            };
+
+            async function createParameters(): Promise<HTMLElement> {
+                const test = TestCreator.fromPool(
+                    { pool: 10, limit: 3 }, { showMessage: false, showDialog: false });
+
+                const line = (await renderCard(test))
+                    .querySelector<HTMLElement>('.card-content--parameters') as HTMLElement;
                 for (const parameter of line.querySelectorAll('.test-parameter'))
                     parameter.addEventListener('click', SuccessTest._chatToggleParameterDetails);
                 return line;
@@ -189,8 +191,8 @@ export const shadowrunChatMessageLayoutTesting = (context: QuenchBatchContext) =
                 line.querySelector<HTMLElement>(`.test-parameter-detail[data-source="${source}"]`);
             const parameter = (line: HTMLElement, source: string) =>
                 line.querySelector<HTMLElement>(`.test-parameter[data-tooltip-source="${source}"]`);
-            it('opens the clicked parameter breakdown', () => {
-                const line = createParameters();
+            it('opens the clicked parameter breakdown', async () => {
+                const line = await createParameters();
 
                 parameter(line, 'pool')?.click();
 
@@ -199,8 +201,8 @@ export const shadowrunChatMessageLayoutTesting = (context: QuenchBatchContext) =
                 assert.equal(parameter(line, 'pool')?.getAttribute('aria-expanded'), 'true');
             });
 
-            it('swaps to another parameter rather than opening both', () => {
-                const line = createParameters();
+            it('swaps to another parameter rather than opening both', async () => {
+                const line = await createParameters();
 
                 parameter(line, 'pool')?.click();
                 parameter(line, 'limit')?.click();
@@ -211,8 +213,8 @@ export const shadowrunChatMessageLayoutTesting = (context: QuenchBatchContext) =
                 assert.equal(parameter(line, 'limit')?.getAttribute('aria-expanded'), 'true');
             });
 
-            it('closes again when the open parameter is clicked twice', () => {
-                const line = createParameters();
+            it('closes again when the open parameter is clicked twice', async () => {
+                const line = await createParameters();
 
                 parameter(line, 'pool')?.click();
                 parameter(line, 'pool')?.click();
@@ -220,6 +222,20 @@ export const shadowrunChatMessageLayoutTesting = (context: QuenchBatchContext) =
                 assert.isTrue(detail(line, 'pool')?.hidden);
                 assert.isTrue(detail(line, 'limit')?.hidden);
                 assert.equal(parameter(line, 'pool')?.getAttribute('aria-expanded'), 'false');
+            });
+
+            // The band is rendered before we know whether a value has anything to break down.
+            it('leaves a parameter without a breakdown inert', async () => {
+                const test = TestCreator.fromPool({ pool: 0 }, { showMessage: false, showDialog: false });
+
+                const card = await renderCard(test);
+                const pool = card.querySelector<HTMLElement>('.test-parameter[data-tooltip-source="pool"]');
+
+                assert.exists(pool, 'the parameter is still rendered');
+                assert.notExists(card.querySelector('.test-parameter-detail'));
+                assert.isNull(pool?.getAttribute('role') ?? null);
+                assert.isNull(pool?.getAttribute('tabindex') ?? null);
+                assert.isNull(pool?.getAttribute('aria-expanded') ?? null);
             });
         });
     });

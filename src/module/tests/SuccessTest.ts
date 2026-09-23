@@ -200,6 +200,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     public ignoreUserPermission: boolean;
 
+    // Stands in for a failure label when the test can't name an outcome, as extended tests can't.
+    static readonly NO_VERDICT_LABEL: Translation = 'SR5.TestResults.Results';
+
     // Allow this.constructor to not reference Function.
     declare ['constructor']: typeof SuccessTest;
 
@@ -976,9 +979,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return this.extended ? this.extendedHits : this.hits;
     }
 
-    /** Hide the non-verdict "Results" label. */
+    /**
+     * Hide the failure label when it is only a placeholder rather than a verdict.
+     *
+     * Compared against the label instead of against `extended`, so a subclass that names its own
+     * failure state keeps showing it on an extended test.
+     */
     get showsFailureOutcome(): boolean {
-        return this.failureLabel !== 'SR5.TestResults.Results';
+        return this.failureLabel !== SuccessTest.NO_VERDICT_LABEL;
     }
 
     get hasBuyHits(): boolean {
@@ -1148,7 +1156,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * How to call a failed test of this type.
      */
     get failureLabel(): Translation {
-        if (this.extended) return 'SR5.TestResults.Results';
+        if (this.extended) return SuccessTest.NO_VERDICT_LABEL;
         return 'SR5.TestResults.Failure';
     }
 
@@ -2092,9 +2100,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
             // Card parameters use inline breakdowns instead of hover tooltips.
             if (valueMod.classList.contains('test-parameter')) {
-                const value = valuesBySource[source];
-                if (value)
-                    await this._prepareParameterDetail(valueMod, test, value, source, tooltipsBySource, options);
+                await this._prepareParameterDetail(
+                    valueMod, test, valuesBySource[source], source, tooltipsBySource, options);
                 continue;
             }
 
@@ -2109,23 +2116,35 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         element.dataset.tooltipClass = 'sr5v2';
     }
 
+    /**
+     * Strip the interactive affordances a parameter carries from the template.
+     *
+     * The markup is rendered before we know whether the value has a breakdown to show, so a parameter
+     * without one would stay focusable and announce itself as a button while doing nothing.
+     */
+    private static _disableParameter(parameter: HTMLElement) {
+        parameter.removeAttribute('role');
+        parameter.removeAttribute('tabindex');
+        parameter.removeAttribute('aria-expanded');
+    }
+
     /** Add a collapsed modifier breakdown to the shared parameter panel. */
     private static async _prepareParameterDetail(
         parameter: HTMLElement,
         test: SuccessTest,
-        value: ValueFieldType,
+        value: ValueFieldType | undefined,
         source: string,
         tooltipsBySource: Record<string, string | undefined>,
         options: ValueModifierTooltipOptions = {}
     ) {
         const container = parameter.closest('.card-content--parameters')
             ?.querySelector<HTMLElement>('.test-parameter-details');
-        if (!container) return;
+        if (!value || !container) return this._disableParameter(parameter);
 
         const traceSources = value.changes.map(change => test.traceSourceForChange(change));
 
         const html = await this._buildValueModifierPanelHtml(value, options, traceSources);
-        if (!html) return;
+        if (!html) return this._disableParameter(parameter);
 
         // Replace details when a message is hydrated again.
         container.querySelector(`.test-parameter-detail[data-source="${source}"]`)?.remove();

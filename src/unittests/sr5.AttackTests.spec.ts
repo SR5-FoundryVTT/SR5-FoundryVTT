@@ -7,6 +7,9 @@ import { DataDefaults } from '../module/data/DataDefaults';
 import { FireModeRules } from '../module/rules/FireModeRules';
 import { TestCreator } from '../module/tests/TestCreator';
 import { PhysicalDefenseTest } from '../module/tests/PhysicalDefenseTest';
+import { MeleeAttackTest } from '../module/tests/MeleeAttackTest';
+import { RangedAttackTest } from '../module/tests/RangedAttackTest';
+import { ThrownAttackTest } from '../module/tests/ThrownAttackTest';
 import { DamageType, DamageTypeType } from 'src/module/types/item/Action';
 type DamageElementType = DamageType['element']['base'];
 
@@ -512,6 +515,41 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 assert.strictEqual(normalArmor?.value, 6);
                 assert.strictEqual(hardenedArmor?.value, 16);
             });
+        });
+    });
+
+    describe('Attack test verdict', () => {
+        // An unopposed attack roll isn't a success until the defense resolves, so the card leads with
+        // the hits chip instead of a verdict. The three attack tests deliberately don't override
+        // showSuccessLabel; re-adding an override would put "Success" back on every attack card.
+        it('shows hits rather than a Success verdict', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const [weapon] = await attacker.createEmbeddedDocuments('Item', [{
+                name: 'Attack Weapon',
+                type: 'weapon',
+                system: {
+                    category: 'melee',
+                    action: { test: 'MeleeAttackTest', opposed: { test: 'PhysicalDefenseTest' } },
+                    technology: { equipped: true },
+                },
+            }]);
+
+            const attackTest = await TestCreator.fromItem(weapon, attacker, { showDialog: false, showMessage: false });
+            if (!attackTest) return assert.fail('Failed to create melee attack test');
+            await attackTest._prepareExecution();
+
+            attackTest.data.values.hits = DataDefaults.createData('value_field', { label: 'SR5.Hits', base: 4, value: 4 });
+
+            assert.isFalse(attackTest.hasThreshold, 'an attack test has no threshold of its own');
+            assert.isTrue(attackTest.success);
+            assert.isFalse(attackTest.showSuccessLabel);
+        });
+
+        it('leaves showSuccessLabel to the base test for every attack type', () => {
+            for (const Test of [MeleeAttackTest, RangedAttackTest, ThrownAttackTest])
+                assert.isUndefined(
+                    Object.getOwnPropertyDescriptor(Test.prototype, 'showSuccessLabel'),
+                    `${Test.name} must not override showSuccessLabel — see the verdict test above`);
         });
     });
 };

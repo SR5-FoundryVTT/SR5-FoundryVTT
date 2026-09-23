@@ -128,6 +128,56 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             });
         });
 
+        describe('chat card verdict band', () => {
+            // Render the real card so the band's guards are asserted rather than re-described here.
+            const renderCard = async (test): Promise<HTMLElement> => {
+                const html = await foundry.applications.handlebars.renderTemplate(
+                    'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',
+                    await test._prepareMessageTemplateData());
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = html;
+                return wrapper;
+            };
+            const codeLine = (card: HTMLElement) => card.querySelector('.test-code')?.textContent ?? '';
+
+            // The card prints term names without their values, so a zero threshold would be empty parens.
+            it('omits the threshold group when the threshold totals zero', async () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+                // What the natural recovery tests do for an undamaged track.
+                ModifiableValue.addUniqueBase(test.data.threshold, 'SR5.StunTrack', 0);
+
+                assert.lengthOf(test.codeTerms.threshold, 1);
+                assert.isFalse(test.hasThreshold);
+
+                assert.notInclude(codeLine(await renderCard(test)), '(');
+            });
+
+            it('renders the threshold group when the threshold applies', async () => {
+                const test = TestCreator.fromPool(
+                    { pool: 10, threshold: 3 }, { showMessage: false, showDialog: false });
+
+                assert.isTrue(test.hasThreshold);
+
+                assert.include(codeLine(await renderCard(test)), '(3)');
+            });
+
+            it('marks a critical glitch even when the test shows a success verdict', async () => {
+                const test = TestCreator.fromPool(
+                    { pool: 10, threshold: 1 }, { showMessage: false, showDialog: false });
+                test.data.values.hits = DataDefaults.createData(
+                    'value_field', { label: 'SR5.Hits', base: 2, value: 2 });
+                Object.defineProperty(test, 'criticalGlitched', { get: () => true });
+
+                assert.isTrue(test.showSuccessLabel);
+
+                const band = (await renderCard(test)).querySelector('.card-test-content--status');
+                assert.exists(band?.querySelector('.glitch-content--critical'));
+                assert.include(band?.textContent ?? '', game.i18n.localize('SR5.GlitchCritical'));
+                // The hits chip comes from the shared partial, so it must survive alongside the verdict.
+                assert.equal(band?.querySelector('.test-outcome-hits-value')?.textContent, '2');
+            });
+        });
+
         describe('description control visibility', () => {
             // The control toggles the description panel, so it must not outlive its content.
             it('hides the control when there is nothing to show', async () => {
