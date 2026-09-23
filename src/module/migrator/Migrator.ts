@@ -76,9 +76,15 @@ export class Migrator {
 
     private static pendingMigrationCount = 0;
 
-    // Generate the migration version mark used to track current system version in documents.
+    /** Completed migration watermark, including migrations ahead of the development manifest. */
+    static get migrationVersion(): string {
+        const latest = this.s_Versions.at(-1)?.TargetVersion ?? "0.0.0";
+        return this.compareVersion(latest, game.system.version) > 0 ? latest : game.system.version;
+    }
+
+    // Temporary marker for completed migrations that still need to be persisted.
     private static get _migrationMark() {
-        return game.system.version + ".0";
+        return this.migrationVersion + ".0";
     }
 
     // Returns an array of migration functions applicable to the given document type and version.
@@ -99,7 +105,7 @@ export class Migrator {
     }
 
     private static markMigrated(data: { _stats: { systemVersion: string } }, nested: boolean): void {
-        data._stats.systemVersion = nested ? game.system.version : this._migrationMark;
+        data._stats.systemVersion = nested ? this.migrationVersion : this._migrationMark;
         this.pendingMigrationCount += nested ? 0 : 1;
     }
 
@@ -145,7 +151,7 @@ export class Migrator {
 
         // If _stats is missing, or systemVersion is not present, or the document is already migrated, skip migration.
         if (!data._stats || !('systemVersion' in data._stats)) return false;
-        if (this.compareVersion(data._stats.systemVersion, game.system.version) === 0) return false;
+        if (this.compareVersion(data._stats.systemVersion, this.migrationVersion) >= 0) return false;
 
         path = [...path, type, data._id ?? "unknown"];
         const migrationKey = path.join(".");
@@ -235,8 +241,8 @@ export class Migrator {
         if (doc._stats.systemVersion !== this._migrationMark) return;
 
         // Mark document as up-to-date
-        doc._stats.systemVersion = game.system.version;
-        doc._source._stats.systemVersion = game.system.version;
+        doc._stats.systemVersion = this.migrationVersion;
+        doc._source._stats.systemVersion = this.migrationVersion;
 
         // Update Parent First
         if (doc.parent instanceof Actor || doc.parent instanceof Item || doc.parent instanceof Combat)
@@ -249,7 +255,7 @@ export class Migrator {
     public static BeginMigration() {
         if (this.pendingMigrationCount === 0) return;
         const migratedVersion = game.settings.get(game.system.id, FLAGS.KEY_DATA_VERSION);
-        if (this.compareVersion(migratedVersion, game.system.version) >= 0) return;
+        if (this.compareVersion(migratedVersion, this.migrationVersion) >= 0) return;
 
         const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
         const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
@@ -398,7 +404,7 @@ export class Migrator {
         }
 
         /* Finalize Migration */
-        await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, game.system.version);
+        await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, this.migrationVersion);
         this.pendingMigrationCount = 0;
 
         new foundry.appv1.api.Dialog({
