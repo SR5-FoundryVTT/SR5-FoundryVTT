@@ -76,10 +76,8 @@ export class Migrator {
 
     /** Completed migration watermark, including migrations ahead of the development manifest. */
     static get migrationVersion(): string {
-        const latest = this.s_Versions.at(-1)?.TargetVersion;
-        return latest && this.compareVersion(latest, game.system.version) > 0
-            ? latest
-            : game.system.version;
+        const latest = this.s_Versions.at(-1)?.TargetVersion ?? "0.0.0";
+        return this.compareVersion(latest, game.system.version) > 0 ? latest : game.system.version;
     }
 
     // Temporary marker for completed migrations that still need to be persisted.
