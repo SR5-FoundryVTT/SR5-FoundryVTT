@@ -301,10 +301,9 @@ export class Version0_38_0 extends VersionMigration {
     /**
      * Id for a lifted child, derived from its parent and its legacy entry.
      *
-     * The same legacy data can be lifted more than once: in memory on every load of an unsaved
-     * compendium document, and separately for a base actor and a token delta holding a copy of the
-     * same parent. Deriving the id keeps those lifts identical, so delta children override the base
-     * children they came from and repeated lifts never produce duplicates.
+     * The parent is part of the seed because copies of one legacy entry keep the child's `_id`: two
+     * items holding the same legacy children would otherwise lift them to a single id, which a
+     * keepId create cannot store twice. See deterministicId for why the lifts must agree at all.
      */
     private static liftedChildId(parentId: string, child: any, index: number, usedIds: Set<string>): string {
         const key = typeof child?._id === 'string' && child._id ? child._id : `#${index}`;
@@ -345,9 +344,15 @@ export class Version0_38_0 extends VersionMigration {
     /**
      * A 16 character document id hashed from a seed, built from two 53 bit cyrb53 hashes.
      *
-     * Both branches derive ids from this: ContainerItem for lifted children, ItemSheetRework for the
-     * nested items still stored in flags. Copies of the same legacy parent then agree on their
-     * children's ids, which is what lets a token delta override the base children it came from.
+     * One piece of legacy data is lifted in more than one place. A base actor and an unlinked token's
+     * delta each migrate their own copy of the same parent, and the delta migration has no version
+     * stamp to skip on, so it runs again on every load until a write persists the lifted form.
+     *
+     * Those lifts have to land on the same ids. Foundry merges a delta's items into the base actor's
+     * by `_id`, keeping every base item the delta does not name, so a child lifted under a different
+     * id stops overriding its base counterpart and shows up beside it instead.
+     *
+     * Hashing the source is what keeps them equal without carrying state between the lifts.
      */
     private static deterministicId(seed: string): string {
         const alphabet = Version0_38_0.ID_ALPHABET;
