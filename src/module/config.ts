@@ -809,6 +809,9 @@ export const SR5 = {
         drone: 'drone'
     },
 
+    // Item types a container can hold: the physical gear an actor's inventory lists.
+    containableItemTypes: ['weapon', 'ammo', 'armor', 'bioware', 'container', 'cyberware', 'device', 'equipment', 'modification'],
+
     mountPoints: {
         barrel: 'SR5.Barrel',
         under: 'SR5.UnderBarrel',

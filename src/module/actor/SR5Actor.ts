@@ -1,5 +1,6 @@
 import { Helpers } from '../helpers';
 import { SR5Item } from '../item/SR5Item';
+import { LinkedItemIndex } from '../item/LinkedItemIndex';
 import { FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME } from '../constants';
 import { ModifiableValue } from '../mods/ModifiableValue';
 import { DataDefaults } from '../data/DataDefaults';
@@ -104,6 +105,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     // Quick access for all items of a type.
     itemsForType = new Map<Item.ConfiguredSubType, SR5Item[]>() as TypedItemMap;
+
+    // Children of each item, rebuilt on every embedded preparation. Declared without initializer,
+    // as a field initializer would reset the index built while the constructor prepares data.
+    declare linkedItems?: LinkedItemIndex;
 
     constructor(data: Actor.CreateData<SubType>, context?: Actor.ConstructionContext) {
         super(data, context);
@@ -211,14 +216,23 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
      */
     override prepareEmbeddedDocuments() {
+        const items = this.items.contents as SR5Item[];
+        this.linkedItems = new LinkedItemIndex(items);
+
+        // Core prepares embedded documents in collection order. Items are prepared deepest first
+        // instead, as a parent's base preparation applies mods and ammo linked below it, which
+        // therefore have to be fully prepared already.
+        const ordered = this.linkedItems.preparationOrder(SR5Item.MAX_ATTACHMENT_DEPTH);
+        const hierarchy = (this.constructor as typeof SR5Actor).hierarchy;
+        for (const collectionName of Object.keys(hierarchy)) {
+            const documents = collectionName === 'items' ? ordered : this.getEmbeddedCollection(collectionName as any);
+            // Protected on ClientDocument, and called here exactly as core's prepareEmbeddedDocuments does.
+            for (const document of documents) (document as unknown as { _safePrepareData(): void })._safePrepareData();
+        }
+
         // This will apply ActiveEffects, which is okay for modify (custom) effects, however add/multiply on .value will be
         // overwritten.
-        super.prepareEmbeddedDocuments();
-        this.prepareLinkedItemRelationships();
-
-        // NOTE: Hello there! Should you ever be in need of calling the grand parents methods, maybe to avoid applyActiveEffects,
-        //       look at this beautiful piece of software and shiver in it's glory.
-        // ClientDocumentMixin(class {}).prototype.prepareEmbeddedDocuments.apply(this);
+        this.applyActiveEffects('initial');
     }
 
     /**
@@ -327,50 +341,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             items.push(item);
             this.itemsForType.set(item.type, items);
         }
-    }
-
-    prepareLinkedItemRelationships() {
-        const items = this.items as unknown as SR5Item[];
-
-        // Index children by parent once. Without this every item rescans the whole collection twice,
-        // for its mods and its ammo, making a single prepare pass quadratic in the actor's item count.
-        const childrenByParent = new Map<string, SR5Item[]>();
-        for (const item of items) {
-            const parentId = item.system.parentId;
-            if (!parentId) continue;
-
-            const siblings = childrenByParent.get(parentId);
-            if (siblings) siblings.push(item);
-            else childrenByParent.set(parentId, [item]);
-        }
-
-        // Deepest first, so a parent always reads children which are themselves already prepared.
-        const depths = new Map(items.map(item => [item, this._attachmentDepth(item)]));
-        const prepared = [...items].sort((left, right) => depths.get(right)! - depths.get(left)!);
-
-        for (const item of prepared) {
-            item.prepareRelationshipData(childrenByParent.get(item.id ?? '') ?? []);
-        }
-    }
-
-    private _attachmentDepth(item: SR5Item): number {
-        let depth = 0;
-        let current: SR5Item | undefined = item;
-        const visited = new Set<string>();
-
-        while (current && depth < SR5Item.MAX_ATTACHMENT_DEPTH) {
-            const parentId = foundry.utils.getProperty(current.system, 'parentId') as string | null | undefined;
-            if (!parentId || visited.has(parentId)) break;
-
-            const parent = this.items.get(parentId) as SR5Item | undefined;
-            if (!parent) break;
-
-            visited.add(parentId);
-            current = parent;
-            depth += 1;
-        }
-
-        return depth;
     }
 
     /**

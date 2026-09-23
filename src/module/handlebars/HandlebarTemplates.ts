@@ -58,6 +58,7 @@ export const preloadHandlebarsTemplates = async () => {
             'list-items/connect-network-icon',
             'list-items/connected-icons-toggle',
             'list-items/edit-delete-icons',
+            'list-items/detach-icon',
             'list-items/equip-icon',
             'list-items/favorite-icon',
             'list-items/add-icon',

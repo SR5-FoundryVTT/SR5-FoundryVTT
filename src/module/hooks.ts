@@ -558,7 +558,7 @@ ___________________
     }
 
     static setup() {
-        SR5ItemCompendium.registerLinkedDocumentLoading();
+        SR5ItemCompendium.registerLinkedDocumentHandling();
         for (const pack of game.packs) {
             if (pack.metadata.type === 'Item') pack.applicationClass = SR5ItemCompendium;
         }

@@ -1194,6 +1194,10 @@ export const Migrators = (context: QuenchBatchContext) => {
                 type: 'container',
                 name: '#QUENCH Backpack',
                 folder: folder!.id,
+            } as any);
+            // Creating an item lifts legacy children right away, so the flags only exist in the source handed to the lift.
+            const backpackSource = {
+                ...backpack.toObject(),
                 flags: {
                     [SYSTEM_NAME]: {
                         [FLAGS.EmbeddedItems]: [{
@@ -1214,10 +1218,10 @@ export const Migrators = (context: QuenchBatchContext) => {
                         }],
                     },
                 },
-            } as any);
+            };
 
             try {
-                await (new Version0_38_0() as any).liftLegacyChildrenFromItems([backpack.toObject()], null);
+                await (new Version0_38_0() as any).liftLegacyChildrenFromItems([backpackSource], null);
 
                 const pouch = game.items.find(item => item.name === '#QUENCH Pouch');
                 const rope = game.items.find(item => item.name === '#QUENCH Rope');

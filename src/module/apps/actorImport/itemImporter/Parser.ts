@@ -66,7 +66,9 @@ export abstract class Parser<T extends ItemSystems> {
         const guid = itemData.suid ?? IH.getArray(itemData.sourceid)[0] ?? null;
         const itemIdFromGuid = guid ? IH.guidToId(guid) : null;
 
-        for (const [packId, indexes] of Parser.compendiumCache.entries()) {
+        for (const [packId, index] of Parser.compendiumCache.entries()) {
+            // Linked items are part of the item listed as their parent, not templates of their own.
+            const indexes = index.filter(e => !foundry.utils.getProperty(e, 'system.parentId'));
             const itemIndex =  indexes.find(e => e._id === itemIdFromGuid && e.type === this.parseType)
                             ?? indexes.find(e => e.name === itemData.name && e.type === this.parseType)
                             ?? indexes.find(e => e.name === itemData.name_english && e.type === this.parseType);
@@ -179,20 +181,39 @@ export abstract class Parser<T extends ItemSystems> {
         return [] as Item.CreateData[];
     }
 
+    /**
+     * Link parsed embedded items below their parent.
+     *
+     * parseItems returns each embedded item followed by the items linked below it, which already
+     * point at it. Only items without a parent yet are direct children; the rest keep their own
+     * parent and are kept whenever that parent is.
+     */
     protected linkEmbeddedItems(parent: { _id?: string; type: string }, items: Item.CreateData[]): Item.CreateData[] {
         if (!parent._id) return [];
 
         const modificationType = SR5Item.modificationTypeFor(parent.type);
+        const kept = new Set<string>();
+        const linkedItems: Item.CreateData[] = [];
 
-        return items.map(item => {
+        for (const item of items) {
             const linked = foundry.utils.duplicate(item) as Item.CreateData;
-            foundry.utils.setProperty(linked, 'system.parentId', parent._id);
+            const ownParentId = foundry.utils.getProperty(linked, 'system.parentId');
 
-            if (linked.type === 'modification' && modificationType) {
-                foundry.utils.setProperty(linked, 'system.type', modificationType);
+            if (typeof ownParentId === 'string' && ownParentId) {
+                if (!kept.has(ownParentId)) continue;
+            } else {
+                if (!SR5Item.isAttachment(parent.type, linked.type!)) continue;
+
+                foundry.utils.setProperty(linked, 'system.parentId', parent._id);
+                if (linked.type === 'modification' && modificationType) {
+                    foundry.utils.setProperty(linked, 'system.type', modificationType);
+                }
             }
 
-            return linked;
-        }).filter(item => SR5Item.isAttachment(parent.type, item.type!));
+            if (typeof linked._id === 'string') kept.add(linked._id);
+            linkedItems.push(linked);
+        }
+
+        return linkedItems;
     }
 }

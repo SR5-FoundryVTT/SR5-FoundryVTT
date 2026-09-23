@@ -132,6 +132,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             equipItem: SR5ItemSheet.#equipItem,
             editItem: SR5ItemSheet.#editItem,
             deleteItem: SR5ItemSheet.#deleteItem,
+            detachItem: SR5ItemSheet.#detachItem,
             addItemQty: SR5ItemSheet.#addItemQty,
             removeItemQty: SR5ItemSheet.#removeItemQty,
             editContainerItem: SR5ItemSheet.#editContainerItem,
@@ -774,6 +775,17 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (id && item) {
             await this.item.deleteChildItem(id);
         }
+    }
+
+    /**
+     * Take a mod or ammo off this item, keeping it as a standalone item in the same collection.
+     */
+    static async #detachItem(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.item.getChildItem(id);
+        await item?.update({ system: { parentId: null } });
     }
 
     static async #editContainerItem(this: SR5ItemSheet, event: Event) {

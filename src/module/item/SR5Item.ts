@@ -37,6 +37,8 @@ import { ModifiableValueType } from '../types/template/Base';
 import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
 import { allApplicableDocumentEffects } from '../effects';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
+import type { SR5Items } from './SR5Items';
+import { LegacyChildrenFlow } from './flows/LegacyChildrenFlow';
 
 type OneOrMany<T> = T | T[];
 // Former parentId per updated document, stashed on the operation options shared by the whole batch.
@@ -122,11 +124,14 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         source: SR5Item,
         { pack, transform }: { pack?: string; transform: LinkedItemTransformer }
     ): Promise<void> {
+        // An actor-owned copy gets its linked items on the same actor, outside of any folder.
+        const parent = created.isEmbedded ? created.actor ?? undefined : undefined;
+
         // Imports keep ids, so created may be an existing document that was replaced in place.
         // Its former linked items belong to the replaced version and would otherwise pile up.
         const replaced = await created.loadContents();
         if (replaced.size > 0) {
-            await SR5Item.deleteDocuments(Array.from(replaced.keys()), { pack } as any);
+            await SR5Item.deleteDocuments(Array.from(replaced.keys()), { pack, parent } as any);
         }
 
         const contents = await source.loadContents();
@@ -137,9 +142,69 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             parent: created,
             transformAll: transform,
         });
-        for (const data of itemData) data.folder = created.folder?.id ?? null;
+        for (const data of itemData) data.folder = parent ? null : created.folder?.id ?? null;
 
-        await Item.implementation.createDocuments(itemData, { pack, keepId: true });
+        await Item.implementation.createDocuments(itemData, { pack, parent, keepId: true } as any);
+    }
+
+    /**
+     * Point imported children at their imported parents, when an import gave both new ids.
+     *
+     * Parents and children are imported together but each gets a new id on its own, so a child
+     * would otherwise keep the id its parent had in the compendium.
+     */
+    static async relinkImportedItems(items: readonly SR5Item[]): Promise<void> {
+        const idBySourceId = new Map<string, string>();
+        for (const item of items) {
+            const source = item._stats.compendiumSource;
+            const sourceId = source ? foundry.utils.parseUuid(source)?.id : undefined;
+            if (sourceId && item.id) idBySourceId.set(sourceId, item.id);
+        }
+
+        const updates = items.flatMap(item => {
+            const parentId = item.system.parentId;
+            const relinked = parentId ? idBySourceId.get(parentId) : undefined;
+            return item.id && relinked && relinked !== parentId ? [{ _id: item.id, system: { parentId: relinked } }] : [];
+        });
+        if (updates.length > 0) await Item.implementation.updateDocuments(updates as Item.UpdateData[]);
+    }
+
+    /**
+     * A saved duplicate, as the sidebar's Duplicate creates it, brings the items linked below the
+     * original along. Plain clones stay ephemeral copies of this item alone.
+     */
+    override clone<Save extends boolean | undefined = undefined>(
+        data?: Parameters<Item['clone']>[0],
+        context?: foundry.abstract.Document.CloneContext<Save>
+    ): foundry.abstract.Document.Clone<this, Save> {
+        const cloned = super.clone(data, context);
+        if (!context?.save || !context.addSource) return cloned;
+
+        return (async () => {
+            const created = await cloned as SR5Item | undefined;
+            if (created) {
+                await SR5Item.createLinkedContents(created, this, {
+                    pack: created.pack ?? undefined,
+                    transform: item => item.toObject(),
+                });
+            }
+            return created;
+        })() as foundry.abstract.Document.Clone<this, Save>;
+    }
+
+    /**
+     * Create items, turning children still stored in an item's flags into linked items beside it.
+     *
+     * The world migration lifts those children out of world data, but not out of data it never
+     * reaches, like module compendiums or older exports. Without this their children would arrive
+     * hidden in a flag nothing reads anymore.
+     */
+    static override async createDocuments(
+        data: Parameters<typeof Item.createDocuments>[0] = [],
+        operation: Parameters<typeof Item.createDocuments>[1] = {}
+    ) {
+        const expanded = LegacyChildrenFlow.expandCreateData(data as object[], !!operation.keepId);
+        return super.createDocuments(expanded.data as typeof data, { ...operation, keepId: expanded.keepId });
     }
 
     /**
@@ -275,13 +340,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (this.pack && !this.isEmbedded) return this._packChildItems ?? new foundry.utils.Collection<SR5Item>();
         if (!this.id) return new foundry.utils.Collection<SR5Item>();
 
-        const collection = this.isEmbedded ? this.actor?.items : game.items;
-        if (!collection) return new foundry.utils.Collection<SR5Item>();
+        // Both indexes are built once per preparation pass rather than scanning the collection per item.
+        const index = this.isEmbedded ? this.actor?.linkedItems : (game.items as SR5Items | undefined)?.linkedItems;
+        if (!index) return new foundry.utils.Collection<SR5Item>();
 
         return new foundry.utils.Collection<SR5Item>(
-            collection.contents.flatMap(item =>
-                item.id && item.system.parentId === this.id ? [[item.id, item] as [string, SR5Item]] : []
-            )
+            index.childrenOf(this.id).flatMap(item => item.id ? [[item.id, item] as [string, SR5Item]] : [])
         );
     }
 
@@ -348,6 +412,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (!this.isType('container')) return false;
         if (!this.id || !item.id) return false;
         if (this.id === item.id) return false;
+        if (!(SR5.containableItemTypes as readonly string[]).includes(item.type)) return false;
 
         const containers = await this.allContainers();
         if (containers.some(container => container.id === item.id)) return false;
@@ -422,9 +487,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         else if (this.isType('bioware', 'cyberware'))
             WarePrep.prepareBaseData(this.system, this.getEquippedMods());
 
-        if (!this.isEmbedded) {
-            this.prepareRelationshipData();
-        }
+        // Children are prepared before their parent (see SR5Actor.prepareEmbeddedDocuments), so their
+        // values are final when applied here, ahead of this item's own effects in prepareDerivedData.
+        this.prepareRelationshipData();
     }
 
     override prepareDerivedData(this: SR5Item): void {
@@ -979,7 +1044,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     async refreshLinkedData({ render = true } = {}) {
         if (this.pack && !this.isEmbedded) await this.loadPackChildItems();
         this.reset();
-        if (this.isEmbedded) this.prepareRelationshipData();
         if (render) this.render(false);
     }
 
@@ -1336,6 +1400,33 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             return this.system.optional !== 'disabled_option';
         }
         return this.system.technology?.equipped ?? false;
+    }
+
+    /**
+     * Whether this mod or ammo is attached, at any depth, to an item which isn't equipped.
+     *
+     * Only attachments inherit this: items stored in a container keep their own equipped state.
+     * Compendium parents resolve asynchronously and never count as unequipped here.
+     */
+    hasUnequippedAttachmentParent(this: SR5Item): boolean {
+        const visited = new Set<string>();
+
+        for (let parent = this.attachedTo(); parent?.id; parent = parent.attachedTo()) {
+            if (visited.has(parent.id)) return false;
+            if (!parent.isEquipped()) return true;
+            visited.add(parent.id);
+        }
+
+        return false;
+    }
+
+    /**
+     * The item this mod or ammo is attached to, when it resolves synchronously.
+     */
+    private attachedTo(this: SR5Item): SR5Item | undefined {
+        if (!this.isType('modification', 'ammo')) return undefined;
+        const parent = this.parentItem;
+        return parent instanceof Promise ? undefined : parent;
     }
 
     getSource(this: SR5Item): string {
@@ -1822,6 +1913,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     override _onUpdate(...args: Parameters<Item['_onUpdate']>) {
         super._onUpdate(...args);
         const [changed, options, userId] = args;
+
+        // Relinking moves this item between parents, which the world index can't notice on its own.
+        if (!this.isEmbedded && !this.pack && foundry.utils.hasProperty(changed, 'system.parentId')) {
+            (game.items as SR5Items | undefined)?.invalidateLinkedItems();
+        }
 
         // Children sit beside their parent in the sidebar tree, so they have to follow it between folders.
         if (userId === game.user?.id && 'folder' in changed) {

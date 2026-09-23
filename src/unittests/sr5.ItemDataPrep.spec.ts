@@ -132,6 +132,30 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.range.rc.value, 5);
         });
 
+        it('keeps item effects on an actor-owned weapon alongside its linked mods', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [{
+                name: 'Ares Alpha',
+                type: 'weapon',
+                system: { category: 'range', range: { rc: { base: 2 } } },
+                effects: [{
+                    name: 'Weapon modifier',
+                    system: {
+                        targets: [{ id: 'item', applyTo: 'item' }],
+                        changes: [{ key: 'system.range.rc', value: '3', type: 'add', target: 'item' }],
+                    },
+                }],
+            } as any]) as SR5Item<'weapon'>[];
+            await actor.createEmbeddedDocuments('Item', [{
+                name: 'Gas Vent',
+                type: 'modification',
+                system: { parentId: weapon.id, type: 'weapon', technology: { equipped: true }, mod_weapon: { rc: 1 } },
+            } as any]);
+
+            // Base 2, the mod's 1 and the effect's 3: the mod must not reset what the effect added.
+            assert.strictEqual((actor.items.get(weapon.id!) as SR5Item<'weapon'>).system.range.rc.value, 6);
+        });
+
         it('applies rating before ware grade and user cost modifiers', async () => {
             const ware = await factory.createItem({
                 type: 'cyberware',

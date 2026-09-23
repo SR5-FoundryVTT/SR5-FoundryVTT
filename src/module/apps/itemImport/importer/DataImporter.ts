@@ -5,6 +5,7 @@ import { ParseData, Schemas } from "../parser/Types";
 import { ImportHelper as IH } from '../helper/ImportHelper';
 import { ChummerFileXML, CompendiumKey, Constants } from './Constants';
 import CompendiumCollection = foundry.documents.collections.CompendiumCollection;
+import { derivedChildId } from '@/module/utils/ids';
 
 export type BulkImportMode = 'add' | 'update' | 'replace' | 'clean';
 
@@ -145,9 +146,14 @@ export abstract class DataImporter {
                 if (!itemMap.has(key)) itemMap.set(key, []);
                 itemMap.get(key)!.push(item);
                 if ('type' in item && Array.isArray(item._embeddedItems)) {
-                    for (const embeddedItem of item._embeddedItems) {
+                    const usedIds = new Set<string>();
+                    for (const [index, embeddedItem] of item._embeddedItems.entries()) {
                         const linked = foundry.utils.duplicate(embeddedItem) as Item.CreateData;
-                        linked._id = foundry.utils.randomID();
+                        // Derived from the parent rather than random, so importing again writes the
+                        // same children instead of adding another set of them.
+                        const sourceId = foundry.utils.getProperty(linked, 'system.importFlags.sourceid');
+                        const childKey = typeof sourceId === 'string' && sourceId ? sourceId : `${linked.name}#${index}`;
+                        linked._id = derivedChildId(id, childKey, usedIds);
                         foundry.utils.setProperty(linked, 'system.parentId', id);
                         if (item.folder) linked.folder = item.folder;
                         itemMap.get(key)!.push(linked);

@@ -117,6 +117,20 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             assert.isDefined(game.items.get(content.id!));
         });
 
+        it('keeps world children lookups current across create, relink and delete', async () => {
+            const first = await factory.createItem({type: 'container'});
+            const second = await factory.createItem({type: 'container'});
+            const content = await factory.createItem({type: 'ammo', system: { parentId: first.id }} as any);
+            assert.deepEqual(first.childItems.map(item => item.id), [content.id]);
+
+            await content.update({ system: { parentId: second.id } } as any);
+            assert.isEmpty(first.childItems.contents);
+            assert.deepEqual(second.childItems.map(item => item.id), [content.id]);
+
+            await content.delete();
+            assert.isEmpty(second.childItems.contents);
+        });
+
         it('deletes an actor-owned parent together with its attachments', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const [weapon] = await actor.createEmbeddedDocuments('Item', [
@@ -219,6 +233,14 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             assert.isTrue(SR5Item.isAttachment('weapon', 'ammo'));
             assert.isFalse(SR5Item.isAttachment('equipment', 'modification'));
             assert.isFalse(SR5Item.isAttachment('armor', 'ammo'));
+        });
+
+        it('only contains the physical item types an inventory lists', async () => {
+            const container = await factory.createItem({type: 'container'});
+
+            assert.isTrue(await container.canContainItem(await factory.createItem({type: 'equipment'})));
+            assert.isFalse(await container.canContainItem(await factory.createItem({type: 'spell'})), 'spell');
+            assert.isFalse(await container.canContainItem(await factory.createItem({type: 'adept_power'})), 'power');
         });
 
         it('refuses to contain itself, an ancestor, or a tree past the depth limit', async () => {
@@ -355,6 +377,147 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
                 assert.lengthOf(children, 1);
             } finally {
                 if (importedId) await game.items.get(importedId)?.delete();
+                await pack.deleteCompendium();
+            }
+        });
+
+        describe('items still carrying legacy flag children', () => {
+            const legacyWeapon = () => ({
+                name: '#QUENCH Legacy Rifle',
+                type: 'weapon',
+                system: { category: 'range' },
+                flags: { shadowrun5e: { embeddedItems: [
+                    { name: 'Gas Vent', type: 'modification', system: { type: 'weapon' } },
+                    { name: 'APDS', type: 'ammo', system: {} },
+                ] } },
+            });
+
+            const assertLifted = (parent: SR5Item | undefined, children: SR5Item[]) => {
+                assert.exists(parent);
+                assert.notProperty(parent!.flags.shadowrun5e ?? {}, 'embeddedItems');
+                assert.sameMembers(children.map(child => child.type), ['modification', 'ammo']);
+                assert.isTrue(children.every(child => child.system.parentId === parent!.id));
+            };
+
+            it('lifts them into linked world items on creation, leaving the caller data intact', async () => {
+                const data = legacyWeapon();
+                const parent = await factory.createItem(data as any) as SR5Item;
+
+                assertLifted(parent, game.items.filter(item => item.system.parentId === parent.id));
+                assert.lengthOf(data.flags.shadowrun5e.embeddedItems, 2);
+            });
+
+            it('lifts them into linked items when created on an actor', async () => {
+                const actor = await factory.createActor({ type: 'character' });
+                const [parent] = await actor.createEmbeddedDocuments('Item', [legacyWeapon() as any]) as SR5Item[];
+
+                assertLifted(parent, actor.items.filter(item => item.system.parentId === parent.id));
+            });
+
+            it('lifts them into linked items when created in a compendium', async () => {
+                const CompendiumCollection = foundry.documents.collections.CompendiumCollection;
+                const pack = await CompendiumCollection.createCompendium({
+                    type: 'Item',
+                    label: '#QUENCH Legacy',
+                    name: `quench-legacy-${foundry.utils.randomID(8).toLowerCase()}`,
+                    packageType: 'world',
+                } as any) as foundry.documents.collections.CompendiumCollection<'Item'>;
+
+                try {
+                    const [parent] = await SR5Item.createDocuments([legacyWeapon()] as any, { pack: pack.collection });
+                    const documents = await pack.getDocuments() as SR5Item[];
+
+                    assertLifted(parent as SR5Item, documents.filter(item => item.system.parentId === parent!.id));
+                } finally {
+                    await pack.deleteCompendium();
+                }
+            });
+        });
+
+        it('duplicates a world parent together with its linked children', async () => {
+            const weapon = await factory.createItem({ type: 'weapon', system: { category: 'range' } });
+            const ammo = await factory.createItem({ type: 'ammo' });
+            await ammo.update({ system: { parentId: weapon.id } } as any);
+
+            const copy = await weapon.clone({ name: '#QUENCH Copy' }, { save: true, addSource: true }) as SR5Item | undefined;
+            try {
+                assert.exists(copy);
+                assert.notStrictEqual(copy!.id, weapon.id);
+                assert.lengthOf(copy!.childItems.contents, 1, 'the copy has its own ammo');
+                assert.notStrictEqual(copy!.childItems.contents[0].id, ammo.id);
+                assert.lengthOf(weapon.childItems.contents, 1, 'the original keeps its ammo');
+            } finally {
+                await copy?.delete();
+            }
+        });
+
+        it('duplicates an actor-owned parent together with its linked children', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [
+                { name: 'Ares Alpha', type: 'weapon', system: { category: 'range' } },
+            ]) as SR5Item<'weapon'>[];
+            await actor.createEmbeddedDocuments('Item', [
+                { name: 'APDS', type: 'ammo', system: { parentId: weapon.id } },
+            ]);
+
+            const copy = await weapon.clone({ name: 'Ares Alpha (Copy)' }, { save: true, addSource: true }) as SR5Item | undefined;
+
+            assert.strictEqual(copy?.parent, actor);
+            assert.lengthOf(actor.items.filter(item => item.system.parentId === copy!.id), 1);
+        });
+
+        it('copies linked children when an item is imported into a compendium', async () => {
+            const CompendiumCollection = foundry.documents.collections.CompendiumCollection;
+            const pack = await CompendiumCollection.createCompendium({
+                type: 'Item',
+                label: '#QUENCH Export',
+                name: `quench-export-${foundry.utils.randomID(8).toLowerCase()}`,
+                packageType: 'world',
+            } as any) as foundry.documents.collections.CompendiumCollection<'Item'>;
+
+            try {
+                const weapon = await factory.createItem({ type: 'weapon', system: { category: 'range' } });
+                const ammo = await factory.createItem({ type: 'ammo' });
+                await ammo.update({ system: { parentId: weapon.id } } as any);
+
+                const exported = await pack.importDocument(weapon as any) as SR5Item | undefined;
+                const index = await pack.getIndex({ fields: ['system.parentId'] as any });
+                const children = index.filter(entry => foundry.utils.getProperty(entry, 'system.parentId') === exported?.id);
+
+                assert.lengthOf(children, 1);
+            } finally {
+                await pack.deleteCompendium();
+            }
+        });
+
+        it('relinks children to their parents when a whole compendium is imported with new ids', async () => {
+            const CompendiumCollection = foundry.documents.collections.CompendiumCollection;
+            const pack = await CompendiumCollection.createCompendium({
+                type: 'Item',
+                label: '#QUENCH Import All',
+                name: `quench-import-all-${foundry.utils.randomID(8).toLowerCase()}`,
+                packageType: 'world',
+            } as any) as foundry.documents.collections.CompendiumCollection<'Item'>;
+
+            let imported: SR5Item[] = [];
+            try {
+                const [weapon] = await SR5Item.createDocuments([
+                    { name: '#QUENCH Import All Rifle', type: 'weapon', system: { category: 'range' } },
+                ] as any, { pack: pack.collection });
+                await SR5Item.createDocuments([
+                    { name: '#QUENCH Import All APDS', type: 'ammo', system: { parentId: weapon!.id } },
+                ] as any, { pack: pack.collection });
+
+                imported = await pack.importAll({ folderName: '#QUENCH Import All' } as any) as SR5Item[];
+                const parent = imported.find(item => item.type === 'weapon');
+                const child = imported.find(item => item.type === 'ammo');
+
+                assert.notStrictEqual(parent?.id, weapon!.id, 'the import assigned new ids');
+                assert.strictEqual(game.items.get(child!.id!)?.system.parentId, parent?.id);
+            } finally {
+                const folder = imported[0]?.folder;
+                await SR5Item.deleteDocuments(imported.flatMap(item => item.id ? [item.id] : []));
+                await folder?.delete();
                 await pack.deleteCompendium();
             }
         });

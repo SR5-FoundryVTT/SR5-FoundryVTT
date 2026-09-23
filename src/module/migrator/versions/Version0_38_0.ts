@@ -1,20 +1,14 @@
-import { SR5 } from '@/module/config';
 import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { VersionMigration } from '../VersionMigration';
 import { MigrationStorage } from '../MigrationStorage';
-import { FLAGS, SYSTEM_NAME } from '@/module/constants';
+import { LegacyChildrenFlow } from '@/module/item/flows/LegacyChildrenFlow';
 
-const { deepClone, getProperty, randomID, setProperty } = foundry.utils;
+const { randomID } = foundry.utils;
 
 /** Migrate data changes from every branch that ships in 0.38.0. */
 export class Version0_38_0 extends VersionMigration {
     readonly TargetVersion = '0.38.0';
-
-    /** Stamped on children lifted from raw actor source, so they run every migrator in turn. */
-    private static readonly UNMIGRATED_VERSION = '0.0.0';
-
-    private static readonly ID_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
     // Each branch contributing to 0.38.0 keeps its whole flow in its own migrate<Branch> method, called here.
     override migrateItem(item: any): void {
@@ -86,11 +80,11 @@ export class Version0_38_0 extends VersionMigration {
 
         // Derived rather than random, so copies of the same legacy parent agree on their children's ids.
         for (const [index, embeddedItem] of embeddedItems.entries()) {
-            embeddedItem._id ??= Version0_38_0.deterministicId(`${item._id}:#${index}`);
+            embeddedItem._id ??= LegacyChildrenFlow.deterministicId(`${item._id}:#${index}`);
 
             if (Array.isArray(embeddedItem.effects)) {
                 for (const [effectIndex, effect] of embeddedItem.effects.entries()) {
-                    effect._id ??= Version0_38_0.deterministicId(`${embeddedItem._id}:effect#${effectIndex}`);
+                    effect._id ??= LegacyChildrenFlow.deterministicId(`${embeddedItem._id}:effect#${effectIndex}`);
                 }
             }
 
@@ -124,7 +118,7 @@ export class Version0_38_0 extends VersionMigration {
 
         for await (const { pack, documents } of Version0_38_0.worldPacks('Item')) {
             const items = documents.map(document => document.toObject());
-            if (!items.some(item => Version0_38_0.legacyChildren(item).length > 0)) continue;
+            if (!items.some(item => LegacyChildrenFlow.legacyChildren(item).length > 0)) continue;
 
             await MigrationStorage.withUnlockedPack(pack, () => this.liftLegacyChildrenFromItems(items, pack));
         }
@@ -163,9 +157,9 @@ export class Version0_38_0 extends VersionMigration {
         const parents = [...items];
         for (const item of parents) this.consolidateParentId(item);
 
-        const lifted = parents.flatMap(item => this.liftLegacyDescendants(item));
+        const lifted = parents.flatMap(item => LegacyChildrenFlow.liftDescendants(item));
         for (const child of lifted) {
-            Version0_38_0.stampAsUnmigrated(child);
+            LegacyChildrenFlow.stampAsUnmigrated(child);
             this.consolidateParentId(child);
         }
         if (lifted.length > 0) items.push(...lifted);
@@ -176,7 +170,7 @@ export class Version0_38_0 extends VersionMigration {
         const updatedParents: any[] = [];
 
         for (const item of items) {
-            const liftedChildren = this.liftLegacyDescendants(item);
+            const liftedChildren = LegacyChildrenFlow.liftDescendants(item);
             if (liftedChildren.length === 0) continue;
 
             // Keep the lifted tree next to its root parent, as importing linked items does.
@@ -203,58 +197,6 @@ export class Version0_38_0 extends VersionMigration {
         } catch (error) {
             console.error(`Failed clearing legacy attachment flags for ${pack ? pack.collection : 'world items'}.`, error);
         }
-    }
-
-    /**
-     * Move a parent's legacy embedded children out into standalone item data.
-     */
-    private liftLegacyEmbeddedChildren(parent: any): any[] {
-        const embeddedItems = Version0_38_0.legacyChildren(parent);
-        if (embeddedItems.length === 0 || !parent?._id) return [];
-
-        // Bioware and cyberware take 'ware' modifications rather than modifications named after
-        // their own item type, so the parent type can't be used as the modification type directly.
-        const modificationType = SR5.modificationTypeByParentType[parent.type];
-
-        const lifted: any[] = [];
-        const remaining: any[] = [];
-        const usedIds = new Set<string>();
-        for (const [index, child] of embeddedItems.entries()) {
-            const canLift = parent.type === 'container' ||
-                (parent.type === 'weapon' && child.type === 'ammo') ||
-                (child.type === 'modification' && !!modificationType);
-            if (!canLift) {
-                remaining.push(child);
-                continue;
-            }
-
-            const liftedChild = deepClone(child);
-            liftedChild._id = Version0_38_0.liftedChildId(parent._id, child, index, usedIds);
-            setProperty(liftedChild, 'system.parentId', parent._id);
-            if (liftedChild.type === 'modification' && modificationType) setProperty(liftedChild, 'system.type', modificationType);
-            lifted.push(liftedChild);
-        }
-
-        if (remaining.length > 0) setProperty(parent, `flags.${SYSTEM_NAME}.${FLAGS.EmbeddedItems}`, remaining);
-        else if (lifted.length > 0) delete parent.flags?.[SYSTEM_NAME]?.[FLAGS.EmbeddedItems];
-        return lifted;
-    }
-
-    /**
-     * Lift all eligible legacy descendants, preserving each child's direct parent relationship.
-     */
-    private liftLegacyDescendants(parent: any): any[] {
-        const lifted: any[] = [];
-        const pending = [parent];
-
-        while (pending.length > 0) {
-            const current = pending.shift();
-            const children = this.liftLegacyEmbeddedChildren(current);
-            lifted.push(...children);
-            pending.push(...children);
-        }
-
-        return lifted;
     }
 
     /**
@@ -296,87 +238,5 @@ export class Version0_38_0 extends VersionMigration {
         // 0.37.0 named the link `container`; an item with neither is simply unparented.
         const { parentId, container } = item.system;
         item.system.parentId = parentId || (typeof container === 'string' && container ? container : null);
-    }
-
-    /**
-     * Id for a lifted child, derived from its parent and its legacy entry.
-     *
-     * The parent is part of the seed because copies of one legacy entry keep the child's `_id`: two
-     * items holding the same legacy children would otherwise lift them to a single id, which a
-     * keepId create cannot store twice. See deterministicId for why the lifts must agree at all.
-     */
-    private static liftedChildId(parentId: string, child: any, index: number, usedIds: Set<string>): string {
-        const key = typeof child?._id === 'string' && child._id ? child._id : `#${index}`;
-        let id = Version0_38_0.deterministicId(`${parentId}:${key}`);
-        for (let attempt = 1; usedIds.has(id); attempt++) {
-            id = Version0_38_0.deterministicId(`${parentId}:${key}:${attempt}`);
-        }
-        usedIds.add(id);
-        return id;
-    }
-
-    /**
-     * A parent's legacy embedded children, which older worlds stored as an object rather than an array.
-     */
-    private static legacyChildren(parent: any): any[] {
-        const embeddedItems = getProperty(parent, `flags.${SYSTEM_NAME}.${FLAGS.EmbeddedItems}`);
-        if (embeddedItems == null) return [];
-        return Array.isArray(embeddedItems) ? embeddedItems : Object.values(embeddedItems);
-    }
-
-    /**
-     * Mark raw flag data lifted into an actor as owing the complete item migration chain.
-     */
-    private static stampAsUnmigrated(item: any) {
-        setProperty(item, '_stats.systemVersion', Version0_38_0.UNMIGRATED_VERSION);
-        if (!Array.isArray(item.effects)) return;
-
-        for (const effect of item.effects) {
-            effect.type ??= 'base';
-            setProperty(effect, '_stats.systemVersion', Version0_38_0.UNMIGRATED_VERSION);
-        }
-    }
-
-    // =========================================================================
-    //                                   SHARED
-    // =========================================================================
-
-    /**
-     * A 16 character document id hashed from a seed, built from two 53 bit cyrb53 hashes.
-     *
-     * One piece of legacy data is lifted in more than one place. A base actor and an unlinked token's
-     * delta each migrate their own copy of the same parent, and the delta migration has no version
-     * stamp to skip on, so it runs again on every load until a write persists the lifted form.
-     *
-     * Those lifts have to land on the same ids. Foundry merges a delta's items into the base actor's
-     * by `_id`, keeping every base item the delta does not name, so a child lifted under a different
-     * id stops overriding its base counterpart and shows up beside it instead.
-     *
-     * Hashing the source is what keeps them equal without carrying state between the lifts.
-     */
-    private static deterministicId(seed: string): string {
-        const alphabet = Version0_38_0.ID_ALPHABET;
-        let id = '';
-        for (const salt of [0, 0x9e3779b9]) {
-            let hash = Version0_38_0.cyrb53(seed, salt);
-            for (let i = 0; i < 8; i++) {
-                id += alphabet[hash % alphabet.length];
-                hash = Math.floor(hash / alphabet.length);
-            }
-        }
-        return id;
-    }
-
-    private static cyrb53(value: string, seed: number): number {
-        let h1 = 0xdeadbeef ^ seed;
-        let h2 = 0x41c6ce57 ^ seed;
-        for (let i = 0; i < value.length; i++) {
-            const char = value.charCodeAt(i);
-            h1 = Math.imul(h1 ^ char, 2654435761);
-            h2 = Math.imul(h2 ^ char, 1597334677);
-        }
-        h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-        h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-        return 4294967296 * (2097151 & h2) + (h1 >>> 0);
     }
 }

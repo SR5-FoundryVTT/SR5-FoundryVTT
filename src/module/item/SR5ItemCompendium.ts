@@ -18,20 +18,45 @@ interface CompendiumItemEntry {
  */
 export class SR5ItemCompendium extends foundry.applications.sidebar.apps.Compendium<typeof SR5Item> {
     /**
-     * Prepare Item documents loaded from any compendium against their linked children.
+     * Keep linked items with their parents as items move into and out of any compendium.
+     *
+     * - Loaded items are prepared against their linked children.
+     * - Importing an item into a pack copies the items linked below it.
+     * - Importing a whole pack into the world relinks children to their imported parents.
      *
      * Core constructs every CompendiumCollection itself, including packs created at runtime, so
-     * there is no collection class to configure and loading is wrapped once on the prototype.
+     * there is no collection class to configure and these are wrapped once on the prototype.
      */
-    static registerLinkedDocumentLoading() {
+    static registerLinkedDocumentHandling() {
         const prototype = foundry.documents.collections.CompendiumCollection.prototype as any;
+        type AnyPack = foundry.documents.collections.CompendiumCollection<any>;
+
         const getDocuments = prototype.getDocuments;
-        prototype.getDocuments = async function (this: foundry.documents.collections.CompendiumCollection<any>, ...args: unknown[]) {
+        prototype.getDocuments = async function (this: AnyPack, ...args: unknown[]) {
             const documents = await getDocuments.apply(this, args);
             if (this.documentName === 'Item') {
                 await SR5Item.prepareLoadedPackItems(this as foundry.documents.collections.CompendiumCollection<'Item'>, documents);
             }
             return documents;
+        };
+
+        const importDocument = prototype.importDocument;
+        prototype.importDocument = async function (this: AnyPack, document: unknown, ...args: unknown[]) {
+            const created = await importDocument.call(this, document, ...args);
+            if (this.documentName !== 'Item' || !created || !(document instanceof SR5Item)) return created;
+
+            await SR5Item.createLinkedContents(created as SR5Item, document, {
+                pack: this.collection,
+                transform: item => item.toCompendium(this as any, { clearSort: false, keepId: true }),
+            });
+            return created;
+        };
+
+        const importAll = prototype.importAll;
+        prototype.importAll = async function (this: AnyPack, ...args: unknown[]) {
+            const created = await importAll.apply(this, args);
+            if (this.documentName === 'Item') await SR5Item.relinkImportedItems(created);
+            return created;
         };
     }
 
@@ -54,17 +79,8 @@ export class SR5ItemCompendium extends foundry.applications.sidebar.apps.Compend
         const collection = (this as any).collection as foundry.documents.collections.CompendiumCollection<'Item'>;
         const root = entry.clone(updates, { keepId: true });
         root.updateSource({ system: { parentId: null } });
-        const created = (await collection.importDocument(root, { dialog: true } as any))!;
-
-        await SR5Item.createLinkedContents(created as SR5Item, entry, {
-            pack: collection.collection,
-            transform: item => item.toCompendium(collection, {
-                clearSort: false,
-                keepId: true,
-            }),
-        });
-
-        return created;
+        // The clone keeps the entry's id and collection, so importDocument finds and copies its children.
+        return (await collection.importDocument(root, { dialog: true } as any))!;
     }
 
     override async _onRender(...args: Parameters<foundry.applications.sidebar.apps.Compendium['_onRender']>) {
