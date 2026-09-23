@@ -173,7 +173,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                 const band = (await renderCard(test)).querySelector('.card-test-content--status');
                 assert.exists(band?.querySelector('.glitch-content--critical'));
                 assert.include(band?.textContent ?? '', game.i18n.localize('SR5.GlitchCritical'));
-                // The hits chip comes from the shared partial, so it must survive alongside the verdict.
+                // The hits chip shares the band with the verdict, so it must survive alongside it.
                 assert.equal(band?.querySelector('.test-outcome-hits-value')?.textContent, '2');
             });
         });

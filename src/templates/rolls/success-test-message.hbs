@@ -210,28 +210,20 @@
             {{/if}}
         {{/if}}
         <div class="card-test-content card-test-content--status">
-            {{! Hits, the verdict, or both. The test decides which it can name. }}
+            {{! Hits, the verdict and the glitched state share one band. The test decides what it can name. }}
             {{#if test.showsOutcome}}
-            <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}} {{#if test.criticalGlitched}}glitch-content--critical{{/if}}">
+            <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}} {{#if test.criticalGlitched}}glitch-content--critical{{else if test.glitched}}glitch-content--warning{{/if}}">
                 <div class="test-outcome">
                     {{#unless test.autoSuccess}}{{#if test.hasBuyHits}}<i class="test-outcome-bought-hits fa-solid fa-coins" role="img" data-tooltip="SR5.HitsBought" aria-label="{{localize 'SR5.HitsBought'}}"></i>{{/if}}<span class="test-outcome-hits" data-tooltip-source="hits"><span class="test-outcome-hits-value">{{test.outcomeHits.value}}</span> {{localize test.outcomeHits.label}}</span>{{/unless}}
                     {{#if test.outcomeLabel}}
                     <span class="glitch" {{#if (and showGlitchAnimation test.criticalGlitched)}} data-glitch="{{localize test.outcomeLabel}}" {{/if}}>{{localize test.outcomeLabel}}</span>
                     {{/if}}
+                    {{#if (and test.glitched (not test.criticalGlitched))}}
+                    <span class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>{{localize "SR5.Glitch"}}</span>
+                    {{/if}}
                 </div>
             </div>
             {{/if}}
-
-            {{! In any case inform about glitched state }}
-            {{#unless test.criticalGlitched}}
-                {{#if test.glitched}}
-                <div class="glitch-content glitch-content--warning">
-                    <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
-                        {{localize "SR5.Glitch"}}
-                    </div>
-                </div>
-                {{/if}}
-            {{/unless}}
         </div>
         <div class="card-rolls {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
             {{#if test.hasBuyHits}}

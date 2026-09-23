@@ -1177,10 +1177,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Whether the chat card shows an outcome band for this test.
      *
      * A test that determined neither success nor failure still shows its hits, so only an automatic
-     * success without a verdict leaves nothing to say.
+     * success without a verdict or a glitch leaves nothing to say.
      */
     get showsOutcome(): boolean {
-        return (this.canSucceed && this.showSuccessLabel) || (this.canFail && this.failure) || !this.autoSuccess;
+        return (this.canSucceed && this.showSuccessLabel)
+            || (this.canFail && this.failure)
+            || this.glitched || !this.autoSuccess;
     }
 
     /**
