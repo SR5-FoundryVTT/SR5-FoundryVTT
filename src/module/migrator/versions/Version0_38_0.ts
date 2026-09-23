@@ -5,7 +5,7 @@ import { VersionMigration } from '../VersionMigration';
 import { MigrationStorage } from '../MigrationStorage';
 import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 
-const { deepClone, getProperty, hasProperty, randomID, setProperty } = foundry.utils;
+const { deepClone, getProperty, randomID, setProperty } = foundry.utils;
 
 /** Migrate data changes from every branch that ships in 0.38.0. */
 export class Version0_38_0 extends VersionMigration {
@@ -22,10 +22,9 @@ export class Version0_38_0 extends VersionMigration {
         this.migrateItemSheetRework(item);
     }
 
-    /** ContainerItem: the legacy container field becomes the parentId every item now carries. */
-    private migrateContainerItem(item: any): void {
-        this.consolidateParentId(item);
-    }
+    // =========================================================================
+    //                              ITEM SHEET REWORK
+    // =========================================================================
 
     /**
      * ItemSheetRework: ids for flag-stored nested items/effects, technology cost/availability/essence as
@@ -99,6 +98,15 @@ export class Version0_38_0 extends VersionMigration {
         }
     }
 
+    // =========================================================================
+    //                               CONTAINER ITEM
+    // =========================================================================
+
+    /** ContainerItem: the legacy container field becomes the parentId every item now carries. */
+    private migrateContainerItem(item: any): void {
+        this.consolidateParentId(item);
+    }
+
     override migrateActor(actor: any): void {
         if (Array.isArray(actor.items)) this.liftActorItems(actor.items);
     }
@@ -114,11 +122,7 @@ export class Version0_38_0 extends VersionMigration {
     override async MigrateWorld(): Promise<void> {
         await this.liftLegacyChildrenFromItems(game.items.contents.map(item => item.toObject()), null);
 
-        for (const collection of game.packs) {
-            if (collection.documentName !== 'Item' || collection.metadata.packageType !== 'world') continue;
-
-            const pack = collection as foundry.documents.collections.CompendiumCollection<'Item'>;
-            const documents = await pack.getDocuments();
+        for await (const { pack, documents } of Version0_38_0.worldPacks('Item')) {
             const items = documents.map(document => document.toObject());
             if (!items.some(item => Version0_38_0.legacyChildren(item).length > 0)) continue;
 
@@ -130,11 +134,8 @@ export class Version0_38_0 extends VersionMigration {
             if (updates.length > 0) await MigrationStorage.updateTokens(scene, updates);
         }
 
-        for (const collection of game.packs) {
-            if (collection.documentName !== 'Scene' || collection.metadata.packageType !== 'world') continue;
-
-            const pack = collection as foundry.documents.collections.CompendiumCollection<'Scene'>;
-            const pending = (await pack.getDocuments())
+        for await (const { pack, documents } of Version0_38_0.worldPacks('Scene')) {
+            const pending = documents
                 .map(scene => ({ scene, updates: Version0_38_0.deltaTombstoneUpdates(scene) }))
                 .filter(({ updates }) => updates.length > 0);
             if (pending.length === 0) continue;
@@ -142,6 +143,16 @@ export class Version0_38_0 extends VersionMigration {
             await MigrationStorage.withUnlockedPack(pack, async () => {
                 for (const { scene, updates } of pending) await MigrationStorage.updateTokens(scene, updates);
             });
+        }
+    }
+
+    /** World compendiums of one document type, with their documents loaded. */
+    private static async *worldPacks<Name extends 'Item' | 'Scene'>(documentName: Name) {
+        for (const collection of game.packs) {
+            if (collection.documentName !== documentName || collection.metadata.packageType !== 'world') continue;
+
+            const pack = collection as foundry.documents.collections.CompendiumCollection<Name>;
+            yield { pack, documents: await pack.getDocuments() };
         }
     }
 
@@ -158,52 +169,6 @@ export class Version0_38_0 extends VersionMigration {
             this.consolidateParentId(child);
         }
         if (lifted.length > 0) items.push(...lifted);
-    }
-
-    /**
-     * A token which overrode a legacy parent replaced its whole embedded list, so base children
-     * the token had removed must stay hidden now that they are separate base items.
-     */
-    private static deltaTombstoneUpdates(scene: Scene.Implementation): any[] {
-        const updates: any[] = [];
-
-        for (const token of scene.tokens) {
-            const baseActor = token.baseActor;
-            if (token.actorLink || !baseActor) continue;
-
-            const data = token.toObject() as any;
-            const deltaItems: any[] = data.delta?.items ?? [];
-            const deltaIds = new Set(deltaItems.map(item => item._id));
-
-            const tombstones: any[] = [];
-            for (const deltaItem of deltaItems) {
-                if (deltaItem._tombstone || !baseActor.items.has(deltaItem._id)) continue;
-
-                for (const baseChild of baseActor.items) {
-                    if (baseChild.system.parentId !== deltaItem._id || deltaIds.has(baseChild.id)) continue;
-                    tombstones.push({ _id: baseChild.id, _tombstone: true });
-                    deltaIds.add(baseChild.id);
-                }
-            }
-            if (tombstones.length === 0) continue;
-
-            data.delta.items.push(...tombstones);
-            data.delta._id ??= token.id;
-            updates.push(data);
-        }
-
-        return updates;
-    }
-
-    private consolidateParentId(item: any) {
-        if (!item?.system || typeof item.system !== 'object') return;
-
-        const parentId = getProperty(item.system, 'parentId');
-        const container = getProperty(item.system, 'container');
-        if ((parentId === null || parentId === undefined || parentId === '') && typeof container === 'string' && container) {
-            setProperty(item.system, 'parentId', container);
-        }
-        if (!hasProperty(item.system, 'parentId')) setProperty(item.system, 'parentId', null);
     }
 
     private async liftLegacyChildrenFromItems(items: any[], pack: foundry.documents.collections.CompendiumCollection<'Item'> | null) {
@@ -293,6 +258,47 @@ export class Version0_38_0 extends VersionMigration {
     }
 
     /**
+     * A token which overrode a legacy parent replaced its whole embedded list, so base children
+     * the token had removed must stay hidden now that they are separate base items.
+     */
+    private static deltaTombstoneUpdates(scene: Scene.Implementation): any[] {
+        const updates: any[] = [];
+
+        for (const token of scene.tokens) {
+            const baseActor = token.baseActor;
+            if (token.actorLink || !baseActor) continue;
+
+            const data = token.toObject() as any;
+            const deltaItems: any[] = data.delta?.items ?? [];
+            const deltaIds = new Set(deltaItems.map(item => item._id));
+
+            // The delta replaced these parents' whole embedded list, so their base children must stay hidden.
+            const overridden = new Set(deltaItems
+                .filter(item => !item._tombstone && baseActor.items.has(item._id))
+                .map(item => item._id));
+
+            const tombstones = baseActor.items
+                .filter(child => overridden.has(child.system.parentId) && !deltaIds.has(child.id))
+                .map(child => ({ _id: child.id, _tombstone: true }));
+            if (tombstones.length === 0) continue;
+
+            data.delta.items.push(...tombstones);
+            data.delta._id ??= token.id;
+            updates.push(data);
+        }
+
+        return updates;
+    }
+
+    private consolidateParentId(item: any) {
+        if (!item?.system || typeof item.system !== 'object') return;
+
+        // 0.37.0 named the link `container`; an item with neither is simply unparented.
+        const { parentId, container } = item.system;
+        item.system.parentId = parentId || (typeof container === 'string' && container ? container : null);
+    }
+
+    /**
      * Id for a lifted child, derived from its parent and its legacy entry.
      *
      * The same legacy data can be lifted more than once: in memory on every load of an unsaved
@@ -300,7 +306,7 @@ export class Version0_38_0 extends VersionMigration {
      * same parent. Deriving the id keeps those lifts identical, so delta children override the base
      * children they came from and repeated lifts never produce duplicates.
      */
-    static liftedChildId(parentId: string, child: any, index: number, usedIds: Set<string>): string {
+    private static liftedChildId(parentId: string, child: any, index: number, usedIds: Set<string>): string {
         const key = typeof child?._id === 'string' && child._id ? child._id : `#${index}`;
         let id = Version0_38_0.deterministicId(`${parentId}:${key}`);
         for (let attempt = 1; usedIds.has(id); attempt++) {
@@ -311,9 +317,39 @@ export class Version0_38_0 extends VersionMigration {
     }
 
     /**
-     * A 16 character document id hashed from a seed, built from two 53 bit cyrb53 hashes.
+     * A parent's legacy embedded children, which older worlds stored as an object rather than an array.
      */
-    static deterministicId(seed: string): string {
+    private static legacyChildren(parent: any): any[] {
+        const embeddedItems = getProperty(parent, `flags.${SYSTEM_NAME}.${FLAGS.EmbeddedItems}`);
+        if (embeddedItems == null) return [];
+        return Array.isArray(embeddedItems) ? embeddedItems : Object.values(embeddedItems);
+    }
+
+    /**
+     * Mark raw flag data lifted into an actor as owing the complete item migration chain.
+     */
+    private static stampAsUnmigrated(item: any) {
+        setProperty(item, '_stats.systemVersion', Version0_38_0.UNMIGRATED_VERSION);
+        if (!Array.isArray(item.effects)) return;
+
+        for (const effect of item.effects) {
+            effect.type ??= 'base';
+            setProperty(effect, '_stats.systemVersion', Version0_38_0.UNMIGRATED_VERSION);
+        }
+    }
+
+    // =========================================================================
+    //                                   SHARED
+    // =========================================================================
+
+    /**
+     * A 16 character document id hashed from a seed, built from two 53 bit cyrb53 hashes.
+     *
+     * Both branches derive ids from this: ContainerItem for lifted children, ItemSheetRework for the
+     * nested items still stored in flags. Copies of the same legacy parent then agree on their
+     * children's ids, which is what lets a token delta override the base children it came from.
+     */
+    private static deterministicId(seed: string): string {
         const alphabet = Version0_38_0.ID_ALPHABET;
         let id = '';
         for (const salt of [0, 0x9e3779b9]) {
@@ -337,27 +373,5 @@ export class Version0_38_0 extends VersionMigration {
         h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
         h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
         return 4294967296 * (2097151 & h2) + (h1 >>> 0);
-    }
-
-    /**
-     * A parent's legacy embedded children, which older worlds stored as an object rather than an array.
-     */
-    private static legacyChildren(parent: any): any[] {
-        const embeddedItems = getProperty(parent, `flags.${SYSTEM_NAME}.${FLAGS.EmbeddedItems}`);
-        if (embeddedItems == null) return [];
-        return Array.isArray(embeddedItems) ? embeddedItems : Object.values(embeddedItems);
-    }
-
-    /**
-     * Mark raw flag data lifted into an actor as owing the complete item migration chain.
-     */
-    private static stampAsUnmigrated(item: any) {
-        setProperty(item, '_stats.systemVersion', Version0_38_0.UNMIGRATED_VERSION);
-        if (!Array.isArray(item.effects)) return;
-
-        for (const effect of item.effects) {
-            effect.type ??= 'base';
-            setProperty(effect, '_stats.systemVersion', Version0_38_0.UNMIGRATED_VERSION);
-        }
     }
 }
