@@ -753,38 +753,34 @@
         // Adjacent bands stack flush: the seam collapses and the lower band drops its
         // top border, so the two edges read as one hairline. Corners square where
         // bands meet, leaving a run rounded only at its ends.
-        $card-bands: '.card-content', '.card-test-content', '.card-description';
+        $card-band: '.card-content, .card-test-content, .card-description';
 
-        @each $band in $card-bands {
-            // The run opens flush against the header block above it.
-            .card-main-content > #{$band}:first-child {
-                margin-top: 0;
-                border-top: none;
-                border-top-left-radius: 0;
-                border-top-right-radius: 0;
-            }
+        // The run opens flush against the header block above it.
+        .card-main-content > :is(#{$card-band}):first-child {
+            margin-top: 0;
+            border-top: none;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
 
-            // The status band has no box of its own; its chips carry the border.
-            #{$band} + .card-test-content .glitch-content {
-                border-top: none;
-                border-top-left-radius: 0;
-                border-top-right-radius: 0;
-            }
+        :is(#{$card-band}):has(+ :is(#{$card-band})) {
+            margin-bottom: 0;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
 
-            @each $next in $card-bands {
-                #{$band}:has(+ #{$next}) {
-                    margin-bottom: 0;
-                    border-bottom-left-radius: 0;
-                    border-bottom-right-radius: 0;
-                }
+        :is(#{$card-band}) + :is(#{$card-band}) {
+            margin-top: 0;
+            border-top: none;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
 
-                #{$band} + #{$next} {
-                    margin-top: 0;
-                    border-top: none;
-                    border-top-left-radius: 0;
-                    border-top-right-radius: 0;
-                }
-            }
+        // The status band has no box of its own; its chips carry the border.
+        :is(#{$card-band}) + .card-test-content .glitch-content {
+            border-top: none;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
         }
 
         .card-test-content {

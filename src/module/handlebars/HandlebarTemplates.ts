@@ -130,7 +130,8 @@ export const preloadHandlebarsTemplates = async () => {
         // Test chat messages and their parts
         'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs',
-        'systems/shadowrun5e/dist/templates/rolls/parts/test-outcome-hits.hbs',
+        // Shared by the chat card and the test dialog.
+        'systems/shadowrun5e/dist/templates/rolls/parts/test-code-terms.hbs',
 
         // Application - Compendium Browser
         'systems/shadowrun5e/dist/templates/apps/compendium-browser/settings-folder.hbs',

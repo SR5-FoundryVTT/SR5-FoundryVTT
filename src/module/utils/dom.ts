@@ -18,3 +18,19 @@ export function isElementInstance<T extends ElementConstructor>(value: unknown, 
     if (!value || typeof value !== 'object') return false;
     return foundry.utils.isElementInstanceOf(value as HTMLElement, cls);
 }
+
+/**
+ * Let an element be activated with Enter or Space, the way a native button is.
+ *
+ * An element given `role="button"` announces itself as one, but only `<button>` gets keyboard
+ * activation from the browser, so anything relying on a click handler needs this as well.
+ *
+ * @param element The element to make activatable. Its existing click handlers do the work.
+ */
+export function activateOnKey(element: HTMLElement) {
+    element.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        element.click();
+    });
+}

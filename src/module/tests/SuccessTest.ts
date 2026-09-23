@@ -24,6 +24,7 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
 import { LinksHelpers } from '../utils/links';
+import { activateOnKey } from '../utils/dom';
 import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType, ResultActionType } from '../types/item/Action';
 import { ValueFieldType } from '../types/template/Base';
 import { DeepPartial } from "fvtt-types/utils";
@@ -455,11 +456,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     traceSourceForChange(change: ValueFieldType['changes'][number]): string | undefined {
         const traces = this.data.codeTermTraces ?? [];
 
-        const traceIndex = traces.findLastIndex(trace =>
+        // The last matching trace is the most recently updated one.
+        return traces.findLast(trace =>
             trace.valueField.label === change.name && trace.valueField.value === change.value
-        );
-
-        return traceIndex >= 0 ? traces[traceIndex].tooltipSource : undefined;
+        )?.tooltipSource;
     }
 
     /** Build rulebook-style formula terms; totals are shown separately. */
@@ -915,6 +915,19 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
+     * The resolved values the chat card offers as clickable parameters, in reading order.
+     *
+     * Each source doubles as the key its modifier breakdown is looked up under.
+     */
+    get cardParameters(): { source: string, value: ValueFieldType }[] {
+        const parameters = [{ source: 'pool', value: this.pool }];
+        if (this.hasLimit) parameters.push({ source: 'limit', value: this.limit });
+        if (this.hasThreshold) parameters.push({ source: 'threshold', value: this.threshold });
+
+        return parameters;
+    }
+
+    /**
      * Helper to determine if this success test has a damage value.
      */
     get hasDamage(): boolean {
@@ -1158,6 +1171,30 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     get failureLabel(): Translation {
         if (this.extended) return SuccessTest.NO_VERDICT_LABEL;
         return 'SR5.TestResults.Failure';
+    }
+
+    /**
+     * Whether the chat card shows an outcome band for this test.
+     *
+     * A test that determined neither success nor failure still shows its hits, so only an automatic
+     * success without a verdict leaves nothing to say.
+     */
+    get showsOutcome(): boolean {
+        return (this.canSucceed && this.showSuccessLabel) || (this.canFail && this.failure) || !this.autoSuccess;
+    }
+
+    /**
+     * What the outcome band calls this result.
+     *
+     * A critical glitch overrules the verdict, and some tests can't name one at all.
+     *
+     * @returns The label to show, or nothing when the band shows hits alone.
+     */
+    get outcomeLabel(): Translation | undefined {
+        if (this.criticalGlitched) return 'SR5.GlitchCritical';
+        if (this.canSucceed && this.showSuccessLabel) return this.successLabel;
+        if (this.canFail && this.failure && this.showsFailureOutcome) return this.failureLabel;
+        return undefined;
     }
 
     /**
@@ -2051,17 +2088,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         await this._hydrateValueModifierTooltips(message, html);
 
         $(html).find('.test-parameter').on('click', this._chatToggleParameterDetails.bind(this));
-        $(html).find('.test-parameter').on('keydown', (event) => {
-            if (event.key !== 'Enter' && event.key !== ' ') return;
-            event.preventDefault();
-            event.currentTarget.click();
-        });
         $(html).find('.modifier-source-link').on('click', this._chatOpenModifierSource.bind(this));
-        $(html).find('.modifier-source-link').on('keydown', (event) => {
-            if (event.key !== 'Enter' && event.key !== ' ') return;
-            event.preventDefault();
-            event.currentTarget.click();
-        });
+        // Both render as buttons without being one.
+        for (const element of $(html).find<HTMLElement>('.test-parameter, .modifier-source-link').toArray())
+            activateOnKey(element);
+
         $(html).find('.show-roll').on('click', this._chatToggleCardRolls.bind(this));
         $(html).find('.show-description').on('click', this._chatToggleCardDescription.bind(this));
         $(html).find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet.bind(Helpers));
@@ -2164,12 +2195,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     /** Values keyed by tooltip source. */
     private static _valueModifierSourcesForTest(test: SuccessTest): Record<string, ValueFieldType | undefined> {
-        const tooltipValues: Record<string, ValueFieldType | undefined> = {
-            pool: test.pool,
-            limit: test.hasLimit ? test.limit : undefined,
-            threshold: test.hasThreshold ? test.threshold : undefined,
-            hits: test.outcomeHits,
-        };
+        const tooltipValues: Record<string, ValueFieldType | undefined> = { hits: test.outcomeHits };
+
+        // Take the card's own chips, so a chip can't be shown without its breakdown.
+        for (const parameter of test.cardParameters)
+            tooltipValues[parameter.source] = parameter.value;
 
         const traces = test.data.codeTermTraces ?? [];
         for (const trace of traces)
@@ -2191,35 +2221,41 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return Object.fromEntries(entries);
     }
 
+    /** Render a value's modifiers as a hover tooltip. */
     static async _buildValueModifierTooltipHtml(
         value: ValueFieldType,
         options: ValueModifierTooltipOptions = {}
     ): Promise<string | undefined> {
-        const tooltipHtml = await foundry.applications.handlebars.renderTemplate(
-            SheetFlow.templateBase('common/modifiers-tooltip'),
-            { value, card: options.card }
-        );
-
-        const content = tooltipHtml.trim();
-        if (!content.length) return undefined;
-        if (!content.includes('value-modifier-name')) return undefined;
-
-        return content;
+        return this._renderValueModifiers('common/modifiers-tooltip', value, options);
     }
 
-    /** Render an inline modifier panel. */
+    /** Render a value's modifiers as an inline panel. */
     static async _buildValueModifierPanelHtml(
         value: ValueFieldType,
         options: ValueModifierTooltipOptions = {},
         traceSources: (string | undefined)[] = []
     ): Promise<string | undefined> {
-        const panelHtml = await foundry.applications.handlebars.renderTemplate(
-            SheetFlow.templateBase('common/value-modifiers-panel'),
+        return this._renderValueModifiers('common/value-modifiers-panel', value, options, traceSources);
+    }
+
+    /**
+     * Render one of the modifier breakdown templates, both of which wrap the same rows.
+     *
+     * @returns The rendered html, or nothing when the value has no modifier to show.
+     */
+    private static async _renderValueModifiers(
+        template: string,
+        value: ValueFieldType,
+        options: ValueModifierTooltipOptions = {},
+        traceSources: (string | undefined)[] = []
+    ): Promise<string | undefined> {
+        const html = await foundry.applications.handlebars.renderTemplate(
+            SheetFlow.templateBase(template),
             { value, card: options.card, traceSources }
         );
 
-        const content = panelHtml.trim();
-        // Avoid empty panels.
+        const content = html.trim();
+        // The wrapper always renders; only a row carries a name.
         if (!content.includes('value-modifier-name')) return undefined;
 
         return content;

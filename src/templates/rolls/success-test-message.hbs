@@ -49,17 +49,15 @@
             <div class="test-line">
                 <span class="test-code">
                     {{#if test.codeTerms.pool.length}}
-                        {{#each test.codeTerms.pool as |term|}}
-                            <span class="test-code-term">{{term.text}}</span>{{#unless @last}} + {{/unless}}
-                        {{/each}}
+                        {{> 'systems/shadowrun5e/dist/templates/rolls/parts/test-code-terms.hbs' terms=test.codeTerms.pool}}
                     {{else}}
                         <span class="test-code-term">{{test.pool.value}}</span>
                     {{/if}}
                     {{#if (and test.hasLimit test.codeTerms.limit.length)}}
-                        [{{#each test.codeTerms.limit as |term|}}<span class="test-code-term">{{term.text}}</span>{{#unless @last}} + {{/unless}}{{/each}}]
+                        [{{> 'systems/shadowrun5e/dist/templates/rolls/parts/test-code-terms.hbs' terms=test.codeTerms.limit}}]
                     {{/if}}
                     {{#if (and test.hasThreshold test.codeTerms.threshold.length)}}
-                        ({{#each test.codeTerms.threshold as |term|}}<span class="test-code-term">{{term.text}}</span>{{#unless @last}} + {{/unless}}{{/each}})
+                        ({{> 'systems/shadowrun5e/dist/templates/rolls/parts/test-code-terms.hbs' terms=test.codeTerms.threshold}})
                     {{/if}}
                 </span>
             </div>
@@ -68,31 +66,15 @@
         {{#unless test.autoSuccess}}
         {{!-- Resolved pool, limit, and threshold values. --}}
         <div class="card-content card-content--parameters {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
-            <span class="test-parameter" data-tooltip-source="pool"
+            {{#each test.cardParameters as |parameter|}}
+            <span class="test-parameter" data-tooltip-source="{{parameter.source}}"
                   role="button" tabindex="0" aria-expanded="false">
                 <span class="test-parameter-content">
-                    <span class="test-parameter-label">{{localize test.pool.label}}</span>
-                    <span class="test-parameter-value">{{test.pool.value}}</span>
+                    <span class="test-parameter-label">{{localize parameter.value.label}}</span>
+                    <span class="test-parameter-value">{{parameter.value.value}}</span>
                 </span>
             </span>
-            {{#if test.hasLimit}}
-            <span class="test-parameter" data-tooltip-source="limit"
-                  role="button" tabindex="0" aria-expanded="false">
-                <span class="test-parameter-content">
-                    <span class="test-parameter-label">{{localize test.limit.label}}</span>
-                    <span class="test-parameter-value">{{test.limit.value}}</span>
-                </span>
-            </span>
-            {{/if}}
-            {{#if test.hasThreshold}}
-            <span class="test-parameter" data-tooltip-source="threshold"
-                  role="button" tabindex="0" aria-expanded="false">
-                <span class="test-parameter-content">
-                    <span class="test-parameter-label">{{localize test.threshold.label}}</span>
-                    <span class="test-parameter-value">{{test.threshold.value}}</span>
-                </span>
-            </span>
-            {{/if}}
+            {{/each}}
             {{! Modifier breakdowns are added during hydration. }}
             <div class="test-parameter-details"></div>
         </div>
@@ -228,54 +210,16 @@
             {{/if}}
         {{/if}}
         <div class="card-test-content card-test-content--status">
-            {{! Show hits when no verdict is available. }}
-            {{#unless test.showSuccessLabel}}
-                {{#unless test.failure}}
-                    {{#unless test.autoSuccess}}
-                    <div class="glitch-content clickable show-roll {{#if test.criticalGlitched}}glitch-content--critical{{/if}}">
-                        <div class="test-outcome">
-                            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/test-outcome-hits.hbs'}}
-                            {{#if test.criticalGlitched}}
-                            <span class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>{{localize "SR5.GlitchCritical"}}</span>
-                            {{/if}}
-                        </div>
-                    </div>
-                    {{/unless}}
-                {{/unless}}
-            {{/unless}}
-
-            {{! Some tests will determine an outcome and success state }}
-            {{#if test.canSucceed}}
-                {{#if test.showSuccessLabel}}
-                <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}} {{#if test.criticalGlitched}}glitch-content--critical{{/if}}">
-                    <div class="test-outcome">
-                        {{#unless test.autoSuccess}}{{> 'systems/shadowrun5e/dist/templates/rolls/parts/test-outcome-hits.hbs'}}{{/unless}}
-                        {{#if test.criticalGlitched}}
-                        <span class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>{{localize "SR5.GlitchCritical"}}</span>
-                        {{else}}
-                        <span class="glitch">{{localize test.successLabel}}</span>
-                        {{/if}}
-                    </div>
+            {{! Hits, the verdict, or both. The test decides which it can name. }}
+            {{#if test.showsOutcome}}
+            <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}} {{#if test.criticalGlitched}}glitch-content--critical{{/if}}">
+                <div class="test-outcome">
+                    {{#unless test.autoSuccess}}{{#if test.hasBuyHits}}<i class="test-outcome-bought-hits fa-solid fa-coins" role="img" data-tooltip="SR5.HitsBought" aria-label="{{localize 'SR5.HitsBought'}}"></i>{{/if}}<span class="test-outcome-hits" data-tooltip-source="hits"><span class="test-outcome-hits-value">{{test.outcomeHits.value}}</span> {{localize test.outcomeHits.label}}</span>{{/unless}}
+                    {{#if test.outcomeLabel}}
+                    <span class="glitch" {{#if (and showGlitchAnimation test.criticalGlitched)}} data-glitch="{{localize test.outcomeLabel}}" {{/if}}>{{localize test.outcomeLabel}}</span>
+                    {{/if}}
                 </div>
-                {{/if}}
-            {{/if}}
-
-            {{! Some tests will determine a failure state }}
-            {{#if test.canFail}}
-                {{#if test.failure}}
-                <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}} {{#if test.criticalGlitched}}glitch-content--critical{{/if}}">
-                    <div class="test-outcome">
-                        {{#unless test.autoSuccess}}{{> 'systems/shadowrun5e/dist/templates/rolls/parts/test-outcome-hits.hbs'}}{{/unless}}
-                        {{#if test.criticalGlitched}}
-                        <span class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>{{localize "SR5.GlitchCritical"}}</span>
-                        {{else}}
-                            {{#if test.showsFailureOutcome}}
-                            <span class="glitch">{{localize test.failureLabel}}</span>
-                            {{/if}}
-                        {{/if}}
-                    </div>
-                </div>
-                {{/if}}
+            </div>
             {{/if}}
 
             {{! In any case inform about glitched state }}
