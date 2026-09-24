@@ -625,22 +625,25 @@
         "EnvModifiersApplication": {
             "ClearModifiers": "Limpar modificadores pessoais",
             "Extreme": "Combinação de duas ou mais condições no nível pesado",
+            "Glare": {
+                "Good": "Sem Clarão",
+                "Heavy": "Clarão Cegante",
+                "Light": "Clarão Fraco",
+                "Moderate": "Clarão Moderado",
+                "Title": "Clarão"
+            },
+            "Light": {
+                "Good": "Luz Total",
+                "Heavy": "Escuridão Total",
+                "Light": "Luz Parcial",
+                "Moderate": "Luz Fraca",
+                "Title": "Luz"
+            },
             "LightGlare": {
-                "Good": "Luz Total/Sem Clarão",
-                "Heavy": "Escuridão Total/Clarão Cegante",
-                "Light": "Luz Parcial/Clarão Fraco",
-                "Moderate": "Luz Fraca/Clarão Moderado",
-                "Title": "Luz/Clarão"
+                "Hint": "Luz e clarão compartilham uma coluna: apenas o pior dos dois conta."
             },
             "Modifier": {
                 "Title": "Modificador"
-            },
-            "Range": {
-                "Good": "Curto",
-                "Heavy": "Extremo",
-                "Light": "Médio",
-                "Moderate": "Longo",
-                "Title": "Alcance"
             },
             "Title": "Modificadores Ambientais",
             "Total": "Resultado",
@@ -1387,6 +1390,7 @@
             "DefenseRanged": "Defesa (Distância)",
             "Drain": "Dreno",
             "Environmental": "Ambiental",
+            "EnvironmentalGlare": "Ambiental (Clarão)",
             "EnvironmentalLight": "Ambiental (Luz)",
             "EnvironmentalRange": "Ambiental (Alcance)",
             "EnvironmentalVisibility": "Ambiental (Visibilidade)",
@@ -2187,9 +2191,14 @@
                     "Contribution": "Visibilidade regional"
                 },
                 "Light": {
-                    "Label": "Luz / Ofuscamento",
-                    "Hint": "Condição de luz ou ofuscamento dentro desta Região.",
-                    "Contribution": "Luz / ofuscamento regional"
+                    "Label": "Luz",
+                    "Hint": "Condição de luz dentro desta Região.",
+                    "Contribution": "Luz regional"
+                },
+                "Glare": {
+                    "Label": "Ofuscamento",
+                    "Hint": "Condição de ofuscamento dentro desta Região.",
+                    "Contribution": "Ofuscamento regional"
                 },
                 "Wind": {
                     "Label": "Vento",

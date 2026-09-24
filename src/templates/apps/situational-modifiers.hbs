@@ -52,6 +52,12 @@
             <span>{{regionalModifiers.environmental.light}}</span>
         </div>
         {{/if}}
+        {{#if regionalModifiers.environmental.glare}}
+        <div class="form-group">
+            <label>{{localize "SR5.Vision.EnvironmentalRegions.Glare.Contribution"}}</label>
+            <span>{{regionalModifiers.environmental.glare}}</span>
+        </div>
+        {{/if}}
         {{#if regionalModifiers.environmental.wind}}
         <div class="form-group">
             <label>{{localize "SR5.Vision.EnvironmentalRegions.Wind.Contribution"}}</label>

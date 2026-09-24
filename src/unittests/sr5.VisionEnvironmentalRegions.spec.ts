@@ -25,6 +25,7 @@ const environment = (
     matrixNoise: 0,
     visibility: 'none',
     light: 'none',
+    glare: 'none',
     wind: 'none',
     ...overrides,
 });
@@ -112,7 +113,7 @@ export const shadowrunVisionEnvironmentalRegions = (context: QuenchBatchContext)
             assert.deepEqual(EnvironmentalRegionFlow.ratingsAtToken(token), {
                 backgroundCount: 5,
                 matrixNoise: 7,
-                physical: { visibility: -3, light: -1, wind: -6 },
+                physical: { visibility: -3, light: -1, glare: 0, wind: -6 },
             });
         });
 
@@ -148,6 +149,20 @@ export const shadowrunVisionEnvironmentalRegions = (context: QuenchBatchContext)
             const modifiers = actor.getSituationModifiers(token);
             assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), 0);
             assert.strictEqual(modifiers.environmental.applied.active.light, 0);
+        });
+
+        it('lets senses compensate regional light but not glare', async () => {
+            const scene = await createScene();
+            const actor = await factory.createActor({ type: 'character', system: { metatype: 'elf' } });
+            const token = await createToken(scene, actor.id, 100, 100);
+            const { behavior } = await createRegion(scene, environment({ light: 'moderate' }));
+
+            const modifiers = actor.getSituationModifiers(token);
+            assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), 0, 'elves see in dim light');
+
+            await behavior.update({ system: { light: 'none', glare: 'moderate' } });
+            assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), -3, 'low-light does not help against glare');
+            assert.strictEqual(modifiers.environmental.applied.active.glare, -3);
         });
 
         it('uses the exact source token and does not persist ratings to a linked actor', async () => {
@@ -256,7 +271,7 @@ export const shadowrunVisionEnvironmentalRegions = (context: QuenchBatchContext)
 
             assert.deepInclude(EnvironmentalRegionFlow.ratingsAtToken(onBaseLevel), {
                 backgroundCount: 4,
-                physical: { visibility: -6, light: 0, wind: 0 },
+                physical: { visibility: -6, light: 0, glare: 0, wind: 0 },
             });
             assert.strictEqual(EnvironmentalRegionFlow.ratingsAtToken(inHole).backgroundCount, 0);
             assert.strictEqual(EnvironmentalRegionFlow.ratingsAtToken(belowRegion).backgroundCount, 0);

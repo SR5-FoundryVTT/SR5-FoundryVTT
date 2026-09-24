@@ -244,6 +244,8 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
     override async _prepareContext(options: Parameters<ApplicationV2['_prepareContext']>[0]): Promise<SituationalModifiersTemplateData> {
         // Update all modifiers before displaying.
         this.modifiers.applyAll();
+        // Range is chosen per attack in the attack dialog, so it's left out here.
+        this.modifiers.environmental.apply({ reapply: true, applicable: ['visibility', 'light', 'glare', 'wind', 'value'] });
 
         const baseData = await super._prepareContext(options);
 

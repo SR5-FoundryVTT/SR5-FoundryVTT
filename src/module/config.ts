@@ -873,6 +873,7 @@ export const SR5 = {
         drain: 'SR5.ModifierTypes.Drain',
         environmental: 'SR5.ModifierTypes.Environmental',
         'environmental.light': 'SR5.ModifierTypes.EnvironmentalLight',
+        'environmental.glare': 'SR5.ModifierTypes.EnvironmentalGlare',
         'environmental.visibility': 'SR5.ModifierTypes.EnvironmentalVisibility',
         'environmental.wind': 'SR5.ModifierTypes.EnvironmentalWind',
         'environmental.range': 'SR5.ModifierTypes.EnvironmentalRange',

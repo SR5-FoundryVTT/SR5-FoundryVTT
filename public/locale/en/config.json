@@ -1199,22 +1199,25 @@
         "EnvModifiersApplication": {
             "ClearModifiers": "Clear personal modifiers",
             "Extreme": "Combination of two or more conditions at the heavy level",
+            "Glare": {
+                "Good": "No Glare",
+                "Heavy": "Blinding Glare",
+                "Light": "Weak Glare",
+                "Moderate": "Moderate Glare",
+                "Title": "Glare"
+            },
+            "Light": {
+                "Good": "Full Light",
+                "Heavy": "Total Darkness",
+                "Light": "Partial Light",
+                "Moderate": "Dim Light",
+                "Title": "Light"
+            },
             "LightGlare": {
-                "Good": "Full Light/No Glare",
-                "Heavy": "Total Darkness/Blinding Glare",
-                "Light": "Partial Light/Weak Glare",
-                "Moderate": "Dim Light/Moderate Glare",
-                "Title": "Light/Glare"
+                "Hint": "Light and glare share one column: only the worse of both counts."
             },
             "Modifier": {
                 "Title": "Modifier"
-            },
-            "Range": {
-                "Good": "Short",
-                "Heavy": "Extreme",
-                "Light": "Medium",
-                "Moderate": "Long",
-                "Title": "Range"
             },
             "Title": "Environmental Modifiers",
             "Total": "Result",
@@ -2209,6 +2212,7 @@
             "DifferentGrid": "Different Grid",
             "Drain": "Drain",
             "Environmental": "Environmental",
+            "EnvironmentalGlare": "Environmental (Glare)",
             "EnvironmentalLight": "Environmental (Light)",
             "EnvironmentalRange": "Environmental (Range)",
             "EnvironmentalVisibility": "Environmental (Visibility)",
@@ -3445,9 +3449,14 @@
                     "Contribution": "Regional visibility"
                 },
                 "Light": {
-                    "Label": "Light / Glare",
-                    "Hint": "Light or glare condition inside this Region.",
-                    "Contribution": "Regional light / glare"
+                    "Label": "Light",
+                    "Hint": "Light condition inside this Region.",
+                    "Contribution": "Regional light"
+                },
+                "Glare": {
+                    "Label": "Glare",
+                    "Hint": "Glare condition inside this Region.",
+                    "Contribution": "Regional glare"
                 },
                 "Wind": {
                     "Label": "Wind",

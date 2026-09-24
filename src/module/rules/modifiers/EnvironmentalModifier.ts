@@ -1,18 +1,18 @@
 import { SR } from '../../constants';
 import { SituationModifier, SituationalModifierApplyOptions } from './SituationModifier';
+import type { RegionalPhysicalEnvironment } from '@/module/vision/environmentalRegions/EnvironmentalRegionFlow';
 import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifiersSourceData = Shadowrun.EnvironmentalModifiersSourceData;
 import EnvironmentalModifiersData = Shadowrun.EnvironmentalModifiersData;
 
 /**
-  * Rules application of situation modifieres for matrix.
+ * Rules application of situation modifiers for environmental conditions.
  */
 export class EnvironmentalModifier extends SituationModifier {
     declare source: EnvironmentalModifiersSourceData
     declare applied: EnvironmentalModifiersData
     override type: Shadowrun.SituationModifierType = 'environmental';
 
-    
     get levels(): EnvironmentalModifierLevels {
         return SR.combat.environmental.levels;
     }
@@ -22,66 +22,47 @@ export class EnvironmentalModifier extends SituationModifier {
         if (!regional) return;
 
         const applicable = options.applicable?.length ? new Set(options.applicable) : null;
-        for (const category of ['visibility', 'light', 'wind'] as const) {
+        const categories = Object.entries(regional) as [keyof RegionalPhysicalEnvironment, number][];
+        for (const [category, regionValue] of categories) {
             if (applicable && !applicable.has(category)) continue;
-            const regionValue = regional[category];
             if (regionValue >= this.levels.good) continue;
             this.applied.active[category] = Math.min(this.applied.active[category] ?? this.levels.good, regionValue);
         }
     }
 
     /**
-     * How many selectios / modifiers are active per level of enviornmental modifiers.
-     * 
-     * A level would be light and fitting modifiers would be 'Light Rain', 'Light Winds' or Medium Range.
-     * 
-     * @param values Active modifier values to be matched to level values
-     * @returns A count per level of modifiers on that level
-     */
-    activeLevels(values: number[]): Record<string, number> {
-        return {
-            light: values.reduce((count: number, value: number) => (value === this.levels.light ? count + 1 : count), 0),
-            moderate: values.reduce((count: number, value: number) => (value === this.levels.moderate ? count + 1 : count), 0),
-            heavy: values.reduce((count: number, value: number) => (value === this.levels.heavy ? count + 1 : count), 0),
-            extreme: values.reduce((count: number, value: number) => (value === this.levels.extreme ? count + 1 : count), 0)
-        }
-    }
-
-    /**
      * Apply rules for environmental modifier selection to calculate a total modifier value.
-     * 
+     *
+     * Only the most severe condition counts. Two or more conditions tied for most severe bump it up a row.
+     *
      * SR5#173 'Environmental Modifiers'
      */
     override _calcActiveTotal(): number {
         // A fixed value selection overrides other selections.
-        if (this.applied.active.value)
-            return this.applied.active.value;
+        const { value: fixed, light, glare, ...others } = this.applied.active;
+        if (fixed) return fixed;
 
-        // Calculation based on active modifier categories, excluding manual overwrite.
-        const activeCategories = Object.entries(this.applied.active);
-        // Should an active category miss a level set, ignore and fail gracefully.
-        const activeValues = activeCategories.map(([category, level]) => level || 0);
-        // Calculate the amout of categor
-        const count = this.activeLevels(activeValues);
+        // Light and glare share a single column (SR5#175), so only the worse of both counts.
+        const conditions = [...Object.values(others), Math.min(light || 0, glare || 0)];
 
-        if (count.extreme > 0 || count.heavy >= 2) {
-            return this.levels.extreme;
-        }
-        else if (count.heavy === 1 || count.moderate >= 2) {
-            return this.levels.heavy;
-        }
-        else if (count.moderate === 1 || count.light >= 2) {
-            return this.levels.moderate;
-        }
-        else if (count.light === 1) {
-            return this.levels.light;
-        } 
+        // Rows of the environmental modifiers table, from good to extreme.
+        const rows = Object.values(this.levels);
+        // Should a condition miss a level, ignore it and fail gracefully.
+        const levels = conditions.filter(condition => rows.includes(condition));
 
-        return this.levels.good;
+        const { good } = this.levels;
+        const worst = Math.min(good, ...levels);
+        const count = levels.filter(level => level === worst).length;
+        if (worst === good || count < 2) return worst;
+        return rows[Math.min(rows.indexOf(worst) + 1, rows.length - 1)];
     }
 
+    /**
+     * A selection inherited from a parent document, like the scene, can't be removed on this document.
+     * Override it with a good condition instead.
+     */
     override setInactive(modifier: string): void {
         if (this.source.active[modifier] !== this.applied.active[modifier]) this.setActive(modifier, 0);
-        else delete this.source.active[modifier];
+        else super.setInactive(modifier);
     }
 }

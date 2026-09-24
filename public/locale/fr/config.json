@@ -467,22 +467,25 @@
         "EnvModifiersApplication": {
             "ClearModifiers": "Effacer les modificateurs personnels",
             "Extreme": "Combinaison de plusieurs conditions à -6",
+            "Glare": {
+                "Good": "Pas d'éblouissement",
+                "Heavy": "Éblouissement aveuglant",
+                "Light": "Éblouissement faible",
+                "Moderate": "Éblouissement modéré",
+                "Title": "Éblouissement"
+            },
+            "Light": {
+                "Good": "Pleine lumière",
+                "Heavy": "Obscurité totale",
+                "Light": "Lumière partielle",
+                "Moderate": "Lumière faible",
+                "Title": "Lumière"
+            },
             "LightGlare": {
-                "Good": "Pleine lumière/pas d'éblouissement",
-                "Heavy": "Obscurité totale/éblouissement aveuglant",
-                "Light": "Lumière partielle/éblouissement faible",
-                "Moderate": "Lumière faible/éblouissement moderé",
-                "Title": "Lumière/Éblouissement"
+                "Hint": "La lumière et l'éblouissement partagent une colonne : seul le pire des deux compte."
             },
             "Modifier": {
                 "Title": "Modificateur"
-            },
-            "Range": {
-                "Good": "Courte",
-                "Heavy": "Extrème",
-                "Light": "Moyenne",
-                "Moderate": "Longue",
-                "Title": "Portée"
             },
             "Title": "Modificateurs environnementaux",
             "Total": "Résultat",
@@ -994,6 +997,7 @@
             "DefenseParry": "Défense (Parrer)",
             "Drain": "Drain",
             "Environmental": "Environnemental",
+            "EnvironmentalGlare": "Environnemental (Éblouissement)",
             "EnvironmentalLight": "Environnemental (Lumière)",
             "EnvironmentalRange": "Environnemental (Portée)",
             "EnvironmentalVisibility": "Environnemental (Visibilité)",
@@ -1514,9 +1518,14 @@
                     "Contribution": "Visibilité régionale"
                 },
                 "Light": {
-                    "Label": "Lumière / Éblouissement",
-                    "Hint": "Conditions de lumière ou d’éblouissement dans cette région.",
-                    "Contribution": "Lumière / éblouissement régional"
+                    "Label": "Lumière",
+                    "Hint": "Conditions de lumière dans cette région.",
+                    "Contribution": "Lumière régionale"
+                },
+                "Glare": {
+                    "Label": "Éblouissement",
+                    "Hint": "Conditions d’éblouissement dans cette région.",
+                    "Contribution": "Éblouissement régional"
                 },
                 "Wind": {
                     "Label": "Vent",

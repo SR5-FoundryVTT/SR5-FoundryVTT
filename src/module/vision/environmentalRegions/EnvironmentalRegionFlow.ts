@@ -6,7 +6,7 @@ import {
     type EnvironmentLevel,
 } from '@/module/types/regionBehavior/Environmental';
 
-export type RegionalPhysicalEnvironment = Record<'visibility' | 'light' | 'wind', number>;
+export type RegionalPhysicalEnvironment = Record<'visibility' | 'light' | 'glare' | 'wind', number>;
 
 export interface EnvironmentalRegionRatings {
     backgroundCount: number;
@@ -14,7 +14,7 @@ export interface EnvironmentalRegionRatings {
     physical: RegionalPhysicalEnvironment;
 }
 
-const EMPTY_PHYSICAL: RegionalPhysicalEnvironment = { visibility: 0, light: 0, wind: 0 };
+const EMPTY_PHYSICAL: RegionalPhysicalEnvironment = { visibility: 0, light: 0, glare: 0, wind: 0 };
 
 export class EnvironmentalRegionFlow {
     private static refreshPending = foundry.utils.debounce(() => {
@@ -63,6 +63,7 @@ export class EnvironmentalRegionFlow {
                 const data = this.dataOf(behavior);
                 strongest.visibility = Math.min(strongest.visibility, this.levelValue(data.visibility));
                 strongest.light = Math.min(strongest.light, this.levelValue(data.light));
+                strongest.glare = Math.min(strongest.glare, this.levelValue(data.glare));
                 strongest.wind = Math.min(strongest.wind, this.levelValue(data.wind));
                 return strongest;
             }, { ...EMPTY_PHYSICAL }),

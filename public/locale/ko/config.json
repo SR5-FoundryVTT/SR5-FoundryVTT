@@ -1189,22 +1189,25 @@
         "EnvModifiersApplication": {
             "ClearModifiers": "개인 수정치 초기화",
             "Extreme": "두 가지 이상의 극단적 상태가 조합됨",
+            "Glare": {
+                "Good": "눈부심 없음",
+                "Heavy": "극심한 눈부심",
+                "Light": "약한 눈부심",
+                "Moderate": "적당한 눈부심",
+                "Title": "눈부심"
+            },
+            "Light": {
+                "Good": "완전 밝음",
+                "Heavy": "완전 어두움",
+                "Light": "부분적으로 밝음",
+                "Moderate": "어둑함",
+                "Title": "빛"
+            },
             "LightGlare": {
-                "Good": "완전 밝음/조명 없음",
-                "Heavy": "완전 어두움/너무 눈부신 조명",
-                "Light": "부분적으로 밝음/약한 조명",
-                "Moderate": "어둑함/적당한 조명",
-                "Title": "빛/조명"
+                "Hint": "빛과 눈부심은 한 열을 공유합니다. 둘 중 더 나쁜 값만 적용됩니다."
             },
             "Modifier": {
                 "Title": "수정치"
-            },
-            "Range": {
-                "Good": "단거리",
-                "Heavy": "초장거리",
-                "Light": "중거리",
-                "Moderate": "장거리",
-                "Title": "사거리"
             },
             "Title": "환경 수정치",
             "Total": "결과",
@@ -2185,6 +2188,7 @@
             "DifferentGrid": "다른 그리드",
             "Drain": "드레인",
             "Environmental": "환경",
+            "EnvironmentalGlare": "환경 (눈부심)",
             "EnvironmentalLight": "환경 (조명)",
             "EnvironmentalRange": "환경 (거리)",
             "EnvironmentalVisibility": "환경 (시야)",
@@ -3419,9 +3423,14 @@
                     "Contribution": "지역 시야"
                 },
                 "Light": {
-                    "Label": "조명 / 눈부심",
-                    "Hint": "이 지역 안의 조명 또는 눈부심 상태입니다.",
-                    "Contribution": "지역 조명 / 눈부심"
+                    "Label": "조명",
+                    "Hint": "이 지역 안의 조명 상태입니다.",
+                    "Contribution": "지역 조명"
+                },
+                "Glare": {
+                    "Label": "눈부심",
+                    "Hint": "이 지역 안의 눈부심 상태입니다.",
+                    "Contribution": "지역 눈부심"
                 },
                 "Wind": {
                     "Label": "바람",

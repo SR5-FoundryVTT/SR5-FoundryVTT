@@ -28,6 +28,7 @@ const EnvironmentalRegionData = () => ({
     matrixNoise: RatingField('MatrixNoise'),
     visibility: LevelField('Visibility'),
     light: LevelField('Light'),
+    glare: LevelField('Glare'),
     wind: LevelField('Wind'),
 });
 

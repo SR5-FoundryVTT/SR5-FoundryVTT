@@ -1190,22 +1190,25 @@
         "EnvModifiersApplication": {
             "ClearModifiers": "Entferne eigene Modifikatoren",
             "Extreme": "Zwei oder mehr Modifikatoren der Stufe Schwer",
-            "LightGlare": {
-                "Good": "Gute Beleuchtung/Keine Blendung",
-                "Heavy": "Völlige Dunkelheit/Starke Blendung",
-                "Light": "Teilbeleuchtung/Schwache Blendung",
-                "Moderate": "Schwache Beleuchtung/Mittlere Blendung",
+            "Glare": {
+                "Good": "Keine Blendung",
+                "Heavy": "Starke Blendung",
+                "Light": "Schwache Blendung",
+                "Moderate": "Mittlere Blendung",
+                "Title": "Blendung"
+            },
+            "Light": {
+                "Good": "Gute Beleuchtung",
+                "Heavy": "Völlige Dunkelheit",
+                "Light": "Teilbeleuchtung",
+                "Moderate": "Schwache Beleuchtung",
                 "Title": "Beleuchtung"
+            },
+            "LightGlare": {
+                "Hint": "Beleuchtung und Blendung teilen sich eine Spalte: Nur der schlechtere Wert zählt."
             },
             "Modifier": {
                 "Title": "Modifikator"
-            },
-            "Range": {
-                "Good": "Kurz",
-                "Heavy": "Maximal",
-                "Light": "Mittel",
-                "Moderate": "Lang",
-                "Title": "Entfernung"
             },
             "Title": "Umweltmodifikatoren",
             "Total": "Ergebnis",
@@ -2186,6 +2189,7 @@
             "DifferentGrid": "Anderes Gitter",
             "Drain": "Entzug",
             "Environmental": "Umwelt",
+            "EnvironmentalGlare": "Umwelt (Blendung)",
             "EnvironmentalLight": "Umwelt (Licht)",
             "EnvironmentalRange": "Umwelt (Reichweite)",
             "EnvironmentalVisibility": "Umwelt (Sicht)",
@@ -3416,9 +3420,14 @@
                     "Contribution": "Regionale Sichtverhältnisse"
                 },
                 "Light": {
-                    "Label": "Licht / Blendung",
-                    "Hint": "Licht- oder Blendverhältnisse innerhalb dieser Region.",
-                    "Contribution": "Regionales Licht / Blendung"
+                    "Label": "Licht",
+                    "Hint": "Lichtverhältnisse innerhalb dieser Region.",
+                    "Contribution": "Regionales Licht"
+                },
+                "Glare": {
+                    "Label": "Blendung",
+                    "Hint": "Blendverhältnisse innerhalb dieser Region.",
+                    "Contribution": "Regionale Blendung"
                 },
                 "Wind": {
                     "Label": "Wind",

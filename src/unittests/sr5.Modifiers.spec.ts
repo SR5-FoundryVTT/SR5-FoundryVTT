@@ -3,6 +3,13 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SituationModifier } from "../module/rules/modifiers/SituationModifier";
 import { DocumentSituationModifiers } from "../module/rules/DocumentSituationModifiers";
 import { EnvironmentalModifier } from './../module/rules/modifiers/EnvironmentalModifier';
+import {
+    applyBestVisionCompensation,
+    flareCompensation,
+    lowLightVision,
+    sunglasses,
+    thermographicVision,
+} from '../module/effect/flows/EnvironmentalChangeFlow';
 import { TestCreator } from '../module/tests/TestCreator';
 import { SR5Item } from '../module/item/SR5Item';
 
@@ -171,6 +178,35 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                 envMod.apply({source: {active: {light: -1, wind: -1, value: -1}}});
                 assert.equal(envMod.total, -1);
             });
+
+            it('count light and glare as a single column', () => {
+                const envMod = new EnvironmentalModifier();
+                envMod.apply({source: {active: {light: -1, glare: -1}}});
+                assert.equal(envMod.total, -1);
+
+                envMod.apply({source: {active: {light: -1, glare: -3}}});
+                assert.equal(envMod.total, -3);
+
+                envMod.apply({source: {active: {glare: -3, wind: -3}}});
+                assert.equal(envMod.total, -6);
+            });
+
+            it('compensate light and glare by vision system', () => {
+                const compensate = (active: Record<string, number>, ...changes: ((modifier: EnvironmentalModifier) => void)[]) => {
+                    const envMod = new EnvironmentalModifier();
+                    envMod.apply({source: {active}});
+                    applyBestVisionCompensation(envMod, changes);
+                    return envMod.applied.active;
+                };
+
+                assert.deepInclude(compensate({light: -3, glare: -3}, lowLightVision), {light: 0, glare: -3});
+                assert.deepInclude(compensate({glare: -6}, flareCompensation), {glare: -1});
+                assert.deepInclude(compensate({light: -1, glare: -3}, sunglasses), {light: -3, glare: -1});
+                assert.deepInclude(compensate({light: -6}, thermographicVision, lowLightVision), {light: -3},
+                    'vision systems do not stack');
+                assert.deepInclude(compensate({light: -1, glare: -3}, sunglasses, lowLightVision), {light: 0, glare: -1},
+                    'each condition uses its best system');
+            });
         });
         
         describe('class DocumentSituationModifiers', () => {
@@ -253,6 +289,28 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
 
                 assert.strictEqual(modifiers.environmental.applied.active.light, 0);
                 assert.strictEqual(total, modifiers.environmental.levels.good);
+            });
+
+            it('apply actor senses once, with or without a matching effect', async () => {
+                const actor = await factory.createActor({
+                    type: 'character',
+                    system: {
+                        metatype: 'dwarf',
+                        situation_modifiers: { environmental: { active: { light: -6 } } },
+                    }
+                });
+
+                const modifiers = actor.getSituationModifiers();
+                assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), -3, 'dwarf thermographic vision');
+
+                await actor.createEmbeddedDocuments('ActiveEffect', [{
+                    name: 'Thermographic Vision',
+                    system: {
+                        targets: [{ id: 'm', applyTo: 'modifier' }],
+                        changes: [{ key: 'environmental.thermographic_vision', value: '1', type: 'custom', target: 'm' }]
+                    },
+                }]);
+                assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), -3, 'not shifted twice');
             });
 
             it('apply onlyForItemTest modifier effects only for the matching test item', async () => {
