@@ -133,6 +133,7 @@ declare module "fvtt-types/configuration" {
 
         interface VisionModes {
             astralPerception: foundry.canvas.perception.VisionMode;
+            ultrasound: foundry.canvas.perception.VisionMode;
         }
     }
 

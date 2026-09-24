@@ -9,6 +9,7 @@ import UltrasoundDetectionMode, {
 import { PhysicalSightDetectionMode } from '@/module/vision/physicalVision/physicalDetectionMode';
 import { SR5TestFactory } from './utils';
 import { BonusHelper } from '@/module/apps/itemImport/helper/BonusHelper';
+import { SR5VisionSource } from '@/module/vision/SR5VisionSource';
 
 const SIGHT = foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT;
 const SOUND = foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SOUND;
@@ -163,6 +164,36 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             senses = PerceptionResolver.resolve(actor).physical;
             assert.isFalse(senses.lowLight, 'unequipped ware stops granting its sense');
             assert.isTrue(senses.thermographic, 'qualities always grant their sense');
+        });
+
+        it('registers a colorless ultrasound vision mode that ignores light', () => {
+            const mode = CONFIG.Canvas.visionModes.ultrasound;
+            assert.exists(mode);
+            assert.isFalse(mode.perceivesLight);
+            assert.strictEqual(mode.canvas.uniforms.saturation, -1);
+
+            const isBlinded = Object.getOwnPropertyDescriptor(SR5VisionSource.prototype, 'isBlinded')?.get;
+            assert.isFalse(isBlinded?.call({ data: { visionMode: 'ultrasound' } }));
+        });
+
+        it('limits ultrasound vision to 50 m and lets glass stop it', function () {
+            if (!canvas.ready || !canvas.dimensions || !canvas.scene) this.skip();
+
+            const source = (visionMode: string, radius: number) => {
+                const vision = new SR5VisionSource() as any;
+                Object.assign(vision.data, { x: 0, y: 0, elevation: 0, radius, externalRadius: 0, lightRadius: 0, visionMode });
+                vision._initialize({});
+                return vision;
+            };
+            const fiftyMeters = PerceptionFlow.metersToSceneUnits(50, canvas.scene!.grid.units) * canvas.dimensions!.distancePixels;
+            const ultrasound = source('ultrasound', fiftyMeters * 10);
+            const basic = source('basic', fiftyMeters * 10);
+
+            assert.closeTo(ultrasound.data.radius, fiftyMeters, 0.001);
+            assert.strictEqual(basic.data.radius, fiftyMeters * 10);
+            // Glass blocks movement but not sight, so ultrasound collides like movement does.
+            assert.strictEqual(ultrasound._getPolygonConfiguration().type, 'move');
+            assert.strictEqual(basic._getPolygonConfiguration().type, 'sight');
         });
 
         it('applies darkness and invisibility according to each physical sense', () => {

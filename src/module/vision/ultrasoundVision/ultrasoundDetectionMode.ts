@@ -4,6 +4,7 @@ import {
 } from '@/module/vision/physicalVision/physicalDetectionMode';
 
 export const ULTRASOUND_RANGE_METERS = 50;
+export const ULTRASOUND_VISION_MODE = 'ultrasound';
 
 export default class UltrasoundDetectionMode extends foundry.canvas.perception.DetectionMode {
     static override getDetectionFilter() {

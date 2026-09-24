@@ -1,12 +1,4 @@
-import { ASTRAL_PERCEPTION_VISION_MODE } from './AstralPerceptionFlow';
 import { hasPhysicalPresence, isAstralVisionSource } from '../physicalVision/physicalDetectionMode';
-
-export class AstralVisionSource extends foundry.canvas.sources.PointVisionSource {
-    override get isBlinded() {
-        if (this.data.visionMode === ASTRAL_PERCEPTION_VISION_MODE) return false;
-        return super.isBlinded;
-    }
-}
 
 export const shouldSuppressPhysicalLightVision = (
     target: object | null | undefined,

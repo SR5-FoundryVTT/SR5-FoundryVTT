@@ -11,9 +11,9 @@ import {
 } from '@/module/vision/astralPerception/AstralPerceptionFlow';
 import AstralPerceptionDetectionMode from '@/module/vision/astralPerception/astralPerceptionDetectionMode';
 import {
-    AstralVisionSource,
     shouldSuppressPhysicalLightVision,
 } from '@/module/vision/astralPerception/astralVisibility';
+import { SR5VisionSource } from '@/module/vision/SR5VisionSource';
 import { SR5TestFactory } from './utils';
 
 export const shadowrunVisionAstralPerception = (context: QuenchBatchContext) => {
@@ -135,7 +135,7 @@ export const shadowrunVisionAstralPerception = (context: QuenchBatchContext) => 
             assert.isTrue((mode as any)._canDetect(source, { document: token }));
             assert.isTrue(mode.walls);
 
-            const isBlinded = Object.getOwnPropertyDescriptor(AstralVisionSource.prototype, 'isBlinded')?.get;
+            const isBlinded = Object.getOwnPropertyDescriptor(SR5VisionSource.prototype, 'isBlinded')?.get;
             assert.isFalse(isBlinded?.call({ data: { visionMode: ASTRAL_PERCEPTION_VISION_MODE } }));
             assert.strictEqual(CONFIG.Canvas.visionModes.astralPerception.canvas.shader,
                 foundry.canvas.rendering.shaders.ColorAdjustmentsSamplerShader);

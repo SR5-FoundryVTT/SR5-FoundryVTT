@@ -1,5 +1,6 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
 import { AstralRegionFlow } from '@/module/vision/astralRegions/AstralRegionFlow';
+import { ULTRASOUND_VISION_MODE } from '@/module/vision/ultrasoundVision/ultrasoundDetectionMode';
 
 export class SR5Token extends foundry.canvas.placeables.Token {
     /**
@@ -23,9 +24,12 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         return astralPath ? [astralPath as typeof path, true] : [path, constrained];
     }
 
+    /** Astral perception and ultrasound aren't optical, and ultrasound works in any light. */
     override _getVisionBlindedStates() {
         const states = super._getVisionBlindedStates();
-        if (this.document.sight.visionMode === 'astralPerception') states.blind = false;
+        const { visionMode } = this.document.sight;
+        if (visionMode === 'astralPerception' || visionMode === ULTRASOUND_VISION_MODE) states.blind = false;
+        if (visionMode === ULTRASOUND_VISION_MODE) states.darkness = false;
         return states;
     }
 
