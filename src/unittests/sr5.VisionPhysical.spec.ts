@@ -68,17 +68,17 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
     describe('Physical vision', () => {
         it('derives only the canonical metatype senses', () => {
             for (const metatype of ['elf', 'ork']) {
-                const senses = PerceptionResolver.resolve(actorData(metatype)).capabilities.physical;
+                const senses = PerceptionResolver.resolve(actorData(metatype)).physical;
                 assert.isTrue(senses.lowLight, metatype);
                 assert.isFalse(senses.thermographic, metatype);
             }
             for (const metatype of ['dwarf', 'troll']) {
-                const senses = PerceptionResolver.resolve(actorData(metatype)).capabilities.physical;
+                const senses = PerceptionResolver.resolve(actorData(metatype)).physical;
                 assert.isFalse(senses.lowLight, metatype);
                 assert.isTrue(senses.thermographic, metatype);
             }
 
-            const custom = PerceptionResolver.resolve(actorData('custom')).capabilities.physical;
+            const custom = PerceptionResolver.resolve(actorData('custom')).physical;
             assert.deepEqual(custom, { lowLight: false, thermographic: false, ultrasound: false });
         });
 
@@ -132,15 +132,15 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
                 },
             ]);
 
-            let senses = PerceptionResolver.resolve(actor).capabilities.physical;
+            let senses = PerceptionResolver.resolve(actor).physical;
             assert.deepEqual(senses, { lowLight: true, thermographic: true, ultrasound: false });
 
             await effect.update({ disabled: false });
-            senses = PerceptionResolver.resolve(actor).capabilities.physical;
+            senses = PerceptionResolver.resolve(actor).physical;
             assert.isTrue(senses.ultrasound);
 
             await item.update({ system: { technology: { equipped: false } } });
-            senses = PerceptionResolver.resolve(actor).capabilities.physical;
+            senses = PerceptionResolver.resolve(actor).physical;
             assert.deepEqual(senses, { lowLight: false, thermographic: false, ultrasound: true });
         });
 
@@ -250,7 +250,7 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
         });
 
         it('sets ultrasound to 50 m and honors the exact native range boundary', () => {
-            const capabilities = PerceptionResolver.resolve(actorData('human')).capabilities;
+            const capabilities = PerceptionResolver.resolve(actorData('human'));
             capabilities.physical.ultrasound = true;
             const modes = PerceptionFlow.reconcileDetectionModes({}, capabilities, 10000, 'm');
             assert.deepEqual(modes.ultrasound, { enabled: true, range: ULTRASOUND_RANGE_METERS });

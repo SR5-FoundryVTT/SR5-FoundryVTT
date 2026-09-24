@@ -218,15 +218,14 @@ export const shadowrunVisionEnvironmentalRegions = (context: QuenchBatchContext)
             const form = await createToken(scene, actor.id, 800, 800);
             const source = body.toObject();
             await body.setFlag(SYSTEM_NAME, FLAGS.AstralProjection, {
-                role: 'body', requestId: 'environmental-region-test', formTokenUuid: form.uuid!,
+                role: 'body', formTokenId: form.id!,
                 previous: {
                     sight: source.sight as Record<string, unknown>, detectionModes: source.detectionModes,
                     initiativeMode: 'meatspace', resumeAstralPerception: false,
                 },
             });
             await form.setFlag(SYSTEM_NAME, FLAGS.AstralProjection, {
-                role: 'form', requestId: 'environmental-region-test', bodyTokenUuid: body.uuid!,
-                previousInitiativeMode: 'meatspace', movement: { walk: 100, run: 5000 }, initiativeMode: 'astral',
+                role: 'form', bodyTokenId: body.id!, previousInitiativeMode: 'meatspace',
             });
             await createRegion(scene, environment({ matrixNoise: 4 }), [rectangle(0, 0, 400, 400)]);
             await createRegion(scene, environment({ backgroundCount: 6 }), [rectangle(700, 700, 400, 300)]);

@@ -13,7 +13,7 @@ export interface PreviousTokenVision {
 
 export class AstralPerceptionFlow {
     static canPerceive(actor: SR5Actor) {
-        return PerceptionResolver.resolve(actor).capabilities.astral.perception;
+        return PerceptionResolver.resolve(actor).astral.perception;
     }
 
     static isActive(token: TokenDocument) {
@@ -33,25 +33,13 @@ export class AstralPerceptionFlow {
         if (this.isActive(token)) return true;
 
         const source = token.toObject();
-        const previous: PreviousTokenVision = {
-            sight: foundry.utils.deepClone(source.sight) as Record<string, unknown>,
-            detectionModes: foundry.utils.deepClone(source.detectionModes),
-        };
-        const range = Math.max(token.sight.range ?? 0, 10000);
+        const { sight, detectionModes } = this.astralVision(token, source);
 
         await actor.toggleStatusEffect(ASTRAL_PERCEPTION_STATUS, { active: true });
-        await token.setFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision, previous);
+        await token.setFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision, this.captureVision(source));
         await token.update({
-            sight: {
-                ...source.sight,
-                enabled: true,
-                range,
-                visionMode: ASTRAL_PERCEPTION_VISION_MODE,
-            },
-            detectionModes: PerceptionFlow.detectionModeUpdate(
-                source.detectionModes,
-                PerceptionFlow.reconcileAstralDetectionModes(source.detectionModes, range),
-            ) as any,
+            sight,
+            detectionModes: PerceptionFlow.detectionModeUpdate(source.detectionModes, detectionModes) as any,
         });
         return true;
     }
@@ -60,15 +48,9 @@ export class AstralPerceptionFlow {
         const previous = token.getFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision) as PreviousTokenVision | undefined;
         if (!previous) return false;
 
-        await token.update({
-            sight: previous.sight,
-            detectionModes: PerceptionFlow.detectionModeUpdate(
-                token.toObject().detectionModes,
-                previous.detectionModes,
-            ) as any,
+        await this.restoreVision(token, previous, {
+            [`flags.${SYSTEM_NAME}.-=${FLAGS.AstralPerceptionVision}`]: null,
         });
-        await token.unsetFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision);
-        PerceptionFlow.refreshTokenSource(token);
 
         const actor = token.actor as SR5Actor | null;
         if (actor && !this.activeTokensFor(actor).length) {
@@ -77,10 +59,42 @@ export class AstralPerceptionFlow {
         return false;
     }
 
+    /** Keep the sight and detection modes a token had before switching to astral sight. */
+    static captureVision(source: Token.Source): PreviousTokenVision {
+        return {
+            sight: foundry.utils.deepClone(source.sight) as Record<string, unknown>,
+            detectionModes: foundry.utils.deepClone(source.detectionModes),
+        };
+    }
+
+    /** Sight and detection modes of a token seeing astrally, based on the given token source. */
+    static astralVision(token: TokenDocument, source: Token.Source) {
+        const range = PerceptionFlow.senseRange(token);
+        return {
+            sight: { ...source.sight, enabled: true, range, visionMode: ASTRAL_PERCEPTION_VISION_MODE },
+            detectionModes: PerceptionFlow.reconcileAstralDetectionModes(source.detectionModes, range),
+        };
+    }
+
+    /**
+     * Put back the vision captured by captureVision and reconcile automatic senses.
+     *
+     * @param changes Further token changes to apply in the same update.
+     */
+    static async restoreVision(token: TokenDocument, previous: PreviousTokenVision, changes: Record<string, unknown> = {}) {
+        await token.update({
+            sight: previous.sight,
+            detectionModes: PerceptionFlow.detectionModeUpdate(
+                token.toObject().detectionModes,
+                previous.detectionModes,
+            ) as any,
+            ...changes,
+        });
+        PerceptionFlow.refreshTokenSource(token);
+    }
+
     private static activeTokensFor(actor: SR5Actor) {
-        return game.scenes.reduce<TokenDocument[]>((tokens, scene) => {
-            tokens.push(...scene.tokens.filter(token => token.actor === actor && this.isActive(token)));
-            return tokens;
-        }, []);
+        return game.scenes.contents.flatMap(scene =>
+            scene.tokens.filter(token => token.actor === actor && this.isActive(token)));
     }
 }

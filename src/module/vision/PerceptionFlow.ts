@@ -1,10 +1,15 @@
 import { FLAGS, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from '@/module/constants';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SR5Item } from '@/module/item/SR5Item';
+import type { PerceptionCapabilities } from '@/module/types/template/Visibility';
 import { PerceptionResolver } from './PerceptionResolver';
 import { ULTRASOUND_RANGE_METERS } from './ultrasoundVision/ultrasoundDetectionMode';
+import { isAstralForm } from './astralProjection/AstralProjectionState';
 
 type RefreshDocument = SR5Actor | SR5Item | ActiveEffect | TokenDocument;
+
+/** Range of senses without a rules limit, far enough to cover any scene. */
+const SENSE_RANGE = 10000;
 
 export class PerceptionFlow {
     private static pendingTokens = new Set<TokenDocument>();
@@ -21,12 +26,13 @@ export class PerceptionFlow {
 
     /** Reconcile derived senses after loading or switching scenes. */
     static refreshScene(scene: Scene | null | undefined) {
-        if (!scene) return;
+        if (scene) this.refreshTokens(scene.tokens);
+    }
+
+    /** Reconcile derived senses of tokens, refreshing the canvas once if any of them is on it. */
+    static refreshTokens(tokens: Iterable<TokenDocument>) {
         let refreshCanvas = false;
-        for (const token of scene.tokens) {
-            const tokenRefreshed = this.refreshTokenSource(token);
-            refreshCanvas = tokenRefreshed || refreshCanvas;
-        }
+        for (const token of tokens) refreshCanvas = this.refreshTokenSource(token) || refreshCanvas;
         if (refreshCanvas) canvas.perception.update({ refreshVision: true, refreshLighting: true });
     }
 
@@ -42,7 +48,7 @@ export class PerceptionFlow {
 
     static reconcileDetectionModes(
         detectionModes: Record<string, { enabled: boolean; range: number | null }>,
-        capabilities: ReturnType<typeof PerceptionResolver.resolve>['capabilities'],
+        capabilities: PerceptionCapabilities,
         range: number,
         sceneUnit = 'm',
     ) {
@@ -92,6 +98,10 @@ export class PerceptionFlow {
         return multiplier ? meters / multiplier : meters;
     }
 
+    static senseRange(token: TokenDocument) {
+        return Math.max(token.sight.range ?? 0, SENSE_RANGE);
+    }
+
     private static worldSettingEnabled() {
         return game.settings.get(SYSTEM_NAME, FLAGS.AutomaticTokenSenses);
     }
@@ -99,15 +109,13 @@ export class PerceptionFlow {
     static refreshTokenSource(token: TokenDocument) {
         if (!this.isRefreshEnabled(token) || !token.actor) return false;
         const source = token.toObject();
-        const range = Math.max(token.sight.range ?? 0, 10000);
-        const projection = token.getFlag(SYSTEM_NAME, FLAGS.AstralProjection) as { role?: string } | undefined;
-        const astralActive = !!token.getFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision)
-            || projection?.role === 'form';
+        const range = this.senseRange(token);
+        const astralActive = !!token.getFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision) || isAstralForm(token);
         const detectionModes = astralActive
             ? this.reconcileAstralDetectionModes(source.detectionModes, range)
             : this.reconcileDetectionModes(
                 source.detectionModes,
-                PerceptionResolver.resolve(token.actor).capabilities,
+                PerceptionResolver.resolve(token.actor),
                 range,
                 token.parent?.grid.units,
             );
@@ -121,30 +129,16 @@ export class PerceptionFlow {
 
     private static tokensFor(document: RefreshDocument): TokenDocument[] {
         if (document instanceof TokenDocument) return [document];
-        const actor = document instanceof SR5Actor
-            ? document
-            : document instanceof SR5Item
-                ? document.actor
-                : document.parent instanceof SR5Actor
-                    ? document.parent
-                    : document.parent instanceof SR5Item
-                        ? document.parent.actor
-                        : null;
-        if (!actor) return [];
+        const owner = document instanceof ActiveEffect ? document.parent : document;
+        const actor = owner instanceof SR5Item ? owner.actor : owner;
+        if (!(actor instanceof SR5Actor)) return [];
 
-        return game.scenes.reduce<TokenDocument[]>((tokens, scene) => {
-            tokens.push(...scene.tokens.filter(token => token.actor === actor));
-            return tokens;
-        }, []);
+        return game.scenes.contents.flatMap(scene => scene.tokens.filter(token => token.actor === actor));
     }
 
     private static flush() {
-        let refreshCanvas = false;
-        for (const token of this.pendingTokens) {
-            const tokenRefreshed = this.refreshTokenSource(token);
-            refreshCanvas = tokenRefreshed || refreshCanvas;
-        }
+        const tokens = [...this.pendingTokens];
         this.pendingTokens.clear();
-        if (refreshCanvas) canvas.perception.update({ refreshVision: true, refreshLighting: true });
+        this.refreshTokens(tokens);
     }
 }

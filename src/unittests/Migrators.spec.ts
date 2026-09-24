@@ -1019,6 +1019,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         it('moves legacy actor targets and preserves their values', () => {
             const migrator = new Version0_38_0();
             const actor: any = {
+                type: 'character',
                 system: {
                     visibilityChecks: {
                         meat: { hasHeat: true },

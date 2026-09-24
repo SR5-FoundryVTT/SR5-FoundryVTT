@@ -32,46 +32,37 @@ export const shadowrunVisionFoundation = (context: QuenchBatchContext) => {
     after(async () => { await factory.destroy(); });
 
     describe('Vision foundation', () => {
-        it('resolves domain-based target state', () => {
-            const state = PerceptionResolver.resolve(actorData());
-            assert.deepEqual(state.targets, {
-                physical: { active: true, thermographic: 'warm' },
-                astral: { hasAura: true, astralActive: false, affectedBySpell: false },
-                matrix: { hasIcon: true, runningSilent: false },
-            });
-        });
-
-        it('keeps the actor thermographic signature level in resolved target state', async () => {
+        it('keeps the actor thermographic signature level', async () => {
             const actor = await factory.createActor({
                 type: 'character',
                 system: { visibilityChecks: { targets: { physical: { thermographic: 'cold' } } } },
             });
-            assert.strictEqual(PerceptionResolver.resolve(actor).targets.physical.thermographic, 'cold');
+            assert.strictEqual(actor.system.visibilityChecks.targets.physical.thermographic, 'cold');
 
             await actor.update({
                 system: { visibilityChecks: { targets: { physical: { thermographic: 'hot' } } } },
             });
-            assert.strictEqual(PerceptionResolver.resolve(actor).targets.physical.thermographic, 'hot');
+            assert.strictEqual(actor.system.visibilityChecks.targets.physical.thermographic, 'hot');
         });
 
         it('resolves magical subtype eligibility and applies explicit overrides last', () => {
             const magician = actorData({
                 magic: { type: 'magician', astralPerceptionOverride: 'default', astralProjectionOverride: 'default' },
             });
-            assert.isTrue(PerceptionResolver.resolve(magician).capabilities.astral.perception);
-            assert.isTrue(PerceptionResolver.resolve(magician).capabilities.astral.projection);
+            assert.isTrue(PerceptionResolver.resolve(magician).astral.perception);
+            assert.isTrue(PerceptionResolver.resolve(magician).astral.projection);
 
             const overridden = actorData({
                 magic: { type: 'magician', astralPerceptionOverride: 'deny', astralProjectionOverride: 'deny' },
             });
-            assert.isFalse(PerceptionResolver.resolve(overridden).capabilities.astral.perception);
-            assert.isFalse(PerceptionResolver.resolve(overridden).capabilities.astral.projection);
+            assert.isFalse(PerceptionResolver.resolve(overridden).astral.perception);
+            assert.isFalse(PerceptionResolver.resolve(overridden).astral.projection);
 
             const mundaneOverride = actorData({
                 magic: { type: 'mundane', astralPerceptionOverride: 'allow', astralProjectionOverride: 'allow' },
             });
-            assert.isTrue(PerceptionResolver.resolve(mundaneOverride).capabilities.astral.perception);
-            assert.isTrue(PerceptionResolver.resolve(mundaneOverride).capabilities.astral.projection);
+            assert.isTrue(PerceptionResolver.resolve(mundaneOverride).astral.perception);
+            assert.isTrue(PerceptionResolver.resolve(mundaneOverride).astral.projection);
         });
 
         it('uses active grants and removes them when the effect is disabled', async () => {
@@ -88,10 +79,10 @@ export const shadowrunVisionFoundation = (context: QuenchBatchContext) => {
                     }],
                 },
             }]);
-            assert.isTrue(PerceptionResolver.resolve(actor).capabilities.physical.lowLight);
+            assert.isTrue(PerceptionResolver.resolve(actor).physical.lowLight);
 
             await effect.update({ disabled: true });
-            assert.isFalse(PerceptionResolver.resolve(actor).capabilities.physical.lowLight);
+            assert.isFalse(PerceptionResolver.resolve(actor).physical.lowLight);
         });
 
         it('updates equipment grants when the item is equipped or unequipped', async () => {
@@ -114,10 +105,10 @@ export const shadowrunVisionFoundation = (context: QuenchBatchContext) => {
                     },
                 }],
             }]);
-            assert.isTrue(PerceptionResolver.resolve(actor).capabilities.physical.ultrasound);
+            assert.isTrue(PerceptionResolver.resolve(actor).physical.ultrasound);
 
             await item.update({ system: { technology: { equipped: false } } });
-            assert.isFalse(PerceptionResolver.resolve(actor).capabilities.physical.ultrasound);
+            assert.isFalse(PerceptionResolver.resolve(actor).physical.ultrasound);
         });
 
         it('preserves unrelated detection modes while reconciling managed senses', () => {
@@ -126,7 +117,7 @@ export const shadowrunVisionFoundation = (context: QuenchBatchContext) => {
                 tremor: { enabled: true, range: 12 },
                 lowlight: { enabled: true, range: 5 },
             };
-            const capabilities = PerceptionResolver.resolve(actorData()).capabilities;
+            const capabilities = PerceptionResolver.resolve(actorData());
             capabilities.physical.thermographic = true;
 
             const reconciled = PerceptionFlow.reconcileDetectionModes(existing, capabilities, 10000);

@@ -2,6 +2,7 @@ import { DeepReadonly } from "fvtt-types/utils";
 import { SYSTEM_NAME, FLAGS } from "../constants";
 import { StorageFlow } from "@/module/flows/StorageFlow";
 import { AstralProjectionFlow } from '@/module/vision/astralProjection/AstralProjectionFlow';
+import { getProjectionBody, isAstralForm } from '@/module/vision/astralProjection/AstralProjectionState';
 import { AstralRegionFlow } from '@/module/vision/astralRegions/AstralRegionFlow';
 
 /**
@@ -24,14 +25,8 @@ export type MovementPhaseMarker = {
 export class SR5TokenDocument extends TokenDocument {
     /** A projected form uses the body's exact actor, including an unlinked body's synthetic ActorDelta. */
     override get actor() {
-        const state = this.getFlag(SYSTEM_NAME, FLAGS.AstralProjection) as
-            | { role?: string; bodyTokenUuid?: string }
-            | undefined;
-        if (state?.role === 'form' && state.bodyTokenUuid) {
-            const bodyId = /^Scene\.[^.]+\.Token\.([^.]+)$/.exec(state.bodyTokenUuid)?.[1];
-            const body = bodyId ? this.parent?.tokens.get(bodyId) : null;
-            if (body && body !== this && body.actor) return body.actor;
-        }
+        const body = isAstralForm(this) ? getProjectionBody(this) : null;
+        if (body && body !== this && body.actor) return body.actor;
         return super.actor;
     }
 
@@ -71,7 +66,7 @@ export class SR5TokenDocument extends TokenDocument {
         // A projected form borrows the body's actor, which outlives the form token. Cleaning up its
         // storage references here would disconnect the still living body from its networks and marks.
         // Disconnect from any networks before a token actor is deleted.
-        if (this.actor?.isToken && !AstralProjectionFlow.isForm(this)) {
+        if (this.actor?.isToken && !isAstralForm(this)) {
             await StorageFlow.deleteStorageReferences(this.actor);
         }
 
@@ -157,7 +152,7 @@ export class SR5TokenDocument extends TokenDocument {
     ): Promise<void> {
         // Perform checks to ensure this logic should run.
         if (game.user.id !== user.id) return;
-        if (AstralProjectionFlow.isForm(token)) return;
+        if (isAstralForm(token)) return;
         if (!token.actor?.system.movement) return;
         if (!game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) return;
 

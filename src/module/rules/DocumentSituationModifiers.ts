@@ -394,11 +394,7 @@ export class DocumentSituationModifiers {
      */
     refreshRegional(): boolean {
         const regional = EnvironmentalRegionFlow.ratingsAtToken(this.regionalToken);
-        const changed = regional.backgroundCount !== this.regional.backgroundCount
-            || regional.matrixNoise !== this.regional.matrixNoise
-            || regional.physical.visibility !== this.regional.physical.visibility
-            || regional.physical.light !== this.regional.physical.light
-            || regional.physical.wind !== this.regional.physical.wind;
+        const changed = !foundry.utils.objectsEqual(regional, this.regional);
         this.regional = regional;
         return changed;
     }

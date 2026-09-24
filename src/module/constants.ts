@@ -83,6 +83,7 @@ export const FLAGS = {
     AutomaticTokenSenses: 'AutomaticTokenSenses',
     AstralPerceptionVision: 'astralPerceptionVision',
     AstralProjection: 'astralProjection',
+    AstralProjecting: 'astralProjecting',
     AstralProjectionOperation: 'AstralProjectionOperation',
 } as const;
 export const CORE_NAME = 'core';

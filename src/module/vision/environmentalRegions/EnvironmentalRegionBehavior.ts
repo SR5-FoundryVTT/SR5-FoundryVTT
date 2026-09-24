@@ -25,16 +25,20 @@ export class EnvironmentalRegionBehavior
 
     static override defineSchema() {
         const { NumberField, StringField } = foundry.data.fields;
-        const rating = (label: string, hint: string) => new NumberField({
+        // Every field has a SR5.Vision.EnvironmentalRegions.<name>.Label and .Hint localization.
+        const labels = (name: string) => ({
+            label: `SR5.Vision.EnvironmentalRegions.${name}.Label`,
+            hint: `SR5.Vision.EnvironmentalRegions.${name}.Hint`,
+        });
+        const rating = (name: string) => new NumberField({
             required: true,
             nullable: false,
             integer: true,
             min: 0,
             initial: 0,
-            label,
-            hint,
+            ...labels(name),
         });
-        const level = (label: string, hint: string) => new StringField({
+        const level = (name: string) => new StringField({
             required: true,
             nullable: false,
             initial: 'none',
@@ -44,31 +48,15 @@ export class EnvironmentalRegionBehavior
                 moderate: 'SR5.Vision.EnvironmentalRegions.Level.Moderate',
                 heavy: 'SR5.Vision.EnvironmentalRegions.Level.Heavy',
             },
-            label,
-            hint,
+            ...labels(name),
         });
 
         return {
-            backgroundCount: rating(
-                'SR5.Vision.EnvironmentalRegions.BackgroundCount.Label',
-                'SR5.Vision.EnvironmentalRegions.BackgroundCount.Hint',
-            ),
-            matrixNoise: rating(
-                'SR5.Vision.EnvironmentalRegions.MatrixNoise.Label',
-                'SR5.Vision.EnvironmentalRegions.MatrixNoise.Hint',
-            ),
-            visibility: level(
-                'SR5.Vision.EnvironmentalRegions.Visibility.Label',
-                'SR5.Vision.EnvironmentalRegions.Visibility.Hint',
-            ),
-            light: level(
-                'SR5.Vision.EnvironmentalRegions.Light.Label',
-                'SR5.Vision.EnvironmentalRegions.Light.Hint',
-            ),
-            wind: level(
-                'SR5.Vision.EnvironmentalRegions.Wind.Label',
-                'SR5.Vision.EnvironmentalRegions.Wind.Hint',
-            ),
+            backgroundCount: rating('BackgroundCount'),
+            matrixNoise: rating('MatrixNoise'),
+            visibility: level('Visibility'),
+            light: level('Light'),
+            wind: level('Wind'),
         };
     }
 }

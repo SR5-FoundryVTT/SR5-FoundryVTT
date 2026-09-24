@@ -1,13 +1,6 @@
 export const ASTRAL_BARRIER_REGION_BEHAVIOR = 'shadowrun5e.astralBarrier';
 export const ASTRAL_WARD_REGION_BEHAVIOR = 'shadowrun5e.astralWard';
 
-export interface AstralBoundaryBehaviorData {
-    blockSight: boolean;
-    blockMovement: boolean;
-    force: number;
-    allowedActors: Set<string>;
-}
-
 type AstralBoundarySchema = {
     blockSight: foundry.data.fields.BooleanField;
     blockMovement: foundry.data.fields.BooleanField;
@@ -15,7 +8,7 @@ type AstralBoundarySchema = {
     allowedActors: foundry.data.fields.SetField<foundry.data.fields.DocumentUUIDField>;
 };
 
-abstract class AstralBoundaryRegionBehavior
+export abstract class AstralBoundaryRegionBehavior
     extends foundry.data.regionBehaviors.RegionBehaviorType<AstralBoundarySchema> {
     static override defineSchema() {
         const { BooleanField, DocumentUUIDField, NumberField, SetField } = foundry.data.fields;

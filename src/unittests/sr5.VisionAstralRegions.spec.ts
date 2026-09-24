@@ -52,11 +52,8 @@ export const shadowrunVisionAstralRegions = (context: QuenchBatchContext) => {
         if (astral) {
             await token.setFlag(SYSTEM_NAME, FLAGS.AstralProjection, {
                 role: 'form',
-                requestId: 'astral-region-test',
-                bodyTokenUuid: `${scene.uuid}.Token.missing-body`,
+                bodyTokenId: 'missing-body',
                 previousInitiativeMode: 'meatspace',
-                movement: { walk: 100, run: 5000 },
-                initiativeMode: 'astral',
             });
         }
         return token;

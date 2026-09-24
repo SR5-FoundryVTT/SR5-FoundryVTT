@@ -1,4 +1,5 @@
-import { FLAGS, SR, SYSTEM_NAME } from '@/module/constants';
+import { SR } from '@/module/constants';
+import { getProjectionBody, getProjectionForm } from '../astralProjection/AstralProjectionState';
 import {
     ENVIRONMENT_REGION_BEHAVIOR,
     type EnvironmentalRegionBehaviorData,
@@ -12,8 +13,6 @@ export interface EnvironmentalRegionRatings {
     matrixNoise: number;
     physical: RegionalPhysicalEnvironment;
 }
-
-type ProjectionFlag = { role?: string; formTokenUuid?: string; bodyTokenUuid?: string } | undefined;
 
 const EMPTY_PHYSICAL: RegionalPhysicalEnvironment = { visibility: 0, light: 0, wind: 0 };
 
@@ -43,11 +42,16 @@ export class EnvironmentalRegionFlow {
         Hooks.on('deleteToken', () => this.refreshPending());
     }
 
-    /** Resolve transient environmental values at the physical, astral, or Matrix location involved. */
+    /**
+     * Resolve transient environmental values at the physical, astral, or Matrix location involved.
+     *
+     * While projecting, magic happens where the astral form is and the Matrix is reached from the body.
+     */
     static ratingsAtToken(token: TokenDocument | null | undefined): EnvironmentalRegionRatings {
-        const magicBehaviors = this.behaviorsAt(this.magicToken(token));
-        const matrixBehaviors = this.behaviorsAt(this.matrixToken(token));
-        const physicalBehaviors = this.behaviorsAt(token ?? null);
+        token ??= null;
+        const magicBehaviors = this.behaviorsAt(getProjectionForm(token) ?? token);
+        const matrixBehaviors = this.behaviorsAt(getProjectionBody(token) ?? token);
+        const physicalBehaviors = this.behaviorsAt(token);
 
         return {
             backgroundCount: Math.max(0, ...magicBehaviors.map(behavior => this.dataOf(behavior).backgroundCount)),
@@ -84,23 +88,6 @@ export class EnvironmentalRegionFlow {
 
     private static levelValue(level: EnvironmentLevel): number {
         return level === 'none' ? SR.combat.environmental.levels.good : SR.combat.environmental.levels[level];
-    }
-
-    private static magicToken(token: TokenDocument | null | undefined) {
-        const state = token?.getFlag(SYSTEM_NAME, FLAGS.AstralProjection) as ProjectionFlag;
-        if (state?.role === 'body' && state.formTokenUuid) return this.resolveToken(state.formTokenUuid) ?? token!;
-        return token ?? null;
-    }
-
-    private static matrixToken(token: TokenDocument | null | undefined) {
-        const state = token?.getFlag(SYSTEM_NAME, FLAGS.AstralProjection) as ProjectionFlag;
-        if (state?.role === 'form' && state.bodyTokenUuid) return this.resolveToken(state.bodyTokenUuid) ?? token!;
-        return token ?? null;
-    }
-
-    private static resolveToken(uuid: string) {
-        const document = fromUuidSync(uuid as any);
-        return document instanceof TokenDocument ? document : null;
     }
 
     private static refreshAfterTokenAnimation(token: TokenDocument) {

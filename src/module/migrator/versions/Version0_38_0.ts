@@ -58,8 +58,9 @@ export class Version0_38_0 extends VersionMigration {
         this.migrateEffectChanges(effect, PERCEPTION_TARGET_PATHS);
         for (const change of effect.system?.changes ?? []) {
             if (change.key !== PERCEPTION_TARGET_PATHS['system.visibilityChecks.meat.hasHeat']) continue;
-            if (change.value === true || change.value === 1 || String(change.value).toLowerCase() === 'true') change.value = 'warm';
-            else if (change.value === false || change.value === 0 || String(change.value).toLowerCase() === 'false') change.value = 'none';
+            const value = String(change.value).toLowerCase();
+            if (value === 'true' || value === '1') change.value = 'warm';
+            else if (value === 'false' || value === '0') change.value = 'none';
         }
     }
 

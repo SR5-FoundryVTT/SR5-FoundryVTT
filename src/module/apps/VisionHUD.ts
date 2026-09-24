@@ -28,46 +28,53 @@ export class VisionHUD {
     }
 
     private static astralPerceptionControl(token: Token) {
-        const control = document.createElement('button');
-        control.type = 'button';
-        control.className = 'control-icon sr5-astral-perception';
-        control.dataset.tooltip = game.i18n.localize('SR5.Vision.ToggleAstralPerception');
-        control.setAttribute('aria-label', game.i18n.localize('SR5.Vision.ToggleAstralPerception'));
-        control.innerHTML = '<i class="fa-solid fa-eye" aria-hidden="true"></i>';
-        control.classList.toggle('active', AstralPerceptionFlow.isActive(token.document));
-        control.addEventListener('click', (event) => {
-            event.preventDefault();
-            control.disabled = true;
-            void AstralPerceptionFlow.toggle(token.document)
-                .then((active) => control.classList.toggle('active', active))
-                .catch((error) => this.reportToggleFailure(error))
-                .finally(() => {
-                    control.disabled = false;
-                });
+        return this.toggleControl({
+            className: 'sr5-astral-perception',
+            label: 'SR5.Vision.ToggleAstralPerception',
+            icon: 'fa-eye',
+            active: AstralPerceptionFlow.isActive(token.document),
+            toggle: () => AstralPerceptionFlow.toggle(token.document),
         });
-        return control;
     }
 
     private static astralProjectionControl(token: Token) {
         const projected = AstralProjectionFlow.isProjected(token.document);
-        const localizationKey = projected
-            ? 'SR5.Vision.ReturnFromAstralProjection'
-            : 'SR5.Vision.BeginAstralProjection';
+        return this.toggleControl({
+            className: 'sr5-astral-projection',
+            label: projected ? 'SR5.Vision.ReturnFromAstralProjection' : 'SR5.Vision.BeginAstralProjection',
+            icon: 'fa-ghost',
+            active: projected,
+            toggle: () => AstralProjectionFlow.toggle(token.document),
+        });
+    }
+
+    /**
+     * A HUD button that is disabled while its toggle runs and then shows the resulting state.
+     *
+     * @param options.toggle Resolves to whether the toggled state is now active.
+     */
+    private static toggleControl(options: {
+        className: string;
+        label: string;
+        icon: string;
+        active: boolean;
+        toggle: () => Promise<boolean>;
+    }) {
+        const label = game.i18n.localize(options.label);
         const control = document.createElement('button');
         control.type = 'button';
-        control.className = 'control-icon sr5-astral-projection';
-        control.dataset.tooltip = game.i18n.localize(localizationKey);
-        control.setAttribute('aria-label', game.i18n.localize(localizationKey));
-        control.innerHTML = '<i class="fa-solid fa-ghost" aria-hidden="true"></i>';
-        control.classList.toggle('active', projected);
+        control.className = `control-icon ${options.className}`;
+        control.dataset.tooltip = label;
+        control.setAttribute('aria-label', label);
+        control.innerHTML = `<i class="fa-solid ${options.icon}" aria-hidden="true"></i>`;
+        control.classList.toggle('active', options.active);
         control.addEventListener('click', (event) => {
             event.preventDefault();
             control.disabled = true;
-            void AstralProjectionFlow.toggle(token.document)
+            void options.toggle()
+                .then((active) => control.classList.toggle('active', active))
                 .catch((error) => this.reportToggleFailure(error))
-                .finally(() => {
-                    control.disabled = false;
-                });
+                .finally(() => { control.disabled = false; });
         });
         return control;
     }

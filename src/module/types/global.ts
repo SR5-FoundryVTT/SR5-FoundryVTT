@@ -55,7 +55,7 @@ import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDe
 import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
 import UltrasoundDetectionMode from '../vision/ultrasoundVision/ultrasoundDetectionMode';
-import type { AstralProjectionState } from '../vision/astralProjection/AstralProjectionFlow';
+import type { AstralProjectionState } from '../vision/astralProjection/AstralProjectionState';
 import type {
     AstralBarrierRegionBehavior,
     AstralWardRegionBehavior,
@@ -202,6 +202,7 @@ declare module "fvtt-types/configuration" {
         Actor: {
             shadowrun5e: {
                 overwatchScore?: number;
+                astralProjecting?: boolean;
             }
         };
         ChatMessage: {

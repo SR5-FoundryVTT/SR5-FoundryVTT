@@ -145,7 +145,6 @@ import { OpposedMatrixTest } from './tests/OpposedMatrixTest';
 import { PerceptionFlow } from './vision/PerceptionFlow';
 import { VisionHUD } from './apps/VisionHUD';
 import { AstralProjectionFlow } from './vision/astralProjection/AstralProjectionFlow';
-import { ActorRollDataFlow } from './actor/flows/ActorRollDataFlow';
 import { AstralRegionFlow } from './vision/astralRegions/AstralRegionFlow';
 import { registerAstralRegionBehaviors } from './vision/astralRegions/AstralRegionBehavior';
 import { EnvironmentalRegionFlow } from './vision/environmentalRegions/EnvironmentalRegionFlow';
@@ -194,7 +193,6 @@ export class HooksManager {
 
         PerceptionFlow.registerHooks();
         AstralProjectionFlow.registerHooks();
-        ActorRollDataFlow.registerHooks();
         AstralRegionFlow.registerHooks();
         EnvironmentalRegionFlow.registerHooks();
 

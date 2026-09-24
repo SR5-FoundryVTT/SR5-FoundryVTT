@@ -256,37 +256,56 @@ export const shadowrunVisionProjection = (context: QuenchBatchContext) => {
             assert.strictEqual(cleanupCalls, 1, 'only the deleted body cleans its actor storage');
         });
 
-        it('invalidates linked projection membership when a token changes actors', async () => {
-            const firstActor = await createMagician();
-            const secondActor = await createMagician();
-            const { body } = await createBody(firstActor);
-            await body.setFlag(SYSTEM_NAME, FLAGS.AstralProjection, {
-                role: 'body',
-                requestId: 'actor-change',
-                formTokenUuid: `${body.parent?.uuid}.Token.missing-form`,
-                previous: {
-                    sight: {},
-                    detectionModes: {},
-                    initiativeMode: 'meatspace',
-                    resumeAstralPerception: false,
-                },
+        it('marks only the projecting actor, until it returns to its body', async () => {
+            const projecting = await createMagician();
+            const other = await createMagician();
+            const { body } = await createBody(projecting);
+
+            await AstralProjectionFlow.project(body);
+            assert.isTrue(ActorRollDataFlow.isAstrallyProjecting(projecting as any));
+            assert.isFalse(ActorRollDataFlow.isAstrallyProjecting(other as any));
+
+            await AstralProjectionFlow.returnToBody(body);
+            assert.isFalse(ActorRollDataFlow.isAstrallyProjecting(projecting as any));
+        });
+
+        it('does not project unlinked tokens of a projecting linked actor', async () => {
+            const actor = await createMagician({
+                attributes: { body: { base: 3 }, willpower: { base: 6 } },
             });
+            const { scene, body } = await createBody(actor);
+            const [unlinked] = await scene.createEmbeddedDocuments('Token', [{ actorId: actor.id, actorLink: false }]);
 
-            assert.isTrue(ActorRollDataFlow.isAstrallyProjecting(firstActor as any));
-            assert.isFalse(ActorRollDataFlow.isAstrallyProjecting(secondActor as any));
+            await AstralProjectionFlow.project(body);
+            assert.isTrue(ActorRollDataFlow.isAstrallyProjecting(actor as any));
+            // Synthetic actors are built from their base actor's data, including its flags.
+            assert.isFalse(ActorRollDataFlow.isAstrallyProjecting(unlinked.actor as any));
+            const rollData = unlinked.actor!.getRollData({ copySystem: true });
+            assert.strictEqual(rollData.attributes.body.value, unlinked.actor!.system.attributes.body.value);
 
-            await body.update({ actorId: secondActor.id });
+            await AstralProjectionFlow.returnToBody(body);
+        });
 
-            assert.isFalse(ActorRollDataFlow.isAstrallyProjecting(firstActor as any));
-            assert.isTrue(ActorRollDataFlow.isAstrallyProjecting(secondActor as any));
+        it('ends the projection on the original actor after the body is given another actor', async () => {
+            const original = await createMagician();
+            const replacement = await createMagician();
+            const { body } = await createBody(original);
+
+            await AstralProjectionFlow.project(body);
+            await body.update({ actorId: replacement.id });
+            await AstralProjectionFlow.returnToBody(body);
+
+            assert.isFalse(ActorRollDataFlow.isAstrallyProjecting(original as any));
+            assert.strictEqual(original.system.initiative.perception, 'meatspace');
+            assert.isFalse(ActorRollDataFlow.isAstrallyProjecting(replacement as any));
         });
 
         it('keeps duplicate projection requests idempotent', async () => {
             const actor = await createMagician();
             const { scene, body } = await createBody(actor);
 
-            const first = await AstralProjectionFlow.project(body, 'same-request');
-            const second = await AstralProjectionFlow.project(body, 'same-request');
+            const first = await AstralProjectionFlow.project(body);
+            const second = await AstralProjectionFlow.project(body);
 
             assert.strictEqual(second, first);
             assert.strictEqual(scene.tokens.size, 2);
@@ -300,7 +319,7 @@ export const shadowrunVisionProjection = (context: QuenchBatchContext) => {
             await AstralProjectionFlow.handleSocketMessage(
                 {
                     type: FLAGS.AstralProjectionOperation,
-                    data: { action: 'project', tokenUuid: body.uuid, requestId: 'socket-request' },
+                    data: { action: 'project', tokenUuid: body.uuid },
                 },
                 game.user.id,
             );

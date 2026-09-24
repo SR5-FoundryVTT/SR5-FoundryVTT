@@ -2,13 +2,7 @@ import { RollDataOptions } from "../../item/Types";
 import { SR5Actor } from "../SR5Actor";
 import { RiggingRules } from '@/module/rules/RiggingRules';
 import { FLAGS, SYSTEM_NAME } from '@/module/constants';
-
-/**
- * Linked actors have no token of their own to read projection state from, so finding out whether
- * they project means scanning every token of every scene. getRollData runs on each data preparation,
- * so that scan is cached and only dropped when a token's system flags or the scene list change.
- */
-let projectedLinkedActorIds: Set<string> | null = null;
+import { getProjectionState } from '@/module/vision/astralProjection/AstralProjectionState';
 
 /**
  * Tests that resolve for the physical body instead of the astral form, and therefore keep their
@@ -23,18 +17,6 @@ const PHYSICAL_BODY_TESTS = ['PhysicalResistTest', 'NaturalRecoveryPhysicalTest'
  * Functionality here 
  */
 export const ActorRollDataFlow = {
-    registerHooks() {
-        const invalidate = () => { projectedLinkedActorIds = null; };
-        Hooks.on('createToken', invalidate);
-        Hooks.on('deleteToken', invalidate);
-        Hooks.on('createScene', invalidate);
-        Hooks.on('deleteScene', invalidate);
-        Hooks.on('ready', invalidate);
-        Hooks.on('updateToken', (_token, changed: Record<string, any>) => {
-            if (changed?.flags?.[SYSTEM_NAME] || 'actorId' in changed || 'actorLink' in changed) invalidate();
-        });
-    },
-
     /**
      * Use the given roll data to inject values for a roll of the given actor.
      * 
@@ -49,11 +31,8 @@ export const ActorRollDataFlow = {
         if (actor.isType('character')
             && ActorRollDataFlow.isAstrallyProjecting(actor)
             && !ActorRollDataFlow.isPhysicalBodyTest(options)) {
-            rollData = {
-                ...rollData,
-                attributes: Object.fromEntries(Object.entries(rollData.attributes ?? {})
-                    .map(([id, attribute]) => [id, foundry.utils.deepClone(attribute)])),
-            };
+            // injectAstralRollData replaces attribute entries, so copy the container it writes to.
+            rollData = { ...rollData, attributes: { ...rollData.attributes } };
             ActorRollDataFlow.injectAstralRollData(actor, rollData, options);
         }
         return rollData;
@@ -107,30 +86,19 @@ export const ActorRollDataFlow = {
         }
     },
 
+    /**
+     * Determine if an actor is astrally projecting.
+     *
+     * A linked actor is flagged by AstralProjectionFlow for as long as it projects. A synthetic actor
+     * inherits its base actor's flags, so an unlinked token only projects when its own token is part of
+     * a projection. A projected form shares its body's synthetic actor, whose token is the body.
+     *
+     * token.actor is never read here. ActorDelta construction calls getRollData while an unlinked
+     * token's synthetic actor is still being materialized, and reading token.actor would recursively
+     * materialize that same delta, or its projected form's delta.
+     */
     isAstrallyProjecting(actor: SR5Actor) {
-        // ActorDelta construction calls getRollData while an unlinked token's synthetic actor is
-        // still being materialized. Reading token.actor here can recursively materialize that same
-        // delta (or its projected form's delta), so projection membership must use token metadata.
-        if (actor.isToken) {
-            const state = actor.token?.getFlag(SYSTEM_NAME, FLAGS.AstralProjection) as
-                | { role?: string }
-                | undefined;
-            return state?.role === 'body' || state?.role === 'form';
-        }
-
-        projectedLinkedActorIds ??= ActorRollDataFlow.collectProjectedLinkedActorIds();
-        return !!actor.id && projectedLinkedActorIds.has(actor.id);
-    },
-
-    collectProjectedLinkedActorIds() {
-        const ids = new Set<string>();
-        for (const scene of game.scenes ?? []) {
-            for (const token of scene.tokens) {
-                if (!token.actorLink || !token.actorId) continue;
-                const state = token.getFlag(SYSTEM_NAME, FLAGS.AstralProjection) as { role?: string } | undefined;
-                if (state?.role === 'body' || state?.role === 'form') ids.add(token.actorId);
-            }
-        }
-        return ids;
+        if (actor.isToken) return !!getProjectionState(actor.token);
+        return !!actor.getFlag(SYSTEM_NAME, FLAGS.AstralProjecting);
     },
 }

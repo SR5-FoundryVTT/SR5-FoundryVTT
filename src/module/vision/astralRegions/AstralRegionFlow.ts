@@ -1,8 +1,8 @@
-import { AstralProjectionFlow } from '../astralProjection/AstralProjectionFlow';
+import { isAstralForm } from '../astralProjection/AstralProjectionState';
 import {
     ASTRAL_BARRIER_REGION_BEHAVIOR,
     ASTRAL_WARD_REGION_BEHAVIOR,
-    AstralBoundaryBehaviorData,
+    type AstralBoundaryRegionBehavior,
 } from './AstralRegionBehavior';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import type { SuccessTest } from '@/module/tests/SuccessTest';
@@ -61,11 +61,8 @@ export class AstralRegionFlow {
         viewer?: TokenDocument | null,
     ) {
         if (!(scene instanceof Scene)) return false;
-        for (const { region } of this.boundariesFor(scene, 'blockSight', viewer)) {
-            const segments = region.segmentizeMovementPath([origin, destination], [{ x: 0, y: 0 }], 0.75);
-            if (segments.some(segment => segment.type !== CONST.REGION_MOVEMENT_SEGMENTS.MOVE)) return true;
-        }
-        return false;
+        return this.boundariesFor(scene, 'blockSight', viewer)
+            .some(({ region }) => this.crosses(region, origin, destination));
     }
 
     /** Sum the visual penalties of every astral boundary crossed by a line of sight. */
@@ -79,7 +76,7 @@ export class AstralRegionFlow {
         let penalty = 0;
         for (const { region, behavior } of this.boundariesFor(scene, undefined, viewer)) {
             if (!this.crosses(region, origin, destination)) continue;
-            penalty += (behavior.system as unknown as AstralBoundaryBehaviorData).force;
+            penalty += this.dataOf(behavior).force;
         }
         return penalty;
     }
@@ -226,14 +223,14 @@ export class AstralRegionFlow {
     private static boundariesFor(scene: Scene, field?: AstralBoundaryField, token?: TokenDocument | null) {
         const actorUuid = token?.baseActor?.uuid;
         return this.activeBoundaries(scene).filter(({ behavior }) => {
-            const system = behavior.system as unknown as AstralBoundaryBehaviorData;
+            const system = this.dataOf(behavior);
             return (!field || system[field]) && !(actorUuid && system.allowedActors.has(actorUuid));
         });
     }
 
     /** Projected forms and actors that exist only on the astral plane are constrained by barriers. */
     private static isAstralForm(token: TokenDocument) {
-        if (AstralProjectionFlow.isForm(token)) return true;
+        if (isAstralForm(token)) return true;
         const targets = token.actor?.system.visibilityChecks.targets;
         return targets?.astral.astralActive === true && targets.physical.active === false;
     }
@@ -263,6 +260,10 @@ export class AstralRegionFlow {
         }
         this.boundaryCache.set(scene.id!, boundaries);
         return boundaries;
+    }
+
+    private static dataOf(behavior: RegionBehavior) {
+        return behavior.system as unknown as AstralBoundaryRegionBehavior;
     }
 
     private static isAstralBoundary(type: string) {

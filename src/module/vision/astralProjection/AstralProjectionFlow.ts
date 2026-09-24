@@ -3,38 +3,20 @@ import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 import { SocketMessage } from '@/module/sockets';
 import { PerceptionFlow } from '@/module/vision/PerceptionFlow';
 import { PerceptionResolver } from '@/module/vision/PerceptionResolver';
+import { AstralPerceptionFlow } from '@/module/vision/astralPerception/AstralPerceptionFlow';
 import {
-    ASTRAL_PERCEPTION_VISION_MODE,
-    AstralPerceptionFlow,
-    PreviousTokenVision,
-} from '@/module/vision/astralPerception/AstralPerceptionFlow';
+    AstralProjectionBodyState,
+    AstralProjectionFormState,
+    AstralProjectionState,
+    getProjectionBody,
+    getProjectionForm,
+    getProjectionState,
+    isAstralForm,
+} from './AstralProjectionState';
 
 export const ASTRAL_WALK_METERS = 100;
 export const ASTRAL_RUN_METERS = 5000;
 export const ASTRAL_FORM_ALPHA = 0.5;
-
-interface ProjectionRestorationState extends PreviousTokenVision {
-    initiativeMode: string;
-    resumeAstralPerception: boolean;
-}
-
-export interface AstralProjectionBodyState {
-    role: 'body';
-    requestId: string;
-    formTokenUuid: string;
-    previous: ProjectionRestorationState;
-}
-
-export interface AstralProjectionFormState {
-    role: 'form';
-    requestId: string;
-    bodyTokenUuid: string;
-    previousInitiativeMode: string;
-    movement: { walk: number; run: number };
-    initiativeMode: 'astral';
-}
-
-export type AstralProjectionState = AstralProjectionBodyState | AstralProjectionFormState;
 
 type ProjectionAction = 'project' | 'return';
 
@@ -62,33 +44,31 @@ export class AstralProjectionFlow {
     }
 
     static canProject(actor: SR5Actor) {
-        return PerceptionResolver.resolve(actor).capabilities.astral.projection;
+        return PerceptionResolver.resolve(actor).astral.projection;
     }
 
     static getState(token: TokenDocument): AstralProjectionState | undefined {
-        const state = token.getFlag(SYSTEM_NAME, FLAGS.AstralProjection) as AstralProjectionState | undefined;
-        if (!state || (state.role !== 'body' && state.role !== 'form')) return undefined;
-        return state;
-    }
-
-    static isForm(token: TokenDocument) {
-        return this.getState(token)?.role === 'form';
+        return getProjectionState(token);
     }
 
     static isProjected(token: TokenDocument) {
         return !!this.getState(token);
     }
 
+    /** Astral movement rates of a form in its scene's units. Other tokens use their actor's movement. */
     static getMovementRates(token: TokenDocument) {
-        const state = this.getState(token);
-        return state?.role === 'form' ? state.movement : undefined;
+        if (!isAstralForm(token)) return undefined;
+        const units = token.parent?.grid.units ?? 'm';
+        return {
+            walk: PerceptionFlow.metersToSceneUnits(ASTRAL_WALK_METERS, units),
+            run: PerceptionFlow.metersToSceneUnits(ASTRAL_RUN_METERS, units),
+        };
     }
 
     static async toggle(token: TokenDocument) {
-        const state = this.getState(token);
-        const body = state?.role === 'form' ? await this.resolveToken(state.bodyTokenUuid) : token;
+        const body = getProjectionBody(token);
         if (!body) return false;
-        const action: ProjectionAction = this.getState(body)?.role === 'body' ? 'return' : 'project';
+        const action: ProjectionAction = this.isProjected(body) ? 'return' : 'project';
 
         if (game.user?.isGM) {
             if (action === 'return') await this.returnToBody(body);
@@ -100,11 +80,7 @@ export class AstralProjectionFlow {
             ui.notifications.warn(game.i18n.localize('SR5.Vision.CannotControlAstralProjection'));
             return false;
         }
-        SocketMessage.emitForGM(FLAGS.AstralProjectionOperation, {
-            action,
-            tokenUuid: body.uuid,
-            requestId: foundry.utils.randomID(),
-        });
+        SocketMessage.emitForGM(FLAGS.AstralProjectionOperation, { action, tokenUuid: body.uuid });
         return action === 'project';
     }
 
@@ -114,8 +90,8 @@ export class AstralProjectionFlow {
         if ((action !== 'project' && action !== 'return') || typeof tokenUuid !== 'string') return;
 
         const requestingUser = game.users?.get(senderId);
-        const token = await this.resolveToken(tokenUuid);
-        if (!requestingUser || !token || !this.userOwnsActor(token, requestingUser)) {
+        const token = fromUuidSync(tokenUuid as any);
+        if (!requestingUser || !(token instanceof TokenDocument) || !this.userOwnsActor(token, requestingUser)) {
             console.warn('Shadowrun 5e | Rejected unauthorized astral projection request.', {
                 senderId,
                 tokenUuid,
@@ -123,11 +99,11 @@ export class AstralProjectionFlow {
             return;
         }
 
-        if (action === 'project') await this.project(token, message.data.requestId);
+        if (action === 'project') await this.project(token);
         else await this.returnToBody(token);
     }
 
-    static async project(body: TokenDocument, requestId = foundry.utils.randomID()) {
+    static async project(body: TokenDocument) {
         const actor = body.actor as SR5Actor | null;
         const scene = body.parent;
         if (!actor || !(scene instanceof Scene) || !this.canProject(actor)) {
@@ -139,61 +115,51 @@ export class AstralProjectionFlow {
         const existingActorProjection = this.projectedBodyForActor(actor);
         if (existingActorProjection && existingActorProjection !== body) {
             ui.notifications.warn(game.i18n.localize('SR5.Vision.AlreadyProjectingAstrally'));
-            return this.resolveForm(existingActorProjection);
+            return getProjectionForm(existingActorProjection);
         }
 
         // A second request while the first is still running must report the form the first one creates.
         const inFlight = this.operations.get(bodyUuid);
         if (inFlight) {
             await inFlight.catch(() => undefined);
-            return this.resolveForm(body);
+            return getProjectionForm(body);
         }
 
         return this.runExclusive(bodyUuid, async () => {
             const existing = this.getState(body);
+            if (existing?.role === 'form') return body;
             if (existing?.role === 'body') {
-                const form = await this.resolveToken(existing.formTokenUuid);
+                const form = getProjectionForm(body);
                 if (form) return form;
-                await this.restoreBody(body, existing, true);
-            } else if (existing?.role === 'form') {
-                return body;
+                await this.restoreBody(body, existing);
             }
 
             const resumeAstralPerception = AstralPerceptionFlow.isActive(body);
             if (resumeAstralPerception) await AstralPerceptionFlow.disable(body);
 
             const source = body.toObject();
-            const previous: ProjectionRestorationState = {
-                sight: foundry.utils.deepClone(source.sight) as Record<string, unknown>,
-                detectionModes: foundry.utils.deepClone(source.detectionModes),
-                initiativeMode: actor.system.initiative?.perception ?? 'meatspace',
-                resumeAstralPerception,
-            };
+            const initiativeMode = actor.system.initiative?.perception ?? 'meatspace';
             const formId = foundry.utils.randomID();
-            const formTokenUuid = `${scene.uuid}.Token.${formId}`;
             const bodyState: AstralProjectionBodyState = {
                 role: 'body',
-                requestId,
-                formTokenUuid,
-                previous,
+                formTokenId: formId,
+                linkedActorId: body.actorLink ? actor.id! : undefined,
+                previous: { ...AstralPerceptionFlow.captureVision(source), initiativeMode, resumeAstralPerception },
             };
             const formState: AstralProjectionFormState = {
                 role: 'form',
-                requestId,
-                bodyTokenUuid: bodyUuid,
-                previousInitiativeMode: previous.initiativeMode,
-                movement: {
-                    walk: PerceptionFlow.metersToSceneUnits(ASTRAL_WALK_METERS, scene.grid.units),
-                    run: PerceptionFlow.metersToSceneUnits(ASTRAL_RUN_METERS, scene.grid.units),
-                },
-                initiativeMode: 'astral',
+                bodyTokenId: body.id!,
+                previousInitiativeMode: initiativeMode,
             };
 
             await body.update({
                 sight: { ...source.sight, enabled: false },
                 [`flags.${SYSTEM_NAME}.${FLAGS.AstralProjection}`]: bodyState,
             });
-            await actor.update({ system: { initiative: { perception: 'astral' } } } as any);
+            await actor.update({
+                system: { initiative: { perception: 'astral' } },
+                [`flags.${SYSTEM_NAME}.${FLAGS.AstralProjecting}`]: true,
+            } as any);
 
             try {
                 const [form] = await scene.createEmbeddedDocuments(
@@ -205,27 +171,20 @@ export class AstralProjectionFlow {
                 this.focusForm(body, form);
                 return form;
             } catch (error) {
-                await this.restoreBody(body, bodyState, true);
+                await this.restoreBody(body, bodyState);
                 throw error;
             }
         });
     }
 
     static async returnToBody(token: TokenDocument) {
-        const initial = this.getState(token);
-        const body = initial?.role === 'form' ? await this.resolveToken(initial.bodyTokenUuid) : token;
-        if (!body) return false;
-        const bodyUuid = body.uuid!;
-        if (this.operations.has(bodyUuid)) return false;
+        const body = getProjectionBody(token);
+        const state = getProjectionState(body);
+        if (!body || state?.role !== 'body' || this.operations.has(body.uuid!)) return false;
 
-        const state = this.getState(body);
-        if (state?.role !== 'body') return false;
-        return this.runExclusive(bodyUuid, async () => {
-            const form = await this.resolveToken(state.formTokenUuid);
-            if (form) {
-                await form.delete({ sr5ProjectionReturn: true } as any);
-            }
-            await this.restoreBody(body, state, true);
+        return this.runExclusive(body.uuid!, async () => {
+            await getProjectionForm(body)?.delete({ sr5ProjectionReturn: true } as any);
+            await this.restoreBody(body, state);
             this.focusBody(body);
             return true;
         });
@@ -233,33 +192,27 @@ export class AstralProjectionFlow {
 
     static async reconcileWorld(force = false) {
         if (!force && !game.users?.activeGM?.isSelf) return;
-        const projected = Array.from(game.scenes).flatMap((scene) =>
-            Array.from(scene.tokens).filter((token) => this.isProjected(token)),
-        );
+        const projected = game.scenes.contents.flatMap(scene => scene.tokens.filter(token => this.isProjected(token)));
 
-        for (const token of projected) {
-            const state = this.getState(token);
+        // Bodies whose form is gone or doesn't project from them anymore.
+        for (const body of projected) {
+            const state = this.getState(body);
             if (state?.role !== 'body') continue;
-            const form = await this.resolveToken(state.formTokenUuid);
-            const formState = form && this.getState(form);
-            if (!form || formState?.role !== 'form' || formState.bodyTokenUuid !== token.uuid) {
-                await this.restoreBody(token, state, true);
-            }
+            if (getProjectionBody(getProjectionForm(body)) !== body) await this.restoreBody(body, state);
         }
 
-        for (const token of projected) {
-            const state = this.getState(token);
+        // Forms whose body is gone or doesn't project into them anymore.
+        for (const form of projected) {
+            const state = this.getState(form);
             if (state?.role !== 'form') continue;
-            const body = await this.resolveToken(state.bodyTokenUuid);
-            const bodyState = body && this.getState(body);
-            if (bodyState?.role === 'body' && bodyState.formTokenUuid === token.uuid) continue;
+            if (getProjectionForm(getProjectionBody(form)) === form) continue;
             // The form resolves its actor through its own projection flag, so capture it before
             // unsetting that flag drops the alias back onto the form's throwaway delta actor.
-            const actor = token.actor as SR5Actor | null;
+            const actor = form.actor as SR5Actor | null;
             // Keep the form flag through _preDelete so SR5TokenDocument does not treat an
             // unlinked form's borrowed actor as an actor that is actually being deleted.
-            await token.delete({ sr5ProjectionReturn: true } as any);
-            await this.restoreInitiative(actor, state.previousInitiativeMode);
+            await form.delete({ sr5ProjectionReturn: true } as any);
+            await this.restoreActor(actor, state.previousInitiativeMode);
         }
     }
 
@@ -273,41 +226,26 @@ export class AstralProjectionFlow {
         flags[SYSTEM_NAME] ??= {};
         delete flags[SYSTEM_NAME][FLAGS.AstralPerceptionVision];
         flags[SYSTEM_NAME][FLAGS.AstralProjection] = state;
-        const range = Math.max(body.sight.range ?? 0, 10000);
 
         return {
             ...bodySource,
+            ...AstralPerceptionFlow.astralVision(body, bodySource),
             _id: formId,
             name: game.i18n.format('SR5.Vision.AstralFormName', { name: body.name }),
             alpha: ASTRAL_FORM_ALPHA,
             actorId: body.actorId,
             actorLink: body.actorLink,
             delta: body.actorLink ? undefined : foundry.utils.deepClone(bodySource.delta),
-            sight: {
-                ...bodySource.sight,
-                enabled: true,
-                range,
-                visionMode: ASTRAL_PERCEPTION_VISION_MODE,
-            },
-            detectionModes: PerceptionFlow.reconcileAstralDetectionModes(bodySource.detectionModes, range),
             flags,
         };
     }
 
-    private static async restoreBody(body: TokenDocument, state: AstralProjectionBodyState, resumePerception: boolean) {
-        await body.update({
-            sight: state.previous.sight,
-            detectionModes: PerceptionFlow.detectionModeUpdate(
-                body.toObject().detectionModes,
-                state.previous.detectionModes,
-            ) as any,
+    private static async restoreBody(body: TokenDocument, state: AstralProjectionBodyState) {
+        await AstralPerceptionFlow.restoreVision(body, state.previous, {
             [`flags.${SYSTEM_NAME}.-=${FLAGS.AstralProjection}`]: null,
         });
-        await this.restoreInitiative(body.actor as SR5Actor | null, state.previous.initiativeMode);
-        PerceptionFlow.refreshTokenSource(body);
-        if (resumePerception && state.previous.resumeAstralPerception) {
-            await AstralPerceptionFlow.enable(body);
-        }
+        await this.restoreActor(this.projectingActor(body, state), state.previous.initiativeMode);
+        if (state.previous.resumeAstralPerception) await AstralPerceptionFlow.enable(body);
     }
 
     private static async handleDeletedToken(token: TokenDocument, userId?: string, intentionalReturn = false) {
@@ -317,27 +255,21 @@ export class AstralProjectionFlow {
         const handlesCleanup = this.handlesCleanupFor(userId);
 
         if (state.role === 'form') {
-            const body = await this.resolveToken(state.bodyTokenUuid);
+            const body = getProjectionBody(token);
             if (token.object?.controlled && body) this.focusBody(body);
-            if (intentionalReturn) return;
-            if (!handlesCleanup || !body) return;
-            const bodyUuid = body.uuid!;
-            if (this.operations.has(bodyUuid)) return;
+            if (intentionalReturn || !handlesCleanup || !body) return;
             const bodyState = this.getState(body);
-            if (bodyState?.role !== 'body') return;
-            await this.runExclusive(bodyUuid, () => this.restoreBody(body, bodyState, true));
+            if (bodyState?.role !== 'body' || this.operations.has(body.uuid!)) return;
+            await this.runExclusive(body.uuid!, () => this.restoreBody(body, bodyState));
             return;
         }
 
         if (!handlesCleanup || this.operations.has(token.uuid!)) return;
-        const form = await this.resolveToken(state.formTokenUuid);
-        if (form) {
-            // Keeping the form flag through _preDelete prevents storage cleanup for the body's
-            // borrowed synthetic actor. The option also prevents the form hook restoring a body
-            // which is itself being deleted.
-            await form.delete({ sr5ProjectionReturn: true } as any);
-        }
-        await this.restoreInitiative(token.actor as SR5Actor | null, state.previous.initiativeMode);
+        // Keeping the form flag through _preDelete prevents storage cleanup for the body's
+        // borrowed synthetic actor. The option also prevents the form hook restoring a body
+        // which is itself being deleted.
+        await getProjectionForm(token)?.delete({ sr5ProjectionReturn: true } as any);
+        await this.restoreActor(this.projectingActor(token, state), state.previous.initiativeMode);
     }
 
     private static async handleDeletedScene(scene: Scene, userId?: string) {
@@ -345,19 +277,19 @@ export class AstralProjectionFlow {
         const restorations = new Map<SR5Actor, string>();
         for (const token of scene.tokens) {
             const state = this.getState(token);
-            const actor = token.actor as SR5Actor | null;
-            if (!state || !actor) continue;
-            const previousMode = state.role === 'body' ? state.previous.initiativeMode : state.previousInitiativeMode;
-            restorations.set(actor, previousMode);
+            // A form with its body in the scene is restored through that body.
+            if (!state || (state.role === 'form' && getProjectionBody(token))) continue;
+            const actor = state.role === 'body' ? this.projectingActor(token, state) : token.actor as SR5Actor | null;
+            if (!actor) continue;
+            restorations.set(actor, state.role === 'body' ? state.previous.initiativeMode : state.previousInitiativeMode);
         }
-        for (const [actor, mode] of restorations) await this.restoreInitiative(actor, mode);
+        for (const [actor, mode] of restorations) await this.restoreActor(actor, mode);
     }
 
     private static focusCreatedForm(token: TokenDocument) {
-        const state = this.getState(token);
-        if (state?.role !== 'form' || token.parent !== canvas.scene) return;
-        const body = fromUuidSync(state.bodyTokenUuid);
-        if (body?.documentName === 'Token') this.focusForm(body as TokenDocument, token);
+        if (!isAstralForm(token) || token.parent !== canvas.scene) return;
+        const body = getProjectionBody(token);
+        if (body) this.focusForm(body, token);
     }
 
     /**
@@ -389,9 +321,9 @@ export class AstralProjectionFlow {
     }
 
     private static projectedBodyForActor(actor: SR5Actor) {
-        return Array.from(game.scenes)
-            .flatMap((scene) => Array.from(scene.tokens))
-            .find((token) => token.actor === actor && this.getState(token)?.role === 'body');
+        return game.scenes.contents
+            .flatMap(scene => scene.tokens.contents)
+            .find(token => token.actor === actor && this.getState(token)?.role === 'body');
     }
 
     /**
@@ -406,25 +338,26 @@ export class AstralProjectionFlow {
         });
     }
 
-    private static async resolveForm(body: TokenDocument) {
-        const state = this.getState(body);
-        return state?.role === 'body' ? this.resolveToken(state.formTokenUuid) : null;
+    /**
+     * The actor that started a body's projection.
+     *
+     * A linked body's token can be pointed at another actor while projecting, but the projection
+     * still has to end on the world actor it started on.
+     */
+    private static projectingActor(body: TokenDocument, state: AstralProjectionBodyState) {
+        const linked = state.linkedActorId ? game.actors.get(state.linkedActorId) : undefined;
+        return (linked ?? body.actor) as SR5Actor | null;
     }
 
-    private static async resolveToken(uuid: string) {
-        const match = /^Scene\.([^.]+)\.Token\.([^.]+)$/.exec(uuid);
-        if (match) {
-            const token = game.scenes?.get(match[1])?.tokens.get(match[2]);
-            if (token) return token;
-        }
-        const document = await fromUuid(uuid as any);
-        return document?.documentName === 'Token' ? (document as TokenDocument) : null;
-    }
-
-    private static async restoreInitiative(actor: SR5Actor | null, mode: string) {
-        if (actor && actor.system.initiative?.perception !== mode) {
-            await actor.update({ system: { initiative: { perception: mode } } } as any);
-        }
+    /** Put back the actor's initiative mode and end its projection. */
+    private static async restoreActor(actor: SR5Actor | null, initiativeMode: string) {
+        if (!actor) return;
+        const projecting = !!actor.getFlag(SYSTEM_NAME, FLAGS.AstralProjecting);
+        if (!projecting && actor.system.initiative?.perception === initiativeMode) return;
+        await actor.update({
+            system: { initiative: { perception: initiativeMode } },
+            [`flags.${SYSTEM_NAME}.-=${FLAGS.AstralProjecting}`]: null,
+        } as any);
     }
 
     private static userOwnsActor(token: TokenDocument, user: User | null | undefined) {
