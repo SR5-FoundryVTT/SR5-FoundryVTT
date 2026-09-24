@@ -23,6 +23,40 @@
         </div>
 
         <div class="list-item-icons">
+            {{#if (eq item.controlMode 'remote')}}
+                <button class="icon sr5-icon active"
+                        data-action="toggleDroneControlMode"
+                        data-uuid="{{item.actorUuid}}"
+                        data-tooltip="SR5.ControlModes.Remote"
+                        title="{{localize 'SR5.ControlModes.Remote'}}">
+                    <i class="fas fa-tower-broadcast"></i>
+                </button>
+            {{else}}
+                <button class="icon sr5-icon"
+                        data-action="toggleDroneControlMode"
+                        data-uuid="{{item.actorUuid}}"
+                        data-tooltip="SR5.ControlModes.Autopilot"
+                        title="{{localize 'SR5.ControlModes.Autopilot'}}">
+                    <i class="fas fa-robot"></i>
+                </button>
+            {{/if}}
+            {{#if (eq item.controlMode 'rigger')}}
+                <button class="icon sr5-icon active"
+                        data-action="toggleJumpInIcon"
+                        data-uuid="{{item.actorUuid}}"
+                        data-tooltip="SR5.Rigger.JumpOut"
+                        title="{{localize 'SR5.Rigger.JumpOut'}}">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            {{else}}
+                <button class="icon sr5-icon"
+                        data-action="toggleJumpInIcon"
+                        data-uuid="{{item.actorUuid}}"
+                        data-tooltip="SR5.Rigger.JumpIn"
+                        title="{{localize 'SR5.Rigger.JumpIn'}}">
+                    <i class="fas fa-steering-wheel"></i>
+                </button>
+            {{/if}}
             <a class="item-icon list-item-action" data-action="openVehicleSheet" data-actor-uuid="{{item.actorUuid}}" data-tooltip="Open Sheet">
                 <i class="fas fa-file-user"></i>
             </a>

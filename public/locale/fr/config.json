@@ -1615,6 +1615,7 @@
             "sr5spunOut": "En tête-à-queue (Pénalité de maniabilité)"
         },
         "Rigger": {
+            "RiggerInterface": "Interface rigger",
             "JumpIn": "Sauter dans le véhicule",
             "JumpOut": "Quitter le véhicule",
             "JumpedInSuccess": "{rigger} a sauté dans {vehicle}",

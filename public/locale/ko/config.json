@@ -3621,6 +3621,7 @@
         "WirelessOnline": "온라인",
         "WirelessUnavailable": "이용 불가능",
         "Rigger": {
+            "RiggerInterface": "리거 인터페이스",
             "JumpIn": "점프인 (차량 탑승)",
             "JumpOut": "점프아웃 (차량 이탈)",
             "JumpedInSuccess": "{rigger}님이 {vehicle}에 점프인했습니다",

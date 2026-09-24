@@ -26,6 +26,23 @@
         <div class="list-item-icons midd-icons">
             {{!-- Add Icons for what the Owner of an item can do --}}
             {{#if (isType item.document 'vehicle')}}
+                {{#if (eq item.document.system.controlMode 'remote')}}
+                    <button class="icon sr5-icon active"
+                            data-action="toggleDroneControlMode"
+                            data-uuid="{{item.document.uuid}}"
+                            data-tooltip="SR5.ControlModes.Remote"
+                            title="{{localize 'SR5.ControlModes.Remote'}}">
+                        <i class="fas fa-tower-broadcast"></i>
+                    </button>
+                {{else}}
+                    <button class="icon sr5-icon"
+                            data-action="toggleDroneControlMode"
+                            data-uuid="{{item.document.uuid}}"
+                            data-tooltip="SR5.ControlModes.Autopilot"
+                            title="{{localize 'SR5.ControlModes.Autopilot'}}">
+                        <i class="fas fa-robot"></i>
+                    </button>
+                {{/if}}
                 {{#if (eq item.document.system.controlMode 'rigger')}}
                     <button class="icon sr5-icon active"
                             data-action="toggleJumpInIcon"

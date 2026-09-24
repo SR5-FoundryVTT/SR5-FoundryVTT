@@ -87,6 +87,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             removeMarks: SR5MatrixActorSheet.#deleteMarks,
             clearAllMarks: SR5MatrixActorSheet.#clearAllMarks,
             toggleJumpInIcon: SR5MatrixActorSheet.#toggleJumpInIcon,
+            toggleDroneControlMode: SR5MatrixActorSheet.#toggleDroneControlMode,
         },
     };
 
@@ -336,6 +337,42 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         if (!vehicleActor || !(vehicleActor instanceof SR5Actor) || !vehicleActor.isType('vehicle')) return;
 
         await this.actor.toggleJumpIn(vehicleActor);
+        void this.render();
+    }
+
+    static async #toggleDroneControlMode(this: SR5MatrixActorSheet, event: PointerEvent) {
+        event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
+
+        const uuid = SheetFlow.closestUuid(event.target);
+        if (!uuid) return;
+
+        const vehicleActor = (await fromUuid(uuid)) as SR5Actor | null;
+        if (!vehicleActor || !(vehicleActor instanceof SR5Actor) || !vehicleActor.isType('vehicle')) return;
+
+        const currentMode = vehicleActor.system.controlMode || 'autopilot';
+
+        // If currently jumped in, jumping out automatically resets it to autopilot
+        if (currentMode === 'rigger') {
+            await this.actor.toggleJumpIn(vehicleActor);
+            void this.render();
+            return;
+        }
+
+        // Toggle between autopilot (Auto mode) and remote (RCC mode)
+        const newMode = currentMode === 'remote' ? 'autopilot' : 'remote';
+
+        // When switching to remote (RCC) mode, if the drone doesn't have an active master,
+        // slave it to the rigger's active equipped RCC if present
+        const updateData: Record<string, any> = { 'system.controlMode': newMode };
+        if (newMode === 'remote' && !vehicleActor.system.master) {
+            const rccItem = this.actor.items.find(i => i.isType('device') && i.system.category === 'rcc' && i.isEquipped());
+            if (rccItem) {
+                updateData['system.master'] = rccItem.uuid;
+            }
+        }
+
+        await vehicleActor.update(updateData);
         void this.render();
     }
 

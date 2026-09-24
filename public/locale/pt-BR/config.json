@@ -2268,6 +2268,7 @@
             "sr5spunOut": "Derrapou / Descontrolou (Penalidade de Manuseio)"
         },
         "Rigger": {
+            "RiggerInterface": "Interface Rigger",
             "JumpIn": "Saltar para Veículo",
             "JumpOut": "Sair do Veículo",
             "JumpedInSuccess": "{rigger} saltou para {vehicle}",

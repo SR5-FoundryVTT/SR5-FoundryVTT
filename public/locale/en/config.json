@@ -845,6 +845,7 @@
             "Manual": "Manual"
         },
         "Rigger": {
+            "RiggerInterface": "Rigger Interface",
             "JumpIn": "Jump In",
             "JumpOut": "Jump Out",
             "JumpedInSuccess": "{rigger} jumped into {vehicle}",

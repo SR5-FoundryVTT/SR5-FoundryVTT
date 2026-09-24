@@ -4,18 +4,42 @@ import { Helpers } from '@/module/helpers';
 import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 import type { InitiativeModeOptions } from '@/module/combat/SR5Combatant';
+import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 
 export function isRiggerInterfaceItem(item: any): boolean {
     if (!item) return false;
-    if (item.getFlag?.('shadowrun5e', 'isRiggerInterface')) return true;
-    if (item.system?.category === 'powertrain' && (item.name?.toLowerCase().includes('rigger') || item.system?.subCategory === 'rigger_interface')) return true;
-    const name = item.name?.toLowerCase() || '';
-    return name.includes('rigger interface') || name.includes('riggeranpassung') || name.includes('interface rigger');
+
+    // 1. Explicit item flag (rename and translation independent)
+    if (item.getFlag?.('shadowrun5e', 'isRiggerInterface') === true) return true;
+    if (item.flags?.shadowrun5e?.isRiggerInterface === true) return true;
+
+    // 2. Structured schema modification subcategory
+    const subCategory = item.system?.subCategory || item.system?.sub_category;
+    if (subCategory === 'rigger_interface') return true;
+
+    // 3. Compendium source ID / slug matching
+    const sourceId = (item.flags?.core?.sourceId || item._stats?.compendiumSource || '') as string;
+    if (sourceId.toLowerCase().includes('rigger-interface') || sourceId.toLowerCase().includes('rigger_interface')) return true;
+
+    // 4. Dynamic localization match against active system language
+    const localizedName = game.i18n?.localize('SR5.Rigger.RiggerInterface')?.toLowerCase();
+    const itemName = (item.name || '').toLowerCase();
+    if (localizedName && itemName.includes(localizedName)) return true;
+
+    // 5. Powertrain modification name check across all supported system locales
+    const isPowertrain = item.system?.modification_category === 'powertrain' || item.system?.category === 'powertrain';
+    if (isPowertrain) {
+        const canonicalNames = ['rigger interface', 'riggeranpassung', 'interface rigger', '리거 인터페이스', 'interface de rigger'];
+        if (canonicalNames.some(cn => itemName.includes(cn))) return true;
+    }
+
+    return itemName.includes('rigger interface');
 }
 
 export function hasRiggerInterface(vehicle: SR5Actor): boolean {
+    if (!vehicle || !vehicle.isType('vehicle')) return false;
     if (vehicle.system.isDrone) return true;
-    if (vehicle.getFlag?.('shadowrun5e', 'hasRiggerInterface')) return true;
+    if (vehicle.getFlag?.('shadowrun5e', 'hasRiggerInterface') === true) return true;
     return vehicle.items.some(isRiggerInterfaceItem);
 }
 
@@ -67,6 +91,24 @@ export const RiggerFlow = {
 
         // 4. Update vehicle controlMode to 'rigger'
         await vehicle.update({ system: { controlMode: 'rigger' } });
+
+        // Ensure all other vehicles owned/driven by the driver are set to 'autopilot'
+        const otherVehicles = (game.actors?.contents || []).filter(a => a.isType('vehicle') && a.uuid !== vehicle.uuid && ActorOwnershipFlow._isOwnerOfActor(driver, a)) as SR5Actor[];
+        for (const other of otherVehicles) {
+            if (other.system.controlMode !== 'autopilot') {
+                await other.update({ system: { controlMode: 'autopilot' } });
+            }
+        }
+        if (canvas.scene?.tokens) {
+            for (const t of canvas.scene.tokens) {
+                const tokenActor = t.actor as SR5Actor | null;
+                if (tokenActor && tokenActor.isType('vehicle') && tokenActor.uuid !== vehicle.uuid && ActorOwnershipFlow._isOwnerOfActor(driver, tokenActor)) {
+                    if (tokenActor.system.controlMode !== 'autopilot') {
+                        await tokenActor.update({ system: { controlMode: 'autopilot' } });
+                    }
+                }
+            }
+        }
 
         // 5. Update driver matrix state to VR & Hot Sim via setInitiativeMode
         if (driver.isType('character')) {

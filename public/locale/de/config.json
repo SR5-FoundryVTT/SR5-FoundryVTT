@@ -847,6 +847,7 @@
             "Manual": "Manuell"
         },
         "Rigger": {
+            "RiggerInterface": "Riggeranpassung",
             "JumpIn": "Hineinspringen",
             "JumpOut": "Hinausspringen",
             "JumpedInSuccess": "{rigger} ist in {vehicle} hineingesprungen",
