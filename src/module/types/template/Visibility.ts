@@ -1,77 +1,52 @@
+import { SR5 } from '@/module/config';
+
 const { SchemaField, BooleanField, StringField } = foundry.data.fields;
 
-export type ThermographicSignature = 'none' | 'cold' | 'warm' | 'hot';
+type SpaceTypes = (Shadowrun.SpaceTypes | 'astralActive')[];
 
-export interface PerceptionCapabilities {
-    physical: {
-        lowLight: boolean;
-        thermographic: boolean;
-        ultrasound: boolean;
-    };
-    astral: {
-        perception: boolean;
-        projection: boolean;
-    };
-    matrix: {
-        perception: boolean;
-    };
-}
-
-export interface PerceptionTargets {
-    physical: {
-        active: boolean;
-        thermographic: ThermographicSignature;
-    };
-    astral: {
-        hasAura: boolean;
-        astralActive: boolean;
-        affectedBySpell: boolean;
-    };
-    matrix: {
-        hasIcon: boolean;
-        runningSilent: boolean;
-    };
-}
-
-export const VisibilityChecks = (...spaces: (Shadowrun.SpaceTypes | 'astralActive')[]) => ({
-    capabilities: new SchemaField({
-        physical: new SchemaField({
-            lowLight: new BooleanField(),
-            thermographic: new BooleanField(),
-            ultrasound: new BooleanField(),
-        }),
-        astral: new SchemaField({
-            perception: new BooleanField({ initial: spaces.includes('astralActive') }),
-            projection: new BooleanField(),
-        }),
-        matrix: new SchemaField({
-            perception: new BooleanField({ initial: spaces.includes('matrix') }),
-        }),
+/** Senses an actor perceives with. */
+const PerceptionCapabilitiesData = (spaces: SpaceTypes) => ({
+    physical: new SchemaField({
+        lowLight: new BooleanField(),
+        thermographic: new BooleanField(),
+        ultrasound: new BooleanField(),
     }),
-    targets: new SchemaField({
-        physical: new SchemaField({
-            active: new BooleanField({ initial: spaces.includes('meatspace') }),
-            thermographic: new StringField({
-                required: true,
-                initial: spaces.includes('meatspace') ? 'warm' : 'none',
-                choices: {
-                    none: 'SR5.Vision.ThermographicSignatures.None',
-                    cold: 'SR5.Vision.ThermographicSignatures.Cold',
-                    warm: 'SR5.Vision.ThermographicSignatures.Warm',
-                    hot: 'SR5.Vision.ThermographicSignatures.Hot',
-                },
-                label: 'SR5.Vision.ThermographicSignature',
-                hint: 'SR5.Vision.ThermographicSignatureHint',
-            }),
-        }),
-        astral: new SchemaField({
-            hasAura: new BooleanField({ initial: spaces.includes('astral') }),
-            astralActive: new BooleanField({ initial: spaces.includes('astralActive') }),
-            affectedBySpell: new BooleanField(),
-        }),
-        matrix: new SchemaField({
-            hasIcon: new BooleanField({ initial: spaces.includes('matrix') }),
-            runningSilent: new BooleanField(),
-        }),
+    astral: new SchemaField({
+        perception: new BooleanField({ initial: spaces.includes('astralActive') }),
+        projection: new BooleanField(),
+    }),
+    matrix: new SchemaField({
+        perception: new BooleanField({ initial: spaces.includes('matrix') }),
     }),
 });
+
+/** How an actor can be perceived by others. */
+const PerceptionTargetsData = (spaces: SpaceTypes) => ({
+    physical: new SchemaField({
+        active: new BooleanField({ initial: spaces.includes('meatspace') }),
+        thermographic: new StringField({
+            required: true,
+            initial: spaces.includes('meatspace') ? 'warm' : 'none',
+            choices: SR5.thermographicSignatures,
+            label: 'SR5.Vision.ThermographicSignature',
+            hint: 'SR5.Vision.ThermographicSignatureHint',
+        }),
+    }),
+    astral: new SchemaField({
+        hasAura: new BooleanField({ initial: spaces.includes('astral') }),
+        astralActive: new BooleanField({ initial: spaces.includes('astralActive') }),
+        affectedBySpell: new BooleanField(),
+    }),
+    matrix: new SchemaField({
+        hasIcon: new BooleanField({ initial: spaces.includes('matrix') }),
+        runningSilent: new BooleanField(),
+    }),
+});
+
+export const VisibilityChecks = (...spaces: SpaceTypes) => ({
+    capabilities: new SchemaField(PerceptionCapabilitiesData(spaces)),
+    targets: new SchemaField(PerceptionTargetsData(spaces)),
+});
+
+export type PerceptionCapabilitiesType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof PerceptionCapabilitiesData>>;
+export type ThermographicSignature = keyof typeof SR5.thermographicSignatures;

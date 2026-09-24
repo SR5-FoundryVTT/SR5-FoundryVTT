@@ -1,6 +1,5 @@
-import type { PerceptionCapabilities } from '@/module/types/template/Visibility';
-
-export type MagicalType = 'mundane' | 'magician' | 'aspected_magician' | 'adept' | 'mystic_adept';
+import type { PerceptionCapabilitiesType } from '@/module/types/template/Visibility';
+import { SR5 } from '@/module/config';
 
 type PerceptionActor = {
     system: Record<string, any>;
@@ -17,9 +16,9 @@ export class PerceptionResolver {
      * actor and item effects. Metatype senses and magical eligibility are added on top, with explicit
      * GM overrides applied last.
      */
-    static resolve(actor: PerceptionActor): PerceptionCapabilities {
+    static resolve(actor: PerceptionActor): PerceptionCapabilitiesType {
         const capabilities = actor.system.visibilityChecks?.capabilities;
-        const resolved: PerceptionCapabilities = {
+        const resolved: PerceptionCapabilitiesType = {
             physical: {
                 lowLight: !!capabilities?.physical?.lowLight,
                 thermographic: !!capabilities?.physical?.thermographic,
@@ -39,7 +38,7 @@ export class PerceptionResolver {
         return resolved;
     }
 
-    private static applyMetatypeSenses(metatype: unknown, capabilities: PerceptionCapabilities) {
+    private static applyMetatypeSenses(metatype: unknown, capabilities: PerceptionCapabilitiesType) {
         if (typeof metatype !== 'string') return;
 
         switch (metatype.toLowerCase()) {
@@ -54,10 +53,10 @@ export class PerceptionResolver {
         }
     }
 
-    private static applyMagicalEligibility(magic: Record<string, any> | undefined, capabilities: PerceptionCapabilities) {
+    private static applyMagicalEligibility(magic: Record<string, any> | undefined, capabilities: PerceptionCapabilitiesType) {
         if (!magic) return;
 
-        const type = magic.type as MagicalType | undefined;
+        const type = magic.type as keyof typeof SR5.magicalTypes | undefined;
         if (type === 'magician') {
             capabilities.astral.perception = true;
             capabilities.astral.projection = true;

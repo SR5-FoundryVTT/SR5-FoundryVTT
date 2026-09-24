@@ -2,8 +2,8 @@ import { isAstralForm } from '../astralProjection/AstralProjectionState';
 import {
     ASTRAL_BARRIER_REGION_BEHAVIOR,
     ASTRAL_WARD_REGION_BEHAVIOR,
-    type AstralBoundaryRegionBehavior,
-} from './AstralRegionBehavior';
+    type AstralBoundaryType,
+} from '@/module/types/regionBehavior/AstralBoundary';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import type { SuccessTest } from '@/module/tests/SuccessTest';
 
@@ -263,7 +263,7 @@ export class AstralRegionFlow {
     }
 
     private static dataOf(behavior: RegionBehavior) {
-        return behavior.system as unknown as AstralBoundaryRegionBehavior;
+        return behavior.system as unknown as AstralBoundaryType;
     }
 
     private static isAstralBoundary(type: string) {

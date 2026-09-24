@@ -146,9 +146,14 @@ import { PerceptionFlow } from './vision/PerceptionFlow';
 import { VisionHUD } from './apps/VisionHUD';
 import { AstralProjectionFlow } from './vision/astralProjection/AstralProjectionFlow';
 import { AstralRegionFlow } from './vision/astralRegions/AstralRegionFlow';
-import { registerAstralRegionBehaviors } from './vision/astralRegions/AstralRegionBehavior';
+import {
+    ASTRAL_BARRIER_REGION_BEHAVIOR,
+    ASTRAL_WARD_REGION_BEHAVIOR,
+    AstralBarrierRegionBehavior,
+    AstralWardRegionBehavior,
+} from './types/regionBehavior/AstralBoundary';
 import { EnvironmentalRegionFlow } from './vision/environmentalRegions/EnvironmentalRegionFlow';
-import { registerEnvironmentalRegionBehaviors } from './vision/environmentalRegions/EnvironmentalRegionBehavior';
+import { ENVIRONMENT_REGION_BEHAVIOR, EnvironmentalRegionBehavior } from './types/regionBehavior/Environmental';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -445,8 +450,15 @@ ___________________
         CONFIG.Combat.dataModels["base"] = CombatDM;
         CONFIG.Combatant.dataModels["base"] = CombatantDM;
 
-        registerAstralRegionBehaviors();
-        registerEnvironmentalRegionBehaviors();
+        CONFIG.RegionBehavior.dataModels[ASTRAL_BARRIER_REGION_BEHAVIOR] = AstralBarrierRegionBehavior;
+        CONFIG.RegionBehavior.dataModels[ASTRAL_WARD_REGION_BEHAVIOR] = AstralWardRegionBehavior;
+        CONFIG.RegionBehavior.dataModels[ENVIRONMENT_REGION_BEHAVIOR] = EnvironmentalRegionBehavior;
+        CONFIG.RegionBehavior.typeIcons[ASTRAL_BARRIER_REGION_BEHAVIOR] = 'fa-solid fa-shield-halved';
+        CONFIG.RegionBehavior.typeIcons[ASTRAL_WARD_REGION_BEHAVIOR] = 'fa-solid fa-shield';
+        CONFIG.RegionBehavior.typeIcons[ENVIRONMENT_REGION_BEHAVIOR] = 'fa-solid fa-cloud-sun';
+        CONFIG.RegionBehavior.typeLabels[ASTRAL_BARRIER_REGION_BEHAVIOR] = 'SR5.Vision.AstralRegions.Barrier.Label';
+        CONFIG.RegionBehavior.typeLabels[ASTRAL_WARD_REGION_BEHAVIOR] = 'SR5.Vision.AstralRegions.Ward.Label';
+        CONFIG.RegionBehavior.typeLabels[ENVIRONMENT_REGION_BEHAVIOR] = 'SR5.Vision.EnvironmentalRegions.Environment.Label';
 
         CONFIG.Item.dataModels["action"] = Action;
         CONFIG.Item.dataModels["ammo"] = Ammo;

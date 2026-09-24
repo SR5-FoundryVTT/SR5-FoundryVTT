@@ -56,11 +56,9 @@ import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetect
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
 import UltrasoundDetectionMode from '../vision/ultrasoundVision/ultrasoundDetectionMode';
 import type { AstralProjectionState } from '../vision/astralProjection/AstralProjectionState';
-import type {
-    AstralBarrierRegionBehavior,
-    AstralWardRegionBehavior,
-} from '../vision/astralRegions/AstralRegionBehavior';
-import type { EnvironmentalRegionBehavior } from '../vision/environmentalRegions/EnvironmentalRegionBehavior';
+import type { PreviousTokenVision } from '../vision/astralPerception/AstralPerceptionFlow';
+import type { AstralBarrierRegionBehavior, AstralWardRegionBehavior } from './regionBehavior/AstralBoundary';
+import type { EnvironmentalRegionBehavior } from './regionBehavior/Environmental';
 import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
 
@@ -250,10 +248,7 @@ declare module "fvtt-types/configuration" {
         Token: {
             shadowrun5e: {
                 AutomaticTokenSenses?: boolean;
-                astralPerceptionVision?: {
-                    sight: Record<string, unknown>;
-                    detectionModes: Record<string, { enabled: boolean; range: number | null }>;
-                };
+                astralPerceptionVision?: PreviousTokenVision;
                 astralProjection?: AstralProjectionState;
                 TokenMovementPhaseMarkers?: MovementPhaseMarker[];
             };

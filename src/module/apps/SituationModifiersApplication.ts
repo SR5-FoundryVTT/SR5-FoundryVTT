@@ -4,6 +4,7 @@ import { DeepPartial } from 'fvtt-types/utils';
 import { SR5_APPV2_CSS_CLASS, SYSTEM_NAME } from "../constants";
 import { ModifiableDocumentTypes, DocumentSituationModifiers } from "../rules/DocumentSituationModifiers";
 import { isElementInstance } from '@/module/utils/dom';
+import type { RegionalPhysicalEnvironment } from '@/module/vision/environmentalRegions/EnvironmentalRegionFlow';
 
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
@@ -20,7 +21,7 @@ interface SituationalModifiersTemplateData extends HandlebarsApplicationMixin.Re
     regionalModifiers: {
         noise: number
         background_count: number
-        environmental: Record<'visibility' | 'light' | 'wind', number>
+        environmental: RegionalPhysicalEnvironment
     }
 }
 

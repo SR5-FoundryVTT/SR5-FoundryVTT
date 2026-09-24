@@ -1,7 +1,7 @@
 import { FLAGS, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from '@/module/constants';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SR5Item } from '@/module/item/SR5Item';
-import type { PerceptionCapabilities } from '@/module/types/template/Visibility';
+import type { PerceptionCapabilitiesType } from '@/module/types/template/Visibility';
 import { PerceptionResolver } from './PerceptionResolver';
 import { ULTRASOUND_RANGE_METERS } from './ultrasoundVision/ultrasoundDetectionMode';
 import { isAstralForm } from './astralProjection/AstralProjectionState';
@@ -48,7 +48,7 @@ export class PerceptionFlow {
 
     static reconcileDetectionModes(
         detectionModes: Record<string, { enabled: boolean; range: number | null }>,
-        capabilities: PerceptionCapabilities,
+        capabilities: PerceptionCapabilitiesType,
         range: number,
         sceneUnit = 'm',
     ) {

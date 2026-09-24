@@ -3,7 +3,7 @@ import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 import {
     ASTRAL_BARRIER_REGION_BEHAVIOR,
     ASTRAL_WARD_REGION_BEHAVIOR,
-} from '@/module/vision/astralRegions/AstralRegionBehavior';
+} from '@/module/types/regionBehavior/AstralBoundary';
 import { AstralRegionFlow } from '@/module/vision/astralRegions/AstralRegionFlow';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';

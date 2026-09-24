@@ -2,9 +2,9 @@ import { SR } from '@/module/constants';
 import { getProjectionBody, getProjectionForm } from '../astralProjection/AstralProjectionState';
 import {
     ENVIRONMENT_REGION_BEHAVIOR,
-    type EnvironmentalRegionBehaviorData,
+    type EnvironmentalRegionType,
     type EnvironmentLevel,
-} from './EnvironmentalRegionBehavior';
+} from '@/module/types/regionBehavior/Environmental';
 
 export type RegionalPhysicalEnvironment = Record<'visibility' | 'light' | 'wind', number>;
 
@@ -83,7 +83,7 @@ export class EnvironmentalRegionFlow {
     }
 
     private static dataOf(behavior: RegionBehavior) {
-        return behavior.system as unknown as EnvironmentalRegionBehaviorData;
+        return behavior.system as unknown as EnvironmentalRegionType;
     }
 
     private static levelValue(level: EnvironmentLevel): number {

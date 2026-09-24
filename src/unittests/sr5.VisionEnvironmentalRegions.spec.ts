@@ -1,8 +1,8 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import {
     ENVIRONMENT_REGION_BEHAVIOR,
-    type EnvironmentalRegionBehaviorData,
-} from '@/module/vision/environmentalRegions/EnvironmentalRegionBehavior';
+    type EnvironmentalRegionType,
+} from '@/module/types/regionBehavior/Environmental';
 import { EnvironmentalRegionFlow } from '@/module/vision/environmentalRegions/EnvironmentalRegionFlow';
 import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 import { SuccessTest } from '@/module/tests/SuccessTest';
@@ -19,8 +19,8 @@ const rectangle = (x: number, y: number, width: number, height: number, hole = f
 });
 
 const environment = (
-    overrides: Partial<EnvironmentalRegionBehaviorData> = {},
-): EnvironmentalRegionBehaviorData => ({
+    overrides: Partial<EnvironmentalRegionType> = {},
+): EnvironmentalRegionType => ({
     backgroundCount: 0,
     matrixNoise: 0,
     visibility: 'none',
@@ -44,7 +44,7 @@ export const shadowrunVisionEnvironmentalRegions = (context: QuenchBatchContext)
 
     const createRegion = async (
         scene: Scene.Stored,
-        system: Partial<EnvironmentalRegionBehaviorData> = {},
+        system: Partial<EnvironmentalRegionType> = {},
         shapes: RegionDocument.CreateData['shapes'] = [rectangle(0, 0, 600, 600)],
         elevation = { bottom: 0, top: 20 },
         levels: string[] = [],
