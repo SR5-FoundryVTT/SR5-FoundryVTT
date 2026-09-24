@@ -67,15 +67,61 @@ export const RiggingTestDataFlow = {
     },
 
     /**
-     * Replace the attributes used in an action to use the Mental attribute equivalent
-     * - this test verifies the actor in the roll is a vehicle being controlled remote or rigger
-     * @param action
-     * @param document
+     * Replace physical attributes with mental attributes for rigger/remote driver
      */
     replacePhysicalAttributesForMentalDriver: (action: ActionRollType, document?: SR5Actor|SR5Item) => {
         if (!document) return;
         const actor = document instanceof SR5Actor ? document : document.actorOwner;
         if (!actor?.isControlledByDriver('rigger', 'remote')) return;
         AttributeRules.replacePhysicalAttributesWithMentalAttributes(action);
+    },
+
+    /**
+     * Resolve and add Autosoft dice pool modifier for autonomous drone actions.
+     */
+    addAutosoftModifier: (test: SuccessTest) => {
+        const vehicle = test.actor?.asType('vehicle');
+        if (!vehicle) return;
+        // Autosofts apply when drone is running on autopilot
+        if (vehicle.system.controlMode !== 'autopilot') return;
+
+        const actionSkill = test.data.action?.skill || '';
+        let autosoftType = '';
+
+        if (actionSkill === 'perception') autosoftType = 'clearsight';
+        else if (actionSkill === 'sneaking') autosoftType = 'stealth';
+        else if (actionSkill === 'gunnery') autosoftType = 'targeting';
+        else if (actionSkill === 'electronic_warfare') autosoftType = 'electronic_warfare';
+        else if (actionSkill.startsWith('pilot_')) autosoftType = 'maneuvering';
+        else if (test.data.categories?.includes('defense')) autosoftType = 'evasion';
+
+        if (!autosoftType) return;
+
+        const autosoft = RiggingRules.getEffectiveAutosoft(vehicle, autosoftType);
+        if (autosoft.rating > 0) {
+            const label = autosoft.name || game.i18n.localize('SR5.Autosoft');
+            ModifiableValue.addUnique(test.data.pool, label, autosoft.rating);
+            ModifiableValue.calcTotal(test.data.pool);
+        }
+    },
+
+    /**
+     * Add Drone Swarm bonus to autonomous drone dice pools and limits (Rigger 5.0 p. 31).
+     */
+    addSwarmModifier: (test: SuccessTest) => {
+        const vehicle = test.actor?.asType('vehicle');
+        if (!vehicle) return;
+        if (vehicle.system.controlMode !== 'autopilot') return;
+
+        const swarmInfo = RiggingRules.getSwarmPilotInfo(vehicle);
+        if (swarmInfo.bonus > 0) {
+            ModifiableValue.addUnique(test.data.pool, game.i18n.localize('SR5.SwarmBonus'), swarmInfo.bonus);
+            ModifiableValue.calcTotal(test.data.pool);
+
+            if (test.data.limit) {
+                ModifiableValue.addUnique(test.data.limit, game.i18n.localize('SR5.SwarmBonus'), swarmInfo.bonus);
+                ModifiableValue.calcTotal(test.data.limit);
+            }
+        }
     },
 }

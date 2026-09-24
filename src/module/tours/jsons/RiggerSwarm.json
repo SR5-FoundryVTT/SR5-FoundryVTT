@@ -1,0 +1,50 @@
+{
+  "title": "SR5.Tours.RiggerSwarm.Title",
+  "description": "SR5.Tours.RiggerSwarm.Description",
+  "canBeResumed": true,
+  "display": true,
+  "actorType": "vehicle",
+  "steps": [
+    {
+      "id": "DroneAttributes",
+      "selector": ".tab[data-tab='skills'] .attributes",
+      "tab": "skills",
+      "title": "SR5.Tours.RiggerSwarm.DroneAttributesTitle",
+      "content": "SR5.Tours.RiggerSwarm.DroneAttributesContent"
+    },
+    {
+      "id": "EnableSwarm",
+      "selector": ".rigger-swarm-bar",
+      "tab": "skills",
+      "title": "SR5.Tours.RiggerSwarm.EnableSwarmTitle",
+      "content": "SR5.Tours.RiggerSwarm.EnableSwarmContent"
+    },
+    {
+      "id": "EnableSwarmActive",
+      "selector": "input[name='system.swarm.active']",
+      "tab": "skills",
+      "title": "SR5.Tours.RiggerSwarm.EnableSwarmActiveTitle",
+      "content": "SR5.Tours.RiggerSwarm.EnableSwarmActiveContent"
+    },
+    {
+      "id": "SwarmCount",
+      "selector": "input[name='system.swarm.count']",
+      "tab": "skills",
+      "title": "SR5.Tours.RiggerSwarm.SwarmCountTitle",
+      "content": "SR5.Tours.RiggerSwarm.SwarmCountContent"
+    },
+    {
+      "id": "CanvasSwarmDisplay",
+      "selector": "#board",
+      "title": "SR5.Tours.RiggerSwarm.CanvasSwarmDisplayTitle",
+      "content": "SR5.Tours.RiggerSwarm.CanvasSwarmDisplayContent"
+    },
+    {
+      "id": "TokenHUDControl",
+      "selector": "#board",
+      "title": "SR5.Tours.RiggerSwarm.TokenHUDControlTitle",
+      "content": "SR5.Tours.RiggerSwarm.TokenHUDControlContent"
+    }
+  ]
+}
+

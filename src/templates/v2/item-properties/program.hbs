@@ -1,1 +1,5 @@
-<label>{{localizeOb item.system.type @root.config.programTypes}}</label>
+{{#if (eq item.system.type 'autosoft')}}
+    <label>{{localizeOb item.system.autosoftType @root.config.autosoftTypes}}{{#if (and (or (eq item.system.autosoftType 'maneuvering') (eq item.system.autosoftType 'stealth') (eq item.system.autosoftType 'evasion')) item.system.targetModel)}} ({{item.system.targetModel}}){{else if (and (eq item.system.autosoftType 'targeting') item.system.targetWeapon)}} ({{item.system.targetWeapon}}){{/if}}</label>
+{{else}}
+    <label>{{localizeOb item.system.type @root.config.programTypes}}</label>
+{{/if}}

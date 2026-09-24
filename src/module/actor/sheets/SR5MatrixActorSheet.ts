@@ -9,6 +9,7 @@ import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { MatrixSheetFlow } from '@/module/flows/MatrixSheetFlow';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
+import { RiggingRules } from '@/module/rules/RiggingRules';
 import { NetworkManager } from '@/module/apps/NetworkManager';
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import ActorAttribute = Shadowrun.ActorAttribute;
@@ -17,6 +18,7 @@ import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 import { isElementInstance } from '@/module/utils/dom';
 
 const { fromUuid, fromUuidSync } = foundry.utils;
+const { TextEditor } = foundry.applications.ux;
 
 // Meant for sheet display only. Doesn't use the SR5Item.getChatData approach to avoid changing system data.
 type sheetAction = {
@@ -36,6 +38,16 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
     matrixTargets: Shadowrun.MatrixTargetDocument[];
     // the master device being used to connect to the matrix
     matrixDevice: SR5Item | undefined;
+    rccInfo?: {
+        rccItemId?: string;
+        deviceRating: number;
+        sharing: number;
+        noiseReduction: number;
+        isOverAllocated: boolean;
+        loadedAutosoftsCount: number;
+        isOverSharingLimit: boolean;
+        loadedAutosofts: SR5Item[];
+    };
     // Matrix ICONs that are owned by this actor
     ownedIcons: MatrixTargetDocument[];
 
@@ -48,6 +60,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     // We accept this selection to not be persistant across Foundry sessions.
     selectedMatrixTarget: string | undefined;
     _connectedIconsOpenClose: Record<string, boolean> = {};
+    _rccAllocationDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
     override async _prepareContext(options: Parameters<SR5BaseActorSheet["_prepareContext"]>[0]) {
         const data = await super._prepareContext(options);
@@ -74,6 +87,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             setupPAN: SR5MatrixActorSheet.#addAllEquippedWirelessDevicesToPAN,
             removeMarks: SR5MatrixActorSheet.#deleteMarks,
             clearAllMarks: SR5MatrixActorSheet.#clearAllMarks,
+            updateRccAllocation: SR5MatrixActorSheet.#updateRccAllocation,
         },
     };
 
@@ -255,7 +269,22 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * @param data
      */
     _prepareMatrixDevice(data: MatrixActorSheetData) {
-        data.matrixDevice = this.actor?.getMatrixDevice();
+        const device = this.actor?.getMatrixDevice();
+        data.matrixDevice = device;
+
+        const masterItem = this.actor?.master;
+        const rccItem = (device && device.system?.category === 'rcc')
+            ? device
+            : (masterItem && masterItem.system?.category === 'rcc' ? masterItem : undefined);
+
+        if (rccItem) {
+            const info = RiggingRules.getRCCSharingInfo(rccItem);
+            data.rccInfo = {
+                ...info,
+                rccItemId: rccItem.id || undefined,
+                loadedAutosofts: RiggingRules.getLoadedRCCAutosofts(rccItem)
+            };
+        }
     }
 
     _prepareOwnedIcons(data: MatrixActorSheetData) {
@@ -418,18 +447,21 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         ];
 
         actions = actions.filter(action => {
+            const actionData = action.system.action;
+            if (!actionData) return true;
+
             if (MatrixRules.isSleazeAction(
-                    action.system.action.attribute as ActorAttribute,
-                    action.system.action.attribute2 as ActorAttribute,
-                    action.system.action.limit.attribute as ActorAttribute)
+                    actionData.attribute as ActorAttribute,
+                    actionData.attribute2 as ActorAttribute,
+                    actionData.limit?.attribute as ActorAttribute)
                 && (this.actor.findAttribute('sleaze')?.value ?? 0) <= 0
             ) {
                 return false;
             }
             if (MatrixRules.isAttackAction(
-                    action.system.action.attribute as ActorAttribute,
-                    action.system.action.attribute2 as ActorAttribute,
-                    action.system.action.limit.attribute as ActorAttribute)
+                    actionData.attribute as ActorAttribute,
+                    actionData.attribute2 as ActorAttribute,
+                    actionData.limit?.attribute as ActorAttribute)
                 && (this.actor.findAttribute('attack')?.value ?? 0) <= 0
             ) {
                 return false;
@@ -442,9 +474,10 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         // Prepare sorting and display of a possibly translated document name.
         const sheetActions: sheetAction[] = [];
         for (const action of actions) {
+            const descValue = action.system.description?.value ?? '';
             sheetActions.push({
                 name: PackItemFlow.localizePackAction(action.name),
-                description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(action.system.description.value),
+                description: await TextEditor.enrichHTML(descValue),
                 action,
             });
         }
@@ -471,7 +504,9 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         const marksPlaced = this.actor.getMarksPlaced(target.uuid!);
 
         return actions.filter(action => {
-            const { marks, owner } = action.system.action.category.matrix;
+            const matrixCat = action.system.action?.category?.matrix;
+            if (!matrixCat) return true;
+            const { marks, owner } = matrixCat;
             if (owner) return ownedItem;
             // you can do actions that require marks on your own devices
             return ownedItem || marks <= marksPlaced;
@@ -742,5 +777,66 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
 
         await this.actor.disconnectNetwork();
         void this.render();
+    }
+
+    static async #updateRccAllocation(this: SR5MatrixActorSheet, event: Event) {
+        if (!(event.target instanceof HTMLInputElement)) return;
+        const rccItemId = event.target.dataset.rccItemId;
+        const newSharing = parseInt(event.target.value, 10);
+        if (isNaN(newSharing)) return;
+
+        const rccItem = rccItemId ? this.actor.items.get(rccItemId) : this.actor.getMatrixDevice();
+        if (!rccItem || !rccItem.isType('device') || rccItem.system.category !== 'rcc') return;
+
+        const deviceRating = rccItem.system.technology?.rating || 0;
+        const boundedSharing = Math.min(Math.max(newSharing, 0), deviceRating);
+        const newNoiseReduction = deviceRating - boundedSharing;
+
+        await rccItem.update({
+            system: {
+                sharing: boundedSharing,
+                noise_reduction: newNoiseReduction
+            }
+        });
+
+        if (this.isPlayMode) {
+            if (this._rccAllocationDebounceTimer) {
+                clearTimeout(this._rccAllocationDebounceTimer);
+            }
+            this._rccAllocationDebounceTimer = setTimeout(() => {
+                void this._sendRccReconfigureMessage(boundedSharing, newNoiseReduction);
+                this._rccAllocationDebounceTimer = null;
+            }, 600);
+        }
+    }
+
+    protected async _sendRccReconfigureMessage(sharing: number, noiseReduction: number) {
+        const speaker = ChatMessage.getSpeaker({ actor: this.actor as Actor.Stored });
+        const inCombat = this.actor.inCombat;
+        const actionLabel = inCombat
+            ? game.i18n.localize('SR5.RCC.SimpleActionInCombat')
+            : game.i18n.localize('SR5.RCC.SimpleAction');
+
+        const content = `
+            <div class="shadowrun5e chat-card matrix-card">
+                <header class="card-header flexrow" style="align-items: center; gap: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px;">
+                    <i class="fas fa-sliders" style="font-size: 1.2em; color: #ff9800;"></i>
+                    <h3 class="item-name" style="margin: 0; font-size: 1.1em;">${game.i18n.localize('SR5.RCC.ReconfigureTitle')}</h3>
+                </header>
+                <div class="card-content" style="padding: 6px 0;">
+                    <p style="margin: 4px 0;"><strong>${this.actor.name}</strong> ${game.i18n.localize('SR5.RCC.ReconfiguredMessage')} (<em>${actionLabel}</em>):</p>
+                    <div style="display: flex; justify-content: space-around; margin-top: 6px; padding: 6px; background: rgba(0,0,0,0.25); border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">
+                        <span><i class="fas fa-wifi" style="color: #4caf50;"></i> ${game.i18n.localize('SR5.RCC.NoiseReduction')}: <strong>${noiseReduction}</strong></span>
+                        <span><i class="fas fa-share-nodes" style="color: #2196f3;"></i> ${game.i18n.localize('SR5.RCC.Sharing')}: <strong>${sharing}</strong></span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        await ChatMessage.create({
+            speaker,
+            content,
+            style: CONST.CHAT_MESSAGE_STYLES.OTHER,
+        });
     }
 }

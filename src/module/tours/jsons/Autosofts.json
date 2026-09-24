@@ -1,0 +1,64 @@
+{
+  "title": "SR5.Tours.Autosofts.Title",
+  "description": "SR5.Tours.Autosofts.Description",
+  "canBeResumed": true,
+  "display": true,
+  "actorType": "vehicle",
+  "steps": [
+    {
+      "id": "AutosoftItemCreation",
+      "selector": ".autosoft-config-row",
+      "tooltipDirection": "RIGHT",
+      "tab": "description",
+      "title": "SR5.Tours.Autosofts.AutosoftItemCreationTitle",
+      "content": "SR5.Tours.Autosofts.AutosoftItemCreationContent"
+    },
+    {
+      "id": "AutosoftTypes",
+      "selector": "[name='system.autosoftType']",
+      "tooltipDirection": "RIGHT",
+      "tab": "description",
+      "title": "SR5.Tours.Autosofts.AutosoftTypesTitle",
+      "content": "SR5.Tours.Autosofts.AutosoftTypesContent"
+    },
+    {
+      "id": "AutosoftPlayMode",
+      "selector": ".item-type-container",
+      "tooltipDirection": "RIGHT",
+      "title": "SR5.Tours.Autosofts.AutosoftPlayModeTitle",
+      "content": "SR5.Tours.Autosofts.AutosoftPlayModeContent"
+    },
+    {
+      "id": "EquipAutosoftOnDrone",
+      "selector": ".tab[data-tab='programs']",
+      "tooltipDirection": "RIGHT",
+      "tab": "matrix",
+      "title": "SR5.Tours.Autosofts.EquipAutosoftOnDroneTitle",
+      "content": "SR5.Tours.Autosofts.EquipAutosoftOnDroneContent"
+    },
+    {
+      "id": "DroneSlotLimits",
+      "selector": ".tab[data-tab='programs']",
+      "tooltipDirection": "RIGHT",
+      "tab": "matrix",
+      "title": "SR5.Tours.Autosofts.DroneSlotLimitsTitle",
+      "content": "SR5.Tours.Autosofts.DroneSlotLimitsContent"
+    },
+    {
+      "id": "RCCOverrideHierarchy",
+      "selector": ".tab[data-tab='programs']",
+      "tooltipDirection": "RIGHT",
+      "tab": "matrix",
+      "title": "SR5.Tours.Autosofts.RCCOverrideHierarchyTitle",
+      "content": "SR5.Tours.Autosofts.RCCOverrideHierarchyContent"
+    },
+    {
+      "id": "AutosoftEffects",
+      "selector": "[data-action='tab'][data-tab='effects'], [data-tab='effects']",
+      "tooltipDirection": "DOWN",
+      "tab": "effects",
+      "title": "SR5.Tours.Autosofts.AutosoftEffectsTitle",
+      "content": "SR5.Tours.Autosofts.AutosoftEffectsContent"
+    }
+  ]
+}

@@ -12,6 +12,19 @@ const ProgramData = () => ({
         initial: 'common_program',
         choices: SR5.programTypes,
     }),
+    autosoftType: new StringField({
+        required: false,
+        initial: 'clearsight',
+        choices: SR5.autosoftTypes,
+    }),
+    targetModel: new StringField({
+        required: false,
+        initial: '',
+    }),
+    targetWeapon: new StringField({
+        required: false,
+        initial: '',
+    }),
 });
 
 export class Program extends ItemBase<ReturnType<typeof ProgramData>> {
