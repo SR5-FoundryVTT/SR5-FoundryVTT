@@ -8,6 +8,7 @@ import UltrasoundDetectionMode, {
 } from '@/module/vision/ultrasoundVision/ultrasoundDetectionMode';
 import { PhysicalSightDetectionMode } from '@/module/vision/physicalVision/physicalDetectionMode';
 import { SR5TestFactory } from './utils';
+import { BonusHelper } from '@/module/apps/itemImport/helper/BonusHelper';
 
 const SIGHT = foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT;
 const SOUND = foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SOUND;
@@ -141,6 +142,27 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             await item.update({ system: { technology: { equipped: false } } });
             senses = PerceptionResolver.resolve(actor).physical;
             assert.deepEqual(senses, { lowLight: false, thermographic: false, ultrasound: true });
+        });
+
+        it('grants senses from imported Chummer items, ware and gear only while equipped', async () => {
+            const cyberware: any = { name: '#QUENCH Low-Light Vision', type: 'cyberware', system: { technology: { equipped: true } } };
+            const quality: any = { name: '#QUENCH Thermographic Vision (SURGE)', type: 'quality', system: {} };
+            const datajack: any = { name: '#QUENCH Datajack', type: 'cyberware', system: { technology: { equipped: true } } };
+            BonusHelper.addSense(cyberware, '97910ef7-dc30-4a87-8314-d1e0021dc39c');
+            BonusHelper.addSense(quality, 'fd346177-3791-44c0-af8c-7cf176fc9aa3');
+            BonusHelper.addSense(datajack, '4ad2c7c3-8ae3-4e07-94e0-5ad0f1bb4cc6');
+            assert.notProperty(datajack, 'effects', 'items without a sense get no effect');
+
+            const actor = await factory.createActor({ type: 'character', system: { metatype: 'human' } });
+            const [ware] = await actor.createEmbeddedDocuments('Item', [cyberware, quality]);
+            let senses = PerceptionResolver.resolve(actor).physical;
+            assert.isTrue(senses.lowLight);
+            assert.isTrue(senses.thermographic);
+
+            await ware.update({ system: { technology: { equipped: false } } });
+            senses = PerceptionResolver.resolve(actor).physical;
+            assert.isFalse(senses.lowLight, 'unequipped ware stops granting its sense');
+            assert.isTrue(senses.thermographic, 'qualities always grant their sense');
         });
 
         it('applies darkness and invisibility according to each physical sense', () => {
