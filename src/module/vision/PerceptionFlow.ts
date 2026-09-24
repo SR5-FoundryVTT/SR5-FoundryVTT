@@ -53,13 +53,12 @@ export class PerceptionFlow {
         sceneUnit = 'm',
     ) {
         const next = foundry.utils.deepClone(detectionModes);
+        // 50 m is only the default for a newly granted ultrasound sense; a range the GM set on the token stays.
+        const ultrasoundRange = detectionModes.ultrasound?.range ?? this.metersToSceneUnits(ULTRASOUND_RANGE_METERS, sceneUnit);
         const managed = {
             lowlight: { enabled: capabilities.physical.lowLight, range },
             thermographic: { enabled: capabilities.physical.thermographic, range },
-            ultrasound: {
-                enabled: capabilities.physical.ultrasound,
-                range: this.metersToSceneUnits(ULTRASOUND_RANGE_METERS, sceneUnit),
-            },
+            ultrasound: { enabled: capabilities.physical.ultrasound, range: ultrasoundRange },
         };
 
         for (const [id, sense] of Object.entries(managed)) {

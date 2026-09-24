@@ -158,7 +158,9 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             assert.notProperty(datajack, 'effects', 'items without a sense get no effect');
 
             const actor = await factory.createActor({ type: 'character', system: { metatype: 'human' } });
-            const [ware] = await actor.createEmbeddedDocuments('Item', [cyberware, quality]);
+            await actor.createEmbeddedDocuments('Item', [cyberware, quality]);
+            // createEmbeddedDocuments doesn't return documents in request order.
+            const ware = actor.items.getName(cyberware.name)!;
             let senses = PerceptionResolver.resolve(actor).physical;
             assert.isTrue(senses.lowLight);
             assert.isTrue(senses.thermographic);
@@ -182,7 +184,7 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             assert.isFalse(isBlinded?.call({ data: { visionMode: 'ultrasound' } }));
         });
 
-        it('limits ultrasound vision to 50 m and lets glass stop it', function () {
+        it('keeps the vision range for ultrasound vision and lets glass stop it', function () {
             if (!canvas.ready || !canvas.dimensions || !canvas.scene) this.skip();
 
             const source = (visionMode: string, radius: number) => {
@@ -191,12 +193,13 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
                 vision._initialize({});
                 return vision;
             };
-            const fiftyMeters = PerceptionFlow.metersToSceneUnits(50, canvas.scene!.grid.units) * canvas.dimensions!.distancePixels;
-            const ultrasound = source('ultrasound', fiftyMeters * 10);
-            const basic = source('basic', fiftyMeters * 10);
+            // The GM sets how far the ultrasound view reaches through the token's vision range.
+            const range = PerceptionFlow.metersToSceneUnits(500, canvas.scene!.grid.units) * canvas.dimensions!.distancePixels;
+            const ultrasound = source('ultrasound', range);
+            const basic = source('basic', range);
 
-            assert.closeTo(ultrasound.data.radius, fiftyMeters, 0.001);
-            assert.strictEqual(basic.data.radius, fiftyMeters * 10);
+            assert.strictEqual(ultrasound.data.radius, range);
+            assert.strictEqual(basic.data.radius, range);
             // Glass blocks movement but not sight, so ultrasound collides like movement does.
             assert.strictEqual(ultrasound._getPolygonConfiguration().type, 'move');
             assert.strictEqual(basic._getPolygonConfiguration().type, 'sight');
@@ -378,6 +381,17 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             assert.isFalse(
                 (mode as any)._testRange(visionSource(), config, target(), { point: { x: 50.01, y: 0, elevation: 0 } }),
             );
+        });
+
+        it('keeps an ultrasound range the GM set on the token', () => {
+            const capabilities = PerceptionResolver.resolve(actorData('human'));
+            capabilities.physical.ultrasound = true;
+            const reconcile = (ultrasound: { enabled: boolean; range: number | null }) =>
+                PerceptionFlow.reconcileDetectionModes({ ultrasound }, capabilities, 10000, 'm').ultrasound;
+
+            assert.deepEqual(reconcile({ enabled: true, range: 80 }), { enabled: true, range: 80 });
+            assert.deepEqual(reconcile({ enabled: false, range: 80 }), { enabled: true, range: 80 });
+            assert.deepEqual(reconcile({ enabled: true, range: null }), { enabled: true, range: ULTRASOUND_RANGE_METERS });
         });
     });
 };
