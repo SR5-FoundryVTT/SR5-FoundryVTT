@@ -10,6 +10,9 @@ import { PhysicalSightDetectionMode } from '@/module/vision/physicalVision/physi
 import { SR5TestFactory } from './utils';
 import { BonusHelper } from '@/module/apps/itemImport/helper/BonusHelper';
 import { SR5VisionSource } from '@/module/vision/SR5VisionSource';
+import { ULTRASOUND_COLOR } from '@/module/vision/ultrasoundVision/ultrasoundShaders';
+import AstralPerceptionDetectionMode from '@/module/vision/astralPerception/astralPerceptionDetectionMode';
+import { SR5Token } from '@/module/token/SR5Token';
 
 const SIGHT = foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT;
 const SOUND = foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SOUND;
@@ -171,6 +174,9 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             assert.exists(mode);
             assert.isFalse(mode.perceivesLight);
             assert.strictEqual(mode.canvas.uniforms.saturation, -1);
+            // Foundry's tremorsense wave shaders default to magenta.
+            assert.deepEqual((mode.vision.background.shader as any).defaultUniforms.colorTint, ULTRASOUND_COLOR);
+            assert.deepEqual((mode.vision.coloration.shader as any).defaultUniforms.colorEffect, ULTRASOUND_COLOR);
 
             const isBlinded = Object.getOwnPropertyDescriptor(SR5VisionSource.prototype, 'isBlinded')?.get;
             assert.isFalse(isBlinded?.call({ data: { visionMode: 'ultrasound' } }));
@@ -224,6 +230,62 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
                 (ultrasound as any)._canDetect(visionSource(), target(true, true)),
                 'ultrasound detects physical shape',
             );
+        });
+
+        it('lets low-light vision see in any light short of total darkness', function () {
+            if (!canvas.ready) this.skip();
+
+            const lowLight = new LowlightVisionDetectionMode({ id: 'lowlight', label: 'Low-Light', type: SIGHT });
+            const base = foundry.canvas.perception.DetectionMode.prototype as any;
+            const effects = canvas.effects as any;
+            const originalTestPoint = base._testPoint;
+            let lit = false;
+            let darkness = 1;
+            base._testPoint = () => true;
+            effects.testInsideLight = () => lit;
+            effects.getDarknessLevel = () => darkness;
+            const detects = () => (lowLight as any)._testPoint(visionSource(), {}, target(), {
+                point: { x: 0, y: 0, elevation: 0 },
+            });
+
+            try {
+                assert.isFalse(detects(), 'total darkness');
+                darkness = 0.8;
+                assert.isTrue(detects(), 'partial darkness');
+                darkness = 1;
+                lit = true;
+                assert.isTrue(detects(), 'inside a light source');
+            } finally {
+                base._testPoint = originalTestPoint;
+                delete effects.testInsideLight;
+                delete effects.getDarknessLevel;
+            }
+        });
+
+        it('outlines tokens that astral perception or ultrasound vision would leave unlit', function () {
+            if (!canvas.ready) this.skip();
+
+            const effects = canvas.effects as any;
+            const originalSources = effects.visionSources;
+            const sources = (...modes: string[]) => {
+                effects.visionSources = modes.map(id => ({ active: true, visionMode: { id } }));
+            };
+            const filter = () => (SR5Token as any).nonOpticalSenseFilter();
+
+            try {
+                sources('ultrasound');
+                assert.strictEqual(filter(), UltrasoundDetectionMode.getDetectionFilter());
+                sources('astralPerception', 'astralPerception');
+                assert.strictEqual(filter(), AstralPerceptionDetectionMode.getDetectionFilter());
+                sources('basic');
+                assert.isNull(filter(), 'normal vision renders tokens lit');
+                sources('ultrasound', 'basic');
+                assert.isNull(filter(), 'another source still lights the scene');
+                sources();
+                assert.isNull(filter());
+            } finally {
+                effects.visionSources = originalSources;
+            }
         });
 
         it('uses signature-specific glow overlays for thermographic targets', () => {

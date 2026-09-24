@@ -24,6 +24,29 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         return astralPath ? [astralPath as typeof path, true] : [path, constrained];
     }
 
+    /**
+     * Astral perception and ultrasound vision disable scene lighting, so a token they don't detect through
+     * their own detection mode, like the observer's own token or a target found by basic sight, renders
+     * unlit and disappears into the dark. Outline it the way that sense outlines what it detects.
+     */
+    override get isVisible() {
+        const visible = super.isVisible;
+        if (visible && !this.detectionFilter) this.detectionFilter = SR5Token.nonOpticalSenseFilter();
+        return visible;
+    }
+
+    /** The detection filter of the non-optical vision mode every active vision source shares, if any. */
+    private static nonOpticalSenseFilter() {
+        const active = canvas.effects.visionSources.filter(source => source.active);
+        const modes = new Set(active.map(source => source.visionMode?.id));
+        if (modes.size !== 1) return null;
+        const [mode] = modes;
+        if (mode !== 'astralPerception' && mode !== ULTRASOUND_VISION_MODE) return null;
+        const detectionMode = CONFIG.Canvas.detectionModes[mode]?.constructor as
+            typeof foundry.canvas.perception.DetectionMode | undefined;
+        return detectionMode?.getDetectionFilter() ?? null;
+    }
+
     /** Astral perception and ultrasound aren't optical, and ultrasound works in any light. */
     override _getVisionBlindedStates() {
         const states = super._getVisionBlindedStates();

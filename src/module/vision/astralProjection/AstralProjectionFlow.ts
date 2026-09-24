@@ -349,9 +349,15 @@ export class AstralProjectionFlow {
         return (linked ?? body.actor) as SR5Actor | null;
     }
 
-    /** Put back the actor's initiative mode and end its projection. */
+    /**
+     * Put back the actor's initiative mode and end its projection.
+     *
+     * The synthetic actor of an unlinked token is deleted along with that token or its scene,
+     * leaving nothing to restore.
+     */
     private static async restoreActor(actor: SR5Actor | null, initiativeMode: string) {
         if (!actor) return;
+        if (actor.isToken && !foundry.utils.fromUuidSync(actor.token!.uuid!)) return;
         const projecting = !!actor.getFlag(SYSTEM_NAME, FLAGS.AstralProjecting);
         if (!projecting && actor.system.initiative?.perception === initiativeMode) return;
         await actor.update({

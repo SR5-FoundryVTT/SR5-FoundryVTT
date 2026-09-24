@@ -5,6 +5,11 @@ import LowlightVisionDetectionMode from './lowlightVision/lowlightDetectionMode'
 import AugmentedRealityVisionDetectionMode from './augmentedReality/arDetectionMode';
 import UltrasoundDetectionMode, { ULTRASOUND_VISION_MODE } from './ultrasoundVision/ultrasoundDetectionMode';
 import {
+    ULTRASOUND_COLOR,
+    UltrasoundBackgroundVisionShader,
+    UltrasoundColorationVisionShader,
+} from './ultrasoundVision/ultrasoundShaders';
+import {
     PhysicalLightPerceptionDetectionMode,
     PhysicalSightDetectionMode,
 } from './physicalVision/physicalDetectionMode';
@@ -90,7 +95,7 @@ export default class VisionConfigurator {
             label: 'SR5.Vision.Ultrasound',
             canvas: {
                 shader: shaders.ColorAdjustmentsSamplerShader,
-                uniforms: { contrast: 0, saturation: -1, exposure: -0.65, tint: [0.75, 0.75, 0.75] },
+                uniforms: { contrast: 0, saturation: -1, exposure: -0.65, tint: ULTRASOUND_COLOR },
             },
             lighting: {
                 background: { visibility: LIGHTING_VISIBILITY.DISABLED },
@@ -101,8 +106,8 @@ export default class VisionConfigurator {
             vision: {
                 darkness: { adaptive: false },
                 defaults: { attenuation: 0, contrast: 0.2, saturation: -1, brightness: 1 },
-                background: { shader: shaders.WaveBackgroundVisionShader },
-                coloration: { shader: shaders.WaveColorationVisionShader },
+                background: { shader: UltrasoundBackgroundVisionShader },
+                coloration: { shader: UltrasoundColorationVisionShader },
             },
         }, { animated: true });
     }

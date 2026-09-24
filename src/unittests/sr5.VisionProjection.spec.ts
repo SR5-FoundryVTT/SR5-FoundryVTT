@@ -256,6 +256,30 @@ export const shadowrunVisionProjection = (context: QuenchBatchContext) => {
             assert.strictEqual(cleanupCalls, 1, 'only the deleted body cleans its actor storage');
         });
 
+        it('does not update the deleted synthetic actor when an unlinked body is deleted', async () => {
+            const actor = await createMagician();
+            const { scene, body } = await createBody(actor, false);
+            const bodyActor = body.actor;
+            const form = await AstralProjectionFlow.project(body);
+            assert.exists(form);
+
+            // The deleteToken hook runs the cleanup without awaiting it, so a failure surfaces as an
+            // unhandled rejection.
+            const rejections: unknown[] = [];
+            const onRejection = (event: PromiseRejectionEvent) => { rejections.push(event.reason); };
+            window.addEventListener('unhandledrejection', onRejection);
+            try {
+                await body.delete();
+                await waitFor(() => scene.tokens.size === 0);
+                await new Promise((resolve) => setTimeout(resolve, 200));
+            } finally {
+                window.removeEventListener('unhandledrejection', onRejection);
+            }
+
+            assert.isEmpty(rejections.map(String));
+            await (AstralProjectionFlow as any).restoreActor(bodyActor, 'meatspace');
+        });
+
         it('marks only the projecting actor, until it returns to its body', async () => {
             const projecting = await createMagician();
             const other = await createMagician();
