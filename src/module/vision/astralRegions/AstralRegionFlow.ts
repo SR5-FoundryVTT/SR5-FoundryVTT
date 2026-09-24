@@ -168,7 +168,7 @@ export class AstralRegionFlow {
      * only test their endpoints, which would let a form hop over any boundary it doesn't land in.
      */
     private static findMovementCrossing(token: TokenDocument, waypoints: MovementWaypoint[]): MovementCrossing | null {
-        if (!this.isAstralForm(token)) return null;
+        if (!this.isAstralOnly(token)) return null;
         const scene = token.parent;
         if (!(scene instanceof Scene) || waypoints.length < 2) return null;
         const boundaries = this.boundariesFor(scene, 'blockMovement', token);
@@ -228,8 +228,11 @@ export class AstralRegionFlow {
         });
     }
 
-    /** Projected forms and actors that exist only on the astral plane are constrained by barriers. */
-    private static isAstralForm(token: TokenDocument) {
+    /**
+     * Projected forms and actors that exist only on the astral plane.
+     * They pass through physical walls, but astral boundaries constrain them.
+     */
+    static isAstralOnly(token: TokenDocument) {
         if (isAstralForm(token)) return true;
         const targets = token.actor?.system.visibilityChecks.targets;
         return targets?.astral.astralActive === true && targets.physical.active === false;

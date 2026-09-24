@@ -3,13 +3,18 @@ import { AstralRegionFlow } from '@/module/vision/astralRegions/AstralRegionFlow
 
 export class SR5Token extends foundry.canvas.placeables.Token {
     /**
-     * Stop astral forms before astral boundaries, so drag previews and executed movement end in front
-     * of them the same way they end in front of walls.
+     * Let astral forms move through physical walls, and stop them before astral boundaries instead, so
+     * drag previews and executed movement end in front of those the same way they end in front of walls.
+     *
+     * SR5#314 only the Earth is solid to an astral form, which scene walls don't model.
      */
     override constrainMovementPath(
         ...args: Parameters<foundry.canvas.placeables.Token['constrainMovementPath']>
     ): ReturnType<foundry.canvas.placeables.Token['constrainMovementPath']> {
-        const [path, constrained] = super.constrainMovementPath(...args);
+        const [waypoints, options] = args;
+        const [path, constrained] = AstralRegionFlow.isAstralOnly(this.document)
+            ? super.constrainMovementPath(waypoints, { ...options, ignoreWalls: true })
+            : super.constrainMovementPath(...args);
         if (args[1]?.ignoreWalls) return [path, constrained];
         // Keep previews wall-like, but let the document pre-movement hook reject executed crossings
         // in full and notify the acting user.

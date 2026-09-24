@@ -5,6 +5,7 @@ import {
     ASTRAL_WARD_REGION_BEHAVIOR,
 } from '@/module/types/regionBehavior/AstralBoundary';
 import { AstralRegionFlow } from '@/module/vision/astralRegions/AstralRegionFlow';
+import { SR5Token } from '@/module/token/SR5Token';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { SR5TestFactory } from './utils';
@@ -176,6 +177,30 @@ export const shadowrunVisionAstralRegions = (context: QuenchBatchContext) => {
 
             assert.isTrue(await form.move({ x: 700, y: 100 }, { constrainOptions: { ignoreWalls: true } } as any));
             assert.strictEqual(form.x, 700);
+        });
+
+        it('lets astral forms, but not physical tokens, move through physical walls', async () => {
+            const scene = await createScene();
+            const form = await createToken(scene, 100, 100, true);
+            const physical = await createToken(scene, 100, 300);
+            const path = [{ x: 100, y: 100, elevation: 0 }, { x: 700, y: 100, elevation: 0 }];
+
+            // Foundry only applies walls on the viewed scene, so check what reaches its wall constraint.
+            const base = foundry.canvas.placeables.Token.prototype;
+            const original = base.constrainMovementPath;
+            const ignoredWalls: boolean[] = [];
+            base.constrainMovementPath = function (waypoints, options) {
+                ignoredWalls.push(!!options?.ignoreWalls);
+                return [waypoints, false] as any;
+            };
+            try {
+                SR5Token.prototype.constrainMovementPath.call({ document: form } as any, path as any, {});
+                SR5Token.prototype.constrainMovementPath.call({ document: physical } as any, path as any, {});
+            } finally {
+                base.constrainMovementPath = original;
+            }
+
+            assert.deepEqual(ignoredWalls, [true, false]);
         });
 
         it('lets allowed actors see and move through a boundary', async () => {
