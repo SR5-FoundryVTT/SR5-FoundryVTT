@@ -353,7 +353,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         ModifiableValue.add(valueField, name, safeValue, {
             type: 'add',
             enabled: true,
-            priority: ModifiableValue.MANUAL_PRIORITY,
+            priority: ModifiableValue.Priority.MANUAL,
         });
 
         this.test.prepareBaseValues();
@@ -406,7 +406,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             } else if (valueField.value !== numericValue) {
                 ModifiableValue.addUnique(
                     valueField, 'SR5.ManualOverride', numericValue,
-                    { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
+                    { type: 'override', priority: ModifiableValue.Priority.TOP }
                 );
             }
         }

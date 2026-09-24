@@ -1,5 +1,8 @@
 import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { VersionMigration } from '../VersionMigration';
+
+const { randomID } = foundry.utils;
 
 const PERCEPTION_TARGET_PATHS = {
     'system.visibilityChecks.astral.hasAura': 'system.visibilityChecks.targets.astral.hasAura',
@@ -10,11 +13,25 @@ const PERCEPTION_TARGET_PATHS = {
     'system.visibilityChecks.meat.hasHeat': 'system.visibilityChecks.targets.physical.thermographic',
 } as const;
 
-/** Migrate item-sheet data introduced for 0.38.0. */
+/** Migrate data changes from every branch that ships in 0.38.0. */
 export class Version0_38_0 extends VersionMigration {
     readonly TargetVersion = '0.38.0';
 
+    // Each branch contributing to 0.38.0 keeps its whole flow in its own migrate<Branch> method, called here.
     override migrateActor(actor: any): void {
+        this.migrateVision(actor);
+    }
+
+    override migrateActiveEffect(effect: any): void {
+        this.migrateVisionEffect(effect);
+    }
+
+    override migrateItem(item: any): void {
+        this.migrateItemSheetRework(item);
+    }
+
+    /** Vision: visibility checks moved under system.visibilityChecks.targets, heat became a thermographic level. */
+    private migrateVision(actor: any): void {
         const visibility = actor.system?.visibilityChecks;
         if (!visibility) return;
 
@@ -36,7 +53,8 @@ export class Version0_38_0 extends VersionMigration {
         delete visibility.matrix;
     }
 
-    override migrateActiveEffect(effect: any): void {
+    /** Vision: effect changes follow the moved visibility check paths. */
+    private migrateVisionEffect(effect: any): void {
         this.migrateEffectChanges(effect, PERCEPTION_TARGET_PATHS);
         for (const change of effect.system?.changes ?? []) {
             if (change.key !== PERCEPTION_TARGET_PATHS['system.visibilityChecks.meat.hasHeat']) continue;
@@ -45,133 +63,71 @@ export class Version0_38_0 extends VersionMigration {
         }
     }
 
-    override migrateItem(item: any): void {
-        Version0_38_0.ensureNestedDocumentIds(item);
+    /**
+     * ItemSheetRework: ids for flag-stored nested items/effects, technology cost/availability/essence as
+     * base/value fields, and legacy "adjusted" rating multipliers as item Active Effects.
+     */
+    private migrateItemSheetRework(item: any): void {
+        Version0_38_0.assignNestedIds(item.flags?.shadowrun5e?.embeddedItems);
 
         const technology = item.system?.technology;
-        if (!technology || typeof technology !== 'object') return;
+        if (!technology) return;
 
-        technology.cost = Version0_38_0.migrateCost(technology.cost);
-        technology.availability = Version0_38_0.migrateAvailability(technology.availability);
+        // 0.37.0 stored cost as a number and availability as a '12R' string, read the same way its prep did.
+        const calculated = technology.calculated;
+        const cost = Number(technology.cost ?? 0) || 0;
+        const availability = String(technology.availability ?? '');
 
-        if (technology.calculated && typeof technology.calculated === 'object') {
-            if (!technology.essence && technology.calculated.essence) {
-                technology.essence = Version0_38_0.migrateEssence(technology.calculated.essence);
-            }
-            delete technology.calculated;
+        technology.cost = { base: cost, value: cost, changes: [] };
+        technology.availability = { ...ItemAvailabilityFlow.parseAvailabilityString(availability), changes: [] };
+
+        if (!calculated) return;
+
+        // Essence moved out of the removed calculated block.
+        const essence = calculated.essence?.value ?? 0;
+        technology.essence ??= { base: essence, value: essence };
+
+        // "adjusted" multiplied cost/availability by rating; keep that as an item effect the user can see and remove.
+        for (const field of ['cost', 'availability'] as const) {
+            if (!calculated[field]?.adjusted) continue;
+            // Availability was only multiplied by rating when it parsed as Number-Letter.
+            if (field === 'availability' && !ItemAvailabilityFlow.parseAvailability(availability).isValid) continue;
+
+            const fieldLabel = field === 'cost' ? 'SR5.Cost' : 'SR5.Availability';
+            item.effects ??= [];
+            item.effects.push({
+                _id: randomID(),
+                name: `${game.i18n.localize('SR5.Rating')} ${game.i18n.localize(fieldLabel)}`,
+                type: 'base',
+                flags: { shadowrun5e: { ratingMultiplier: field } },
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [{
+                        key: `system.technology.${field}`,
+                        type: 'multiply',
+                        value: '@system.technology.rating',
+                        priority: ModifiableValue.Priority.RATING,
+                        target: 'item',
+                    }],
+                },
+            });
         }
+
+        delete technology.calculated;
     }
 
-    private static migrateEssence(essence: unknown) {
-        if (essence && typeof essence === 'object') {
-            const data = essence as { base?: unknown; value?: unknown };
-            const value = Version0_38_0.firstFiniteNumber(data.value, data.base, 0);
-            return { base: value, value };
-        }
+    /** Nested items and their effects are stored in flags and need ids to be addressable as documents. */
+    private static assignNestedIds(items: unknown): void {
+        if (!Array.isArray(items)) return;
 
-        return { base: 0, value: 0 };
-    }
+        for (const nested of items) {
+            nested._id ??= randomID();
 
-    private static ensureNestedDocumentIds(item: any): void {
-        const embeddedItems = item.flags?.shadowrun5e?.embeddedItems;
-        if (!Array.isArray(embeddedItems)) return;
-
-        for (const embeddedItem of embeddedItems) {
-            embeddedItem._id ??= foundry.utils.randomID();
-
-            if (Array.isArray(embeddedItem.effects)) {
-                for (const effect of embeddedItem.effects) {
-                    effect._id ??= foundry.utils.randomID();
-                }
-            }
-
-            Version0_38_0.ensureNestedDocumentIds(embeddedItem);
-        }
-    }
-
-    private static migrateCost(cost: unknown) {
-        if (typeof cost === 'number') {
-            return { base: cost, value: cost, changes: [] };
-        }
-
-        if (cost && typeof cost === 'object') {
-            const data = cost as { base?: unknown; value?: unknown };
-            const base = Version0_38_0.firstFiniteNumber(data.base, data.value, 0);
-            return { base, value: base, changes: [] };
-        }
-
-        return { base: 0, value: 0, changes: [] };
-    }
-
-    private static migrateAvailability(availability: unknown) {
-        if (typeof availability === 'string') {
-            return Version0_38_0.createAvailabilityFromString(availability);
-        }
-
-        if (availability && typeof availability === 'object') {
-            const data = availability as {
-                base?: unknown;
-                value?: unknown;
-                restriction?: unknown;
-            };
-
-            const base = Version0_38_0.firstString(data.base, data.value, '');
-            const migrated = Version0_38_0.createAvailabilityFromString(base);
-
-            if (typeof data.base === 'number') {
-                migrated.base = Number.isFinite(data.base) ? data.base : 0;
-                migrated.value = migrated.base;
+            if (Array.isArray(nested.effects)) {
+                for (const effect of nested.effects) effect._id ??= randomID();
             }
 
-            migrated.restriction = Version0_38_0.migrateRestriction(data.restriction, migrated.restriction);
-            migrated.label = ItemAvailabilityFlow.composeValue(migrated.value, migrated.restriction);
-            return migrated;
+            Version0_38_0.assignNestedIds(nested.flags?.shadowrun5e?.embeddedItems);
         }
-
-        return Version0_38_0.createAvailabilityFromString('');
-    }
-
-    private static migrateRestriction(restriction: unknown, fallback: 'none' | 'restricted' | 'forbidden'): 'none' | 'restricted' | 'forbidden' {
-        if (typeof restriction === 'string') return Version0_38_0.normalizeRestriction(restriction);
-
-        if (restriction && typeof restriction === 'object') {
-            const data = restriction as { base?: unknown; value?: unknown };
-            return Version0_38_0.normalizeRestriction(Version0_38_0.firstString(data.value, data.base, fallback));
-        }
-
-        return fallback;
-    }
-
-    private static firstFiniteNumber(...values: unknown[]) {
-        for (const value of values) {
-            const number = Number(value);
-            if (Number.isFinite(number)) return number;
-        }
-        return 0;
-    }
-
-    private static firstString(...values: unknown[]) {
-        for (const value of values) {
-            if (typeof value === 'string') return value;
-            if (typeof value === 'number') return String(value);
-        }
-        return '';
-    }
-
-    private static createAvailabilityFromString(value: string): {
-        base: number;
-        value: number;
-        changes: any[];
-        restriction: 'none' | 'restricted' | 'forbidden';
-        label: string;
-    } {
-        const parsed = ItemAvailabilityFlow.parseAvailabilityString(value);
-        return { base: parsed.base, value: parsed.value, changes: [], restriction: parsed.restriction, label: parsed.label };
-    }
-
-    private static normalizeRestriction(value: string): 'none' | 'restricted' | 'forbidden' {
-        return ['none', 'restricted', 'forbidden'].includes(value)
-            ? value as 'none' | 'restricted' | 'forbidden'
-            : ItemAvailabilityFlow.restrictionFromSuffix(value);
     }
 }

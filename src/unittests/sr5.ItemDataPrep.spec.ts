@@ -5,6 +5,8 @@ import { RangePrep } from "../module/item/prep/functions/RangePrep";
 import { ActionPrep } from "../module/item/prep/functions/ActionPrep";
 import { TechnologyPrep } from "../module/item/prep/functions/TechnologyPrep";
 import { ArmorPrep } from "../module/item/prep/functions/ArmorPrep";
+import { ModifiableValue } from "../module/mods/ModifiableValue";
+import { Version0_38_0 } from "../module/migrator/versions/Version0_38_0";
 
 /**
  * Tests involving data preparation for SR5Item types.
@@ -74,6 +76,85 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             device.prepareData();
 
             assert.strictEqual(device.system.technology.cost.value, 150);
+        });
+
+        it('recalculates concealment after applying an item effect', async () => {
+            const device = await factory.createItem({
+                type: 'device',
+                system: { technology: { conceal: { base: 2, value: 2 } } },
+            });
+            const [effect] = await device.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Concealment Modifier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [{ key: 'system.technology.conceal', value: '3', type: 'add', target: 'item' }],
+                },
+            }]);
+
+            device.prepareData();
+            assert.strictEqual(device.system.technology.conceal.value, 5);
+            device.prepareData();
+            assert.strictEqual(device.system.technology.conceal.value, 5);
+            await effect.update({ disabled: true });
+            device.prepareData();
+            assert.strictEqual(device.system.technology.conceal.value, 2);
+        });
+
+        it('recalculates weapon damage, AP, limit, and recoil after item effects', async () => {
+            const weapon = await factory.createItem({
+                type: 'weapon',
+                system: {
+                    category: 'range',
+                    action: {
+                        damage: { base: 4, ap: { base: -1 } },
+                        limit: { base: 5 },
+                    },
+                    range: { rc: { base: 2 } },
+                },
+            });
+            await weapon.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Weapon modifier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.action.damage', value: '2', type: 'add', target: 'item' },
+                        { key: 'system.action.damage.ap', value: '-1', type: 'add', target: 'item' },
+                        { key: 'system.action.limit', value: '1', type: 'add', target: 'item' },
+                        { key: 'system.range.rc', value: '3', type: 'add', target: 'item' },
+                    ],
+                },
+            }]);
+
+            weapon.prepareData();
+            assert.strictEqual(weapon.system.action.damage.value, 6);
+            assert.strictEqual(weapon.system.action.damage.ap.value, -2);
+            assert.strictEqual(weapon.system.action.limit.value, 6);
+            assert.strictEqual(weapon.system.range.rc.value, 5);
+        });
+
+        it('applies rating before ware grade and user cost modifiers', async () => {
+            const ware = await factory.createItem({
+                type: 'cyberware',
+                system: { grade: 'alpha', technology: { rating: 4, cost: { base: 100, value: 100 }, availability: { base: 3, restriction: 'restricted' } } },
+            });
+            await ware.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Rating multiplier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.technology.cost', value: '@system.technology.rating', type: 'multiply', priority: ModifiableValue.Priority.RATING, target: 'item' },
+                        { key: 'system.technology.availability', value: '@system.technology.rating', type: 'multiply', priority: ModifiableValue.Priority.RATING, target: 'item' },
+                    ],
+                },
+            }]);
+            ware.prepareData();
+
+            assert.strictEqual(ware.system.technology.cost.value, 100 * 4 * 1.2);
+            assert.strictEqual(ware.system.technology.availability.value, 3 * 4 + 2);
+            await ware.update({ system: { technology: { rating: 0 } } });
+            ware.prepareData();
+            assert.strictEqual(ware.system.technology.cost.value, 0);
+            assert.strictEqual(ware.system.technology.availability.value, 2);
         });
 
         it('applies item-target active effect multipliers to technology cost', async () => {
@@ -326,6 +407,34 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(ware.system.technology.availability.value, 8);
             assert.strictEqual(ware.system.technology.availability.label, '8R');
             assert.strictEqual(ware.system.technology.cost.value, 120);
+        });
+
+        it('loads migrated rating effects on an unequipped item', async () => {
+            // A 0.37.0 item, where cost was a number, availability a string and both were multiplied by rating.
+            const legacy: any = {
+                type: 'device',
+                system: {
+                    technology: {
+                        rating: 4,
+                        equipped: false,
+                        cost: 100,
+                        availability: '3R',
+                        calculated: {
+                            cost: { value: 400, adjusted: true },
+                            availability: { value: '12R', adjusted: true },
+                        },
+                    },
+                },
+            };
+            new Version0_38_0().migrateItem(legacy);
+
+            const device = await factory.createItem<'device'>(legacy);
+            device.prepareData();
+
+            // The effects the migration wrote apply to the stored item, even while it is unequipped.
+            assert.strictEqual(device.system.technology.cost.value, 400);
+            assert.strictEqual(device.system.technology.availability.value, 12);
+            assert.strictEqual(device.system.technology.availability.label, '12R');
         });
     });
 

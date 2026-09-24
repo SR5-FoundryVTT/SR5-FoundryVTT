@@ -6,16 +6,21 @@
   "effects": [],
   "folder": null,
   "sort": 0,
-  "flags": {},
+  "flags": {
+    "shadowrun5e": {
+      "embeddedItems": []
+    }
+  },
   "_stats": {
-    "coreVersion": "12.331",
-    "systemId": null,
-    "systemVersion": null,
+    "coreVersion": "14.367",
+    "systemId": "shadowrun5e",
+    "systemVersion": "0.37.4",
     "createdTime": null,
     "modifiedTime": null,
     "lastModifiedBy": null,
     "compendiumSource": null,
-    "duplicateSource": null
+    "duplicateSource": null,
+    "exportSource": null
   },
   "ownership": {
     "default": 0
@@ -41,7 +46,9 @@
       "limit": {
         "value": 0,
         "base": 0,
-        "attribute": ""
+        "attribute": "",
+        "base_formula_operator": "add",
+        "changes": []
       },
       "threshold": {
         "value": 0,
@@ -64,7 +71,10 @@
         "base": 0,
         "ap": {
           "value": 0,
-          "base": 0
+          "base": 0,
+          "attribute": "",
+          "base_formula_operator": "add",
+          "changes": []
         },
         "base_formula_operator": "add",
         "attribute": "",
@@ -74,12 +84,9 @@
           "itemType": "",
           "itemName": ""
         },
-        "itemSource": {
-          "actorId": "",
-          "itemId": "",
-          "itemType": "",
-          "itemName": ""
-        }
+        "biofeedback": "",
+        "changes": [],
+        "normal_weapon": false
       },
       "opposed": {
         "type": "",
@@ -111,17 +118,29 @@
         "global",
         "judge_intentions",
         "wounds"
-      ]
+      ],
+      "alt_mod": 0,
+      "category": {
+        "matrix": {
+          "marks": 0,
+          "owner": false
+        }
+      },
+      "dice_pool_mod": [],
+      "initiative_mod": 0
     },
     "result": {
-      "success": {}
+      "success": {
+        "matrix": {
+          "placeMarks": false
+        }
+      }
     },
     "importFlags": {
       "name": "",
-      "type": "",
-      "subType": "",
       "isFreshImport": false,
-      "isImported": false
+      "category": "",
+      "sourceid": ""
     }
   },
   "_key": "!items!0RHkpnQA1qNjyxKE"

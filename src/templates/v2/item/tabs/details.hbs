@@ -9,19 +9,19 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/capacity.hbs"}}
             {{/if}}
 
-            {{#if (eq item.type 'adept_power')}}
+            {{#if (isType item 'adept_power')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/adept_power.hbs"}}
             {{/if}}
 
-            {{#if (eq item.type 'critter_power')}}
+            {{#if (isType item 'critter_power')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/critter_power.hbs"}}
             {{/if}}
 
-            {{#if (eq item.type 'ammo')}}
+            {{#if (isType item 'ammo')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/ammo.hbs"}}
             {{/if}}
 
-            {{#if (eq item.type 'host')}}
+            {{#if (isType item 'host')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/host.hbs"}}
             {{/if}}
 
@@ -29,11 +29,11 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/device-host.hbs"}}
             {{/if}}
 
-            {{#if (eq item.type 'weapon')}}
+            {{#if (isType item 'weapon')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/weapon.hbs"}}
             {{/if}}
 
-            {{#if (eq item.type 'modification')}}
+            {{#if (isType item 'modification')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/modification.hbs"}}
             {{/if}}
 
@@ -41,7 +41,7 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/call_in_action.hbs"}}
             {{/if}}
 
-            {{#if (eq item.type 'contact')}}
+            {{#if (isType item 'contact')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/contact.hbs"}}
             {{/if}}
 
@@ -49,23 +49,23 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/complex_form.hbs"}}
             {{/if}}
 
-            {{#if (eq item.type 'grid')}}
+            {{#if (isType item 'grid')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/grid.hbs"}}
             {{/if}}
 
-            {{#if (eq item.type 'lifestyle')}}
+            {{#if (isType item 'lifestyle')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/lifestyle.hbs"}}
             {{/if}}
 
-            {{#if (eq item.type 'program')}}
+            {{#if (isType item 'program')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/program.hbs"}}
             {{/if}}
 
-            {{#if (eq item.type 'quality')}}
+            {{#if (isType item 'quality')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/quality.hbs"}}
             {{/if}}
 
-            {{#if (eq item.type 'ritual')}}
+            {{#if (isType item 'ritual')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/ritual.hbs"}}
             {{/if}}
 
@@ -73,7 +73,7 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/ware.hbs"}}
             {{/if}}
 
-            {{#if (eq item.type 'spell')}}
+            {{#if (isType item 'spell')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/spell.hbs"}}
             {{/if}}
 

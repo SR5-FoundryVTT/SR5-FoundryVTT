@@ -8,5 +8,20 @@
   "scope": "global",
   "folder": null,
   "flags": {},
-  "_key": "!macros!ZWfyY8P4y1LEstU1"
+  "_key": "!macros!ZWfyY8P4y1LEstU1",
+  "_stats": {
+    "compendiumSource": null,
+    "coreVersion": "14.367",
+    "createdTime": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "lastModifiedBy": null,
+    "modifiedTime": null,
+    "systemId": "shadowrun5e",
+    "systemVersion": "0.37.4"
+  },
+  "ownership": {
+    "default": 0
+  },
+  "sort": 0
 }

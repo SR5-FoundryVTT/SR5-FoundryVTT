@@ -307,14 +307,14 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
             ModifiableValue.add(valueField, 'Custom Modifier', 3, {
                 type: 'add',
-                priority: ModifiableValue.MANUAL_PRIORITY,
+                priority: ModifiableValue.Priority.MANUAL,
             });
 
             const createdChange = valueField.changes.find(change => change.name === 'Custom Modifier');
             if (!createdChange) assert.fail('Expected manual-priority modifier to exist');
             if (!createdChange) return;
 
-            assert.strictEqual(createdChange.priority, ModifiableValue.MANUAL_PRIORITY);
+            assert.strictEqual(createdChange.priority, ModifiableValue.Priority.MANUAL);
             assert.isTrue(ModifiableValue.isManualChange(createdChange));
         });
 
