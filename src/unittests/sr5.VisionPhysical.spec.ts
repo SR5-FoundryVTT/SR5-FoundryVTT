@@ -303,12 +303,25 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
                 hot: [1, 0.1, 0, 1],
             };
 
+            const filters: Record<string, any> = {};
             for (const [signature, color] of Object.entries(expectedColors)) {
                 assert.isTrue((mode as any)._canDetect(visionSource(), target(true, false, signature)));
                 const filter = ThermographicVisionDetectionMode.getDetectionFilter() as any;
                 assert.instanceOf(filter, foundry.canvas.rendering.filters.GlowOverlayFilter);
                 assert.deepEqual(Array.from(filter.uniforms.glowColor), color, signature);
+                assert.isAtLeast(filter.padding, filter.uniforms.distance, `${signature} halo fits its padding`);
+                filters[signature] = filter;
             }
+            const { cold, warm, hot } = filters;
+
+            assert.isBelow(cold.uniforms.distance, warm.uniforms.distance, 'warm halo is wider than cold');
+            assert.isBelow(warm.uniforms.distance, hot.uniforms.distance, 'hot halo is wider than warm');
+            assert.isBelow(cold.outerStrength, warm.outerStrength, 'warm glows brighter than cold');
+            assert.isBelow(warm.outerStrength, hot.outerStrength, 'hot glows brighter than warm');
+            assert.isFalse(cold.animated, 'cold glow is steady');
+            assert.isNull(cold.pulse);
+            assert.isTrue(warm.animated && hot.animated, 'warm and hot glows pulse');
+            assert.isBelow(hot.pulse.period, warm.pulse.period, 'hot pulses faster than warm');
 
             assert.isFalse((mode as any)._canDetect(visionSource(), target(true, false, 'none')));
             assert.isUndefined(ThermographicVisionDetectionMode.getDetectionFilter());

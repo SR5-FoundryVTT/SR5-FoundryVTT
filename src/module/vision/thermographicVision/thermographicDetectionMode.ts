@@ -1,21 +1,14 @@
-import type { ThermographicSignature } from '@/module/types/template/Visibility';
 import {
     getPhysicalTargetActor,
     hasPhysicalPresence,
     isAstralVisionSource,
     isInvisiblePhysicalTarget,
 } from '@/module/vision/physicalVision/physicalDetectionMode';
+import { type HeatSignature, HeatSignatureFilter } from './heatSignatureFilter';
 
 export default class ThermographicVisionDetectionMode extends foundry.canvas.perception.DetectionMode {
-    private static readonly GLOW_COLORS: Readonly<
-        Record<Exclude<ThermographicSignature, 'none'>, [number, number, number, number]>
-    > = {
-        cold: [0.25, 0.5, 1.0, 1.0],
-        warm: [1.0, 0.55, 0.0, 1.0],
-        hot: [1.0, 0.1, 0.0, 1.0],
-    };
-    private static readonly filters = new Map<Exclude<ThermographicSignature, 'none'>, PIXI.Filter>();
-    private static pendingSignature: Exclude<ThermographicSignature, 'none'> | null = null;
+    private static readonly filters = new Map<HeatSignature, PIXI.Filter>();
+    private static pendingSignature: HeatSignature | null = null;
 
     static override getDetectionFilter() {
         const signature = this.pendingSignature;
@@ -24,9 +17,7 @@ export default class ThermographicVisionDetectionMode extends foundry.canvas.per
 
         let filter = this.filters.get(signature);
         if (!filter) {
-            filter = foundry.canvas.rendering.filters.GlowOverlayFilter.create({
-                glowColor: this.GLOW_COLORS[signature],
-            });
+            filter = HeatSignatureFilter.forSignature(signature);
             this.filters.set(signature, filter);
         }
         return filter;
