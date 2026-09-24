@@ -15,9 +15,6 @@ const PerceptionCapabilitiesData = (spaces: SpaceTypes) => ({
         perception: new BooleanField({ initial: spaces.includes('astralActive') }),
         projection: new BooleanField(),
     }),
-    matrix: new SchemaField({
-        perception: new BooleanField({ initial: spaces.includes('matrix') }),
-    }),
 });
 
 /** How an actor can be perceived by others. */

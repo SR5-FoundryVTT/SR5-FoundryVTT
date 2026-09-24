@@ -13,6 +13,14 @@ const PERCEPTION_TARGET_PATHS = {
     'system.visibilityChecks.meat.hasHeat': 'system.visibilityChecks.targets.physical.thermographic',
 } as const;
 
+/** Qualities naming a magical type, checked in order so that e.g. Mystic Adept wins over Adept. */
+const MAGICAL_TYPE_QUALITIES = [
+    ['mystic adept', 'mystic_adept'],
+    ['aspected magician', 'aspected_magician'],
+    ['adept', 'adept'],
+    ['magician', 'magician'],
+] as const;
+
 /** Migrate data changes from every branch that ships in 0.38.0. */
 export class Version0_38_0 extends VersionMigration {
     readonly TargetVersion = '0.38.0';
@@ -20,6 +28,7 @@ export class Version0_38_0 extends VersionMigration {
     // Each branch contributing to 0.38.0 keeps its whole flow in its own migrate<Branch> method, called here.
     override migrateActor(actor: any): void {
         this.migrateVision(actor);
+        this.migrateMagicalType(actor);
     }
 
     override migrateActiveEffect(effect: any): void {
@@ -51,6 +60,29 @@ export class Version0_38_0 extends VersionMigration {
         delete visibility.meat;
         delete visibility.astral;
         delete visibility.matrix;
+    }
+
+    /**
+     * Vision: astral senses now follow the magical type, so awakened characters need one.
+     *
+     * A magic type quality decides it. Without one, adept powers and spells tell adepts, mystic
+     * adepts and magicians apart. Aspected magicians are only recognized by their quality.
+     */
+    private migrateMagicalType(actor: any): void {
+        const magic = actor.system?.magic;
+        if (actor.type !== 'character' || actor.system?.special !== 'magic' || !magic || magic.type) return;
+
+        const items: any[] = actor.items ?? [];
+        const qualities = new Set(items.filter(item => item.type === 'quality').map(item => String(item.name).toLowerCase()));
+        const fromQuality = MAGICAL_TYPE_QUALITIES.find(([quality]) => qualities.has(quality));
+        if (fromQuality) {
+            magic.type = fromQuality[1];
+            return;
+        }
+
+        const hasPowers = items.some(item => item.type === 'adept_power');
+        const hasSpells = items.some(item => item.type === 'spell');
+        magic.type = hasPowers && hasSpells ? 'mystic_adept' : hasPowers ? 'adept' : 'magician';
     }
 
     /** Vision: effect changes follow the moved visibility check paths. */

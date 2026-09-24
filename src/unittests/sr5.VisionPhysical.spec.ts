@@ -19,7 +19,6 @@ const actorData = (metatype: string, changes: Record<string, unknown> = {}): any
             capabilities: {
                 physical: { lowLight: false, thermographic: false, ultrasound: false },
                 astral: { perception: false, projection: false },
-                matrix: { perception: false },
             },
             targets: {
                 physical: { active: true, thermographic: 'warm' },

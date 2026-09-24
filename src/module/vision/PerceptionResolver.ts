@@ -28,9 +28,6 @@ export class PerceptionResolver {
                 perception: !!capabilities?.astral?.perception,
                 projection: !!capabilities?.astral?.projection,
             },
-            matrix: {
-                perception: !!capabilities?.matrix?.perception,
-            },
         };
 
         this.applyMetatypeSenses(actor.system.metatype, resolved);

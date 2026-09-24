@@ -1015,6 +1015,51 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
     });
 
+    describe('Version0_38_0 magical type migration', () => {
+        const awakened = (items: { type: string; name: string }[] = [], magic: Record<string, unknown> = {}) => ({
+            type: 'character',
+            system: { special: 'magic', magic: { ...magic } },
+            items,
+        }) as any;
+
+        it('uses a magic type quality, preferring the more specific one', () => {
+            const migrator = new Version0_38_0();
+            const mystic = awakened([{ type: 'quality', name: 'Adept' }, { type: 'quality', name: 'Mystic Adept' }]);
+            const aspected = awakened([{ type: 'quality', name: 'Aspected Magician' }]);
+
+            migrator.migrateActor(mystic);
+            migrator.migrateActor(aspected);
+
+            assert.strictEqual(mystic.system.magic.type, 'mystic_adept');
+            assert.strictEqual(aspected.system.magic.type, 'aspected_magician');
+        });
+
+        it('tells adepts, mystic adepts and magicians apart by powers and spells', () => {
+            const migrator = new Version0_38_0();
+            const adept = awakened([{ type: 'adept_power', name: 'Killing Hands' }]);
+            const mystic = awakened([{ type: 'adept_power', name: 'Killing Hands' }, { type: 'spell', name: 'Stunbolt' }]);
+            const magician = awakened([{ type: 'spell', name: 'Stunbolt' }]);
+
+            for (const actor of [adept, mystic, magician]) migrator.migrateActor(actor);
+
+            assert.strictEqual(adept.system.magic.type, 'adept');
+            assert.strictEqual(mystic.system.magic.type, 'mystic_adept');
+            assert.strictEqual(magician.system.magic.type, 'magician');
+        });
+
+        it('leaves mundane characters and chosen types alone', () => {
+            const migrator = new Version0_38_0();
+            const mundane: any = { type: 'character', system: { special: 'mundane', magic: {} }, items: [] };
+            const chosen = awakened([{ type: 'spell', name: 'Stunbolt' }], { type: 'adept' });
+
+            migrator.migrateActor(mundane);
+            migrator.migrateActor(chosen);
+
+            assert.notProperty(mundane.system.magic, 'type');
+            assert.strictEqual(chosen.system.magic.type, 'adept');
+        });
+    });
+
     describe('Version0_38_0 perception target migration', () => {
         it('moves legacy actor targets and preserves their values', () => {
             const migrator = new Version0_38_0();
