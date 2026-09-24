@@ -22,6 +22,8 @@ type ProjectionAction = 'project' | 'return';
 
 export class AstralProjectionFlow {
     private static operations = new Map<string, Promise<unknown>>();
+    /** Linked bodies share a projection request; synthetic actors keep their own requests. */
+    private static projections = new Map<string, Promise<TokenDocument | null>>();
     /** Form tokens awaiting their placeable to be drawn before control can be moved onto them. */
     private static pendingFocus = new Set<string>();
 
@@ -110,6 +112,21 @@ export class AstralProjectionFlow {
             ui.notifications.warn(game.i18n.localize('SR5.Vision.CannotProjectAstrally'));
             return null;
         }
+        const actorUuid = actor.uuid!;
+        const inFlight = this.projections.get(actorUuid);
+        if (inFlight) return inFlight;
+
+        // Reserve the actor before checking existing projections or updating either document.
+        const running = Promise.resolve().then(() => this.projectBody(body, actor, scene));
+        this.projections.set(actorUuid, running);
+        try {
+            return await running;
+        } finally {
+            if (this.projections.get(actorUuid) === running) this.projections.delete(actorUuid);
+        }
+    }
+
+    private static async projectBody(body: TokenDocument, actor: SR5Actor, scene: Scene) {
         const bodyUuid = body.uuid!;
 
         const existingActorProjection = this.projectedBodyForActor(actor);
