@@ -295,13 +295,13 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                 const actor = await factory.createActor({
                     type: 'character',
                     system: {
-                        metatype: 'dwarf',
+                        visibilityChecks: { capabilities: { physical: { thermographic: true } } },
                         situation_modifiers: { environmental: { active: { light: -6 } } },
                     }
                 });
 
                 const modifiers = actor.getSituationModifiers();
-                assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), -3, 'dwarf thermographic vision');
+                assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), -3, 'thermographic vision');
 
                 await actor.createEmbeddedDocuments('ActiveEffect', [{
                     name: 'Thermographic Vision',

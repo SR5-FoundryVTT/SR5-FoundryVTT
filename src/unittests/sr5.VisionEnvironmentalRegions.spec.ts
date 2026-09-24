@@ -153,12 +153,15 @@ export const shadowrunVisionEnvironmentalRegions = (context: QuenchBatchContext)
 
         it('lets senses compensate regional light but not glare', async () => {
             const scene = await createScene();
-            const actor = await factory.createActor({ type: 'character', system: { metatype: 'elf' } });
+            const actor = await factory.createActor({
+                type: 'character',
+                system: { visibilityChecks: { capabilities: { physical: { lowLight: true } } } },
+            });
             const token = await createToken(scene, actor.id, 100, 100);
             const { behavior } = await createRegion(scene, environment({ light: 'moderate' }));
 
             const modifiers = actor.getSituationModifiers(token);
-            assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), 0, 'elves see in dim light');
+            assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), 0, 'low-light vision compensates dim light');
 
             await behavior.update({ system: { light: 'none', glare: 'moderate' } });
             assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), -3, 'low-light does not help against glare');

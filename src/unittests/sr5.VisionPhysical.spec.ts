@@ -70,22 +70,6 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
     });
 
     describe('Physical vision', () => {
-        it('derives only the canonical metatype senses', () => {
-            for (const metatype of ['elf', 'ork']) {
-                const senses = PerceptionResolver.resolve(actorData(metatype)).physical;
-                assert.isTrue(senses.lowLight, metatype);
-                assert.isFalse(senses.thermographic, metatype);
-            }
-            for (const metatype of ['dwarf', 'troll']) {
-                const senses = PerceptionResolver.resolve(actorData(metatype)).physical;
-                assert.isFalse(senses.lowLight, metatype);
-                assert.isTrue(senses.thermographic, metatype);
-            }
-
-            const custom = PerceptionResolver.resolve(actorData('custom')).physical;
-            assert.deepEqual(custom, { lowLight: false, thermographic: false, ultrasound: false });
-        });
-
         it('uses equipped item grants and ignores disabled effects and unequipped items', async () => {
             const actor = await factory.createActor({ type: 'character', system: { metatype: 'human' } });
             const [effect] = await actor.createEmbeddedDocuments('ActiveEffect', [

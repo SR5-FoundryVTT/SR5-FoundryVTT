@@ -134,7 +134,7 @@ export const shadowrunVisionProjection = (context: QuenchBatchContext) => {
         });
 
         it('returns to the body and restores its prior vision and initiative', async () => {
-            const actor = await createMagician({ metatype: 'elf' });
+            const actor = await createMagician({ visibilityChecks: { capabilities: { physical: { lowLight: true } } } });
             const { scene, body } = await createBody(actor);
             const form = await AstralProjectionFlow.project(body);
             assert.exists(form);

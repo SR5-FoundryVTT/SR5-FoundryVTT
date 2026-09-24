@@ -13,8 +13,7 @@ export class PerceptionResolver {
      * Resolve which senses an actor has.
      *
      * Active Effect grants are already part of the prepared capabilities, as actor preparation applies
-     * actor and item effects. Metatype senses and magical eligibility are added on top, with explicit
-     * GM overrides applied last.
+     * actor and item effects. Magical eligibility is added on top, with explicit GM overrides applied last.
      */
     static resolve(actor: PerceptionActor): PerceptionCapabilitiesType {
         const capabilities = actor.system.visibilityChecks?.capabilities;
@@ -30,24 +29,8 @@ export class PerceptionResolver {
             },
         };
 
-        this.applyMetatypeSenses(actor.system.metatype, resolved);
         this.applyMagicalEligibility(actor.system.magic, resolved);
         return resolved;
-    }
-
-    private static applyMetatypeSenses(metatype: unknown, capabilities: PerceptionCapabilitiesType) {
-        if (typeof metatype !== 'string') return;
-
-        switch (metatype.toLowerCase()) {
-            case 'elf':
-            case 'ork':
-                capabilities.physical.lowLight = true;
-                break;
-            case 'dwarf':
-            case 'troll':
-                capabilities.physical.thermographic = true;
-                break;
-        }
     }
 
     private static applyMagicalEligibility(magic: Record<string, any> | undefined, capabilities: PerceptionCapabilitiesType) {

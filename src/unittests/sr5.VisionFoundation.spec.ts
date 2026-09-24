@@ -137,7 +137,7 @@ export const shadowrunVisionFoundation = (context: QuenchBatchContext) => {
             assert.isFalse(PerceptionFlow.isRefreshEnabled(automatic, false));
         });
 
-        it('reconciles derived senses when a scene is loaded', async () => {
+        it('reconciles effect-granted senses when a scene is loaded', async () => {
             const actor = await factory.createActor({
                 type: 'character',
                 system: { metatype: 'elf' },
@@ -153,9 +153,59 @@ export const shadowrunVisionFoundation = (context: QuenchBatchContext) => {
 
             token.updateSource({ detectionModes: {} });
             PerceptionFlow.refreshScene(scene);
+            assert.notProperty(token.detectionModes, 'lowlight');
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: '#QUENCH Scene Vision Grant',
+                system: {
+                    targets: [{ id: 'actor', name: 'Actor', applyTo: 'actor' }],
+                    changes: [{
+                        key: 'system.visibilityChecks.capabilities.physical.lowLight',
+                        type: 'override',
+                        value: true,
+                        target: 'actor',
+                    }],
+                },
+            }]);
+            PerceptionFlow.refreshScene(scene);
 
             assert.isTrue(token.detectionModes.lowlight.enabled);
             assert.strictEqual(token.detectionModes.lowlight.range, 10000);
+        });
+
+        it('uses an Active Effect to set token vision and detection modes', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const scene = await factory.createScene({});
+            const [token] = await scene.createEmbeddedDocuments('Token', [{
+                actorId: actor.id,
+                actorLink: true,
+                sight: { enabled: true, range: 30 },
+            }]);
+            const [effect] = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: '#QUENCH Ultrasound Vision',
+                system: {
+                    targets: [{ id: 'actor', name: 'Actor', applyTo: 'actor' }],
+                    changes: [{
+                        key: 'system.visibilityChecks.capabilities.physical.ultrasound',
+                        type: 'override',
+                        value: true,
+                        target: 'actor',
+                    }, {
+                        key: 'token.sight.visionMode',
+                        type: 'override',
+                        value: 'ultrasound',
+                        target: 'actor',
+                    }],
+                },
+            }]);
+            PerceptionFlow.refreshScene(scene);
+            assert.strictEqual(token.sight.visionMode, 'ultrasound');
+            assert.isTrue(token.detectionModes.ultrasound.enabled);
+
+            await effect.update({ disabled: true });
+            PerceptionFlow.refreshScene(scene);
+            assert.strictEqual(token.sight.visionMode, 'basic');
+            assert.notProperty(token.detectionModes, 'ultrasound');
         });
     });
 };

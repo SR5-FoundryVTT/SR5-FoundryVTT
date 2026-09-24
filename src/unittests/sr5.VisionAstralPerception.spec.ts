@@ -69,7 +69,10 @@ export const shadowrunVisionAstralPerception = (context: QuenchBatchContext) => 
         it('restores prior vision and then reconciles current automatic senses', async () => {
             const actor = await factory.createActor({
                 type: 'character',
-                system: { metatype: 'elf', magic: { type: 'magician' } },
+                system: {
+                    magic: { type: 'magician' },
+                    visibilityChecks: { capabilities: { physical: { lowLight: true } } },
+                },
             });
             const scene = await factory.createScene({});
             const [token] = await scene.createEmbeddedDocuments('Token', [{
