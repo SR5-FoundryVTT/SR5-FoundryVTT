@@ -20,6 +20,7 @@ const SRStatus = [
             targets: [
                 {
                     id: 'penalty',
+                    name: 'penalty',
                     applyTo: 'test_all',
                     conditions: [
                         // Exclude defense and resist tests from the penalty.
@@ -40,6 +41,7 @@ const SRStatus = [
                 {
                     // +4 raw on melee attacks = net +2 after the general -2 penalty.
                     id: 'melee',
+                    name: 'melee',
                     applyTo: 'test_all',
                     conditions: [
                         { type: 'tests', mode: 'include', values: ['MeleeAttackTest'] },
@@ -48,6 +50,7 @@ const SRStatus = [
                 {
                     // -2 to a ranged/thrown attack made against this running actor (applies to the attacker's test).
                     id: 'targetRanged',
+                    name: 'targetRanged',
                     applyTo: 'test_target',
                     conditions: [
                         { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest', 'SpellCastingTest'] },
@@ -72,6 +75,7 @@ const SRStatus = [
             targets: [
                 {
                     id: 'penalty',
+                    name: 'penalty',
                     applyTo: 'test_all',
                     conditions: [
                         { type: 'tests', mode: 'exclude', values: ['PhysicalDefenseTest', 'SuppressionDefenseTest', 'PhysicalResistTest'] },
@@ -90,6 +94,7 @@ const SRStatus = [
                 {
                     // +4 raw on melee attacks = net +2 after the general -2 penalty.
                     id: 'melee',
+                    name: 'melee',
                     applyTo: 'test_all',
                     conditions: [
                         { type: 'tests', mode: 'include', values: ['MeleeAttackTest'] },
@@ -98,6 +103,7 @@ const SRStatus = [
                 {
                     // -4 to a ranged/thrown attack made against this sprinting actor (applies to the attacker's test).
                     id: 'targetRanged',
+                    name: 'targetRanged',
                     applyTo: 'test_target',
                     conditions: [
                         { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest', 'SpellCastingTest'] },
@@ -113,13 +119,94 @@ const SRStatus = [
             ],
         },
     },
-] as const satisfies CONFIG.StatusEffect[];
+    {
+        id: 'sr5jumpedIn',
+        name: 'SR5.StatusEffects.JumpedIn',
+        img: 'icons/svg/lock.svg',
+    },
+    {
+        id: 'sr5riggedVehicle',
+        name: 'SR5.StatusEffects.RiggedVehicle',
+        img: 'systems/shadowrun5e/dist/icons/status-effects/steering-wheel.svg',
+    },
+    {
+        id: 'sr5disoriented',
+        name: 'SR5.Rigger.Disoriented',
+        img: 'icons/svg/daze.svg',
+        duration: { value: 1, units: 'rounds', expiry: 'roundStart' },
+        system: {
+            targets: [
+                {
+                    id: 'penalty',
+                    name: 'penalty',
+                    applyTo: 'test_all',
+                    conditions: [
+                        { type: 'tests', mode: 'exclude', values: ['PhysicalDefenseTest', 'SuppressionDefenseTest', 'PhysicalResistTest', 'BiofeedbackResistTest'] },
+                    ],
+                },
+            ],
+            changes: [
+                { key: "data.pool", type: "add", value: "-2", target: 'penalty' },
+            ],
+        },
+    },
+    {
+        id: 'sr5sensorLock',
+        name: 'SR5.Rigger.ActiveSensorLock',
+        img: 'icons/svg/target.svg',
+        duration: { value: 1, units: 'rounds', expiry: 'roundStart' },
+        system: {
+            targets: [
+                {
+                    id: 'attackerBonus',
+                    name: 'attackerBonus',
+                    applyTo: 'test_target',
+                    conditions: [
+                        { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest'] },
+                        { type: 'categories', mode: 'include', values: ['attack_ranged', 'attack_thrown'] },
+                    ],
+                },
+            ],
+            changes: [
+                { key: "data.pool", type: "add", value: "1", target: 'attackerBonus' },
+            ],
+        },
+    },
+    {
+        id: 'sr5spunOut',
+        name: 'SR5.Rigger.SpunOut',
+        img: 'systems/shadowrun5e/dist/icons/anticlockwise-rotation.svg',
+        duration: { value: 1, units: 'rounds', expiry: 'roundStart' },
+        system: {
+            targets: [
+                {
+                    id: 'handlingPenalty',
+                    name: 'handlingPenalty',
+                    applyTo: 'test_all',
+                    conditions: [
+                        { type: 'tests', mode: 'include', values: ['PilotVehicleTest'] },
+                    ],
+                },
+            ],
+            changes: [
+                { key: "data.pool", type: "add", value: "-2", target: 'handlingPenalty' },
+            ],
+        },
+    },
+];
 
 export function getSRStatus(): CONFIG.StatusEffect[] {
-    const expiry = getMovementExpiry();
+    const movementExpiry = getMovementExpiry();
 
-    return SRStatus.map(status => ({
-        ...status,
-        duration: { ...status.duration, expiry },
-    }));
+    return SRStatus.map(status => {
+        if (!('duration' in status) || !status.duration) return { ...status };
+        const expiry = (status.duration as any).expiry === DEFAULT_MOVEMENT_EXPIRY ? movementExpiry : (status.duration as any).expiry;
+        return {
+            ...status,
+            duration: {
+                ...(status.duration as any),
+                expiry,
+            },
+        };
+    }) as CONFIG.StatusEffect[];
 }

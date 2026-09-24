@@ -1,0 +1,56 @@
+<div class="list-item-container {{#if item.isExpanded}} expanded {{/if}}">
+    <div class="list-item draggable"
+         draggable="true"
+         data-actor-uuid="{{item.actorUuid}}"
+         data-uuid="{{item.uuid}}"
+         data-item-id="{{item.id}}">
+        <div class="list-item-start">
+            <img class="item-image image" src="{{item.img}}" width="24" height="24" style="border: none; border-radius: 3px; margin-right: 5px; flex-shrink: 0;" />
+            <a data-action="openVehicleSheet" data-actor-uuid="{{item.actorUuid}}" class="item-name item-text" style="font-weight: bold;">
+                {{item.name}}
+            </a>
+            {{#if item.isStacked}}
+                <a class="drone-expand-toggle" data-action="toggleDroneStack" data-stack-name="{{item.name}}" style="margin-left: 6px; cursor: pointer; color: #ff9800;" data-tooltip="SR5.ToggleExpand">
+                    <i class="fas {{#if item.isExpanded}}fa-square-minus{{else}}fa-square-plus{{/if}}"></i>
+                </a>
+            {{/if}}
+        </div>
+
+        <div class="list-item-col" style="flex: 0 0 60px; text-align: center;">
+            {{#if item.isStacked}}
+                <span class="badge" style="background: rgba(255,152,0,0.2); border: 1px solid #ff9800; border-radius: 3px; padding: 1px 5px; font-weight: bold;">×{{item.quantity}}</span>
+            {{/if}}
+        </div>
+
+        <div class="list-item-icons">
+            <a class="item-icon list-item-action" data-action="openVehicleSheet" data-actor-uuid="{{item.actorUuid}}" data-tooltip="Open Sheet">
+                <i class="fas fa-file-user"></i>
+            </a>
+        </div>
+    </div>
+
+    {{#if item.isExpanded}}
+        <div class="list-item-desc expanded-drone-stack" style="display: block; padding-left: 20px; background: rgba(0,0,0,0.15);">
+            {{#each item.actors}}
+                <div class="list-item sub-item draggable"
+                     draggable="true"
+                     data-actor-uuid="{{this.uuid}}"
+                     data-uuid="{{this.uuid}}"
+                     data-item-id="{{this.id}}"
+                     style="border-bottom: 1px solid rgba(255,255,255,0.05); padding: 3px 0;">
+                    <div class="list-item-start">
+                        <img class="item-image image" src="{{this.img}}" width="20" height="20" style="border: none; border-radius: 3px; margin-right: 5px;" />
+                        <a data-action="openVehicleSheet" data-actor-uuid="{{this.uuid}}" class="item-text">
+                            {{this.name}}
+                        </a>
+                    </div>
+                    <div class="list-item-icons">
+                        <a class="item-icon list-item-action" data-action="openVehicleSheet" data-actor-uuid="{{this.uuid}}" data-tooltip="Open Sheet">
+                            <i class="fas fa-file-user"></i>
+                        </a>
+                    </div>
+                </div>
+            {{/each}}
+        </div>
+    {{/if}}
+</div>

@@ -1249,7 +1249,10 @@
             "NoAvailableActorFound": "해당 행동에 사용할 수 있는 액터를 찾을 수 없음",
             "SkillWithoutAttribute": "해당 기술에 특성치 설정이 없습니다.",
             "TestExpectsVehicleOnly": "해당 판정은 탑승물 유형의 액터만 사용 가능",
-            "TooManyActionsWithCategory": "액터에 {category} 범주의 해동이 정확히 하나 있어야 함"
+            "TooManyActionsWithCategory": "액터에 {category} 범주의 해동이 정확히 하나 있어야 함",
+            "NoDriverSelectedForJumpIn": "점프인할 드론/차량 운전자가 선택되지 않았습니다.",
+            "ActiveSensorLockFailure": "능동 센서 조준에 실패했습니다!",
+            "VehicleCannotBeOwnDriver": "차량이 스스로의 운전자가 될 수 없습니다 (파일럿 등급을 사용하세요)."
         },
         "EssenceCost": "에센스",
         "Expand": "펼치기",
@@ -2954,9 +2957,13 @@
         },
         "StatusEffects": {
             "Running": "달리기",
-            "Sprinting": "전력 질주"
-        },																 
-	      "Stock": "개머리판",
+            "Sprinting": "전력 질주",
+            "sr5jumpedIn": "점프인 완료 (이동 잠금)",
+            "sr5riggedVehicle": "리거 조종 차량",
+            "sr5sensorLock": "센서 조준됨",
+            "sr5spunOut": "스핀아웃 (조종 페널티)"
+        },
+        "Stock": "개머리판",
         "StreetCred": "길거리 명성",
         "StunTrack": "기절 추적기",
         "Submersion": "몰닉",
@@ -3226,7 +3233,7 @@
                 "Extended": "요구 성공횟수에 도달할 때까지 연장 판정으로 굴립니다. 간격을 0으로 두면 일반 판정으로 굴립니다.",
                 "ExtendedInterval": "굴림 사이의 게임 시간입니다. 0이면 연장 판정이 아닌 일반 판정으로 굴립니다.",
                 "Limit": "계산된 한계치",
-                "LimitIgnored": "현재 해당 판정에 대하여 한계가 무시됨Limit is currently ignored for this test",								
+                "LimitIgnored": "현재 해당 판정에 대하여 한계가 무시됨Limit is currently ignored for this test",
                 "Modifier": "주사위 풀에 적용되는 모든 수정치의 합계",
                 "Pool": "굴릴 수 있는 주사위 개수",
                 "PushTheLimit": "한계 돌파 엣지 규칙 적용",
@@ -3273,6 +3280,33 @@
                 "Mini": "초소형",
                 "Missile": "미사일",
                 "Small": "소형"
+            },
+            "SubCategory": "하위 유형",
+            "SubCategories": {
+                "Bike": "자전거",
+                "Motorcycle": "오토바이",
+                "Car": "승용차",
+                "Truck": "트럭",
+                "Boat": "보트",
+                "Submarine": "잠수함",
+                "Aircraft": "항공기",
+                "Rotorcraft": "헬리콥터",
+                "Vtol": "수직이착륙기",
+                "Hovercraft": "호버크래프트",
+                "Ltav": "비행선",
+                "Glider": "글라이더",
+                "Walker": "보행형",
+                "HeavyEquipment": "중장비",
+                "Military": "군용 / 경찰용",
+                "Commercial": "상업용",
+                "MicroDrone": "마이크로 드론",
+                "MiniDrone": "미니 드론",
+                "SmallDrone": "소형 드론",
+                "MediumDrone": "중형 드론",
+                "LargeDrone": "대형 드론",
+                "HugeDrone": "거대 드론",
+                "AnthroDrone": "인간형 드론",
+                "MissileDrone": "미사일 드론"
             },
             "Category": "범주",
             "ChaseEnvironment": "추적 환경",
@@ -3373,7 +3407,11 @@
             "SkillSetDefaultTypeOutsideCompendium": "설정된 기술 설정 컨펜디움에 포함된 기술 설정만 액터 생성에 영향을 줌",
             "SummoningNotConcluded": "소환이 완료되지 않았습니다. 드레인 결정을 위해 영혼 경쟁 판정이 완료되길 기다려야 합니다.",
             "TokenSelectionNeeded": "하나 이상의 토큰이 선택되어야 함",
-            "NoActorCreatePermission": "액터를 생성할 권한이 없습니다."
+            "NoActorCreatePermission": "액터를 생성할 권한이 없습니다.",
+            "RCCOverAllocated": "RCC 프로그램 공유 + 노이즈 감쇄 합이 장치 등급을 초과했습니다",
+            "OverAutosoftSlots": "이 드론의 오토소프트 슬롯 용량을 초과했습니다",
+            "OverSharingLimit": "탑재된 오토소프트가 RCC 공유 한도를 초과했습니다",
+            "TokenMovementLockedJumpedIn": "{vehicle}은 현재 리거 조종 중입니다! 캐릭터 이동이 잠겼습니다."
         },
         "Weapon": {
             "AmmoCount": "탄약 수량",
@@ -3581,7 +3619,30 @@
         "Wireless": "무선",
         "WirelessOffline": "오프라인",
         "WirelessOnline": "온라인",
-        "WirelessUnavailable": "이용 불가능"
+        "WirelessUnavailable": "이용 불가능",
+        "Rigger": {
+            "JumpIn": "점프인 (차량 탑승)",
+            "JumpOut": "점프아웃 (차량 이탈)",
+            "JumpedInSuccess": "{rigger}님이 {vehicle}에 점프인했습니다",
+            "JumpedOutSuccess": "{vehicle}에서 점프아웃했습니다",
+            "JumpInTestRequired": "소유하지 않은 차량 {vehicle}에 점프인하려면 판정이 필요합니다.",
+            "JumpedInEffectName": "점프인 상태 ({rigger})",
+            "RiggerMovingVehicle": "{rigger}님이 {vehicle}을(를) 조종 중입니다",
+            "GODRiggerInterfaceWarning": "<div class='sr5-god-alert'><div class='god-header'>⚡ 그리드 감시 부서 // 시스템 경보</div><div class='god-body'><p><strong>경고:</strong> 차량 <em>{vehicle}</em>에 검증된 리거 인터페이스 연결이 없습니다.</p></div></div>",
+            "MissingRiggerInterface": "차량 {vehicle}에 리거 인터페이스가 설치되어 있지 않습니다!",
+            "ActiveSensorLock": "능동 센서 조준 (Active Sensor Lock)",
+            "ActiveSensorLockSuccess": "{attacker}님이 {target}에 센서 조준을 완료했습니다 (+{netHits} 방어 페널티)"
+        },
+        "Swarm": {
+            "Label": "스웜 (군집)",
+            "Toggle": "스웜 모드 전환",
+            "IsLeader": "스웜 리더",
+            "MemberCount": "{count}대의 드론",
+            "Bonus": "+{bonus} 보너스",
+            "EffectivePilot": "파일럿: {rating}",
+            "LeaderSelection": "스웜 리더 선택",
+            "SharedAutosofts": "공유된 RCC 오토소프트"
+        }
     },
     "TYPES": {
         "Actor": {
@@ -3620,5 +3681,38 @@
             "vehicle": "탑승물",
             "weapon": "무기"
         }
+    },
+    "MatrixAttributeDisplayModeName": "매트릭스 속성 표시 모드",
+    "MatrixAttributeDisplayModeDescription": "매트릭스 속성을 전체 텍스트 라벨로 표시할지, 툴팁이 포함된 아이콘으로 표시할지 선택합니다.",
+    "MatrixAttributeDisplayModeFull": "전체 텍스트 라벨",
+    "MatrixAttributeDisplayModeIcons": "아이콘만 (툴팁 포함)",
+    "RequireRiggerInterfaceName": "리거 인터페이스 필수 적용",
+    "RequireRiggerInterfaceDescription": "활성화하면 리거 인터페이스가 설치되지 않은 차량에 점프인하는 것이 차단됩니다.",
+    "AutosoftTargetModeName": "오토소프트 타겟팅 모드",
+    "AutosoftTargetModeDescription": "타겟팅 오토소프트를 특정 장착 무기(RAW)에 연결할지 무기 범주/전투 기술에 연결할지 선택합니다.",
+    "AutosoftTargetModeWeapon": "특정 장착 무기 (원작 규칙)",
+    "AutosoftTargetModeCategory": "무기 범주 / 기술 (변형 규칙)",
+    "Autosoft": "오토소프트",
+    "AutosoftType": "오토소프트 유형",
+    "AutosoftConfigManager": {
+        "Title": "오토소프트 설정 및 전송",
+        "TargetActor": "대상 드론 / 차량",
+        "TargetWeapon": "대상 무기 (포술)",
+        "TargetModel": "대상 기종",
+        "NoWeapons": "대상에 장착된 무기가 없습니다",
+        "NoDrones": "소유한 드론이나 차량을 찾을 수 없습니다",
+        "Submit": "설정 및 전송",
+        "Cancel": "취소"
+    },
+    "TargetModel": "대상 기종",
+    "TargetWeapon": "대상 무기",
+    "ControlMode": "제어 모드",
+    "AutosoftTypes": {
+        "Clearsight": "명시 (Clearsight)",
+        "Evasion": "회피 (Evasion)",
+        "Maneuvering": "조종 (Maneuvering)",
+        "Stealth": "은신 (Stealth)",
+        "Targeting": "조준 (Targeting)",
+        "ElectronicWarfare": "전자전 (Electronic Warfare)"
     }
 }

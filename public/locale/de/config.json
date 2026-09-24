@@ -9,7 +9,17 @@
         }
     },
     "SETTINGS": {
-        "ApplyLimitsDescription": "Sollen Limits auf auf Würfen angewendet werden?",
+        "MatrixAttributeDisplayModeName": "Matrix-Attribut Anzeige-Modus",
+        "MatrixAttributeDisplayModeDescription": "Wählen Sie, ob Matrix-Attribute auf Bogen-Tabs als voller Text oder als Icons mit Hover-Tooltip angezeigt werden.",
+        "MatrixAttributeDisplayModeFull": "Vollständiger Text",
+        "MatrixAttributeDisplayModeIcons": "Nur Icons (mit Tooltip)",
+        "RequireRiggerInterfaceName": "Erfordere Rigger-Interface Pflicheinstellung",
+        "RequireRiggerInterfaceDescription": "Wenn aktiviert, wird das Hineinspringen in ein Fahrzeug ohne Rigger-Interface blockiert. Wenn deaktiviert (Standard), sendet G.O.D. eine Ingame-Warnung im Chat.",
+        "AutosoftTargetModeCategory": "Waffenkategorie / Fertigkeit (Hausregel)",
+        "AutosoftTargetModeDescription": "Wähle, ob Zielerfassungs-Autosofts an spezifische montierte Waffen (RAW) oder Waffenkategorien / Fertigkeiten gebunden sind.",
+        "AutosoftTargetModeName": "Autosoft-Zielerfassungs-Modus",
+        "AutosoftTargetModeWeapon": "Spezifische montierte Waffe (RAW)",
+        "ApplyLimitsDescription": "Sollen Limits auf Würfen angewendet werden?",
         "ApplyLimitsName": "Verwende Limits bei Würfen",
         "AutomateMultiDefenseModifier": "Automatisiere Verteidigungsmodifikator",
         "AutomateMultiDefenseModifierDescription": "Automatische Anwendung des Verteidigungsmodifikators, wenn man mehrfach pro Runde angegriffen wird.",
@@ -807,6 +817,81 @@
         "Collapse": "Einklappen",
         "CollapseAll": "Alles einklappen",
         "CommonProgram": "Standardprogramm",
+        "Autosoft": "Autosoft",
+        "AutosoftType": "Autosoft-Typ",
+        "AutosoftConfigManager": {
+            "Title": "Autosoft konfigurieren & übertragen",
+            "TargetActor": "Ziel-Drohne / Fahrzeug",
+            "TargetWeapon": "Ziel-Waffe (Geschütze)",
+            "TargetModel": "Ziel-Modell",
+            "NoWeapons": "Keine Waffen am Ziel montiert",
+            "NoDrones": "Keine eigenen Drohnen oder Fahrzeuge gefunden",
+            "Submit": "Konfigurieren & Übertragen",
+            "Cancel": "Abbrechen"
+        },
+        "TargetModel": "Ziel-Modell",
+        "TargetWeapon": "Ziel-Waffe",
+        "ControlMode": "Steuerungsmodus",
+        "AutosoftTypes": {
+            "Clearsight": "Clearsight",
+            "Evasion": "Ausweichen",
+            "Maneuvering": "Manövrieren",
+            "Stealth": "Schleichen",
+            "Targeting": "Zielerfassung",
+            "ElectronicWarfare": "Elektronische Kriegsführung"
+        },
+        "ControlModes": {
+            "Autopilot": "Autopilot",
+            "Remote": "Fernsteuerung",
+            "Rigger": "Hineingesprungen",
+            "Manual": "Manuell"
+        },
+        "Rigger": {
+            "JumpIn": "Hineinspringen",
+            "JumpOut": "Hinausspringen",
+            "JumpedInSuccess": "{rigger} ist in {vehicle} hineingesprungen",
+            "JumpedOutSuccess": "Aus {vehicle} hinausgesprungen",
+            "JumpInTestRequired": "Das Hineinspringen in das fremde Fahrzeug {vehicle} erfordert eine Probe.",
+            "JumpedInEffectName": "Hineingesprungen ({rigger})",
+            "RiggerMovingVehicle": "{rigger} steuert {vehicle}",
+            "GODRiggerInterfaceWarning": "<div class='sr5-god-alert'><div class='god-header'>⚡ GRID OVERWATCH DIVISION // SYSTEMALERT</div><div class='god-body'><p><strong>WARNUNG:</strong> Fahrzeug <em>{vehicle}</em> verfügt über keine verifizierte Rigger-Interface-Verbindung. Direct Neural Interface Verbindung ohne Hardware-Link hergestellt.</p></div></div>",
+            "ResistBiofeedback": "Biofeedback-Schaden widerstehen",
+            "BiofeedbackSuffered": "Fahrzeug {vehicle} hat {damage} körperlichen Schaden erlitten. {driver} muss Biofeedback-Schaden widerstehen!",
+            "ResistDumpShock": "Auswurfschock widerstehen",
+            "DumpShockSuffered": "{driver} erlitt Notauswurf aus {vehicle} ({reason}).",
+            "DumpShockDeviceDestroyed": "Gerät zerstört",
+            "DumpShockConnectionSevered": "Verbindung getrennt",
+            "MissingRiggerInterface": "Fahrzeug {vehicle} besitzt kein installiertes Rigger-Interface!",
+            "RepairMatrixDamage": "Matrix-Schaden reparieren",
+            "ActiveSensorLock": "Aktive Zielerfassung",
+            "ActiveSensorLockSuccess": "{attacker} hat Sensoren auf {target} aufgeschaltet (+{netHits} Ziel-Verteidigungsmalus)",
+            "Disoriented": "Orientierungslos",
+            "SpunOut": "Ins Schleudern Geraten",
+            "SpunOutInfo": "{target} ist ins Schleudern geraten!",
+            "EWarNoiseReductionSuccess": "{actor} erhält +{hits} Rauschunterdrückung für 1 Runde.",
+            "RammingSuccess": "{attacker} hat {target} gerammt und {damage} körperlichen Schaden verursacht!",
+            "ResistRammingDamage": "Rammschaden widerstehen",
+            "RammingBothDamaged": "{attacker} hat {target} gerammt ({damage} körperlicher Schaden)! {attacker} widersteht {selfDamage} Rückstoßschaden.",
+            "EmergencyExitFailure": "{actor} Notausstieg fehlgeschlagen und erleidet {damage} Aufprallschaden!",
+            "EWarNoiseReductionEffect": "E-War Rauschunterdrückung",
+            "JumpInTestFailed": "Probe zum Hineinspringen ins Fahrzeug fehlgeschlagen."
+        },
+        "Swarm": {
+            "Label": "Schwarm",
+            "Toggle": "Schwarm umschalten",
+            "Drones": "Drohnen",
+            "Count": "Drohnen-Anzahl"
+        },
+        "RCC": {
+            "Sharing": "Zugriff",
+            "NoiseReduction": "Rauschunterdrückung",
+            "SharedAutosofts": "Geteilte RCC-Autosofts",
+            "SharedFromRCC": "Geteilt via RCC",
+            "ReconfigureTitle": "Rigger-Konsole neukonfiguriert",
+            "ReconfiguredMessage": "hat die Rigger-Konsole neukonfiguriert",
+            "SimpleAction": "Einfache Handlung",
+            "SimpleActionInCombat": "Einfache Handlung (Kampf)"
+        },
         "CompendiaSettings": {
             "Description": "Diese Kompendien werden vom System verwendet. Du kannst sie mit eigenen Kompendien überschreiben, solltest sie aber nicht entfernen.",
             "GeneralActionsPack": {
@@ -1250,7 +1335,9 @@
             "NoAvailableActorFound": "Es wurde kein verfügbarer Akteur für diese Aktion gefunden",
             "SkillWithoutAttribute": "Die Fertigkeit hat kein konfiguriertes Attribut.",
             "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug-Akteur geworfen werden",
-            "TooManyActionsWithCategory": "Es darf nur eine Aktion mit der Kategorie {category} pro Akteur geben."
+            "TooManyActionsWithCategory": "Es darf nur eine Aktion mit der Kategorie {category} pro Akteur geben.",
+            "NoDriverSelectedForJumpIn": "Kein Fahrer für das Hineinspringen ausgewählt oder zugewiesen.",
+            "NoVehicleOwnership": "Du besitzt dieses Fahrzeug nicht."
         },
         "EssenceCost": "Essenz",
         "Expand": "Ausklappen",
@@ -1499,6 +1586,8 @@
         "IncomingFade": "Schwund",
         "Information": "Info",
         "Infos": {
+            "NoMatrixDamageToRepair": "Gerät hat keinen zu reparierenden Matrixschaden.",
+            "MatrixDamageRepaired": "{device} um {hits} Matrixschaden repariert.",
             "CantModifyHostContent": "Hostdaten können nicht von einem IC-Akteur aus verändert werden",
             "ConsumedEquippedAmmo": "Kugeln von ausgerüsteter Munition abgezogen",
             "ResetProgressiveRecoil": "Kummulativer Rückstoß zurückgesetzt auf 0 abgefeuerte Kugeln"
@@ -3016,6 +3105,8 @@
         "TemporaryModifiers": "Temporäre Modifikatoren",
         "Test": "Probe",
         "TestResults": {
+            "ActiveSensorLockFailure": "Aktive Zielerfassung fehlgeschlagen!",
+            "ActiveSensorLockSuccess": "Aktive Zielerfassung erfolgreich!",
             "AttackBlockedByHardenedArmor": "Angriff trifft, wird aber von verstärkter Panzerung abgewehrt",
             "AttackBlockedByVehicleArmor": "Angriff trifft, wird aber von Fahrzeugpanzerung abgewehrt",
             "AttackDodged": "Ausgewichen",
@@ -3274,7 +3365,8 @@
                 "ResultOverrideGlitches": "Überschreibt Patzer für dieses Probenergebnis.",
                 "ResultOverrideHits": "Überschreibt Erfolge für dieses Probenergebnis.",
                 "RollMode": "Sichtbarkeit der FoundryVTT-Chat-Nachricht",
-                "Threshold": "Vollständiger Schwellenwert"
+                "Threshold": "Vollständiger Schwellenwert",
+                "LimitIgnored": "Limit wird ignoriert"
             },
             "ToggleEditMode": "Umschalter Editiermodus"
         },
@@ -3298,6 +3390,54 @@
                 "Title": "Zustandsmonitor-Tour",
                 "WoundModifierContent": "Dieses Kästchen zeigt an, dass das Ausfüllen den Wundmodifikator um die im Kästchen angegebene Zahl erhöht.",
                 "WoundModifierTitle": "Wundmodifikator"
+            },
+            "RiggerSwarm": {
+                "Title": "Drohnenschwarm Erstellungs- & Steuerungs-Tour",
+                "Description": "Schritt-für-Schritt-Anleitung zum Erstellen einer Drohne, Aktivieren des Schwarm-Modus, Einstellen der Drohnen-Anzahl und Anzeigen der Begleit-Tiles auf der Karte.",
+                "DroneAttributesTitle": "1. Fahrzeug- & Drohnen-Attribute",
+                "DroneAttributesContent": "Beim Erstellen einer Drohne werden die Basis-Attribute (Pilot, Rumpf, Handling, Geschwindigkeit, Beschleunigung, Sensor) mit mindestens Stufe 1 festgelegt.",
+                "EnableSwarmTitle": "2. Drohnenschwarm Aktivieren",
+                "EnableSwarmContent": "Im Editiermodus des Fahrzeugbogens findest du unten den Schwarm-Bereich. Klicke auf das 'Schwarm:' Kontrollkästchen, um den Schwarm-Modus zu aktivieren.",
+                "EnableSwarmActiveTitle": "3. Schwarm-Kontrollkästchen Aktiviert",
+                "EnableSwarmActiveContent": "Sobald der Schwarm-Modus aktiv ist, wird das Häkchen gesetzt und das Eingabefeld 'Anzahl:' für die Drohnen-Anzahl freigeschaltet.",
+                "SwarmCountTitle": "4. Drohnen-Anzahl Einrichten",
+                "SwarmCountContent": "Trage die Anzahl der Drohnen im Schwarm ein (z.B. 4). Eine höhere Drohnen-Anzahl erhöht die effektive Pilot-Stufe und Teamwork-Boni.",
+                "CanvasSwarmDisplayTitle": "5. Schwarm-Begleit-Tiles auf der Karte",
+                "CanvasSwarmDisplayContent": "Beim Wechsel in den Spielmodus erscheint das Anführer-Token auf der Karte. Die restlichen 3 Drohnen werden automatisch als gesperrte Formations-Tiles um den Anführer platziert!",
+                "TokenHUDControlTitle": "6. Token HUD & Echtzeit-Formationsbewegung",
+                "TokenHUDControlContent": "Rechtsklicke auf das Anführer-Token für das native SR5 Token HUD (Hineinspringen / Herausspringen). Beim Ziehen des Tokens gleiten alle Begleit-Tiles synchron über das Raster."
+            },
+            "Autosofts": {
+                "Title": "Autosoft Verwaltungs-Anleitung",
+                "Description": "Umfassende Anleitung zum Erstellen, Konfigurieren und Ausrüsten von Autosofts für Drohnen und Rigger-Kommandokonsolen.",
+                "AutosoftItemCreationTitle": "Autosoft-Gegenstand erstellen",
+                "AutosoftItemCreationContent": "Autosofts werden als Programm-Items vom Typ 'autosoft' erstellt. Im Edit-Modus kannst du Stufe, Typ und Zielanforderungen konfigurieren.",
+                "AutosoftTypesTitle": "Autosoft-Typen & Zielzuweisung",
+                "AutosoftTypesContent": "Konfiguriere den autosoftType: ClearSight (Wahrnehmung), Evasion (Ausweichen), Maneuvering (Steuern), Stealth (Schleichen), Targeting (Geschütze) oder Cyberware. Wähle je nach Typ passende Ziel-Fahrzeugmodelle oder Waffenkategorien.",
+                "AutosoftPlayModeTitle": "Autosoft Play-Modus",
+                "AutosoftPlayModeContent": "Der Wechsel in den Play-Modus sperrt Bearbeitungsfelder und zeigt übersichtliche Eigenschafts-Badges für Stufe und Zielspezifikationen.",
+                "EquipAutosoftOnDroneTitle": "Autosoft auf Fahrzeug ausrüsten",
+                "EquipAutosoftOnDroneContent": "Rüste die Autosoft auf deinem Drohnen-Fahrzeug aus. Der Matrix-Tab listet aktive lokale Autosofts und die verbleibende Slot-Kapazität auf.",
+                "AutosoftEffectsTitle": "Autosoft-Effekte & Modifikatoren",
+                "AutosoftEffectsContent": "Der Effekte-Tab im Play-Modus zeigt aktive Effekte ausgerüsteter Autosofts, die sich direkt auf Würfelpools und Fahrzeugwerte auswirken.",
+                "TargetingSchemasTitle": "Ziel- & Modell-Schemata",
+                "TargetingSchemasContent": "Ziel-Autosofts benötigen ein Ziel-Waffenmodell oder eine Kategorie. Manövrier-Autosofts benötigen ein Ziel-Fahrzeugmodell. Autosofts funktionieren nur auf passenden Modellen.",
+                "DroneSlotLimitsTitle": "Drohnen Slot-Limits & Warnungen",
+                "DroneSlotLimitsContent": "Drohnen können lokale Autosofts bis zu ihrer Pilot-Stufe ausführen. Bei Überschreitung warnt ein Slot-Überlauf-Badge.",
+                "RCCOverrideHierarchyTitle": "Lokale vs. Geteilte Hierarchie",
+                "RCCOverrideHierarchyContent": "Wenn eine Drohne mit einem RCC verbunden ist, überschreiben spezifische lokale Autosofts geteilte RCC-Autosofts des gleichen Typs. Geteilte Autosofts füllen unbesetzte Slots."
+            },
+            "MatrixNoise": {
+                "Title": "Matrix-Rauschen & Kompensations-Anleitung",
+                "Description": "Lerne, wie Distanzrauschen, Störsender, statisches Rauschen und RCC-Rauschunterdrückung bei Rigger- & Matrix-Proben zusammenwirken.",
+                "OverviewTitle": "Matrix-Rauschen verstehen",
+                "OverviewContent": "Matrix-Rauschen erzeugt Würfelpool-Abzüge für Rigger- & Matrixproben basierend auf Entfernung, Barrieren, Störsendern und Gitter-Abzügen.",
+                "RCCNoiseVsSharingTitle": "RCC Rauschunterdrückung vs Program-Sharing",
+                "RCCNoiseVsSharingContent": "Rigger-Kommandokonsolen teilen ihre Gerätestufe zwischen Rauschunterdrückung und Program-Sharing auf. Höhere Rauschunterdrückung senkt die Sharing-Kapazität.",
+                "CalculationTitle": "Rausch-Kompensations-Berechnung",
+                "CalculationContent": "Gesamte Rauschunterdrückung von RCCs, Antennen und Cyberware verrechnet eingehende Rauschabzüge automatisch in Proben.",
+                "SoftWarningBadgesTitle": "Kapazitäts Soft-Warnungen",
+                "SoftWarningBadgesContent": "Wenn aktive geteilte Autosofts die RCC-Sharing-Kapazität überschreiten, machen Soft-Warnungen auf dem Matrix-Reiter darauf aufmerksam."
             }
         },
         "UnderBarrel": "Unterlaufmontiert",
@@ -3314,6 +3454,33 @@
                 "Mini": "Mini",
                 "Missile": "Rakete",
                 "Small": "Klein"
+            },
+            "SubCategory": "Subtyp",
+            "SubCategories": {
+                "Bike": "Fahrrad",
+                "Motorcycle": "Motorrad",
+                "Car": "Auto",
+                "Truck": "LKW",
+                "Boat": "Boot",
+                "Submarine": "U-Boot",
+                "Aircraft": "Flugzeug",
+                "Rotorcraft": "Hubschrauber",
+                "Vtol": "Senkrechtstarter",
+                "Hovercraft": "Luftkissenboot",
+                "Ltav": "Luftschiff",
+                "Glider": "Segelflugzeug",
+                "Walker": "Läufer",
+                "HeavyEquipment": "Baumaschine / Schweres Gerät",
+                "Military": "Militär / Polizei",
+                "Commercial": "Nutzfahrzeug",
+                "MicroDrone": "Mikrodrohne",
+                "MiniDrone": "Minidrohne",
+                "SmallDrone": "Kleine Drohne",
+                "MediumDrone": "Mittlere Drohne",
+                "LargeDrone": "Große Drohne",
+                "HugeDrone": "Riesige Drohne",
+                "AnthroDrone": "Anthropomorphe Drohne",
+                "MissileDrone": "Raketendrohne"
             },
             "Category": "Kategorie",
             "ChaseEnvironment": "Verfolgungsumgebung",
@@ -3381,6 +3548,11 @@
         "Walk": "Gehen",
         "WalkingSpeed": "Gehen",
         "Warnings": {
+            "HardwareSkillRequired": "Hardware-Fertigkeit > 0 ist für Matrix-Reparaturen erforderlich.",
+            "RCCOverAllocated": "RCC-Sharing + Rauschunterdrückung überschreitet Gerätestufe",
+            "OverAutosoftSlots": "Autosoft-Programmplätze für diese Drohne überschritten",
+            "OverSharingLimit": "Geladene Autosofts überschreiten RCC-Zugriffskapazität",
+            "TokenMovementLockedJumpedIn": "{vehicle} ist aktuell geriggt! Metamensch-Tokenbewegung ist gesperrt.",
             "ActorMissingRequirements": "Der Akteur muss die Voraussetzung der Fertigkeit erfüllen: erwacht oder emergiert",
             "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
             "AlreadyJoinedNetwork": "bereits mit dem Netzwerk {name} verbunden",
@@ -3625,7 +3797,9 @@
         "WirelessUnavailable": "Kabel",
         "StatusEffects": {
             "Running": "Laufen",
-            "Sprinting": "Sprint"
+            "Sprinting": "Sprint",
+            "JumpedIn": "Hineingesprungen (Bewegung gesperrt)",
+            "RiggedVehicle": "Geriggtes Fahrzeug (Rigger aktiv)"
         }
     },
     "TYPES": {
