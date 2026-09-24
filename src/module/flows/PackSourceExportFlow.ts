@@ -43,7 +43,6 @@ export class PackSourceExportFlow {
                 // JSON omits undefined optional fields; reconstruction may restore them.
                 const original = foundry.utils.duplicate(entry.system);
                 const reconstructed = foundry.utils.duplicate(document.toObject().system);
-                // @ts-expect-error --Not yet typed in fvtt-types
                 if (!foundry.utils.equals(original, reconstructed))
                     throw new Error(`${path}: reconstruction still changes system source data`);
             }

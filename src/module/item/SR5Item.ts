@@ -1050,7 +1050,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     async getLinkedActor(this: SR5Item): Promise<SR5Actor | undefined> {
         const uuid = this.system.linkedActor;
 
-        if (uuid && this.isType('contact') && foundry.utils.parseUuid(uuid).documentType === 'Actor')
+        if (uuid && this.isType('contact') && foundry.utils.parseUuid(uuid)?.documentType === 'Actor')
             return fromUuid(uuid) as Promise<SR5Actor>;
 
         return undefined;

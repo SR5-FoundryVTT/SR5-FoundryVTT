@@ -250,9 +250,8 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
             const { effect } = await createEffect({type: 'character'}, {
                 duration: { value: 1, units: 'minutes', expiry: null } as any,
             });
-            const result = effect.isExpiryEvent('turnStart', ctx());
-            // Without an expiry, native lets the duration alone decide, so every event qualifies.
-            assert.isTrue(result, 'real_time effect should leave expiry to its duration on turnStart');
+            const native = foundry.documents.ActiveEffect.prototype.isExpiryEvent.call(effect, 'turnStart', ctx());
+            assert.strictEqual(effect.isExpiryEvent('turnStart', ctx()), native);
         });
     });
 

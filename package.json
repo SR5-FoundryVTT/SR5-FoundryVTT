@@ -23,7 +23,7 @@
         "events": "^3.3.0",
         "fs-extra": "^11.4.0",
         "fuse.js": "^7.5.0",
-        "fvtt-types": "github:BM123499/foundry-vtt-types#85ec1e1689cfebb0299dc40b62e23891d9c44dd7",
+        "fvtt-types": "github:BM123499/foundry-vtt-types#SR5_Types",
         "gulp": "^5.0.1",
         "gulp-sass": "^6.0.1",
         "jszip": "^3.10.2",
