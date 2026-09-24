@@ -99,6 +99,15 @@ export const RiggingTestDataFlow = {
 
         const autosoft = RiggingRules.getEffectiveAutosoft(vehicle, autosoftType);
         if (autosoft.rating > 0) {
+            // Remove defaulting penalty if skill was added to pool
+            if (actionSkill) {
+                const skill = vehicle.getSkill(actionSkill);
+                if (skill) {
+                    const pool = new ModifiableValue(test.data.pool);
+                    pool.remove(skill.label);
+                }
+            }
+
             const label = autosoft.name || game.i18n.localize('SR5.Autosoft');
             ModifiableValue.addUnique(test.data.pool, label, autosoft.rating);
             ModifiableValue.calcTotal(test.data.pool);
@@ -112,6 +121,16 @@ export const RiggingTestDataFlow = {
         const vehicle = test.actor?.asType('vehicle');
         if (!vehicle) return;
         if (vehicle.system.controlMode !== 'autopilot') return;
+
+        // If no autosoft removed defaulting penalty, remove it for autonomous drone swarm roll
+        const actionSkill = test.data.action?.skill;
+        if (actionSkill) {
+            const skill = vehicle.getSkill(actionSkill);
+            if (skill) {
+                const pool = new ModifiableValue(test.data.pool);
+                pool.remove(skill.label);
+            }
+        }
 
         const swarmInfo = RiggingRules.getSwarmPilotInfo(vehicle);
         if (swarmInfo.bonus > 0) {
