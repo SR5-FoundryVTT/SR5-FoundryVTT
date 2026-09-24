@@ -179,7 +179,6 @@ export class HooksManager {
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
         Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory.bind(HooksManager));
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory.bind(HooksManager));
-        Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));
         Hooks.on('renderTokenHUD', VisionHUD.onRenderTokenHUD.bind(VisionHUD));
         Hooks.on('moveToken', SR5TokenDocument.moveToken.bind(SR5Token));
         Hooks.on('createItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });

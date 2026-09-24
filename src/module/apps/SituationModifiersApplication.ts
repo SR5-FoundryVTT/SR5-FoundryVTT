@@ -1,7 +1,7 @@
 import { Helpers } from "../helpers";
 import { SR5Actor } from "../actor/SR5Actor";
 import { DeepPartial } from 'fvtt-types/utils';
-import { SR5_APPV2_CSS_CLASS, SYSTEM_NAME } from "../constants";
+import { SR5_APPV2_CSS_CLASS } from "../constants";
 import { ModifiableDocumentTypes, DocumentSituationModifiers } from "../rules/DocumentSituationModifiers";
 import { isElementInstance } from '@/module/utils/dom';
 import type { RegionalPhysicalEnvironment } from '@/module/vision/environmentalRegions/EnvironmentalRegionFlow';
@@ -34,45 +34,12 @@ class ModifiersHandler {
     constructor(situationModifiersApp: SituationModifiersApplication) {
         this.app = situationModifiersApp;
     }
-
-    /**
-     * Define what token hud buttons to register for the extending modifier type.
-     * 
-     * NOTE: TypeScript doesn't support abstract static method definitions as of yet.
-     */
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    static addTokenHUDElements(modifierColumn: HTMLElement, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
-        console.error(`Shadowrun5e | Class ${this.constructor.name} must implement static method onRenderTokenHUD`);
-    };
 }
 
 /**
  * Handle all sheet action for environmental modifiers.
  */
 class EnvironmentalModifiersHandler extends ModifiersHandler {
-
-    static override addTokenHUDElements(modifierColumn: HTMLElement, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
-        console.log(`${SYSTEM_NAME} | Environmental modifier HUD on renderTokenHUD`);
-
-        // Setup and connect tokenHUD elements.
-        const modifier = document.createElement('div');
-        modifier.className = 'modifier-row';
-
-        const modifierValue = document.createElement('div');
-        modifierValue.className = 'modifier-value modifier-value-matrix';
-        modifierValue.innerText = String(modifiers.environmental.applied.total);
-
-        const modifierDescription = document.createElement('div');
-        modifierDescription.className = 'modifier-description open-matrix-modifier';
-        modifierDescription.innerText = game.i18n.localize('SR5.ModifierTypes.Environmental');
-        modifierDescription.addEventListener('click', event => {
-            void SituationModifiersApplication.openForTokenHUD(tokenId)(event);
-        });
-
-        modifier.append(modifierValue, modifierDescription);
-        modifierColumn.append(modifier);
-    }
-
     async _handleModifierChange(event: Event, target?: HTMLElement) {
         event.preventDefault();
         event.stopPropagation();
@@ -111,57 +78,7 @@ class EnvironmentalModifiersHandler extends ModifiersHandler {
     }
 }
 
-
-class MatrixModifiersHandler extends ModifiersHandler {
-    static override addTokenHUDElements(modifierColumn: HTMLElement, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
-        console.log(`${SYSTEM_NAME} | Matrix modifier HUD on renderTokenHUD`);
-
-        // Setup and connect tokenHUD elements.
-        const modifier = document.createElement('div');
-        modifier.className = 'modifier-row';
-
-        const modifierValue = document.createElement('div');
-        modifierValue.className = 'modifier-value modifier-value-matrix';
-        modifierValue.innerText = String(modifiers.noise.applied.total);
-
-        const modifierDescription = document.createElement('div');
-        modifierDescription.className = 'modifier-description open-matrix-modifier';
-        modifierDescription.innerText = game.i18n.localize('SR5.ModifierTypes.Noise');
-        modifierDescription.addEventListener('click', event => {
-            void SituationModifiersApplication.openForTokenHUD(tokenId)(event);
-        });
-
-        modifier.append(modifierValue, modifierDescription);
-        modifierColumn.append(modifier);
-    }
-}
-
 class MagicModifiersHandler extends ModifiersHandler {
-    static override addTokenHUDElements(modifierColumn: HTMLElement, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
-        console.log(`${SYSTEM_NAME} | Magic modifier HUD on renderTokenHUD`);
-
-        // Don't add awakened modifiers to token hud for mundane actors.
-        if (!actor.isAwakened()) return;
-
-        // Setup and connect tokenHUD elements.
-        const modifier = document.createElement('div');
-        modifier.className = 'modifier-row';
-
-        const modifierValue = document.createElement('div');
-        modifierValue.className = 'modifier-value modifier-value-magic';
-        modifierValue.innerText = String(modifiers.background_count.applied.total);
-
-        const modifierDescription = document.createElement('div');
-        modifierDescription.className = 'modifier-description open-magic-modifier';
-        modifierDescription.innerText = game.i18n.localize('SR5.ModifierTypes.BackgroundCount');
-        modifierDescription.addEventListener('click', event => {
-            void SituationModifiersApplication.openForTokenHUD(tokenId)(event);
-        });
-
-        modifier.append(modifierValue, modifierDescription);
-        modifierColumn.append(modifier);
-    }
-
     async handleClearMagicModifiers(event: Event) {
         event.preventDefault();
 
@@ -211,28 +128,6 @@ class RecoilModifiersHandler extends ModifiersHandler {
         this.app.modifiers.applyAll();
         await this.app.render();
     }
-
-    static override addTokenHUDElements(modifierColumn: HTMLElement, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
-        console.log(`${SYSTEM_NAME} | Recoil modifier HUD on renderTokenHUD`);
-
-        // Setup and connect tokenHUD elements.
-        const modifier = document.createElement('div');
-        modifier.className = 'modifier-row';
-
-        const modifierValue = document.createElement('div');
-        modifierValue.className = 'modifier-value modifier-value-recoil';
-        modifierValue.innerText = String(modifiers.recoil.applied.total);
-
-        const modifierDescription = document.createElement('div');
-        modifierDescription.className = 'modifier-description open-recoil-modifier';
-        modifierDescription.innerText = game.i18n.localize('SR5.ModifierTypes.Recoil');
-        modifierDescription.addEventListener('click', event => {
-            void SituationModifiersApplication.openForTokenHUD(tokenId)(event);
-        });
-
-        modifier.append(modifierValue, modifierDescription);
-        modifierColumn.append(modifier);
-    }
 }
 
 /**
@@ -247,7 +142,6 @@ class RecoilModifiersHandler extends ModifiersHandler {
 export class SituationModifiersApplication extends HandlebarsApplicationMixin(ApplicationV2)<SituationalModifiersTemplateData> {
     // Static Handlers contain the class references used for both static method calls and to setup the instance handlers.
     static _staticHandlers: typeof ModifiersHandler[] = [
-        MatrixModifiersHandler, 
         MagicModifiersHandler,
         EnvironmentalModifiersHandler,
         RecoilModifiersHandler
@@ -501,64 +395,8 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
         }
     }
 
-    // TODO: Implement system wide token HUD management...
-    /**
-     * Add buttons to both show and open global modifiers currently applied to this token when showing the
-     * tokenHUD.
-     */
-    static onRenderTokenHUD(
-        _app: foundry.applications.hud.TokenHUD,
-        html: HTMLElement,
-        // On fvtt-types this is still a stub
-        context: foundry.applications.hud.TokenHUD.RenderContext & { _id?: string },
-        _options: foundry.applications.hud.TokenHUD.RenderOptions
-    ) {
-        if (!context._id) return;
-
-        // Generate general structure for ModifierHandlers to connect to.
-        const token = Helpers.getToken(context._id);
-        if (!token) return;
-
-        const actor = token.actor as SR5Actor;
-        const modifiers = actor.getSituationModifiers(token.document);
-        modifiers.applyAll();
-
-        // Setup and connect tokenHUD elements.
-        const container = document.createElement('div');
-        container.className = 'col far-right sr-modifier-container';
-
-        const column = document.createElement('div');
-        column.className = 'col modifier-column';
-        container.append(column);
-
-        // Connect SR-FoundryVTT tokenHUD elements to FoundryVTT tokenHUD column structure.
-        const rightColumn = html.querySelector<HTMLElement>('.col.right');
-        if (!rightColumn) return;
-        rightColumn.after(container);
-
-        // Hand DOM element over and let ModifierHandlers add their TokenHUDElements.
-        SituationModifiersApplication._staticHandlers.forEach(handler => handler.addTokenHUDElements(column, context._id!, actor, modifiers));
-    }
-
     static openForCurrentScene() {
         SituationModifiersApplication.open();
-    }
-
-    /** 
-     * Part of the tokenHUD workflow makes it necessary to have the token id piped in
-     * @param tokenId
-     */
-    static openForTokenHUD(tokenId: string) {
-        const token = Helpers.getToken(tokenId);
-
-        // When the token hud control is activated, this inline handler will be called with it.
-        return async (event: Event) => {
-            event.preventDefault();
-
-            if (!token?.actor) return;
-            const app = new SituationModifiersApplication(token.actor, {}, token.document);
-            await app.render({ force: true });
-        }
     }
 
     /**
