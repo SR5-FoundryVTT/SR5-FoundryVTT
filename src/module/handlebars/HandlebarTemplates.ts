@@ -55,6 +55,7 @@ export const preloadHandlebarsTemplates = async () => {
             'item/tabs/details/ware',
             'item/tabs/details/weapon',
             'common/generic-data-properties',
+            'common/value-modifiers-rows',
             'list-items/connect-network-icon',
             'list-items/connected-icons-toggle',
             'list-items/edit-delete-icons',
@@ -151,6 +152,7 @@ export const preloadHandlebarsTemplates = async () => {
         // Test chat messages and their parts
         'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs',
+        'systems/shadowrun5e/dist/templates/rolls/parts/test-code-terms.hbs',
 
         // Application - Compendium Browser
         'systems/shadowrun5e/dist/templates/apps/compendium-browser/settings-folder.hbs',

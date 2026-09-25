@@ -1,0 +1,22 @@
+{{#if (or (not card) value.base)}}
+    <div class="list-item">
+        <div class="value-modifier-name">
+            <label>{{localize 'SR5.BaseValue'}}</label>
+        </div>
+        <div class="value-modifiers-base">
+            <label>{{value.base}}</label>
+        </div>
+    </div>
+{{/if}}
+{{#each value.changes as |change|}}
+    <div class="list-item{{#if (lookup ../traceSources @index)}} has-tooltip{{/if}}{{#if (and ../card ../sourceLinks change.source)}} modifier-source-link{{/if}}"
+         {{#if (lookup ../traceSources @index)}}data-tooltip-source="{{lookup ../traceSources @index}}"{{/if}}
+         {{#if (and ../card ../sourceLinks change.source)}}data-source="{{change.source}}" role="button" tabindex="0"{{/if}}>
+        <div class="value-modifier-name {{getChangeCSS change}}">
+            <label>{{localize change.name}}</label>
+        </div>
+        <div class="value-modifiers-modifier {{getChangeCSS change}}">
+            <label>{{getChangeValue change}}</label>
+        </div>
+    </div>
+{{/each}}

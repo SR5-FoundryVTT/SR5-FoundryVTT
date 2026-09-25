@@ -37,10 +37,6 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/melee-attack-test-dialog.hbs';
     }
 
-    override get showSuccessLabel(): boolean {
-        return this.success;
-    }
-
     override async prepareDocumentData() {
         if (!this.item?.isMeleeWeapon()) return;
 

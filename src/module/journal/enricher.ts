@@ -84,18 +84,6 @@ export class JournalEnrichers {
         return rollEntity;
     }
 
-    static async chatlogRequestHooks(html) {
-        const elements = $(html).find('.chat-message').toArray();
-
-        for (const element of elements) {
-            const id = $(element).data('messageId');
-            const message = game.messages?.get(id);
-            if (!message) continue;
-
-            await this.messageRequestHooks(element);
-        }
-    }
-
     static async messageRequestHooks(html) {
         $(html).find('.sr5-requestAnswer').on('click', async (ev) => {
             const element = ev.currentTarget
