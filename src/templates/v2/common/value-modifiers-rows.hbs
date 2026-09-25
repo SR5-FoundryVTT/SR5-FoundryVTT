@@ -11,9 +11,9 @@
 {{/if}}
 {{#each value.changes as |change|}}
     {{!-- Link traced changes to their nested breakdowns. --}}
-    <div class="list-item{{#if (lookup ../traceSources @index)}} has-tooltip{{/if}}{{#if (and ../card change.source)}} modifier-source-link{{/if}}"
+    <div class="list-item{{#if (lookup ../traceSources @index)}} has-tooltip{{/if}}{{#if (and ../card ../sourceLinks change.source)}} modifier-source-link{{/if}}"
          {{#if (lookup ../traceSources @index)}}data-tooltip-source="{{lookup ../traceSources @index}}"{{/if}}
-         {{#if (and ../card change.source)}}data-source="{{change.source}}" role="button" tabindex="0"{{/if}}>
+         {{#if (and ../card ../sourceLinks change.source)}}data-source="{{change.source}}" role="button" tabindex="0"{{/if}}>
         <div class="value-modifier-name {{getChangeCSS change}}">
             <label>{{localize change.name}}</label>
         </div>

@@ -579,7 +579,7 @@
             @include mixins.systemFonts;
             font-size: var(--font-size-12);
 
-            .test-parameter[data-tooltip-source] {
+            .test-parameter[role='button'] {
                 cursor: var(--cursor-pointer);
             }
 
