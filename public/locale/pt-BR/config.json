@@ -461,6 +461,12 @@
         },
         "ComplexForm": "Forma Complexa",
         "ComplexForms": "Formas Complexas",
+        "Container": {
+            "CannotContain": "This item cannot be placed in that container.",
+            "Empty": "This container is empty.",
+            "MaxDepth": "Contêineres não podem ser aninhados em mais de {depth} níveis.",
+            "Remove": "Remove from container"
+        },
         "Conceal": "Ocultar",
         "ConditionMonitor": "Mon. de Con.",
         "Contact": {
@@ -1157,6 +1163,7 @@
             "Armor": "Armadura",
             "Bioware": "Biônico",
             "ComplexForm": "Forma Complexa",
+            "Container": "Container",
             "Contact": "Contato",
             "CritterPower": "Poder de Criatura",
             "Cyberware": "Cibernético",
@@ -2285,6 +2292,8 @@
         },
         "Tabs": {
             "Item": {
+                "ArmorMods": "Mods de Armadura",
+                "ContainerContents": "Contents",
                 "Mods": "Mods"
             }
         },
@@ -2310,6 +2319,7 @@
             "bioware": "Biônico",
             "call_in_action": "Invocar/Compilar",
             "complex_form": "Forma Complexa",
+            "container": "Container",
             "contact": "Contato",
             "critter_power": "Poder de Criatura",
             "cyberware": "Cibernético",

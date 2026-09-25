@@ -35,6 +35,7 @@ export const SR5 = {
         armor: 'SR5.ItemTypes.Armor',
         bioware: 'SR5.ItemTypes.Bioware',
         complex_form: 'SR5.ItemTypes.ComplexForm',
+        container: 'SR5.ItemTypes.Container',
         contact: 'SR5.ItemTypes.Contact',
         critter_power: 'SR5.ItemTypes.CritterPower',
         cyberware: 'SR5.ItemTypes.Cyberware',
@@ -796,6 +797,20 @@ export const SR5 = {
         vehicle: 'SR5.Vehicle.Vehicle',
         drone: 'SR5.Vehicle.Drone'
     },
+
+    // The modificationTypes key each item type accepts as its modifications. Note that
+    // bioware and cyberware share the 'ware' key rather than using their own item type.
+    modificationTypeByParentType: {
+        weapon: 'weapon',
+        armor: 'armor',
+        bioware: 'ware',
+        cyberware: 'ware',
+        vehicle: 'vehicle',
+        drone: 'drone'
+    },
+
+    // Item types a container can hold: the physical gear an actor's inventory lists.
+    containableItemTypes: ['weapon', 'ammo', 'armor', 'bioware', 'container', 'cyberware', 'device', 'equipment', 'modification'],
 
     mountPoints: {
         barrel: 'SR5.Barrel',

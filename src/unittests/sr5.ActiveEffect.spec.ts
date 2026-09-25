@@ -72,7 +72,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 system: { category: 'range' },
             }]);
 
-            await weapon.createNestedItem({
+            await weapon.createChildItems({
                 type: 'modification',
                 name: 'Nested Mod',
                 effects: [{
@@ -86,7 +86,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 }],
             } as Item.Source);
 
-            const nestedEffect = weapon.items[0]?.effects.contents[0];
+            const nestedEffect = weapon.childItems.contents[0]?.effects.contents[0];
             assert.exists(nestedEffect);
             assert.strictEqual(nestedEffect?.actor, actor);
         });
@@ -1264,6 +1264,51 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             assert.lengthOf(actor.system.attributes.body.changes, 1);
             assert.equal(actor.system.attributes.body.value, 3);
+        });
+
+        it('An equipped only effect of an attachment follows the equipped state of the item it is attached to', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [
+                { type: 'weapon', name: 'Unequipped Weapon', system: { category: 'range', technology: { equipped: false } } },
+            ]);
+            const [mod] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'modification',
+                name: 'Equipped Mod',
+                system: { type: 'weapon', parentId: weapon.id, technology: { equipped: true } },
+            } as any]);
+            await mod.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: {
+                    onlyForEquipped: true,
+                    changes: [{ key: 'system.attributes.body', value: '3', type: 'add' }],
+                },
+            }]);
+
+            assert.lengthOf(actor.system.attributes.body.changes, 0, 'suppressed while the weapon is unequipped');
+
+            await weapon.update({ system: { technology: { equipped: true } } } as any);
+            assert.lengthOf(actor.system.attributes.body.changes, 1, 'applied once the weapon is equipped');
+        });
+
+        it('An equipped only effect of an item stored in an unequipped container still applies', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [container] = await actor.createEmbeddedDocuments('Item', [
+                { type: 'container', name: 'Backpack' },
+            ]);
+            const [ware] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'cyberware',
+                name: 'Stored Item',
+                system: { parentId: container.id, technology: { equipped: true } },
+            } as any]);
+            await ware.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: {
+                    onlyForEquipped: true,
+                    changes: [{ key: 'system.attributes.body', value: '3', type: 'add' }],
+                },
+            }]);
+
+            assert.lengthOf(actor.system.attributes.body.changes, 1);
         });
 
         it('A wireless and equipped only effect should not apply for a wired and unequipped item', async () => {

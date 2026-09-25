@@ -1,5 +1,6 @@
 import { Helpers } from '../helpers';
 import { SR5Item } from '../item/SR5Item';
+import { LinkedItemIndex } from '../item/LinkedItemIndex';
 import { FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME } from '../constants';
 import { ModifiableValue } from '../mods/ModifiableValue';
 import { DataDefaults } from '../data/DataDefaults';
@@ -104,6 +105,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     // Quick access for all items of a type.
     itemsForType = new Map<Item.ConfiguredSubType, SR5Item[]>() as TypedItemMap;
+
+    // Children of each item, rebuilt on every embedded preparation. Declared without initializer,
+    // as a field initializer would reset the index built while the constructor prepares data.
+    declare linkedItems?: LinkedItemIndex;
 
     constructor(data: Actor.CreateData<SubType>, context?: Actor.ConstructionContext) {
         super(data, context);
@@ -211,13 +216,23 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
      */
     override prepareEmbeddedDocuments() {
+        const items = this.items.contents as SR5Item[];
+        this.linkedItems = new LinkedItemIndex(items);
+
+        // Core prepares embedded documents in collection order. Items are prepared deepest first
+        // instead, as a parent's base preparation applies mods and ammo linked below it, which
+        // therefore have to be fully prepared already.
+        const ordered = this.linkedItems.preparationOrder(SR5Item.MAX_ATTACHMENT_DEPTH);
+        const hierarchy = (this.constructor as typeof SR5Actor).hierarchy;
+        for (const collectionName of Object.keys(hierarchy)) {
+            const documents = collectionName === 'items' ? ordered : this.getEmbeddedCollection(collectionName as any);
+            // Protected on ClientDocument, and called here exactly as core's prepareEmbeddedDocuments does.
+            for (const document of documents) (document as unknown as { _safePrepareData(): void })._safePrepareData();
+        }
+
         // This will apply ActiveEffects, which is okay for modify (custom) effects, however add/multiply on .value will be
         // overwritten.
-        super.prepareEmbeddedDocuments();
-
-        // NOTE: Hello there! Should you ever be in need of calling the grand parents methods, maybe to avoid applyActiveEffects,
-        //       look at this beautiful piece of software and shiver in it's glory.
-        // ClientDocumentMixin(class {}).prototype.prepareEmbeddedDocuments.apply(this);
+        this.applyActiveEffects('initial');
     }
 
     /**
@@ -280,11 +295,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Collect item effects.
         for (const item of this.items) {
             effects = effects.concat(item.effects.filter(showEffectIcon));
-
-            // Collect nested item effects.
-            for (const nestedItem of item.items) {
-                effects = effects.concat(nestedItem.effects.filter(showEffectIcon));
-            }
         }
 
         return effects;
@@ -1970,7 +1980,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // CASE - Vehicle marks are stored on their master actor.
         if (this.isType('vehicle')) {
             const master = this.master;
-            return master?.actorOwner;
+            return master?.actor;
         }
 
         // DEFAULT CASE

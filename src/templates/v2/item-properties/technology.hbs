@@ -1,5 +1,7 @@
 {{#if item.system.technology.rating}}
-    <label>{{localize "SR5.Rating"}}&nbsp;{{item.system.technology.rating}}</label>
+    {{#unless (isType item 'container')}}
+        <label>{{localize "SR5.Rating"}}&nbsp;{{item.system.technology.rating}}</label>
+    {{/unless}}
 {{/if}}
 {{#if item.system.technology.conceal.value}}
     <label data-tooltip="SR5.Conceal">
