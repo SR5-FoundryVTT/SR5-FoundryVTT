@@ -2,7 +2,6 @@ import { SR5Actor } from '@/module/actor/SR5Actor';
 import { TokenLockHooks } from '@/module/token/TokenLockHooks';
 import { Helpers } from '@/module/helpers';
 import { FLAGS, SYSTEM_NAME } from '@/module/constants';
-import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 import type { InitiativeModeOptions } from '@/module/combat/SR5Combatant';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 
@@ -123,9 +122,6 @@ export const RiggerFlow = {
         await TokenLockHooks.setJumpedInState(driver, vehicle, true);
         await driver.setFlag(SYSTEM_NAME, 'jumpedInVehicleUuid', vehicle.uuid ?? '');
 
-        // 7. Apply temporary Active Effect on the vehicle actor for jumped-in skills
-        await this._applyJumpedInActiveEffect(driver, vehicle);
-
         ui.notifications?.info(game.i18n.format('SR5.Rigger.JumpedInSuccess', {
             rigger: driver.name,
             vehicle: vehicle.name
@@ -160,9 +156,6 @@ export const RiggerFlow = {
         } else {
             await TokenLockHooks.setJumpedInState(null, vehicle, false);
         }
-
-        // 3. Remove temporary jumped-in Active Effect on vehicle actor
-        await this._removeJumpedInActiveEffect(vehicle);
 
         // Note: Driver is retained on vehicle/drone so rigger retains PAN ownership
 
@@ -257,169 +250,5 @@ export const RiggerFlow = {
      */
     getActorInstances(actor: SR5Actor | null): SR5Actor[] {
         return actor ? [actor] : [];
-    },
-
-    /**
-     * Create/apply or update persistent ActiveEffect on vehicle actor with driver's attributes, skills, and Control Rig modifiers.
-     */
-    async _applyJumpedInActiveEffect(driver: SR5Actor, vehicle: SR5Actor) {
-        const changes: Array<{ key: string; value: string; type: string }> = [];
-
-        // Transfer Driver attributes
-        const attributeKeysToTransfer = ['logic', 'intuition', 'reaction', 'agility'] as const;
-        for (const attKey of attributeKeysToTransfer) {
-            const att = driver.findAttribute(attKey);
-            const rating = att?.value || 0;
-            if (rating > 0) {
-                changes.push({
-                    key: `system.attributes.${attKey}.value`,
-                    value: String(rating),
-                    type: 'upgrade'
-                });
-            }
-        }
-
-        // Transfer Driver skills
-        const skillKeysToTransfer: string[] = ['gunnery', 'perception', 'sneaking'];
-        const vehiclePilotSkill = vehicle.getVehicleTypeSkillName();
-        if (vehiclePilotSkill) {
-            skillKeysToTransfer.push(vehiclePilotSkill);
-        }
-
-        for (const skillKey of skillKeysToTransfer) {
-            const driverSkill = driver.findActiveSkill(skillKey);
-            const rating = driverSkill?.value || 0;
-            if (rating > 0) {
-                changes.push({
-                    key: `system.skills.active.${skillKey}.value`,
-                    value: String(rating),
-                    type: 'upgrade'
-                });
-            }
-        }
-
-        // Apply Control Rig Rating handling & speed bonuses if driver has a Control Rig and no duplicate ActiveEffect exists
-        const controlRigRating = driver.getControlRigRating();
-
-        const controlRigItemHasHandlingBonus = () => {
-            const items = Array.from(driver.items.values());
-            return items.some(item => {
-                const isControlRig = item.name?.toLowerCase().includes('control rig') ||
-                    (item.isType('cyberware', 'bioware') && item.system.category === 'control_rig');
-                if (!isControlRig) return false;
-                return item.effects.some(e => {
-                    if (e.disabled || (e instanceof SR5ActiveEffect && e.isSuppressed)) return false;
-                    const cList = (e instanceof SR5ActiveEffect ? e.system.changes : (e as ActiveEffect.Stored).changes) || [];
-                    return cList.some(c =>
-                        c.key === 'system.vehicle_stats.handling.mod' ||
-                        c.key === 'system.vehicle_stats.speed.mod' ||
-                        Boolean(e.getFlag?.('shadowrun5e', 'isControlRigHandlingBonus'))
-                    );
-                });
-            });
-        };
-
-        if (controlRigRating > 0 && !controlRigItemHasHandlingBonus()) {
-            changes.push({
-                key: 'system.vehicle_stats.handling.mod',
-                value: String(controlRigRating),
-                type: 'add'
-            });
-            changes.push({
-                key: 'system.vehicle_stats.speed.mod',
-                value: String(controlRigRating),
-                type: 'add'
-            });
-        }
-
-        const effectName = game.i18n.format('SR5.Rigger.JumpedInEffectName', { rigger: driver.name }) || `Jumped-In: ${driver.name}`;
-
-        const instances = this.getActorInstances(vehicle);
-        for (const v of instances) {
-            const riggerInterfaceItem = v.items.find(isRiggerInterfaceItem);
-
-            const savedEffectId = v.getFlag(SYSTEM_NAME, 'jumpedInEffectId') as string | undefined;
-            const riggerInterfaceEffectId = riggerInterfaceItem ? (riggerInterfaceItem.getFlag(SYSTEM_NAME, 'jumpedInEffectId') as string | undefined) : undefined;
-
-            const existingEffect = v.effects.find((e): boolean => {
-                if (e.getFlag('shadowrun5e', 'isJumpedInEffect') === true) return true;
-                if (savedEffectId && e.id === savedEffectId) return true;
-                if (riggerInterfaceEffectId && e.id === riggerInterfaceEffectId) return true;
-                return false;
-            });
-
-            if (existingEffect) {
-                await existingEffect.update({
-                    name: effectName,
-                    disabled: false,
-                    flags: {
-                        shadowrun5e: {
-                            isJumpedInEffect: true,
-                            driverUuid: driver.uuid ?? undefined,
-                            riggerInterfaceItemId: riggerInterfaceItem?.id || null
-                        }
-                    },
-                    system: {
-                        targets: [{ id: 'actor', applyTo: 'actor' }],
-                        changes
-                    }
-                });
-                await v.setFlag(SYSTEM_NAME, 'jumpedInEffectId', existingEffect.id);
-                if (riggerInterfaceItem) {
-                    await riggerInterfaceItem.setFlag(SYSTEM_NAME, 'jumpedInEffectId', existingEffect.id);
-                }
-            } else {
-                const createdEffects = await v.createEmbeddedDocuments('ActiveEffect', [{
-                    name: effectName,
-                    img: 'systems/shadowrun5e/dist/icons/status-effects/steering-wheel.svg',
-                    disabled: false,
-                    flags: {
-                        shadowrun5e: {
-                            isJumpedInEffect: true,
-                            driverUuid: driver.uuid ?? undefined,
-                            riggerInterfaceItemId: riggerInterfaceItem?.id || null
-                        }
-                    },
-                    system: {
-                        targets: [{ id: 'actor', applyTo: 'actor' }],
-                        changes
-                    }
-                }]);
-
-                if (createdEffects && createdEffects.length > 0 && createdEffects[0].id) {
-                    const newId = createdEffects[0].id;
-                    await v.setFlag(SYSTEM_NAME, 'jumpedInEffectId', newId);
-                    if (riggerInterfaceItem) {
-                        await riggerInterfaceItem.setFlag(SYSTEM_NAME, 'jumpedInEffectId', newId);
-                    }
-                }
-            }
-        }
-    },
-
-    /**
-     * Deactivate temporary ActiveEffect on vehicle actor.
-     */
-    async _removeJumpedInActiveEffect(vehicle: SR5Actor) {
-        if (!vehicle) return;
-
-        const instances = this.getActorInstances(vehicle);
-        for (const v of instances) {
-            const riggerInterfaceItem = v.items.find(isRiggerInterfaceItem);
-
-            const savedEffectId = v.getFlag(SYSTEM_NAME, 'jumpedInEffectId') as string | undefined;
-            const riggerInterfaceEffectId = riggerInterfaceItem ? (riggerInterfaceItem.getFlag(SYSTEM_NAME, 'jumpedInEffectId') as string | undefined) : undefined;
-
-            for (const effect of v.effects) {
-                const isJumpedInFlag = effect.getFlag('shadowrun5e', 'isJumpedInEffect') === true;
-                const isSavedEffect = Boolean(savedEffectId && effect.id === savedEffectId);
-                const isRiggerInterfaceEffect = Boolean(riggerInterfaceEffectId && effect.id === riggerInterfaceEffectId);
-                if (isJumpedInFlag || isSavedEffect || isRiggerInterfaceEffect) {
-                    await effect.update({ disabled: true });
-                }
-            }
-
-            await v.toggleStatusEffect('sr5riggedVehicle', { active: false });
-        }
     }
 };

@@ -191,16 +191,12 @@ declare module "fvtt-types/configuration" {
                 overwatchScore?: number;
                 jumpedInVehicleUuid?: string;
                 jumpedInVehicle?: string;
-                jumpedInEffectId?: string;
                 previousInitiativeMode?: string;
                 hasRiggerInterface?: boolean;
             }
         };
         ActiveEffect: {
             shadowrun5e: {
-                isJumpedInEffect?: boolean;
-                driverUuid?: string;
-                riggerInterfaceItemId?: string | null;
                 isSensorLock?: boolean;
                 isControlRigHandlingBonus?: boolean;
                 attackerUuid?: string | null;
@@ -230,7 +226,6 @@ declare module "fvtt-types/configuration" {
                 lastComplexFormLevel?: ComplexFormLevelType;
                 lastFireRange?: FireRangeType;
                 embeddedItems: Item.Source[];
-                jumpedInEffectId?: string;
                 isRiggerInterface?: boolean;
                 rccUuid?: string;
             };
