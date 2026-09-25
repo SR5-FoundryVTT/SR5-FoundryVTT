@@ -11,8 +11,7 @@
 
 @mixin chat-card-control {
     flex: 0 0 auto;
-    // Sized by its icon: a fixed box would stretch the row it sits in and drop the
-    // icon below the sibling controls that flow on the first line.
+    // A fixed width would push the icon below adjacent controls.
     padding: 0 0.15rem;
     display: inline-flex;
     align-items: center;
@@ -56,9 +55,7 @@
     }
 }
 
-// SR5 cards use the Foundry message shell as their single visual card. The system
-// header is promoted into this shell at render time. Its chat texture is limited to
-// the header, leaving the body edge-to-edge on the standard card surface.
+// The card header moves into Foundry's message shell; only that header keeps the chat texture.
 .chat-message:has(.sr5.chat-card),
 .chat-message.sr5-chat-message {
     padding: 0;
@@ -131,8 +128,7 @@
 
         .card-control {
             @include chat-card-control;
-            // Foundry's own metadata controls render their icon on the top edge of
-            // the line box rather than its centre; match them, not the line.
+            // Match Foundry's top-aligned metadata icons.
             align-items: flex-start;
         }
 
@@ -570,7 +566,6 @@
             margin-top: 0.35rem;
         }
 
-        // Resolved pool, limit, and threshold values.
         .card-content--parameters {
             display: flex;
             flex-flow: row wrap;
@@ -601,27 +596,22 @@
                 font-weight: bold;
             }
 
-            // Visual separator between parameters.
             .test-parameter + .test-parameter::before {
                 content: '·';
                 margin-right: 0.6rem;
                 color: var(--sr5-card-border-soft);
             }
 
-            // Shared full-width modifier panel.
             .test-parameter-details {
                 flex: 0 0 100%;
-                // Allow long modifier names to truncate.
                 min-width: 0;
                 margin-top: 0.35rem;
 
-                // Hide when every breakdown is collapsed.
                 &:not(:has(.test-parameter-detail:not([hidden]))) {
                     display: none;
                 }
             }
 
-            // Inline panel styled as part of the card.
             .value-modifiers-panel {
                 padding: 0.25rem 0.35rem;
                 background: var(--sr5-card-surface-soft);
@@ -631,7 +621,7 @@
                 .list-item.has-tooltip {
                     cursor: var(--cursor-pointer);
 
-                    // Keep the row as Foundry's tooltip target.
+                    // Keep the row as the tooltip target.
                     > * {
                         pointer-events: none;
                     }
@@ -639,12 +629,10 @@
             }
         }
 
-        // Ordinary tests may have no remaining metric rows.
         .card-content--metrics:not(:has(.metric-row)) {
             display: none;
         }
 
-        // Hide empty outcome containers.
         .glitch-content:not(:has(.test-outcome-hits, .glitch)) {
             display: none;
         }
@@ -750,12 +738,9 @@
             margin: 0.35rem 0.45rem 0;
         }
 
-        // Adjacent bands stack flush: the seam collapses and the lower band drops its
-        // top border, so the two edges read as one hairline. Corners square where
-        // bands meet, leaving a run rounded only at its ends.
+        // Collapse shared band borders and square their adjoining corners.
         $card-band: '.card-content, .card-test-content, .card-description';
 
-        // The run opens flush against the header block above it.
         .card-main-content > :is(#{$card-band}):first-child {
             margin-top: 0;
             border-top: none;
@@ -776,7 +761,7 @@
             border-top-right-radius: 0;
         }
 
-        // The status band has no box of its own; its chips carry the border.
+        // Status chips carry the band border.
         :is(#{$card-band}) + .card-test-content .glitch-content {
             border-top: none;
             border-top-left-radius: 0;
@@ -841,7 +826,6 @@
             }
         }
 
-        // Keep "4 HITS - SUCCESS" on one text flow.
         .test-outcome {
             text-align: center;
 
@@ -866,7 +850,6 @@
                 color: var(--sr5-card-accent);
             }
 
-            // Add a separator only before a verdict.
             &:has(+ .glitch)::after {
                 content: ' -';
             }

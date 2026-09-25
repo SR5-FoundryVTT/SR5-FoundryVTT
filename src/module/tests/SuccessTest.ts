@@ -914,11 +914,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return this.threshold.value > 0;
     }
 
-    /**
-     * The resolved values the chat card offers as clickable parameters, in reading order.
-     *
-     * Each source doubles as the key its modifier breakdown is looked up under.
-     */
+    /** Card parameters in reading order; source keys their modifier breakdowns. */
     get cardParameters(): { source: string, value: ValueFieldType }[] {
         const parameters = [{ source: 'pool', value: this.pool }];
         if (this.hasLimit) parameters.push({ source: 'limit', value: this.limit });
@@ -987,17 +983,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return this.data.values.extendedHits || DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
     }
 
-    /** Hits used to determine the outcome. */
     get outcomeHits(): ValueFieldType {
         return this.extended ? this.extendedHits : this.hits;
     }
 
-    /**
-     * Hide the failure label when it is only a placeholder rather than a verdict.
-     *
-     * Compared against the label instead of against `extended`, so a subclass that names its own
-     * failure state keeps showing it on an extended test.
-     */
+    /** A subclass may name an extended failure, so check the label itself. */
     get showsFailureOutcome(): boolean {
         return this.failureLabel !== SuccessTest.NO_VERDICT_LABEL;
     }
@@ -1173,25 +1163,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return 'SR5.TestResults.Failure';
     }
 
-    /**
-     * Whether the chat card shows an outcome band for this test.
-     *
-     * A test that determined neither success nor failure still shows its hits, so only an automatic
-     * success without a verdict or a glitch leaves nothing to say.
-     */
+    /** Ordinary rolls still show hits without a verdict. */
     get showsOutcome(): boolean {
         return (this.canSucceed && this.showSuccessLabel)
             || (this.canFail && this.failure)
             || this.glitched || !this.autoSuccess;
     }
 
-    /**
-     * What the outcome band calls this result.
-     *
-     * A critical glitch overrules the verdict, and some tests can't name one at all.
-     *
-     * @returns The label to show, or nothing when the band shows hits alone.
-     */
     get outcomeLabel(): Translation | undefined {
         if (this.criticalGlitched) return 'SR5.GlitchCritical';
         if (this.canSucceed && this.showSuccessLabel) return this.successLabel;
@@ -1913,9 +1891,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return true;
     }
 
-    /**
-     * Whether the description panel would show anything at all.
-     */
     _hasDescriptionContent(description: unknown): boolean {
         if (!description || typeof description !== 'object') return false;
 
@@ -2091,7 +2066,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         $(html).find('.test-parameter').on('click', this._chatToggleParameterDetails.bind(this));
         $(html).find('.modifier-source-link').on('click', this._chatOpenModifierSource.bind(this));
-        // Both render as buttons without being one.
         for (const element of $(html).find<HTMLElement>('.test-parameter, .modifier-source-link').toArray())
             activateOnKey(element);
 
@@ -2131,7 +2105,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             const source = valueMod.dataset.tooltipSource;
             if (!source) continue;
 
-            // Card parameters use inline breakdowns instead of hover tooltips.
             if (valueMod.classList.contains('test-parameter')) {
                 await this._prepareParameterDetail(
                     valueMod, test, valuesBySource[source], source, tooltipsBySource, options);
@@ -2149,19 +2122,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         element.dataset.tooltipClass = 'sr5v2';
     }
 
-    /**
-     * Strip the interactive affordances a parameter carries from the template.
-     *
-     * The markup is rendered before we know whether the value has a breakdown to show, so a parameter
-     * without one would stay focusable and announce itself as a button while doing nothing.
-     */
+    /** Remove button semantics when hydration finds no breakdown. */
     private static _disableParameter(parameter: HTMLElement) {
         parameter.removeAttribute('role');
         parameter.removeAttribute('tabindex');
         parameter.removeAttribute('aria-expanded');
     }
 
-    /** Add a collapsed modifier breakdown to the shared parameter panel. */
     private static async _prepareParameterDetail(
         parameter: HTMLElement,
         test: SuccessTest,
@@ -2179,7 +2146,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const html = await this._buildValueModifierPanelHtml(value, options, traceSources);
         if (!html) return this._disableParameter(parameter);
 
-        // Replace details when a message is hydrated again.
+        // Rehydration replaces the previous panel.
         container.querySelector(`.test-parameter-detail[data-source="${source}"]`)?.remove();
 
         const detail = container.ownerDocument.createElement('div');
@@ -2188,18 +2155,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         detail.hidden = true;
         detail.innerHTML = html;
 
-        // Hydrate tooltips added with the panel.
         for (const row of detail.querySelectorAll<HTMLElement>('[data-tooltip-source]'))
             this._applyValueModifierTooltip(row, tooltipsBySource[row.dataset.tooltipSource ?? '']);
 
         container.append(detail);
     }
 
-    /** Values keyed by tooltip source. */
     private static _valueModifierSourcesForTest(test: SuccessTest): Record<string, ValueFieldType | undefined> {
         const tooltipValues: Record<string, ValueFieldType | undefined> = { hits: test.outcomeHits };
 
-        // Take the card's own chips, so a chip can't be shown without its breakdown.
         for (const parameter of test.cardParameters)
             tooltipValues[parameter.source] = parameter.value;
 
@@ -2223,7 +2187,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return Object.fromEntries(entries);
     }
 
-    /** Render a value's modifiers as a hover tooltip. */
     static async _buildValueModifierTooltipHtml(
         value: ValueFieldType,
         options: ValueModifierTooltipOptions = {}
@@ -2231,7 +2194,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return this._renderValueModifiers('common/modifiers-tooltip', value, options);
     }
 
-    /** Render a value's modifiers as an inline panel. */
     static async _buildValueModifierPanelHtml(
         value: ValueFieldType,
         options: ValueModifierTooltipOptions = {},
@@ -2240,11 +2202,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return this._renderValueModifiers('common/value-modifiers-panel', value, options, traceSources);
     }
 
-    /**
-     * Render one of the modifier breakdown templates, both of which wrap the same rows.
-     *
-     * @returns The rendered html, or nothing when the value has no modifier to show.
-     */
+    /** Render shared modifier rows, or return nothing for an empty breakdown. */
     private static async _renderValueModifiers(
         template: string,
         value: ValueFieldType,
@@ -2402,7 +2360,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return options;
     }
 
-    /** Toggle one parameter breakdown at a time. */
     static _chatToggleParameterDetails(event: Event) {
         event.preventDefault();
         event.stopPropagation();
@@ -2434,7 +2391,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         await LinksHelpers.openSource(source);
     }
 
-    /** Toggle hidden roll results. */
     static async _chatToggleCardRolls(event: Event) {
         event.preventDefault();
         event.stopPropagation();
@@ -2469,7 +2425,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * By default, item descriptions are hidden in a chat card.
      *
      * This will hide / show them, when called with a card event.
-     * @param event A PointerEvent triggered by a description control in the current chat-message layout
      */
     static _chatToggleCardDescription(event: Event) {
         event.preventDefault();

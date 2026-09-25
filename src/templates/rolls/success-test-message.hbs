@@ -30,7 +30,7 @@
                         <a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">
                             <img src="{{item.img}}" data-tooltip="{{localizeContent item.name}}" />
                         </a>
-                        {{!-- An action item usually carries the test's own name; the icon alone says it. --}}
+                        {{!-- Omit the item name when it repeats the test title. --}}
                         {{#ifne (localizeContent item.name) (localize title)}}
                         <h3 class="header-name">
                             <a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">{{localizeContent item.name}}</a>
@@ -64,7 +64,6 @@
         </div>
         {{/if}}
         {{#unless test.autoSuccess}}
-        {{!-- Resolved pool, limit, and threshold values. --}}
         <div class="card-content card-content--parameters {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
             {{#each test.cardParameters as |parameter|}}
             <span class="test-parameter" data-tooltip-source="{{parameter.source}}"

@@ -1,4 +1,3 @@
-{{!-- Rows shared by modifier tooltips and inline panels. --}}
 {{#if (or (not card) value.base)}}
     <div class="list-item">
         <div class="value-modifier-name">
@@ -10,7 +9,6 @@
     </div>
 {{/if}}
 {{#each value.changes as |change|}}
-    {{!-- Link traced changes to their nested breakdowns. --}}
     <div class="list-item{{#if (lookup ../traceSources @index)}} has-tooltip{{/if}}{{#if (and ../card ../sourceLinks change.source)}} modifier-source-link{{/if}}"
          {{#if (lookup ../traceSources @index)}}data-tooltip-source="{{lookup ../traceSources @index}}"{{/if}}
          {{#if (and ../card ../sourceLinks change.source)}}data-source="{{change.source}}" role="button" tabindex="0"{{/if}}>

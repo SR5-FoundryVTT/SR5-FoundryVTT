@@ -32,7 +32,6 @@ export const preloadHandlebarsTemplates = async () => {
             'item/tabs/details/skill',
             'item/footer/skill',
             'common/generic-data-properties',
-            // Shared by the value modifier tooltip and the chat card's inline panel.
             'common/value-modifiers-rows',
             'list-items/connect-network-icon',
             'list-items/connected-icons-toggle',
@@ -130,7 +129,6 @@ export const preloadHandlebarsTemplates = async () => {
         // Test chat messages and their parts
         'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',
         'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs',
-        // Shared by the chat card and the test dialog.
         'systems/shadowrun5e/dist/templates/rolls/parts/test-code-terms.hbs',
 
         // Application - Compendium Browser

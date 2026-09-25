@@ -519,9 +519,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
     });
 
     describe('Attack test verdict', () => {
-        // An unopposed attack roll isn't a success until the defense resolves, so the card leads with
-        // the hits chip instead of a verdict. The three attack tests deliberately don't override
-        // showSuccessLabel; re-adding an override would put "Success" back on every attack card.
+        // An attack needs its defense result before showing a success verdict.
         it('shows hits rather than a Success verdict', async () => {
             const attacker = await factory.createActor({ type: 'character' });
             const [weapon] = await attacker.createEmbeddedDocuments('Item', [{

@@ -15,10 +15,7 @@ export class SR5ChatMessage extends ChatMessage<'base'> {
         return html;
     }
 
-    /**
-     * Merge Foundry's message header with the first meaningful SR5 card header.
-     * Additional card fragments remain in the message body.
-     */
+    /** Promote the first SR5 card header into the Foundry message header. */
     static _enrichSystemCardMessage(html: HTMLElement): void {
         const messageContent = html.querySelector<HTMLElement>('.message-content');
         const firstCard = messageContent?.querySelector<HTMLElement>(':scope > .sr5.chat-card');
@@ -30,26 +27,18 @@ export class SR5ChatMessage extends ChatMessage<'base'> {
 
         this._mergeWhisperTarget(messageHeader);
 
-        // Initiative cards carry a summary row rather than a header to promote.
         if (this._promoteInitiativeDetail(firstCard, messageHeader)) return;
 
         this._promoteCardHeader(html, firstCard, messageHeader);
     }
 
-    /**
-     * Move the whisper recipients under the sender, so the header's title row stays free.
-     */
     private static _mergeWhisperTarget(messageHeader: HTMLElement) {
         const sender = messageHeader.querySelector<HTMLElement>(':scope > .message-sender');
         const whisperTo = messageHeader.querySelector<HTMLElement>(':scope > .whisper-to');
         if (sender && whisperTo) sender.append(whisperTo);
     }
 
-    /**
-     * Lift an initiative card's primary row into the header, leaving the detail row in the body.
-     *
-     * @returns Whether this card was an initiative card, handled or not.
-     */
+    /** Return true for initiative cards even when their summary row is missing. */
     private static _promoteInitiativeDetail(firstCard: HTMLElement, messageHeader: HTMLElement): boolean {
         if (!firstCard.classList.contains('initiative-mode-change-card')) return false;
 
@@ -72,9 +61,6 @@ export class SR5ChatMessage extends ChatMessage<'base'> {
         return true;
     }
 
-    /**
-     * Use the card's own header as the message title, in place of the sender line.
-     */
     private static _promoteCardHeader(html: HTMLElement, firstCard: HTMLElement, messageHeader: HTMLElement) {
         const cardHeader = firstCard.firstElementChild;
         if (!isElementInstance(cardHeader, HTMLElement) || !cardHeader.matches('.card-header')) return;
@@ -87,16 +73,12 @@ export class SR5ChatMessage extends ChatMessage<'base'> {
         if (metadata) this._promoteCardControls(cardHeader, metadata);
     }
 
-    /**
-     * Move the promoted header's controls in among Foundry's own, ahead of the delete control.
-     */
     private static _promoteCardControls(cardHeader: HTMLElement, metadata: HTMLElement) {
         const builtInControl = metadata.querySelector('.message-delete, .message-dismiss');
 
         for (const control of cardHeader.querySelectorAll<HTMLElement>(':scope > .card-control')) {
             control.setAttribute('role', 'button');
             control.tabIndex = 0;
-            // Icon-only controls have no text to announce.
             if (!control.hasAttribute('aria-label')) {
                 control.setAttribute(
                     'aria-label',

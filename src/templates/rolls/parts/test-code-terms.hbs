@@ -1,2 +1,2 @@
-{{!-- One group of the pool [limit] (threshold) notation. `detailed` adds the tooltips and values the test dialog shows. --}}
+{{!-- The dialog's detailed view adds values and tooltips. --}}
 {{#each terms as |term|}}<span class="test-code-term{{#if (and ../detailed term.tooltipSource)}} has-tooltip{{/if}}"{{#if (and ../detailed term.tooltipSource)}} data-tooltip-source="{{term.tooltipSource}}"{{/if}}>{{term.text}}{{#if (and ../detailed term.valueText)}} {{term.valueText}}{{/if}}</span>{{#unless @last}} + {{/unless}}{{/each~}}

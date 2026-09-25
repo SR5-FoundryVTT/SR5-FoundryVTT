@@ -91,7 +91,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
 
         describe('outcome hits', () => {
-            // The verdict must use the same hits as the outcome calculation.
             it('reports the rolled hits for a normal test', () => {
                 const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
 
@@ -109,7 +108,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
 
         describe('outcome label visibility', () => {
-            // Zero hits is a definite failure even without a threshold.
             it('shows a generic failure verdict without a threshold', () => {
                 const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
 
@@ -129,7 +127,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
 
         describe('chat card verdict band', () => {
-            // Render the real card so the band's guards are asserted rather than re-described here.
             const renderCard = async (test): Promise<HTMLElement> => {
                 const html = await foundry.applications.handlebars.renderTemplate(
                     'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',
@@ -143,7 +140,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             // The card prints term names without their values, so a zero threshold would be empty parens.
             it('omits the threshold group when the threshold totals zero', async () => {
                 const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
-                // What the natural recovery tests do for an undamaged track.
                 ModifiableValue.addUniqueBase(test.data.threshold, 'SR5.StunTrack', 0);
 
                 assert.lengthOf(test.codeTerms.threshold, 1);
@@ -173,13 +169,11 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                 const band = (await renderCard(test)).querySelector('.card-test-content--status');
                 assert.exists(band?.querySelector('.glitch-content--critical'));
                 assert.include(band?.textContent ?? '', game.i18n.localize('SR5.GlitchCritical'));
-                // The hits chip shares the band with the verdict, so it must survive alongside it.
                 assert.equal(band?.querySelector('.test-outcome-hits-value')?.textContent, '2');
             });
         });
 
         describe('description control visibility', () => {
-            // The control toggles the description panel, so it must not outlive its content.
             it('hides the control when there is nothing to show', async () => {
                 const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
 

@@ -165,8 +165,6 @@ export const shadowrunChatMessageLayoutTesting = (context: QuenchBatchContext) =
         });
 
         describe('parameter modifier panels', () => {
-            // Render the real card and hydrate it the way chatMessageListeners does, so these tests
-            // fail if the template stops emitting the parameter band.
             const renderCard = async (test): Promise<HTMLElement> => {
                 const wrapper = document.createElement('div');
                 wrapper.innerHTML = await foundry.applications.handlebars.renderTemplate(
@@ -224,7 +222,6 @@ export const shadowrunChatMessageLayoutTesting = (context: QuenchBatchContext) =
                 assert.equal(parameter(line, 'pool')?.getAttribute('aria-expanded'), 'false');
             });
 
-            // The band is rendered before we know whether a value has anything to break down.
             it('leaves a parameter without a breakdown inert', async () => {
                 const test = TestCreator.fromPool({ pool: 0 }, { showMessage: false, showDialog: false });
 
