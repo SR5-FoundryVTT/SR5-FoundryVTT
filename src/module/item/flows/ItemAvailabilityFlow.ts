@@ -73,7 +73,11 @@ export const ItemAvailabilityFlow = {
         const restriction = ItemAvailabilityFlow.normalizeRestriction(availability.restriction);
         availability.restriction = restriction;
 
-        availability.label = ItemAvailabilityFlow.composeValue(availability.value, restriction);
+        // Keep unparseable legacy text until its numeric base or restriction is set.
+        const hasRawLabel = availability.base === 0 && restriction === 'none'
+            && !ItemAvailabilityFlow.parseAvailability(availability.label).isValid;
+        if (!hasRawLabel)
+            availability.label = ItemAvailabilityFlow.composeValue(availability.value, restriction);
         return availability.label;
     },
 

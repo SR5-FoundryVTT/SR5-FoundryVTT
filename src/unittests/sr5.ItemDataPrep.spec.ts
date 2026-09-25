@@ -315,6 +315,32 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(device.system.technology.availability.label, '8R');
         });
 
+        it('keeps unparseable migrated availability until its structured fields change', async () => {
+            const legacy: any = {
+                type: 'device',
+                system: { technology: { cost: 100, availability: '(Rating * 3)R' } },
+            };
+            new Version0_38_0().migrateItem(legacy);
+            assert.strictEqual(legacy.system.technology.availability.label, '(Rating * 3)R');
+
+            const device = await factory.createItem<'device'>(legacy);
+            assert.strictEqual(device.system.technology.availability.label, '(Rating * 3)R');
+            device.prepareData();
+            device.prepareData();
+            assert.strictEqual(device.system.technology.availability.value, 0);
+            assert.strictEqual(device.system.technology.availability.label, '(Rating * 3)R');
+
+            await device.update({ system: { technology: { availability: { base: 3 } } } });
+            assert.strictEqual(device.system.technology.availability.label, '3');
+
+            const restricted = await factory.createItem({
+                type: 'device',
+                system: { technology: { availability: legacy.system.technology.availability } },
+            });
+            await restricted.update({ system: { technology: { availability: { restriction: 'restricted' } } } });
+            assert.strictEqual(restricted.system.technology.availability.label, '0R');
+        });
+
         it('applies item-target active effect overrides to availability number only', async () => {
             const device = await factory.createItem({
                 type: 'device',
