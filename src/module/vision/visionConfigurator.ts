@@ -3,12 +3,39 @@ import AstralPerceptionBackgroundVisionShader  from './astralPerception/astralPe
 import ThermographicVisionDetectionMode from './thermographicVision/thermographicDetectionMode';
 import LowlightVisionDetectionMode from './lowlightVision/lowlightDetectionMode';
 import AugmentedRealityVisionDetectionMode from './augmentedReality/arDetectionMode';
+import UltrasoundDetectionMode, { ULTRASOUND_VISION_MODE } from './ultrasoundVision/ultrasoundDetectionMode';
+import {
+    ULTRASOUND_COLOR,
+    UltrasoundBackgroundVisionShader,
+    UltrasoundColorationVisionShader,
+} from './ultrasoundVision/ultrasoundShaders';
+import {
+    PhysicalLightPerceptionDetectionMode,
+    PhysicalSightDetectionMode,
+} from './physicalVision/physicalDetectionMode';
+import { AstralAwareCanvasVisibility } from './astralPerception/astralVisibility';
+import { SR5VisionSource } from './SR5VisionSource';
 
 export default class VisionConfigurator {
+    static configurePhysicalSight() {
+        const basicSight = CONFIG.Canvas.detectionModes.basicSight;
+        const lightPerception = CONFIG.Canvas.detectionModes.lightPerception;
+        CONFIG.Canvas.detectionModes.basicSight = new PhysicalSightDetectionMode(
+            basicSight.toObject(),
+        ) as unknown as typeof basicSight;
+        CONFIG.Canvas.detectionModes.lightPerception = new PhysicalLightPerceptionDetectionMode(
+            lightPerception.toObject(),
+        ) as unknown as typeof lightPerception;
+    }
+
     static configureAstralPerception() {
+        CONFIG.Canvas.visionSourceClass = SR5VisionSource as unknown as typeof CONFIG.Canvas.visionSourceClass;
+        CONFIG.Canvas.groups.visibility.groupClass = AstralAwareCanvasVisibility as unknown as
+            typeof CONFIG.Canvas.groups.visibility.groupClass;
         CONFIG.Canvas.detectionModes.astralPerception = new AstralPerceptionDetectionMode({
             id: 'astralPerception',
             label: 'SR5.Vision.AstralPerception',
+            walls: true,
             type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
         });
   
@@ -50,6 +77,41 @@ export default class VisionConfigurator {
         });
     }
 
+    static configureUltrasound() {
+        CONFIG.Canvas.detectionModes.ultrasound = new UltrasoundDetectionMode({
+            id: 'ultrasound',
+            label: 'SR5.Vision.Ultrasound',
+            walls: true,
+            angle: false,
+            type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SOUND,
+        });
+
+        // Ultrasound replaces normal vision with a colorless map of shapes and textures that ignores light.
+        // It is based on Foundry's tremorsense, tinted gray like the ultrasound detection outline.
+        const { LIGHTING_VISIBILITY } = foundry.canvas.perception.VisionMode;
+        const { shaders } = foundry.canvas.rendering;
+        CONFIG.Canvas.visionModes.ultrasound = new foundry.canvas.perception.VisionMode({
+            id: ULTRASOUND_VISION_MODE,
+            label: 'SR5.Vision.Ultrasound',
+            canvas: {
+                shader: shaders.ColorAdjustmentsSamplerShader,
+                uniforms: { contrast: 0, saturation: -1, exposure: -0.65, tint: ULTRASOUND_COLOR },
+            },
+            lighting: {
+                background: { visibility: LIGHTING_VISIBILITY.DISABLED },
+                illumination: { visibility: LIGHTING_VISIBILITY.DISABLED },
+                coloration: { visibility: LIGHTING_VISIBILITY.DISABLED },
+                darkness: { visibility: LIGHTING_VISIBILITY.DISABLED },
+            },
+            vision: {
+                darkness: { adaptive: false },
+                defaults: { attenuation: 0, contrast: 0.2, saturation: -1, brightness: 1 },
+                background: { shader: UltrasoundBackgroundVisionShader },
+                coloration: { shader: UltrasoundColorationVisionShader },
+            },
+        }, { animated: true });
+    }
+
     static configureAR() {
         CONFIG.Canvas.detectionModes.augmentedReality = new AugmentedRealityVisionDetectionMode({
             id: 'augmentedReality',
@@ -58,4 +120,3 @@ export default class VisionConfigurator {
         });
     }
 }
-  

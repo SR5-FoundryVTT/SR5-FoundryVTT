@@ -109,6 +109,37 @@ export const SR5 = {
         resonance: 'SR5.Emerged',
     },
 
+    // Magical types decide which astral senses a character has.
+    magicalTypes: {
+        mundane: 'SR5.Vision.MagicalTypes.Mundane',
+        magician: 'SR5.Vision.MagicalTypes.Magician',
+        aspected_magician: 'SR5.Vision.MagicalTypes.AspectedMagician',
+        adept: 'SR5.Vision.MagicalTypes.Adept',
+        mystic_adept: 'SR5.Vision.MagicalTypes.MysticAdept',
+    },
+
+    // GM overrides of what a magical type grants.
+    astralOverrideModes: {
+        default: 'SR5.Vision.OverrideModes.Default',
+        allow: 'SR5.Vision.OverrideModes.Allow',
+        deny: 'SR5.Vision.OverrideModes.Deny',
+    },
+
+    thermographicSignatures: {
+        none: 'SR5.Vision.ThermographicSignatures.None',
+        cold: 'SR5.Vision.ThermographicSignatures.Cold',
+        warm: 'SR5.Vision.ThermographicSignatures.Warm',
+        hot: 'SR5.Vision.ThermographicSignatures.Hot',
+    },
+
+    // Environmental Region levels, mapped onto the environmental modifier table levels.
+    environmentLevels: {
+        none: 'SR5.Vision.EnvironmentalRegions.Level.None',
+        light: 'SR5.Vision.EnvironmentalRegions.Level.Light',
+        moderate: 'SR5.Vision.EnvironmentalRegions.Level.Moderate',
+        heavy: 'SR5.Vision.EnvironmentalRegions.Level.Heavy',
+    },
+
     damageTypes: {
         physical: 'SR5.DmgTypePhysical',
         stun: 'SR5.DmgTypeStun',
@@ -842,6 +873,7 @@ export const SR5 = {
         drain: 'SR5.ModifierTypes.Drain',
         environmental: 'SR5.ModifierTypes.Environmental',
         'environmental.light': 'SR5.ModifierTypes.EnvironmentalLight',
+        'environmental.glare': 'SR5.ModifierTypes.EnvironmentalGlare',
         'environmental.visibility': 'SR5.ModifierTypes.EnvironmentalVisibility',
         'environmental.wind': 'SR5.ModifierTypes.EnvironmentalWind',
         'environmental.range': 'SR5.ModifierTypes.EnvironmentalRange',

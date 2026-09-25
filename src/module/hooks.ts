@@ -142,6 +142,18 @@ import { Skill } from './types/item/Skill';
 import { SR5SkillSheet } from './item/sheets/SR5SkillSheet';
 import { SkillGroupFlow } from './actor/flows/SkillGroupFlow';
 import { OpposedMatrixTest } from './tests/OpposedMatrixTest';
+import { PerceptionFlow } from './vision/PerceptionFlow';
+import { VisionHUD } from './apps/VisionHUD';
+import { AstralProjectionFlow } from './vision/astralProjection/AstralProjectionFlow';
+import { AstralRegionFlow } from './vision/astralRegions/AstralRegionFlow';
+import {
+    ASTRAL_BARRIER_REGION_BEHAVIOR,
+    ASTRAL_WARD_REGION_BEHAVIOR,
+    AstralBarrierRegionBehavior,
+    AstralWardRegionBehavior,
+} from './types/regionBehavior/AstralBoundary';
+import { EnvironmentalRegionFlow } from './vision/environmentalRegions/EnvironmentalRegionFlow';
+import { ENVIRONMENT_REGION_BEHAVIOR, EnvironmentalRegionBehavior } from './types/regionBehavior/Environmental';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -167,7 +179,7 @@ export class HooksManager {
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
         Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory.bind(HooksManager));
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory.bind(HooksManager));
-        Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));
+        Hooks.on('renderTokenHUD', VisionHUD.onRenderTokenHUD.bind(VisionHUD));
         Hooks.on('moveToken', SR5TokenDocument.moveToken.bind(SR5Token));
         Hooks.on('createItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('updateItem', (item, data, options, userId) => { void HooksManager.updateIcConnectedToHostItem(item, data, options, userId); });
@@ -180,6 +192,11 @@ export class HooksManager {
         // Announce extended tests game time has made rollable again. Debounced, as holding a
         // time preset would otherwise scan every record per tick.
         Hooks.on('updateWorldTime', foundry.utils.debounce(() => { void ExtendedTestDueFlow.announceDue(); }, 250));
+
+        PerceptionFlow.registerHooks();
+        AstralProjectionFlow.registerHooks();
+        AstralRegionFlow.registerHooks();
+        EnvironmentalRegionFlow.registerHooks();
 
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();
@@ -429,6 +446,16 @@ ___________________
 
         CONFIG.Combat.dataModels["base"] = CombatDM;
         CONFIG.Combatant.dataModels["base"] = CombatantDM;
+
+        CONFIG.RegionBehavior.dataModels[ASTRAL_BARRIER_REGION_BEHAVIOR] = AstralBarrierRegionBehavior;
+        CONFIG.RegionBehavior.dataModels[ASTRAL_WARD_REGION_BEHAVIOR] = AstralWardRegionBehavior;
+        CONFIG.RegionBehavior.dataModels[ENVIRONMENT_REGION_BEHAVIOR] = EnvironmentalRegionBehavior;
+        CONFIG.RegionBehavior.typeIcons[ASTRAL_BARRIER_REGION_BEHAVIOR] = 'fa-solid fa-shield-halved';
+        CONFIG.RegionBehavior.typeIcons[ASTRAL_WARD_REGION_BEHAVIOR] = 'fa-solid fa-shield';
+        CONFIG.RegionBehavior.typeIcons[ENVIRONMENT_REGION_BEHAVIOR] = 'fa-solid fa-cloud-sun';
+        CONFIG.RegionBehavior.typeLabels[ASTRAL_BARRIER_REGION_BEHAVIOR] = 'SR5.Vision.AstralRegions.Barrier.Label';
+        CONFIG.RegionBehavior.typeLabels[ASTRAL_WARD_REGION_BEHAVIOR] = 'SR5.Vision.AstralRegions.Ward.Label';
+        CONFIG.RegionBehavior.typeLabels[ENVIRONMENT_REGION_BEHAVIOR] = 'SR5.Vision.EnvironmentalRegions.Environment.Label';
 
         CONFIG.Item.dataModels["action"] = Action;
         CONFIG.Item.dataModels["ammo"] = Ammo;
@@ -704,6 +731,7 @@ ___________________
             [FLAGS.UnsetDataStorage]: [DataStorage._handleUnsetDataStorageSocketMessage.bind(DataStorage)],
             [FLAGS.UpdateDocumentsAsGM]: [SocketMessageFlow.handleUpdateDocumentsAsGMMessage.bind(SocketMessage)],
             [FLAGS.ApplyExtendedTestRoll]: [ExtendedTestFlow._handleApplyRollSocketMessage.bind(ExtendedTestFlow)],
+            [FLAGS.AstralProjectionOperation]: [AstralProjectionFlow.handleSocketMessage.bind(AstralProjectionFlow)],
         } as const;
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData, senderId?: string) => {
@@ -738,9 +766,11 @@ ___________________
 
     static configureVision() {
         //register detection modes
+        VisionConfigurator.configurePhysicalSight()
         VisionConfigurator.configureAstralPerception()
         VisionConfigurator.configureThermographicVision()
         VisionConfigurator.configureLowlight()
+        VisionConfigurator.configureUltrasound()
         VisionConfigurator.configureAR()
     }
 

@@ -9,6 +9,8 @@
         }
     },
     "SETTINGS": {
+        "AutomaticTokenSenses": "Token-Sinne automatisch verwalten",
+        "AutomaticTokenSensesDescription": "Aktualisiert systemverwaltete Wahrnehmungsmodi, wenn sich Akteur-, Gegenstands-, Effekt- oder Tokendaten ändern. Einzelne Tokens können über das Flag shadowrun5e.AutomaticTokenSenses ausgenommen werden.",
         "ApplyLimitsDescription": "Sollen Limits auf auf Würfen angewendet werden?",
         "ApplyLimitsName": "Verwende Limits bei Würfen",
         "AutomateMultiDefenseModifier": "Automatisiere Verteidigungsmodifikator",
@@ -1188,22 +1190,23 @@
         "EnvModifiersApplication": {
             "ClearModifiers": "Entferne eigene Modifikatoren",
             "Extreme": "Zwei oder mehr Modifikatoren der Stufe Schwer",
+            "Glare": {
+                "Heavy": "Starke Blendung",
+                "Light": "Schwache Blendung",
+                "Moderate": "Mittlere Blendung"
+            },
+            "Light": {
+                "Heavy": "Völlige Dunkelheit",
+                "Light": "Teilbeleuchtung",
+                "Moderate": "Schwache Beleuchtung"
+            },
             "LightGlare": {
                 "Good": "Gute Beleuchtung/Keine Blendung",
-                "Heavy": "Völlige Dunkelheit/Starke Blendung",
-                "Light": "Teilbeleuchtung/Schwache Blendung",
-                "Moderate": "Schwache Beleuchtung/Mittlere Blendung",
-                "Title": "Beleuchtung"
+                "Hint": "Wähle die Beleuchtungs- oder die Blendungshälfte: Sie entscheidet, welche Ausrüstung ausgleicht.",
+                "Title": "Beleuchtung/Blendung"
             },
             "Modifier": {
                 "Title": "Modifikator"
-            },
-            "Range": {
-                "Good": "Kurz",
-                "Heavy": "Maximal",
-                "Light": "Mittel",
-                "Moderate": "Lang",
-                "Title": "Entfernung"
             },
             "Title": "Umweltmodifikatoren",
             "Total": "Ergebnis",
@@ -2184,6 +2187,7 @@
             "DifferentGrid": "Anderes Gitter",
             "Drain": "Entzug",
             "Environmental": "Umwelt",
+            "EnvironmentalGlare": "Umwelt (Blendung)",
             "EnvironmentalLight": "Umwelt (Licht)",
             "EnvironmentalRange": "Umwelt (Reichweite)",
             "EnvironmentalVisibility": "Umwelt (Sicht)",
@@ -3374,9 +3378,98 @@
         },
         "Vision": {
             "AstralPerception": "Astrale Wahrnehmung",
+            "AstralRegions": {
+                "Barrier": { "Label": "Astrale Barriere" },
+                "Ward": { "Label": "Astraler Schutzkreis" },
+                "BlockSight": "Astrale Sicht blockieren",
+                "BlockSightHint": "Verhindert, dass astrale Sicht die Grenze dieser Region überschreitet.",
+                "BlockMovement": "Astrale Bewegung blockieren",
+                "BlockMovementHint": "Verhindert, dass astrale Formen die Grenze dieser Region überschreiten.",
+                "MovementBlocked": "Eine astrale Barriere blockiert diese Bewegung.",
+                "Force": "Kraft",
+                "ForceHint": "Die Kraft der Manabarriere. Askennenproben durch sie erhalten einen Würfelpoolmalus in Höhe dieses Werts.",
+                "ForcePenalty": "Kraft der Astralbarriere",
+                "AllowedActors": "Erlaubte Akteure",
+                "AllowedActorsHint": "Der Erschaffer der Barriere und alle, die er durchlässt. Diese Akteure ignorieren die Barriere für Sicht und Bewegung."
+            },
+            "EnvironmentalRegions": {
+                "Environment": {
+                    "Label": "SR5-Umgebung"
+                },
+                "Level": {
+                    "None": "Keine",
+                    "Light": "Leicht",
+                    "Moderate": "Mäßig",
+                    "Heavy": "Schwer"
+                },
+                "BackgroundCount": {
+                    "Label": "Hintergrundstrahlung",
+                    "Hint": "Die höchste überlappende Stufe gilt für magische Handlungen.",
+                    "Contribution": "Regionale Hintergrundstrahlung"
+                },
+                "MatrixNoise": {
+                    "Label": "Matrixrauschen",
+                    "Hint": "Stufen überlappender Regionen werden addiert.",
+                    "Contribution": "Regionales Matrixrauschen"
+                },
+                "Visibility": {
+                    "Label": "Sichtverhältnisse",
+                    "Hint": "Sichtverhältnisse innerhalb dieser Region.",
+                    "Contribution": "Regionale Sichtverhältnisse"
+                },
+                "Light": {
+                    "Label": "Licht / Blendung",
+                    "Hint": "Licht- oder Blendverhältnisse innerhalb dieser Region.",
+                    "Contribution": "Regionales Licht"
+                },
+                "Glare": {
+                    "Contribution": "Regionale Blendung"
+                },
+                "Wind": {
+                    "Label": "Wind",
+                    "Hint": "Windverhältnisse innerhalb dieser Region.",
+                    "Contribution": "Regionaler Wind"
+                }
+            },
+            "CannotPerceiveAstrally": "Dieser Akteur kann keine astrale Wahrnehmung verwenden.",
+            "ToggleAstralPerception": "Astrale Wahrnehmung umschalten",
+            "BeginAstralProjection": "Astrale Projektion beginnen",
+            "ReturnFromAstralProjection": "In den Körper zurückkehren",
+            "AstralFormName": "{name} — Astralgestalt",
+            "CannotProjectAstrally": "Dieser Akteur kann keine astrale Projektion verwenden.",
+            "CannotControlAstralProjection": "Du besitzt die astrale Projektion dieses Akteurs nicht.",
+            "AlreadyProjectingAstrally": "Dieser Akteur projiziert bereits astral.",
+            "AstralToggleFailed": "Astrale Sicht konnte nicht umgeschaltet werden. Details in der Konsole.",
+            "AstralPerceptionOverride": "Override für astrale Wahrnehmung",
+            "AstralPerceptionOverrideHint": "SL-Override, ob dieser Akteur astral wahrnehmen darf.",
+            "AstralProjectionOverride": "Override für astrale Projektion",
+            "AstralProjectionOverrideHint": "SL-Override, ob dieser Akteur astral projizieren darf.",
             "AugmentedReality": "Augmented Reality",
             "LowLight": "Restlistverstärkung",
-            "ThermographicVision": "Infrarotsicht"
+            "MagicalType": "Magischer Typ",
+            "MagicalTypeHint": "Bestimmt die standardmäßige Berechtigung für astrale Wahrnehmung und Projektion.",
+            "MagicalTypes": {
+                "Adept": "Adept",
+                "AspectedMagician": "Aspektmagier",
+                "Magician": "Magier",
+                "Mundane": "Mundan",
+                "MysticAdept": "Magieradept"
+            },
+            "OverrideModes": {
+                "Allow": "Erlauben",
+                "Default": "Magischen Typ verwenden",
+                "Deny": "Verweigern"
+            },
+            "ThermographicSignature": "Thermografische Signatur",
+            "ThermographicSignatureHint": "Legt fest, wie dieser Akteur durch Infrarotsicht erscheint.",
+            "ThermographicSignatures": {
+                "None": "Keine",
+                "Cold": "Kalt",
+                "Warm": "Warm",
+                "Hot": "Heiß"
+            },
+            "ThermographicVision": "Infrarotsicht",
+            "Ultrasound": "Ultraschall"
         },
         "Walk": "Gehen",
         "WalkingSpeed": "Gehen",
@@ -3624,6 +3717,7 @@
         "WirelessOnline": "Online",
         "WirelessUnavailable": "Kabel",
         "StatusEffects": {
+            "AstralPerception": "Astrale Wahrnehmung",
             "Running": "Laufen",
             "Sprinting": "Sprint"
         }

@@ -16,12 +16,13 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
 
         it('visibility checks', async () => {
             const sprite = await factory.createActor({ type: 'sprite' });
-            assert.strictEqual(sprite.system.visibilityChecks.astral.hasAura, false);
-            assert.strictEqual(sprite.system.visibilityChecks.astral.astralActive, false);
-            assert.strictEqual(sprite.system.visibilityChecks.astral.affectedBySpell, false);
-            assert.strictEqual(sprite.system.visibilityChecks.meat.hasHeat, false);
-            assert.strictEqual(sprite.system.visibilityChecks.matrix.hasIcon, true);
-            assert.strictEqual(sprite.system.visibilityChecks.matrix.runningSilent, false);
+            assert.strictEqual(sprite.system.visibilityChecks.targets.astral.hasAura, false);
+            assert.strictEqual(sprite.system.visibilityChecks.targets.astral.astralActive, false);
+            assert.strictEqual(sprite.system.visibilityChecks.targets.astral.affectedBySpell, false);
+            assert.strictEqual(sprite.system.visibilityChecks.targets.physical.active, false);
+            assert.strictEqual(sprite.system.visibilityChecks.targets.physical.thermographic, 'none');
+            assert.strictEqual(sprite.system.visibilityChecks.targets.matrix.hasIcon, true);
+            assert.strictEqual(sprite.system.visibilityChecks.targets.matrix.runningSilent, false);
         });
 
         it('sprite type is metadata only and does not change prepared values', async () => {

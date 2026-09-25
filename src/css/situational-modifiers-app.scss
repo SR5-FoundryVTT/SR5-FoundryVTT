@@ -175,6 +175,7 @@
             text-align: left;
             font-size: var(--font-size-13) !important;
             line-height: normal;
+            white-space: nowrap;
             padding-top: 5px;
             padding-bottom: 5px;
             width: 100%;
@@ -211,6 +212,34 @@
 
         td.env-modifier-level {
             padding: 3px 4px;
+        }
+
+        .env-modifier-hint {
+            font-size: var(--font-size-11);
+            cursor: help;
+        }
+
+        // A Light/Glare row is one cell of the environmental modifiers table (SR5#175), split into its
+        // light and glare halves.
+        .env-modifier-split {
+            display: flex;
+
+            button.env-modifier {
+                flex: 1 1 auto;
+                min-width: max-content;
+                height: auto;
+            }
+
+            button.env-modifier:first-child {
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+
+            button.env-modifier:last-child {
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+                border-left-width: 0;
+            }
         }
 
         .dialog-buttons {

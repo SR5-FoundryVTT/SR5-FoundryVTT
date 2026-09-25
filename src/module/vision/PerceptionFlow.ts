@@ -1,0 +1,143 @@
+import { FLAGS, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from '@/module/constants';
+import { SR5Actor } from '@/module/actor/SR5Actor';
+import { SR5Item } from '@/module/item/SR5Item';
+import type { PerceptionCapabilitiesType } from '@/module/types/template/Visibility';
+import { PerceptionResolver } from './PerceptionResolver';
+import { ULTRASOUND_RANGE_METERS } from './ultrasoundVision/ultrasoundDetectionMode';
+import { isAstralForm } from './astralProjection/AstralProjectionState';
+
+type RefreshDocument = SR5Actor | SR5Item | ActiveEffect | TokenDocument;
+
+/** Range of senses without a rules limit, far enough to cover any scene. */
+const SENSE_RANGE = 10000;
+
+export class PerceptionFlow {
+    private static pendingTokens = new Set<TokenDocument>();
+    private static refreshPending = foundry.utils.debounce(() => PerceptionFlow.flush(), 100);
+
+    static registerHooks() {
+        for (const documentName of ['Actor', 'Item', 'ActiveEffect', 'Token'] as const) {
+            Hooks.on(`create${documentName}`, (document: RefreshDocument) => this.schedule(document));
+            Hooks.on(`update${documentName}`, (document: RefreshDocument) => this.schedule(document));
+            Hooks.on(`delete${documentName}`, (document: RefreshDocument) => this.schedule(document));
+        }
+        Hooks.on('canvasReady', (canvas) => this.refreshScene(canvas.scene));
+    }
+
+    /** Reconcile derived senses after loading or switching scenes. */
+    static refreshScene(scene: Scene | null | undefined) {
+        if (scene) this.refreshTokens(scene.tokens);
+    }
+
+    /** Reconcile derived senses of tokens, refreshing the canvas once if any of them is on it. */
+    static refreshTokens(tokens: Iterable<TokenDocument>) {
+        let refreshCanvas = false;
+        for (const token of tokens) refreshCanvas = this.refreshTokenSource(token) || refreshCanvas;
+        if (refreshCanvas) canvas.perception.update({ refreshVision: true, refreshLighting: true });
+    }
+
+    static schedule(document: RefreshDocument) {
+        for (const token of this.tokensFor(document)) this.pendingTokens.add(token);
+        this.refreshPending();
+    }
+
+    static isRefreshEnabled(token: TokenDocument, worldEnabled = this.worldSettingEnabled()) {
+        if (!worldEnabled) return false;
+        return foundry.utils.getProperty(token, `flags.${SYSTEM_NAME}.${FLAGS.AutomaticTokenSenses}`) !== false;
+    }
+
+    static reconcileDetectionModes(
+        detectionModes: Record<string, { enabled: boolean; range: number | null }>,
+        capabilities: PerceptionCapabilitiesType,
+        range: number,
+        sceneUnit = 'm',
+    ) {
+        const next = foundry.utils.deepClone(detectionModes);
+        // 50 m is only the default for a newly granted ultrasound sense; a range the GM set on the token stays.
+        const ultrasoundRange = detectionModes.ultrasound?.range ?? this.metersToSceneUnits(ULTRASOUND_RANGE_METERS, sceneUnit);
+        const managed = {
+            lowlight: { enabled: capabilities.physical.lowLight, range },
+            thermographic: { enabled: capabilities.physical.thermographic, range },
+            ultrasound: { enabled: capabilities.physical.ultrasound, range: ultrasoundRange },
+        };
+
+        for (const [id, sense] of Object.entries(managed)) {
+            if (sense.enabled) next[id] = { enabled: true, range: sense.range };
+            else delete next[id];
+        }
+        return next;
+    }
+
+    static reconcileAstralDetectionModes(
+        detectionModes: Record<string, { enabled: boolean; range: number | null }>,
+        range: number,
+    ) {
+        const next = foundry.utils.deepClone(detectionModes);
+        for (const id of ['lowlight', 'thermographic', 'ultrasound', 'augmentedReality']) delete next[id];
+        next.basicSight = { enabled: false, range: null };
+        delete next.lightPerception;
+        next.astralPerception = { enabled: true, range };
+        return next;
+    }
+
+    static detectionModeUpdate(
+        current: Record<string, { enabled: boolean; range: number | null }>,
+        next: Record<string, { enabled: boolean; range: number | null }>,
+    ) {
+        const update = foundry.utils.deepClone(next) as Record<string, unknown>;
+        for (const id of Object.keys(current)) {
+            if (!(id in next)) update[`-=${id}`] = null;
+        }
+        return update;
+    }
+
+    static metersToSceneUnits(meters: number, sceneUnit: string) {
+        const normalizedUnit = sceneUnit.trim().toLowerCase() as keyof typeof LENGTH_UNIT_TO_METERS_MULTIPLIERS;
+        const multiplier = LENGTH_UNIT_TO_METERS_MULTIPLIERS[normalizedUnit];
+        return multiplier ? meters / multiplier : meters;
+    }
+
+    static senseRange(token: TokenDocument) {
+        return Math.max(token.sight.range ?? 0, SENSE_RANGE);
+    }
+
+    private static worldSettingEnabled() {
+        return game.settings.get(SYSTEM_NAME, FLAGS.AutomaticTokenSenses);
+    }
+
+    static refreshTokenSource(token: TokenDocument) {
+        if (!this.isRefreshEnabled(token) || !token.actor) return false;
+        const source = token.toObject();
+        const range = this.senseRange(token);
+        const astralActive = !!token.getFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision) || isAstralForm(token);
+        const detectionModes = astralActive
+            ? this.reconcileAstralDetectionModes(source.detectionModes, range)
+            : this.reconcileDetectionModes(
+                source.detectionModes,
+                PerceptionResolver.resolve(token.actor),
+                range,
+                token.parent?.grid.units,
+            );
+        token.updateSource({
+            detectionModes: this.detectionModeUpdate(source.detectionModes, detectionModes) as any,
+        });
+        if (token.parent !== canvas.scene) return false;
+        token.object?.initializeSources();
+        return true;
+    }
+
+    private static tokensFor(document: RefreshDocument): TokenDocument[] {
+        if (document instanceof TokenDocument) return [document];
+        const owner = document instanceof ActiveEffect ? document.parent : document;
+        const actor = owner instanceof SR5Item ? owner.actor : owner;
+        if (!(actor instanceof SR5Actor)) return [];
+
+        return game.scenes.contents.flatMap(scene => scene.tokens.filter(token => token.actor === actor));
+    }
+
+    private static flush() {
+        const tokens = [...this.pendingTokens];
+        this.pendingTokens.clear();
+        this.refreshTokens(tokens);
+    }
+}
