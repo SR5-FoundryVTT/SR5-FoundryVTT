@@ -241,6 +241,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (technology) {
             ModifiableValue.calcTotal(technology.conceal);
             TechnologyPrep.prepareCost(technology);
+            TechnologyPrep.prepareEssence(technology);
             TechnologyPrep.prepareAvailability(technology);
             TechnologyPrep.calculateAttributes(this.system.attributes!);
         }

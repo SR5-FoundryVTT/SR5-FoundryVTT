@@ -2,6 +2,7 @@ import { SR5 } from "@/module/config";
 import { SR5Item } from "../../SR5Item";
 import { ModifiableValue } from "../../../mods/ModifiableValue";
 import { DataDefaults } from "@/module/data/DataDefaults";
+import { Helpers } from "@/module/helpers";
 import { TechnologyType } from "src/module/types/template/Technology";
 import { ItemAvailabilityFlow } from "../../flows/ItemAvailabilityFlow";
 import { AttributesPrep } from "@/module/actor/prep/functions/AttributesPrep";
@@ -114,5 +115,10 @@ export const TechnologyPrep = {
      */
     prepareCost(technology: TechnologyType) {
         ModifiableValue.calcTotal(technology.cost, { decimal: true });
+    },
+
+    /** Calculate essence values */
+    prepareEssence(technology: TechnologyType) {
+        technology.essence.value = Helpers.roundTo(ModifiableValue.calcTotal(technology.essence, { decimal: true }), 4);
     },
 }

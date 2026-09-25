@@ -1,5 +1,4 @@
 import { SR } from "../../constants";
-import { Helpers } from "../../helpers";
 import type { SR5Item } from "../SR5Item";
 import { ModifiableValue } from "@/module/mods/ModifiableValue";
 
@@ -33,7 +32,7 @@ export const WarePrep = {
             return essence + (mod.system.essence * quantity);
         }, 0);
 
-        system.technology.essence.value = system.technology.essence.base + modificationEssence;
+        ModifiableValue.setUnique(system.technology.essence, 'SR5.ItemTypes.Modification', modificationEssence, { type: 'add' });
     },
 
     /**
@@ -52,23 +51,18 @@ export const WarePrep = {
         }
 
         if (grade === 'standard') {
-            system.technology.essence.base = system.essence;
+            ModifiableValue.remove(system.technology.essence, 'SR5.Grade');
             ModifiableValue.remove(system.technology.cost, 'SR5.Grade');
             ModifiableValue.remove(system.technology.availability, 'SR5.Grade');
             return;
         }
 
         const essenceMod = SR.gradeModifiers[grade].essence ?? 1;
-        const availMod = SR.gradeModifiers[grade].avail ?? 0;
         const costMod = SR.gradeModifiers[grade].cost ?? 1;
+        const availMod = SR.gradeModifiers[grade].avail ?? 0;
 
-        // Alter essence values.
-        const floatEssence = Number(system.essence || 0) * essenceMod;
-        const actualEssence = Helpers.roundTo(floatEssence, 4);
-
+        ModifiableValue.addUnique(system.technology.essence, 'SR5.Grade', essenceMod, { type: 'multiply', priority: ModifiableValue.Priority.GRADE });
         ModifiableValue.addUnique(system.technology.cost, 'SR5.Grade', costMod, { type: 'multiply', priority: ModifiableValue.Priority.GRADE });
         ModifiableValue.setUnique(system.technology.availability, 'SR5.Grade', availMod, { type: 'add', priority: ModifiableValue.Priority.GRADE });
-
-        system.technology.essence.base = actualEssence;
     },
 }

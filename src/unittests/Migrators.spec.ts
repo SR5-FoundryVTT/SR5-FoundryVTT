@@ -927,8 +927,32 @@ export const Migrators = (context: QuenchBatchContext) => {
                 restriction: 'restricted',
                 label: '6R',
             });
-            assert.deepEqual(item.system.technology.essence, { base: 0, value: 0 });
+            assert.deepEqual(item.system.technology.essence, { base: 0, value: 0, changes: [] });
             assert.notProperty(item.system.technology, 'calculated');
+        });
+
+        it('moves ware essence into technology essence base', () => {
+            const migrator = new Version0_38_0();
+            const item: any = {
+                type: 'cyberware',
+                system: {
+                    essence: 0.5,
+                    grade: 'alpha',
+                    technology: {
+                        cost: 500,
+                        availability: '6R',
+                        calculated: {
+                            essence: { value: 0.4, adjusted: false },
+                            cost: { value: 500, adjusted: false },
+                            availability: { value: '6R', adjusted: false },
+                        },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+
+            assert.deepEqual(item.system.technology.essence, { base: 0.5, value: 0.5, changes: [] });
         });
 
         it('turns an adjusted cost into a rating multiplier effect and keeps existing effects', () => {

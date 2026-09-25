@@ -34,8 +34,8 @@ export class Version0_38_0 extends VersionMigration {
         if (!calculated) return;
 
         // Essence moved out of the removed calculated block.
-        const essence = calculated.essence?.value ?? 0;
-        technology.essence ??= { base: essence, value: essence };
+        const essence = Number(item.system.essence ?? calculated.essence?.value) || 0;
+        technology.essence ??= { base: essence, value: essence, changes: [] };
 
         // "adjusted" multiplied cost/availability by rating; keep that as an item effect the user can see and remove.
         for (const field of ['cost', 'availability'] as const) {
