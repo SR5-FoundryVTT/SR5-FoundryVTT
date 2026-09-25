@@ -385,7 +385,7 @@ export class CompendiumBrowser extends BaseClass {
         const { uuid } = target?.closest<HTMLElement>("[data-uuid]")?.dataset ?? {};
         if (!uuid) return;
 
-        const { type } = foundry.utils.parseUuid(uuid);
+        const type = foundry.utils.parseUuid(uuid)?.type;
         event.dataTransfer?.setData("text/plain", JSON.stringify({ type, uuid }));
     }
 

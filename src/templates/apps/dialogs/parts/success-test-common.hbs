@@ -4,17 +4,16 @@
     <div class="common-test">
         <span class="test-code">
             {{#if test.codeTerms.pool.length}}
-                {{#each test.codeTerms.pool as |term|}}
-                    <span class="test-code-term {{#if term.tooltipSource}}has-tooltip{{/if}}" {{#if term.tooltipSource}}data-tooltip-source="{{term.tooltipSource}}"{{/if}}>{{term.text}}</span>{{#unless @last}} + {{/unless}}
-                {{/each}}
+                {{> 'systems/shadowrun5e/dist/templates/rolls/parts/test-code-terms.hbs' terms=test.codeTerms.pool detailed=true}}
             {{else}}
                 <span class="test-code-term">{{test.pool.value}}</span>
             {{/if}}
-            {{#if test.codeTerms.limit.length}}
-                [{{#each test.codeTerms.limit as |term|}}<span class="test-code-term {{#if term.tooltipSource}}has-tooltip{{/if}}" {{#if term.tooltipSource}}data-tooltip-source="{{term.tooltipSource}}"{{/if}}>{{term.text}}</span>{{#unless @last}} + {{/unless}}{{/each}}]
+            {{#if (and test.hasLimit test.codeTerms.limit.length)}}
+                [{{> 'systems/shadowrun5e/dist/templates/rolls/parts/test-code-terms.hbs' terms=test.codeTerms.limit detailed=true}}]
             {{/if}}
+            {{! The dialog keeps a zero threshold visible, as it shows the value next to the name. }}
             {{#if test.codeTerms.threshold.length}}
-                ({{#each test.codeTerms.threshold as |term|}}<span class="test-code-term {{#if term.tooltipSource}}has-tooltip{{/if}}" {{#if term.tooltipSource}}data-tooltip-source="{{term.tooltipSource}}"{{/if}}>{{term.text}}</span>{{#unless @last}} + {{/unless}}{{/each}})
+                ({{> 'systems/shadowrun5e/dist/templates/rolls/parts/test-code-terms.hbs' terms=test.codeTerms.threshold detailed=true}})
             {{/if}}
         </span>
     </div>

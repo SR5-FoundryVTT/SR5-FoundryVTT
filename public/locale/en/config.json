@@ -1440,6 +1440,7 @@
         "HardenedArmor": "Hardened Armor",
         "Help": "Help",
         "Hits": "Hits",
+        "HitsBought": "Hits Bought",
         "Host": {
             "Attributes": "Host Attributes",
             "CustomAttributes": "Custom Attributes",

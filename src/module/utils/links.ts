@@ -93,12 +93,12 @@ export class LinksHelpers {
     static async openSourceByUuid(source: string | undefined) {
         if (!source) return;
 
-        const resolvedUuid = foundry.utils.parseUuid(source);
+        const resolvedUuid = foundry.utils.parseUuid(source)?.uuid;
 
         type docType = foundry.abstract.Document.ImplementationFor<CONST.ALL_DOCUMENT_TYPES>;
-        const uuid = resolvedUuid.uuid.split('#')[0];
-        const anchor = resolvedUuid.uuid.split('#')[1] as string | undefined;
-        const document = await fromUuid(uuid) as docType | null;
+        const uuid = resolvedUuid?.split('#')[0];
+        const anchor = resolvedUuid?.split('#')[1];
+        const document = uuid ? await fromUuid(uuid) as docType | null : null;
 
         if (!document) {
             ui.notifications.error('SR5.SourceFieldEmptyError', { localize: true });
@@ -113,7 +113,7 @@ export class LinksHelpers {
             else
                 ui.notifications.error(`The document has no associated sheet.`);
         } catch (error) {
-            ui.notifications.error(`Error opening the sheet for UUID: ${resolvedUuid.uuid}`, error as any);
+            ui.notifications.error(`Error opening the sheet for UUID: ${resolvedUuid}`, error as any);
         }
     }
 
