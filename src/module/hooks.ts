@@ -181,8 +181,6 @@ export class HooksManager {
         // time preset would otherwise scan every record per tick.
         Hooks.on('updateWorldTime', foundry.utils.debounce(() => { void ExtendedTestDueFlow.announceDue(); }, 250));
 
-        Hooks.on('renderChatLog', HooksManager.chatLogListeners.bind(HooksManager));
-
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();
         TagifyHooks.registerHooks();
@@ -638,17 +636,6 @@ ___________________
     }
 
     /**
-     * Register renderChatMessage Hooks using FoundryVTT Hooks.on for each registered test type.
-     *
-     * This will avoid calling the same method on different types twice.
-     *
-     * Must be called on 'ready' or after game.shadowrun is registered.
-     */
-    static renderChatMessage() {
-        console.debug('Shadowrun5e | Registering new chat messages related hooks');
-    }
-
-    /**
      * Extend rendering of Sidebar tab 'CompendiumDirectory' by
      * - the Chummer Compendium Import button
      * 
@@ -747,14 +734,6 @@ ___________________
         await JournalEnrichers.messageRequestHooks(html);
         await MatrixNetworkFlow.chatMessageListeners(message, html, data);
         await ExtendedTestDueFlow.chatMessageListeners(message, html);
-    }
-
-    static async chatLogListeners(chatLog: ChatLog, html, data) {
-        await SuccessTest.chatLogListeners(chatLog, html, data);
-        await OpposedTest.chatLogListeners(chatLog, html, data);
-        await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
-        await TeamworkTest.chatLogListeners(chatLog, html);
-        await JournalEnrichers.chatlogRequestHooks(html);
     }
 
     static configureVision() {
