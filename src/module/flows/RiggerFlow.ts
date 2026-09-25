@@ -194,7 +194,7 @@ export const RiggerFlow = {
                                   data-tooltip="${game.i18n.localize('SR5.Rigger.ResistDumpShock')}"
                                   data-damage-value="${damageValue}"
                                   data-damage-type="${damageType}"
-                                  data-damage-biofeedback="true"
+                                  data-damage-biofeedback="${damageType}"
                                   data-damage-ap="0"
                                   data-damage-element=""
                                   data-target-uuid="${driver.uuid}">
@@ -212,7 +212,12 @@ export const RiggerFlow = {
             style: CONST.CHAT_MESSAGE_STYLES.OTHER
         });
 
-        await driver.toggleStatusEffect('sr5disoriented', { active: true });
+        const effect = await driver.toggleStatusEffect('sr5disoriented', { active: true });
+        if (effect instanceof ActiveEffect) {
+            const willpower = driver.findAttribute('willpower')?.value ?? driver.system.attributes?.willpower?.value ?? 0;
+            const durationSeconds = Math.max(1, 10 - willpower) * 60;
+            await effect.update({ duration: { value: durationSeconds, units: 'seconds' } });
+        }
         await this.jumpOut(driver, vehicle);
     },
 

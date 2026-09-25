@@ -10,6 +10,7 @@ import { CombatRules } from "@/module/rules/CombatRules";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { ResonsanceRules } from "@/module/rules/ResonanceRules";
 import { RiggerFlow } from "@/module/flows/RiggerFlow";
+import { SYSTEM_NAME } from "@/module/constants";
 
 type DamageElement = Item.SystemOfType<'weapon'>['action']['damage']['element']['base'];
 
@@ -292,10 +293,29 @@ export class DamageApplicationFlow {
 
         const { rest } = DamageApplicationFlow._calcDamageOverflow(damage, track);
 
-        if (device)
+        if (device) {
             await DamageApplicationFlow._addDamageToDeviceTrack(rest, device);
-        if (actor.isType('ic', 'sprite'))
+            const condition = device.getCondition();
+            if (condition && condition.value >= condition.max) {
+                const jumpedUuid = actor.getFlag(SYSTEM_NAME, 'jumpedInVehicleUuid') as string | undefined;
+                if (jumpedUuid) {
+                    const vehicle = (await fromUuid(jumpedUuid)) as SR5Actor | null;
+                    if (vehicle && vehicle.isType('vehicle')) {
+                        await RiggerFlow.ejectDriver(vehicle, true);
+                    }
+                }
+            }
+        }
+
+        if (actor.isType('ic', 'sprite', 'vehicle')) {
             await DamageApplicationFlow._addDamageToTrack(actor, rest, track);
+            if (actor.isType('vehicle') && actor.system.controlMode === 'rigger') {
+                const updatedTrack = actor.getMatrixTrack();
+                if (updatedTrack && updatedTrack.value >= updatedTrack.max) {
+                    await RiggerFlow.ejectDriver(actor, true);
+                }
+            }
+        }
         return undefined;
     }
 

@@ -112,6 +112,25 @@ export const ActiveSensorLockFlow = {
                 }
             }
         }
+    },
+
+    /**
+     * Remove Active Sensor Lock status effect from a target actor/token (e.g. after successful evasion).
+     */
+    async removeSensorLock(target: SR5Actor | SR5Token | SR5TokenDocument) {
+        if (!target) return;
+        let targetActor: SR5Actor | null = null;
+        if (target instanceof SR5Actor) {
+            targetActor = target;
+        } else if (target instanceof SR5Token || target instanceof SR5TokenDocument) {
+            targetActor = target.actor;
+        }
+        if (!targetActor) return;
+
+        const lockEffects = targetActor.effects.filter(e => e.statuses.has('sr5sensorLock') || Boolean(e.getFlag('shadowrun5e', 'isSensorLock')));
+        for (const e of lockEffects) {
+            await e.delete();
+        }
     }
 };
 
