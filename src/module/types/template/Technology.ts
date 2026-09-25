@@ -1,5 +1,5 @@
 import { SR5 } from "@/module/config";
-import { ModifiableValueSchema } from "./Base";
+import { BaseValuePair, ModifiableValueSchema } from "./Base";
 import { ConditionData } from "./Condition";
 import { MatrixMasterData } from "./MatrixNetwork";
 import { TechnologyAttributes } from "./Attributes";
@@ -9,9 +9,14 @@ const { SchemaField, NumberField, BooleanField, StringField, DocumentUUIDField }
 export const TechnologyData = () => ({
     // === Basic Info ===
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
-    availability: new StringField({ required: true }),
+    max_rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    availability: new ModifiableField({
+        ...ModifiableValueSchema(),
+        restriction: new StringField({ required: true, nullable: false, initial: 'none', choices: SR5.availabilityRestrictions }),
+        label: new StringField({ required: true, nullable: false, initial: '0' }),
+    }),
     quantity: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
-    cost: new NumberField({ required: true, nullable: false, initial: 0 }),
+    cost: new ModifiableField(ModifiableValueSchema({ integer: false })),
     equipped: new BooleanField(),
 
     // === Condition & Concealment ===
@@ -26,21 +31,8 @@ export const TechnologyData = () => ({
     }),
     master: new DocumentUUIDField({ blank: true, required: true, nullable: false }),
 
-    // === Calculated Values ===
-    calculated: new SchemaField({
-        essence: new SchemaField({
-            value: new NumberField({ required: true, nullable: false, initial: 0 }),
-            adjusted: new BooleanField({ initial: false }),
-        }),
-        availability: new SchemaField({
-            value: new StringField({ required: true }),
-            adjusted: new BooleanField({ initial: false }),
-        }),
-        cost: new SchemaField({
-            value: new NumberField({ required: true, nullable: false, initial: 0 }),
-            adjusted: new BooleanField({ initial: false }),
-        }),
-    }),
+    // === Essence ===
+    essence: new SchemaField(BaseValuePair({ integer: false })),
 });
 
 export const TechnologyPartData = () => ({
@@ -50,3 +42,4 @@ export const TechnologyPartData = () => ({
 });
 
 export type TechnologyType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof TechnologyData>>;
+export type AvailabilityValueType = TechnologyType['availability'];

@@ -1,5 +1,5 @@
 import {SR} from "../constants";
-import {ModifiableValue} from "../mods/ModifiableValue";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import {Helpers} from "../helpers";
 import {SoakRules} from "./SoakRules";
 import {SR5Actor} from "../actor/SR5Actor";
@@ -160,11 +160,11 @@ export class CombatRules {
 
         // Keep base and modification intact, only overwriting the result.
         ModifiableValue.add(
-            modifiedDamage, 'SR5.TestResults.Success', 0, { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
+            modifiedDamage, 'SR5.TestResults.Success', 0, { type: 'override', priority: ModifiableValue.Priority.TOP }
         );
         ModifiableValue.calcTotal(modifiedDamage, { min: 0 });
         ModifiableValue.add(
-            modifiedDamage.ap, 'SR5.TestResults.Success', 0, { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
+            modifiedDamage.ap, 'SR5.TestResults.Success', 0, { type: 'override', priority: ModifiableValue.Priority.TOP }
         );
         ModifiableValue.calcTotal(modifiedDamage.ap);
         modifiedDamage.type.value = 'physical';
