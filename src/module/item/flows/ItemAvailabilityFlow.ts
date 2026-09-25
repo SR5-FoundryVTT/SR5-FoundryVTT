@@ -33,7 +33,7 @@ export const ItemAvailabilityFlow = {
 
         avail = avail.replace(/\([+-]\d{1,2}\)$/, '');
 
-        const availParts = /^(\d+)(.*)$/.exec(avail);
+        const availParts = /^(\d+)([RF]?)$/i.exec(avail);
         if (!availParts)
             return { isValid: false, availability: avail, restriction: 'none' } as const;
 

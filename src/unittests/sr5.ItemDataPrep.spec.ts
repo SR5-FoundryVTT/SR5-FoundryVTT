@@ -7,6 +7,13 @@ import { TechnologyPrep } from "../module/item/prep/functions/TechnologyPrep";
 import { ArmorPrep } from "../module/item/prep/functions/ArmorPrep";
 import { ModifiableValue } from "../module/mods/ModifiableValue";
 import { Version0_38_0 } from "../module/migrator/versions/Version0_38_0";
+import { ChummerFormulaParser } from '../module/apps/itemImport/helper/ChummerFormula';
+import { Parser } from '../module/apps/itemImport/parser/Parser';
+import { DynamicValueEvaluator } from '../module/effect/DynamicValueEvaluator';
+import { BonusHelper } from '../module/apps/itemImport/helper/BonusHelper';
+import type { BonusSchema } from '../module/apps/itemImport/schema/BonusSchema';
+import type { DocCreateData } from '../module/apps/itemImport/helper/BonusConstant';
+import { ItemAvailabilityFlow } from '../module/item/flows/ItemAvailabilityFlow';
 
 /**
  * Tests involving data preparation for SR5Item types.
@@ -17,6 +24,166 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
     const assert: Chai.AssertStatic = context.assert;
 
     after(async () => { await factory.destroy(); });
+
+    describe('Chummer formula import', () => {
+        it('imports fixed cost and mixed availability as rating-dependent item effects', async () => {
+            class DeviceParser extends Parser<'device'> {
+                protected readonly parseType = 'device';
+                protected async getFolder() { return { id: null } as unknown as Folder; }
+            }
+            const source = await new DeviceParser().Parse({
+                id: { _TEXT: 'e13eb55b-e957-426a-85ba-1943a936bdf9' },
+                name: { _TEXT: 'Rating lookup' },
+                rating: { _TEXT: '3' },
+                cost: { _TEXT: 'FixedValues(39000,149000,217000)' },
+                avail: { _TEXT: 'FixedValues(8R,12R,20F)' },
+                wirelessbonus: {
+                    specificskill: { name: { _TEXT: 'Pistols' }, bonus: { _TEXT: '2' } },
+                },
+            } as never, 'Gear') as Item.CreateData;
+            assert.isTrue((source.effects as ActiveEffect.CreateData[]).some(effect => effect.system?.onlyForWireless));
+            const { folder: _folder, ...itemData } = source;
+            const device = await factory.createItem({ ...itemData, type: 'device' });
+
+            assert.strictEqual(device.system.technology.cost.value, 39000);
+            assert.strictEqual(device.system.technology.availability.label, '8R');
+            await device.update({ system: { technology: { rating: 2 } } });
+            device.prepareData();
+            assert.strictEqual(device.system.technology.cost.value, 149000);
+            assert.strictEqual(device.system.technology.availability.label, '12R');
+            await device.update({ system: { technology: { rating: 3 } } });
+            device.prepareData();
+            assert.strictEqual(device.system.technology.availability.label, '20F');
+            device.prepareData();
+            assert.strictEqual(device.system.technology.cost.value, 217000);
+
+            const wireless = device.effects.find(effect => effect.system.onlyForWireless)!;
+            assert.isTrue(wireless.isSuppressed);
+            await device.update({ system: { technology: { wireless: 'online' } } });
+            assert.isFalse(wireless.isSuppressed);
+        });
+
+        it('translates arithmetic and Chummer boolean casts without accepting parent references', () => {
+            const formula = ChummerFormulaParser.parse('4000 * Rating - 2000 * number(Rating > 1)');
+            assert.exists(formula);
+            assert.strictEqual(DynamicValueEvaluator.evaluate(formula!.value, path =>
+                path === 'system.technology.rating' ? 2 : undefined), 6000);
+            assert.isNull(ChummerFormulaParser.parse('Weapon Cost * Rating'));
+            assert.isNull(ChummerFormulaParser.parse('Rating * Body'));
+            assert.isFalse(ItemAvailabilityFlow.parseAvailability('12R or Gear').isValid);
+            const slots = ChummerFormulaParser.parse('FixedValues(4,8)')!;
+            assert.strictEqual(DynamicValueEvaluator.evaluate(slots.value, path =>
+                path === 'system.technology.rating' ? 3 : undefined), 8);
+        });
+
+        it('separates own capacity, parent capacity and parent-relative values', async () => {
+            assert.deepEqual(ChummerFormulaParser.splitCapacity('8/[6]'), { own: '8', used: '6' });
+            assert.deepEqual(ChummerFormulaParser.splitCapacity('Rating/[1]'), { own: 'Rating', used: '1' });
+            assert.deepEqual(ChummerFormulaParser.splitCapacity('[-Rating]'), { used: '-Rating' });
+            assert.deepEqual(ChummerFormulaParser.splitCapacity('4'), { own: '4' });
+            assert.isTrue(ChummerFormulaParser.isRelative('+(Rating * 2)'));
+            assert.isTrue(ChummerFormulaParser.isRelative('[-Rating]'));
+            assert.isFalse(ChummerFormulaParser.isRelative('Rating * 2'));
+            assert.strictEqual(ChummerFormulaParser.firstAlternative('12R or Gear'), '12R');
+            assert.strictEqual(ChummerFormulaParser.variableMinimum('Variable(50-500)'), 50);
+            assert.strictEqual(ChummerFormulaParser.classify('20000 + (99 * Gear Cost)'), 'requires child item');
+            assert.strictEqual(ChummerFormulaParser.classify('Parent Cost * 5'), 'requires parent item');
+            assert.strictEqual(ChummerFormulaParser.classify('1000 + 4000*number(Body >= 4)'), 'requires vehicle stats');
+            assert.strictEqual(ChummerFormulaParser.classify('(Rating - MinRating + 1) * 5000'), 'requires metatype minimum');
+            assert.strictEqual(ChummerFormulaParser.classify('[*]'), 'wildcard');
+
+            assert.isNull(ChummerFormulaParser.parse('Slots * 100'));
+            const slotCost = ChummerFormulaParser.parse('Slots * 100', { identifiers: { Slots: '@system.slots' } })!;
+            assert.strictEqual(DynamicValueEvaluator.evaluate(slotCost.value, path =>
+                path === 'system.slots' ? 3 : undefined), 300);
+
+            class DeviceParser extends Parser<'device'> {
+                protected readonly parseType = 'device';
+                protected async getFolder() { return { id: null } as unknown as Folder; }
+            }
+            const parse = async (data: Record<string, string>) => {
+                const source = await new DeviceParser().Parse({
+                    id: { _TEXT: 'e13eb55b-e957-426a-85ba-1943a936bdf9' },
+                    name: { _TEXT: 'Chummer device' },
+                    ...Object.fromEntries(Object.entries(data).map(([key, _TEXT]) => [key, { _TEXT }])),
+                } as never, 'Gear') as Item.CreateData;
+                const effects = (source.effects ?? []) as { system?: { changes?: { key: string }[] } }[];
+                return {
+                    technology: (source.system as Item.SystemOfType<'device'>).technology,
+                    changes: effects.flatMap(effect => effect.system?.changes ?? []).map(change => change.key),
+                };
+            };
+
+            const relative = await parse({ rating: '6', avail: '+(Rating *2)', cost: 'Rating * 100' });
+            assert.notInclude(relative.changes, 'system.technology.availability');
+            assert.include(relative.changes, 'system.technology.cost');
+            assert.strictEqual(relative.technology.availability.label, '+(Rating *2)');
+
+            const alternative = await parse({ avail: '12R or Gear', cost: 'Variable(50-500)' });
+            assert.strictEqual(alternative.technology.availability.base, 12);
+            assert.strictEqual(alternative.technology.availability.restriction, 'restricted');
+            assert.strictEqual(alternative.technology.cost.base, 50);
+
+            const fromCharacter = await parse({ rating: '{STRMaximum}' });
+            assert.strictEqual(fromCharacter.technology.rating, 1);
+            assert.strictEqual(fromCharacter.technology.max_rating, 0);
+        });
+
+        it('calculates ware essence and capacity after item formula effects', async () => {
+            const essence = ChummerFormulaParser.parse('Rating * 0.1')!;
+            const capacity = ChummerFormulaParser.parse('Rating * 4')!;
+            const ware = await factory.createItem({
+                type: 'cyberware',
+                system: {
+                    grade: 'alpha', capacity: { total: 0 },
+                    technology: { rating: 2, availability: { base: 0, restriction: 'restricted' } },
+                },
+                effects: [{
+                    name: 'Chummer formulas',
+                    system: {
+                        targets: [{ id: 'item', applyTo: 'item' }],
+                        changes: [
+                            { key: 'system.technology.essence', value: essence.value, type: 'override', priority: ModifiableValue.Priority.RATING, target: 'item' },
+                            { key: 'system.capacity.total', value: capacity.value, type: 'override', target: 'item' },
+                            { key: 'system.technology.cost', value: '@system.technology.rating * 1000', type: 'override', priority: ModifiableValue.Priority.RATING, target: 'item' },
+                            { key: 'system.technology.availability', value: '@system.technology.rating * 3', type: 'override', priority: ModifiableValue.Priority.RATING, target: 'item' },
+                        ],
+                    },
+                }],
+            });
+            ware.prepareData();
+            assert.closeTo(ware.system.technology.essence.value, 0.16, 0.00001);
+            assert.strictEqual(ware.system.capacity.total, 8);
+            assert.strictEqual(ware.system.technology.cost.value, 2400);
+            assert.strictEqual(ware.system.technology.availability.label, '8R');
+            await ware.update({ system: { technology: { rating: 3 } } });
+            ware.prepareData();
+            assert.closeTo(ware.system.technology.essence.value, 0.24, 0.00001);
+            assert.strictEqual(ware.system.capacity.total, 12);
+            assert.strictEqual(ware.system.technology.cost.value, 3600);
+            assert.strictEqual(ware.system.technology.availability.label, '11R');
+            await ware.update({ system: { grade: 'standard' } });
+            ware.prepareData();
+            assert.closeTo(ware.system.technology.essence.value, 0.3, 0.00001);
+            assert.strictEqual(ware.system.technology.cost.value, 3000);
+            assert.strictEqual(ware.system.technology.availability.label, '9R');
+        });
+
+        it('imports supported wireless and reputation bonuses as effects', () => {
+            const wireless = { name: 'Wireless gear', system: { technology: { rating: 1 } }, effects: [] } as unknown as DocCreateData;
+            BonusHelper.addBonus(wireless, {
+                specificskill: { name: { _TEXT: 'Pistols' }, bonus: { _TEXT: '2' } },
+            } as BonusSchema, { onlyForWireless: true });
+            assert.isTrue(wireless.effects![0].system.onlyForWireless);
+
+            const quality = { name: 'Blandness', system: {}, effects: [] } as unknown as DocCreateData;
+            BonusHelper.addBonus(quality, {
+                notoriety: { _TEXT: '-1' }, publicawareness: { _TEXT: '-2' },
+            } as BonusSchema);
+            assert.deepEqual(quality.effects!.map(effect => effect.system.changes[0].key),
+                ['system.notoriety', 'system.public_awareness']);
+        });
+    });
 
     describe('TechnologyData preparation', () => {
         it('Calculate the correct device item condition monitor', async () => {

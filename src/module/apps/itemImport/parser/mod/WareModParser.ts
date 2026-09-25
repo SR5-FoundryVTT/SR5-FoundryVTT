@@ -1,6 +1,7 @@
 import { Parser } from '../Parser';
 import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
+import { ChummerFormulaParser } from '../../helper/ChummerFormula';
 import { Bioware, BiowareSchema } from '../../schema/BiowareSchema';
 import { Cyberware, CyberwareSchema } from '../../schema/CyberwareSchema';
 
@@ -24,7 +25,7 @@ export class WareModParser extends Parser<'modification'> {
         const system = this.getBaseSystem();
 
         system.type = 'ware';
-        system.slots = parseInt(jsonData.capacity._TEXT.replace(/[[\]]/g, '')) || 0;
+        system.slots = Number(ChummerFormulaParser.usedCapacity(jsonData.capacity._TEXT)) || 0;
         
         if ('addtoparentess' in jsonData) {
             system.essence = parseFloat(jsonData.ess._TEXT) || 0;

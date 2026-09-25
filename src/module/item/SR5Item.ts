@@ -237,6 +237,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         super.prepareDerivedData();
         this.applyItemActiveEffects();
 
+        if (this.isType('bioware', 'cyberware'))
+            WarePrep.prepareDerivedData(this.system, this.getEquippedMods());
+
         const technology = this.getTechnologyData();
         if (technology) {
             ModifiableValue.calcTotal(technology.conceal);

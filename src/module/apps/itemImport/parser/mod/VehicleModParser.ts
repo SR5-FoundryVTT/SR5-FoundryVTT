@@ -12,9 +12,9 @@ export class VehicleModParser extends Parser<'modification'> {
 
         system.modification_category = jsonData.category._TEXT?.toLowerCase() as any;
 
-        const slots = jsonData.slots._TEXT.match(/[0-9]\.?[0-9]*/g);
-        if (slots)
-            system.slots = Number(slots[0]);
+        const slots = Number(jsonData.slots._TEXT);
+        if (Number.isFinite(slots))
+            system.slots = slots;
 
         return system;
     }

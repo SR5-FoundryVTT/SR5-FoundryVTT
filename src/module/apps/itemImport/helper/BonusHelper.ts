@@ -3,8 +3,16 @@ import { Constants } from "../importer/Constants";
 import { BonusSchema } from "../schema/BonusSchema";
 import { ImportHelper as IH } from "./ImportHelper";
 import { SkillNamingFlow } from "@/module/flows/SkillNamingFlow";
+import { ChummerImportCoverage } from './ChummerImportCoverage';
 
 export class BonusHelper {
+    /** Chummer bonus keys that addEffects turns into effects. */
+    private static readonly handledBonuses = new Set<string>([
+        ...Object.keys(BC.BonusConstant.simpleEffects),
+        'conditionmonitor', 'limitmodifier', 'skillattribute', 'skillcategory',
+        'skillgroup', 'specificattribute', 'specificskill',
+    ]);
+
     private static normalizeValue(sheet: BC.DocCreateData, value: string | number): string {
         if (typeof value === 'number')
             return value.toString();
@@ -118,9 +126,22 @@ export class BonusHelper {
         });
     }
 
-    public static addBonus(sheet: BC.DocCreateData, bonus?: BonusSchema): void {
+    public static addBonus(sheet: BC.DocCreateData, bonus?: BonusSchema, options: { onlyForWireless?: boolean } = {}): void {
         if (!bonus) return;
+        const start = sheet.effects?.length ?? 0;
         this.addEffects(sheet, bonus);
+        if (options.onlyForWireless) {
+            for (const effect of sheet.effects?.slice(start) ?? []) {
+                effect.system ??= {};
+                effect.system.onlyForWireless = true;
+            }
+        }
+        const block = options.onlyForWireless ? 'wirelessbonus' : 'bonus';
+        for (const key of Object.keys(bonus)) {
+            if (key === '$') continue;
+            if (this.handledBonuses.has(key)) ChummerImportCoverage.add(`${block}.${key}`);
+            else ChummerImportCoverage.skip(`${block}.${key}: no faithful target`, sheet.name ?? 'unnamed');
+        }
     }
 
     private static addEffects(sheet: BC.DocCreateData, bonus: BonusSchema): void {
@@ -239,10 +260,16 @@ export class BonusHelper {
                 const excludedSkill = this.normalizeSkillName(skillCategory.exclude?._TEXT ?? "");
 
                 type Keys = keyof typeof BC.BonusConstant.skillCategoryTable;
-                const skills = BC.BonusConstant.skillCategoryTable[skillCategory.name._TEXT as Keys]
-                                .filter(skillId => !excludedSkill || skillId !== excludedSkill);
+                const categoryName = skillCategory.name._TEXT === 'Social'
+                    ? 'Social Active' : skillCategory.name._TEXT;
+                const categorySkills = BC.BonusConstant.skillCategoryTable[categoryName as Keys];
+                if (!categorySkills) {
+                    ChummerImportCoverage.skip('bonus.skillcategory: unknown category', `${sheet.name}: ${categoryName}`);
+                    continue;
+                }
+                const skills = categorySkills.filter(skillId => !excludedSkill || skillId !== excludedSkill);
 
-                if (!skills?.length)
+                if (!skills.length)
                     console.log("Error skillcategory:", skillCategory.name._TEXT);
                 else
                     this.createEffect(
