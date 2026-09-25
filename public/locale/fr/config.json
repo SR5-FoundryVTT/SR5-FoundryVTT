@@ -468,21 +468,19 @@
             "ClearModifiers": "Effacer les modificateurs personnels",
             "Extreme": "Combinaison de plusieurs conditions à -6",
             "Glare": {
-                "Good": "Pas d'éblouissement",
                 "Heavy": "Éblouissement aveuglant",
                 "Light": "Éblouissement faible",
-                "Moderate": "Éblouissement modéré",
-                "Title": "Éblouissement"
+                "Moderate": "Éblouissement modéré"
             },
             "Light": {
-                "Good": "Pleine lumière",
                 "Heavy": "Obscurité totale",
                 "Light": "Lumière partielle",
-                "Moderate": "Lumière faible",
-                "Title": "Lumière"
+                "Moderate": "Lumière faible"
             },
             "LightGlare": {
-                "Hint": "La lumière et l'éblouissement partagent une colonne : seul le pire des deux compte."
+                "Good": "Pleine lumière/Pas d'éblouissement",
+                "Hint": "Choisissez la moitié lumière ou éblouissement : elle détermine quel équipement compense.",
+                "Title": "Lumière/Éblouissement"
             },
             "Modifier": {
                 "Title": "Modificateur"
@@ -1518,13 +1516,11 @@
                     "Contribution": "Visibilité régionale"
                 },
                 "Light": {
-                    "Label": "Lumière",
-                    "Hint": "Conditions de lumière dans cette région.",
+                    "Label": "Lumière / Éblouissement",
+                    "Hint": "Conditions de lumière ou d’éblouissement dans cette région.",
                     "Contribution": "Lumière régionale"
                 },
                 "Glare": {
-                    "Label": "Éblouissement",
-                    "Hint": "Conditions d’éblouissement dans cette région.",
                     "Contribution": "Éblouissement régional"
                 },
                 "Wind": {

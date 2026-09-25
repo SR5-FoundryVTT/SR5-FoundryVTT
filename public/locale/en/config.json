@@ -1200,21 +1200,19 @@
             "ClearModifiers": "Clear personal modifiers",
             "Extreme": "Combination of two or more conditions at the heavy level",
             "Glare": {
-                "Good": "No Glare",
                 "Heavy": "Blinding Glare",
                 "Light": "Weak Glare",
-                "Moderate": "Moderate Glare",
-                "Title": "Glare"
+                "Moderate": "Moderate Glare"
             },
             "Light": {
-                "Good": "Full Light",
                 "Heavy": "Total Darkness",
                 "Light": "Partial Light",
-                "Moderate": "Dim Light",
-                "Title": "Light"
+                "Moderate": "Dim Light"
             },
             "LightGlare": {
-                "Hint": "Light and glare share one column: only the worse of both counts."
+                "Good": "Full Light/No Glare",
+                "Hint": "Pick the light or the glare half: it decides which gear compensates.",
+                "Title": "Light/Glare"
             },
             "Modifier": {
                 "Title": "Modifier"
@@ -3449,13 +3447,11 @@
                     "Contribution": "Regional visibility"
                 },
                 "Light": {
-                    "Label": "Light",
-                    "Hint": "Light condition inside this Region.",
+                    "Label": "Light / Glare",
+                    "Hint": "Light or glare condition inside this Region.",
                     "Contribution": "Regional light"
                 },
                 "Glare": {
-                    "Label": "Glare",
-                    "Hint": "Glare condition inside this Region.",
                     "Contribution": "Regional glare"
                 },
                 "Wind": {

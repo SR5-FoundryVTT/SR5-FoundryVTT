@@ -1191,21 +1191,19 @@
             "ClearModifiers": "Entferne eigene Modifikatoren",
             "Extreme": "Zwei oder mehr Modifikatoren der Stufe Schwer",
             "Glare": {
-                "Good": "Keine Blendung",
                 "Heavy": "Starke Blendung",
                 "Light": "Schwache Blendung",
-                "Moderate": "Mittlere Blendung",
-                "Title": "Blendung"
+                "Moderate": "Mittlere Blendung"
             },
             "Light": {
-                "Good": "Gute Beleuchtung",
                 "Heavy": "Völlige Dunkelheit",
                 "Light": "Teilbeleuchtung",
-                "Moderate": "Schwache Beleuchtung",
-                "Title": "Beleuchtung"
+                "Moderate": "Schwache Beleuchtung"
             },
             "LightGlare": {
-                "Hint": "Beleuchtung und Blendung teilen sich eine Spalte: Nur der schlechtere Wert zählt."
+                "Good": "Gute Beleuchtung/Keine Blendung",
+                "Hint": "Wähle die Beleuchtungs- oder die Blendungshälfte: Sie entscheidet, welche Ausrüstung ausgleicht.",
+                "Title": "Beleuchtung/Blendung"
             },
             "Modifier": {
                 "Title": "Modifikator"
@@ -3420,13 +3418,11 @@
                     "Contribution": "Regionale Sichtverhältnisse"
                 },
                 "Light": {
-                    "Label": "Licht",
-                    "Hint": "Lichtverhältnisse innerhalb dieser Region.",
+                    "Label": "Licht / Blendung",
+                    "Hint": "Licht- oder Blendverhältnisse innerhalb dieser Region.",
                     "Contribution": "Regionales Licht"
                 },
                 "Glare": {
-                    "Label": "Blendung",
-                    "Hint": "Blendverhältnisse innerhalb dieser Region.",
                     "Contribution": "Regionale Blendung"
                 },
                 "Wind": {

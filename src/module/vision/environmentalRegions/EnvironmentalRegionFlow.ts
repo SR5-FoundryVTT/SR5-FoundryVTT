@@ -62,9 +62,14 @@ export class EnvironmentalRegionFlow {
             physical: physicalBehaviors.reduce((strongest, behavior) => {
                 const data = this.dataOf(behavior);
                 strongest.visibility = Math.min(strongest.visibility, this.levelValue(data.visibility));
-                strongest.light = Math.min(strongest.light, this.levelValue(data.light));
-                strongest.glare = Math.min(strongest.glare, this.levelValue(data.glare));
                 strongest.wind = Math.min(strongest.wind, this.levelValue(data.wind));
+                // Light and glare are one column: the worst region sets it, the later one on a tie.
+                const [kind, level] = data.lightGlare.split('-');
+                const value = this.levelValue((level ?? 'none') as EnvironmentLevel);
+                if (value < 0 && value <= Math.min(strongest.light, strongest.glare)) {
+                    strongest.light = kind === 'light' ? value : 0;
+                    strongest.glare = kind === 'glare' ? value : 0;
+                }
                 return strongest;
             }, { ...EMPTY_PHYSICAL }),
         };

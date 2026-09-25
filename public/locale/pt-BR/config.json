@@ -626,21 +626,19 @@
             "ClearModifiers": "Limpar modificadores pessoais",
             "Extreme": "Combinação de duas ou mais condições no nível pesado",
             "Glare": {
-                "Good": "Sem Clarão",
                 "Heavy": "Clarão Cegante",
                 "Light": "Clarão Fraco",
-                "Moderate": "Clarão Moderado",
-                "Title": "Clarão"
+                "Moderate": "Clarão Moderado"
             },
             "Light": {
-                "Good": "Luz Total",
                 "Heavy": "Escuridão Total",
                 "Light": "Luz Parcial",
-                "Moderate": "Luz Fraca",
-                "Title": "Luz"
+                "Moderate": "Luz Fraca"
             },
             "LightGlare": {
-                "Hint": "Luz e clarão compartilham uma coluna: apenas o pior dos dois conta."
+                "Good": "Luz Total/Sem Clarão",
+                "Hint": "Escolha a metade de luz ou de clarão: ela decide qual equipamento compensa.",
+                "Title": "Luz/Clarão"
             },
             "Modifier": {
                 "Title": "Modificador"
@@ -2191,13 +2189,11 @@
                     "Contribution": "Visibilidade regional"
                 },
                 "Light": {
-                    "Label": "Luz",
-                    "Hint": "Condição de luz dentro desta Região.",
+                    "Label": "Luz / Ofuscamento",
+                    "Hint": "Condição de luz ou ofuscamento dentro desta Região.",
                     "Contribution": "Luz regional"
                 },
                 "Glare": {
-                    "Label": "Ofuscamento",
-                    "Hint": "Condição de ofuscamento dentro desta Região.",
                     "Contribution": "Ofuscamento regional"
                 },
                 "Wind": {

@@ -179,16 +179,23 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                 assert.equal(envMod.total, -1);
             });
 
-            it('count light and glare as a single column', () => {
+            it('keep a single selection in the light/glare column', () => {
                 const envMod = new EnvironmentalModifier();
-                envMod.apply({source: {active: {light: -1, glare: -1}}});
+                envMod.apply();
+
+                envMod.setActive('glare', -3);
+                assert.deepInclude(envMod.source.active, {light: 0, glare: -3});
+                envMod.setActive('light', -1);
+                assert.deepInclude(envMod.source.active, {light: -1, glare: 0});
+                envMod.apply({reapply: true});
                 assert.equal(envMod.total, -1);
 
-                envMod.apply({source: {active: {light: -1, glare: -3}}});
-                assert.equal(envMod.total, -3);
+                envMod.setInactive('light');
+                assert.notProperty(envMod.source.active, 'light');
+                assert.notProperty(envMod.source.active, 'glare');
 
                 envMod.apply({source: {active: {glare: -3, wind: -3}}});
-                assert.equal(envMod.total, -6);
+                assert.equal(envMod.total, -6, 'glare counts toward the table like light');
             });
 
             it('compensate light and glare by vision system', () => {
@@ -199,13 +206,17 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                     return envMod.applied.active;
                 };
 
-                assert.deepInclude(compensate({light: -3, glare: -3}, lowLightVision), {light: 0, glare: -3});
+                assert.deepInclude(compensate({light: -3}, lowLightVision), {light: 0});
+                assert.deepInclude(compensate({glare: -3}, lowLightVision), {glare: -3}, 'low-light does not help against glare');
                 assert.deepInclude(compensate({glare: -6}, flareCompensation), {glare: -1});
-                assert.deepInclude(compensate({light: -1, glare: -3}, sunglasses), {light: -3, glare: -1});
+                assert.deepInclude(compensate({light: -6}, flareCompensation), {light: -6}, 'flare compensation does not help in darkness');
+                assert.deepInclude(compensate({glare: -3}, sunglasses), {glare: -1});
+                assert.deepInclude(compensate({light: -1}, sunglasses), {light: -3}, 'sunglasses make darkness worse');
+                assert.deepInclude(compensate({glare: -6}, thermographicVision), {glare: -6}, 'thermographic does not help against glare');
                 assert.deepInclude(compensate({light: -6}, thermographicVision, lowLightVision), {light: -3},
                     'vision systems do not stack');
-                assert.deepInclude(compensate({light: -1, glare: -3}, sunglasses, lowLightVision), {light: 0, glare: -1},
-                    'each condition uses its best system');
+                assert.deepInclude(compensate({light: -1}, sunglasses, lowLightVision), {light: 0},
+                    'the best system counts');
             });
         });
         
@@ -289,6 +300,38 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
 
                 assert.strictEqual(modifiers.environmental.applied.active.light, 0);
                 assert.strictEqual(total, modifiers.environmental.levels.good);
+            });
+
+            it('let an actor light/glare selection replace the scene one', async () => {
+                const scene = await factory.createScene({});
+                const sceneModifiers = DocumentSituationModifiers.fromDocument(scene);
+                sceneModifiers.environmental.setActive('light', -3);
+                await sceneModifiers.updateDocument();
+
+                const actor = await factory.createActor({type: 'character'});
+                const [token] = await scene.createEmbeddedDocuments('Token', [{actorId: actor.id, actorLink: false, x: 0, y: 0}]);
+                const modifiers = token.actor!.getSituationModifiers();
+                modifiers.environmental.apply({reapply: true});
+                assert.deepInclude(modifiers.environmental.applied.active, {light: -3}, 'scene light is inherited');
+
+                modifiers.environmental.setActive('glare', -1);
+                modifiers.environmental.apply({reapply: true});
+                assert.deepInclude(modifiers.environmental.applied.active, {light: 0, glare: -1});
+                assert.strictEqual(modifiers.environmental.total, -1);
+
+                modifiers.environmental.toggleSelection('light', 0);
+                modifiers.environmental.apply({reapply: true});
+                assert.deepInclude(modifiers.environmental.applied.active, {light: 0, glare: 0}, 'neutral replaces glare');
+                assert.strictEqual(modifiers.environmental.total, 0);
+
+                modifiers.environmental.toggleSelection('light', 0);
+                modifiers.environmental.apply({reapply: true});
+                assert.deepInclude(modifiers.environmental.applied.active, {light: 0, glare: 0}, 'neutral stays selected');
+
+                modifiers.environmental.setInactive('light');
+                modifiers.environmental.apply({reapply: true});
+                assert.deepInclude(modifiers.environmental.applied.active, {light: -3}, 'scene light is back');
+                assert.strictEqual(modifiers.environmental.total, -3);
             });
 
             it('apply actor senses once, with or without a matching effect', async () => {

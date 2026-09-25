@@ -163,6 +163,7 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
             closeOnSubmit: false,
         },
         position: {
+            width: 720,
             height: 'auto' as const,
         },
         window: {

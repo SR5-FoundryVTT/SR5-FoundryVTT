@@ -27,8 +27,22 @@ const EnvironmentalRegionData = () => ({
     backgroundCount: RatingField('BackgroundCount'),
     matrixNoise: RatingField('MatrixNoise'),
     visibility: LevelField('Visibility'),
-    light: LevelField('Light'),
-    glare: LevelField('Glare'),
+    lightGlare: new StringField({
+        required: true,
+        nullable: false,
+        initial: 'none',
+        choices: {
+            none: 'SR5.Vision.EnvironmentalRegions.Level.None',
+            'light-light': 'SR5.EnvModifiersApplication.Light.Light',
+            'light-moderate': 'SR5.EnvModifiersApplication.Light.Moderate',
+            'light-heavy': 'SR5.EnvModifiersApplication.Light.Heavy',
+            'glare-light': 'SR5.EnvModifiersApplication.Glare.Light',
+            'glare-moderate': 'SR5.EnvModifiersApplication.Glare.Moderate',
+            'glare-heavy': 'SR5.EnvModifiersApplication.Glare.Heavy',
+        },
+        label: 'SR5.Vision.EnvironmentalRegions.Light.Label',
+        hint: 'SR5.Vision.EnvironmentalRegions.Light.Hint',
+    }),
     wind: LevelField('Wind'),
 });
 

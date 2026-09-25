@@ -1190,21 +1190,19 @@
             "ClearModifiers": "개인 수정치 초기화",
             "Extreme": "두 가지 이상의 극단적 상태가 조합됨",
             "Glare": {
-                "Good": "눈부심 없음",
                 "Heavy": "극심한 눈부심",
                 "Light": "약한 눈부심",
-                "Moderate": "적당한 눈부심",
-                "Title": "눈부심"
+                "Moderate": "적당한 눈부심"
             },
             "Light": {
-                "Good": "완전 밝음",
                 "Heavy": "완전 어두움",
                 "Light": "부분적으로 밝음",
-                "Moderate": "어둑함",
-                "Title": "빛"
+                "Moderate": "어둑함"
             },
             "LightGlare": {
-                "Hint": "빛과 눈부심은 한 열을 공유합니다. 둘 중 더 나쁜 값만 적용됩니다."
+                "Good": "완전 밝음/눈부심 없음",
+                "Hint": "빛 또는 눈부심 쪽을 고르세요. 어떤 장비가 보정하는지가 이것으로 정해집니다.",
+                "Title": "빛/눈부심"
             },
             "Modifier": {
                 "Title": "수정치"
@@ -3423,13 +3421,11 @@
                     "Contribution": "지역 시야"
                 },
                 "Light": {
-                    "Label": "조명",
-                    "Hint": "이 지역 안의 조명 상태입니다.",
+                    "Label": "조명 / 눈부심",
+                    "Hint": "이 지역 안의 조명 또는 눈부심 상태입니다.",
                     "Contribution": "지역 조명"
                 },
                 "Glare": {
-                    "Label": "눈부심",
-                    "Hint": "이 지역 안의 눈부심 상태입니다.",
                     "Contribution": "지역 눈부심"
                 },
                 "Wind": {

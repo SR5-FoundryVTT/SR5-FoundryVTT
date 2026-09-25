@@ -24,8 +24,7 @@ const environment = (
     backgroundCount: 0,
     matrixNoise: 0,
     visibility: 'none',
-    light: 'none',
-    glare: 'none',
+    lightGlare: 'none',
     wind: 'none',
     ...overrides,
 });
@@ -91,6 +90,12 @@ export const shadowrunVisionEnvironmentalRegions = (context: QuenchBatchContext)
                 system: environment({ visibility: 'invalid' as any }),
             }]);
             assert.isEmpty(invalid, 'unknown physical condition levels are rejected');
+
+            const invalidLight = await region.createEmbeddedDocuments('RegionBehavior', [{
+                type: ENVIRONMENT_REGION_BEHAVIOR,
+                system: environment({ lightGlare: 'invalid' as any }),
+            }]);
+            assert.isEmpty(invalidLight, 'unknown light or glare choices are rejected');
         });
 
         it('uses one behavior for all environmental fields and their distinct overlap rules', async () => {
@@ -101,7 +106,7 @@ export const shadowrunVisionEnvironmentalRegions = (context: QuenchBatchContext)
                 backgroundCount: 2,
                 matrixNoise: 3,
                 visibility: 'moderate',
-                light: 'light',
+                lightGlare: 'light-light',
             }));
             await createRegion(scene, environment({
                 backgroundCount: 5,
@@ -124,7 +129,7 @@ export const shadowrunVisionEnvironmentalRegions = (context: QuenchBatchContext)
                 system: { situation_modifiers: { environmental: { active: { visibility: -1, wind: -3 } } } },
             });
             const token = await createToken(scene, actor.id, 100, 100);
-            await createRegion(scene, environment({ visibility: 'moderate', light: 'light', wind: 'light' }));
+            await createRegion(scene, environment({ visibility: 'moderate', lightGlare: 'light-light', wind: 'light' }));
 
             const modifiers = actor.getSituationModifiers(token);
             assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), -6);
@@ -137,7 +142,7 @@ export const shadowrunVisionEnvironmentalRegions = (context: QuenchBatchContext)
             const scene = await createScene();
             const actor = await factory.createActor({ type: 'character', system: {} });
             const token = await createToken(scene, actor.id, 100, 100);
-            await createRegion(scene, environment({ light: 'moderate' }));
+            await createRegion(scene, environment({ lightGlare: 'light-moderate' }));
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: '#QUENCH Low Light Vision',
                 system: {
@@ -158,14 +163,39 @@ export const shadowrunVisionEnvironmentalRegions = (context: QuenchBatchContext)
                 system: { visibilityChecks: { capabilities: { physical: { lowLight: true } } } },
             });
             const token = await createToken(scene, actor.id, 100, 100);
-            const { behavior } = await createRegion(scene, environment({ light: 'moderate' }));
+            const { behavior } = await createRegion(scene, environment({ lightGlare: 'light-moderate' }));
 
             const modifiers = actor.getSituationModifiers(token);
             assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), 0, 'low-light vision compensates dim light');
 
-            await behavior.update({ system: { light: 'none', glare: 'moderate' } });
+            await behavior.update({ system: { lightGlare: 'glare-moderate' } });
             assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), -3, 'low-light does not help against glare');
             assert.strictEqual(modifiers.environmental.applied.active.glare, -3);
+        });
+
+        it('treats regional light and glare as one column', async () => {
+            const scene = await createScene();
+            const actor = await factory.createActor({
+                type: 'character',
+                system: { situation_modifiers: { environmental: { active: { light: -1, glare: 0 } } } },
+            });
+            const token = await createToken(scene, actor.id, 100, 100);
+            await createRegion(scene, environment({ lightGlare: 'light-light' }));
+            const { behavior } = await createRegion(scene, environment({ lightGlare: 'glare-moderate' }));
+
+            assert.deepInclude(EnvironmentalRegionFlow.ratingsAtToken(token).physical, { light: 0, glare: -3 },
+                'the worst region sets the column');
+
+            const modifiers = actor.getSituationModifiers(token);
+            assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), -3);
+            assert.deepInclude(modifiers.environmental.applied.active, { light: 0, glare: -3 },
+                'regional glare replaces the milder light selection');
+
+            await behavior.update({ system: { lightGlare: 'none' } });
+            await actor.update({ system: { situation_modifiers: { environmental: { active: { light: -6, glare: 0 } } } } } as any);
+            const worse = actor.getSituationModifiers(token);
+            assert.strictEqual(worse.getTotalFor('environmental', { reapply: true }), -6);
+            assert.deepInclude(worse.environmental.applied.active, { light: -6, glare: 0 }, 'a worse selection stays');
         });
 
         it('uses the exact source token and does not persist ratings to a linked actor', async () => {
