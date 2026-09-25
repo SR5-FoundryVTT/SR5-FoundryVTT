@@ -1,7 +1,7 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
 import { SuccessTest } from '../tests/SuccessTest';
 import { TestCreator } from '../tests/TestCreator';
-import { activateOnKey } from '../utils/dom';
+import { activateOnKey, isElementInstance } from '../utils/dom';
 
 /**
  * The system needs a place to override default ChatMessage behaviors, making it necessary to replace the default implementation.
@@ -77,7 +77,7 @@ export class SR5ChatMessage extends ChatMessage<'base'> {
      */
     private static _promoteCardHeader(html: HTMLElement, firstCard: HTMLElement, messageHeader: HTMLElement) {
         const cardHeader = firstCard.firstElementChild;
-        if (!(cardHeader instanceof HTMLElement) || !cardHeader.matches('.card-header')) return;
+        if (!isElementInstance(cardHeader, HTMLElement) || !cardHeader.matches('.card-header')) return;
 
         cardHeader.classList.add('sr5-message-system-header');
         messageHeader.prepend(cardHeader);
