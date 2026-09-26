@@ -10,7 +10,7 @@ export const hasValidWeaponRanges = (ranges: RangesTemplateType): boolean => {
 
     for (const key of RANGE_KEYS) {
         const distance = ranges[key].distance;
-        if (!Number.isFinite(distance) || distance < previousDistance) return false;
+        if (!Number.isFinite(distance) || distance <= previousDistance) return false;
         previousDistance = distance;
     }
 
