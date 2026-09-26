@@ -12,6 +12,7 @@ import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicati
 
 export interface TestDialogLike {
     render: (...args: any[]) => unknown
+    applyFormData?: () => void
 }
 
 /**

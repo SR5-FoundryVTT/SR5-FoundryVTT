@@ -643,6 +643,7 @@
 
         .card-content--metrics {
             cursor: pointer;
+            flex-flow: row wrap;
 
             // Handlebars whitespace prevents using :empty.
             .left-side:not(:has(*)),
@@ -652,18 +653,19 @@
 
             .metric-row--template .value-result {
                 color: var(--sr5-card-accent);
-            }
 
-            .place-template {
-                color: var(--sr5-card-accent);
-                font-size: 1.05rem;
-                line-height: 1;
-                padding: 0 0.1rem;
-
-                &:hover {
-                    text-shadow: 0 0 8px rgba(variables.$yellow, 0.55);
+                .template-preview-button {
+                    color: var(--sr5v2-text-primary);
                 }
             }
+
+        }
+
+        .scatter-metrics-row {
+            display: flex;
+            flex: 1 1 100%;
+            width: 100%;
+            gap: 0.5rem;
         }
 
         .card-content--results {

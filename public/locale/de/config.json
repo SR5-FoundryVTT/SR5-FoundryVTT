@@ -83,6 +83,15 @@
     },
     "SR5": {
         "AP": "DK",
+        "Scatter": {
+            "Title": "Streuung",
+            "Grenade": "Granatenstreuung",
+            "Spell": "Streuung indirekter Kampfzauber",
+            "Rolls": "Streuungswürfe",
+            "Direction": "Richtung",
+            "Distance": "Entfernung",
+            "RolledDistance": "Gewürfelte Entfernung"
+        },
         "Accessory": "Zubehör",
         "Accuracy": "Präz.",
         "Action": "Handlung",
@@ -1152,6 +1161,9 @@
         "DmgTypeMatrix": "Matrix",
         "DmgTypePhysical": "Körperlich",
         "DmgTypeStun": "Geistig",
+        "DmgCodeMatrix": "M",
+        "DmgCodePhysical": "K",
+        "DmgCodeStun": "G",
         "Dodge": "Ausweichen",
         "DontApplyWounds": "Wunden nicht anwenden",
         "Drain": "Entzug",
@@ -2964,6 +2976,23 @@
             "SpiritType": "Geistart"
         },
         "Suppressing": "Sperrfeuer",
+        "SuppressiveFire": {
+            "Label": "Sperrfeuer",
+            "Mode": "Sperrfeuer-Modus",
+            "Modes": {
+                "Double": "Doppelt (20 m)",
+                "Enhanced": "Verstärkt (5 m)",
+                "Normal": "Normal (10 m)"
+            }
+        },
+        "Shotgun": {
+            "Label": "Schrotflinten-Choke",
+            "Choke": {
+                "Narrow": "Eng",
+                "Medium": "Mittel",
+                "Wide": "Weit"
+            }
+        },
         "Tabs": {
             "Actor": {
                 "Actions": "Aktionen",
@@ -3246,7 +3275,10 @@
                 "RecoilAfterAttack": "Kumulativer Rückstoß nach diesem Angriff",
                 "RecoilBeforeAttack": "Kumulativer Rückstoß jetzt, vor dem Angriff",
                 "RecoilCompensation": "Gesamte RK, inklusive RK der Waffe",
-                "ResetRecoil": "Setze kumulativen Rückstoß zurück"
+                "ResetRecoil": "Setze kumulativen Rückstoß zurück",
+                "ShowSuppressiveFireTemplate": "Unterdrückungsfeuerkegel platzieren",
+                "ShowShotgunTemplate": "Schrotkegel platzieren",
+                "ShowWeaponRanges": "Waffenreichweiten anzeigen"
             },
             "Ritual": {
                 "Force": "Kraftstufe des Rituals",
@@ -3382,6 +3414,7 @@
         "WalkingSpeed": "Gehen",
         "Warnings": {
             "ActorMissingRequirements": "Der Akteur muss die Voraussetzung der Fertigkeit erfüllen: erwacht oder emergiert",
+            "InvalidWeaponRanges": "Waffenreichweiten müssen aufsteigend sein und über null enden.",
             "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
             "AlreadyJoinedNetwork": "bereits mit dem Netzwerk {name} verbunden",
             "BulkImportPerformanceWarning": "Wenn du eine große Anzahl von Items importiert hast, kann Foundry langsam laufen, bis du deinen Browser aktualisierst. Es wird empfohlen, jetzt zu aktualisieren.",
@@ -3497,6 +3530,10 @@
                     }
                 },
                 "thrown": {
+                    "thrown_type": {
+                        "hint": "Typ der Wurfwaffe für die Streuweite. Für Wurfwaffen ohne Explosionswirkung leer lassen.",
+                        "label": "Wurfwaffentyp"
+                    },
                     "blast": {
                         "dropoff": {
                             "hint": "Schadensreduktion pro Meter Distanz zur Explosion",

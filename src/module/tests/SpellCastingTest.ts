@@ -7,6 +7,8 @@ import ModifierTypes = Shadowrun.ModifierTypes;
 import { DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 import { SR5Item } from "../item/SR5Item";
+import { getItemScatterKind } from "../rules/ScatterRules";
+import { BlastTemplateFlow } from './flows/BlastTemplateFlow';
 
 
 export interface SpellCastingTestData extends SuccessTestData {
@@ -23,6 +25,10 @@ export interface SpellCastingTestData extends SuccessTestData {
  */
 export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
     public override item: SR5Item<'spell'> | undefined = undefined;
+    public blastTemplateFlow = new BlastTemplateFlow(this, {
+        getBlastData: () => this.getBlastData(),
+        canScatter: () => getItemScatterKind(this.item) !== undefined,
+    });
 
     override _prepareData(data: DeepPartial<SpellCastingTestData>, options: Partial<TestOptions>): SpellCastingTestData {
         const prepared = super._prepareData(data, options);
@@ -48,6 +54,10 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
      */
     override get canBeExtended() {
         return false;
+    }
+
+    get canPlaceBlastTemplate(): boolean {
+        return this.blastTemplateFlow.canPlace;
     }
 
     static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
@@ -89,6 +99,29 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         this.prepareInitialForceValue();
 
         await super.prepareDocumentData();
+    }
+
+    getBlastData() {
+        if (!this.item?.isAreaOfEffect()) return this.item?.getBlastData();
+
+        return {
+            radius: Number(this.data.force) * (this.item.system.extended ? 10 : 1),
+            dropoff: 0,
+        };
+    }
+
+    override _testDialogListeners() {
+        return [...super._testDialogListeners(), ...this.blastTemplateFlow.dialogListeners()];
+    }
+
+    override async _cleanUpAfterDialogCancel() {
+        await this.blastTemplateFlow.cancelPreview();
+        await super._cleanUpAfterDialogCancel();
+    }
+
+    override async _cleanUpAfterDialog() {
+        await this.blastTemplateFlow.finalizePreview();
+        await super._cleanUpAfterDialog();
     }
 
     /**
