@@ -100,7 +100,11 @@ export type ScatterKind = 'grenade_standard' |  'grenade_aerodynamic' | 'grenade
  * A grenade thrown by hand or an indirect combat spell can scatter on a failed test.
  */
 export function getItemScatterKind(item: SR5Item | undefined): ScatterKind | undefined {
-    if (item?.isGrenade()) return item.system.thrown.thrown_type as ScatterKind;
+    if (item?.isGrenade()) {
+        const thrownType = item.system.thrown.thrown_type;
+        if (thrownType === 'grenade_standard' || thrownType === 'grenade_aerodynamic') return thrownType;
+        return undefined;
+    }
     if (item?.isCombatSpell() && item.system.combat.type === 'indirect') return 'spell';
 
     return undefined;

@@ -25,13 +25,17 @@ export const scatterRulesTesting = (context: QuenchBatchContext) => {
             });
         });
 
-        it('reads the thrown weapon scatter type from thrown_type', () => {
-            const item = {
+        it('accepts only configured grenade scatter types', () => {
+            const getGrenade = (thrownType: string) => ({
                 isGrenade: () => true,
-                system: { thrown: { thrown_type: 'grenade_standard' } },
-            } as unknown as SR5Item;
+                isCombatSpell: () => false,
+                system: { thrown: { thrown_type: thrownType } },
+            } as unknown as SR5Item);
 
-            assert.equal(getItemScatterKind(item), 'grenade_standard');
+            assert.equal(getItemScatterKind(getGrenade('grenade_standard')), 'grenade_standard');
+            assert.equal(getItemScatterKind(getGrenade('grenade_aerodynamic')), 'grenade_aerodynamic');
+            assert.isUndefined(getItemScatterKind(getGrenade('')));
+            assert.isUndefined(getItemScatterKind(getGrenade('unconfigured')));
         });
 
         it('rejects values outside the 2d6 direction result', () => {
