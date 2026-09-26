@@ -24,16 +24,6 @@ type RegionShape = {
     updateSource: (data: Record<string, unknown>) => void
 };
 
-// TODO: fvtt-types v14 RegionLayer lacks the placeRegion and _cancelPlacement declarations.
-type RegionLayerV14 = typeof canvas.regions & {
-    placeRegion: (data: Record<string, unknown>, options: {
-        create: boolean
-        allowRotation: boolean
-        onMove: (args: { position: Point, shape: RegionShape }) => false
-    }) => Promise<foundry.documents.RegionDocument | null>
-    _cancelPlacement?: () => void
-};
-
 /**
  * Handles the placement of a suppressive-fire cone with a selected outer width.
  */
@@ -124,8 +114,7 @@ export class SuppressiveFireTemplateFlow {
         };
         this.#width = meters;
 
-        const regions = canvas.regions as RegionLayerV14;
-        this.#placement = regions.placeRegion({
+        this.#placement = canvas.regions.placeRegion({
             name: game.i18n.localize('SR5.SuppressiveFire.Label'),
             color: game.user?.color?.toString() ?? '#ffffff',
             shapes: [{
@@ -168,8 +157,7 @@ export class SuppressiveFireTemplateFlow {
     cancelPreview() {
         if (!this.#placement) return;
 
-        const regions = canvas.regions as RegionLayerV14;
-        regions._cancelPlacement?.();
+        canvas.regions._cancelPlacement();
         this.#placement = undefined;
     }
 

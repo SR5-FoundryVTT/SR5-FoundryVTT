@@ -36,16 +36,6 @@ type RegionShape = {
     updateSource: (data: Record<string, unknown>) => void
 };
 
-// TODO: fvtt-types v14 RegionLayer lacks the placeRegion and _cancelPlacement declarations.
-type RegionLayerV14 = typeof canvas.regions & {
-    placeRegion: (data: Record<string, unknown>, options: {
-        create: boolean
-        allowRotation: boolean
-        onMove: (args: { position: Point, shape: RegionShape }) => false
-    }) => Promise<foundry.documents.RegionDocument | null>
-    _cancelPlacement?: () => void
-};
-
 const lightenColor = (color: number): number => {
     const red = (color >> 16) & 0xff;
     const green = (color >> 8) & 0xff;
@@ -164,10 +154,10 @@ export class ShotgunTemplateFlow {
         const rangeIndex = this.#getRangeIndex(initialPointer);
         this.#drawShotgunTemplate(initialPointer);
 
-        const regions = canvas.regions as RegionLayerV14;
-        this.#placement = regions.placeRegion({
+        this.#placement = canvas.regions.placeRegion({
             name: game.i18n.localize('SR5.Shotgun.Label'),
             color: game.user?.color?.toString() ?? '#ffffff',
+            // @ts-expect-error #TODO: fvtt-types v14 
             shapes: [this.#getRegionLine(rangeIndex, 0)],
             elevation: {bottom: null, top: null, topInclusive: null},
             levels: [],
@@ -204,8 +194,7 @@ export class ShotgunTemplateFlow {
     cancelPreview() {
         this.#destroyPreviewOverlay();
         if (this.#placement) {
-            const regions = canvas.regions as RegionLayerV14;
-            regions._cancelPlacement?.();
+            canvas.regions._cancelPlacement();
             this.#placement = undefined;
         }
     }

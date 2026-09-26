@@ -25,10 +25,6 @@ type RegionPlacementEvent = PIXI.FederatedPointerEvent & {
     getLocalPosition: (displayObject: PIXI.DisplayObject) => Point
 };
 
-type RegionLayerV14 = typeof canvas.regions & {
-    preview: PIXI.Container
-};
-
 type RegionCreateEmbeddedDocuments = (
     embeddedName: 'Region',
     data: object[],
@@ -166,7 +162,7 @@ export class BlastTemplateFlow {
         if (this.#placement) {
             const placement = this.#placement;
             this.#placement = undefined;
-            (canvas.regions as RegionLayerV14)._cancelPlacement?.();
+            canvas.regions._cancelPlacement();
             await placement;
         }
         this.clearPreviewState();
@@ -243,11 +239,10 @@ export class BlastTemplateFlow {
         if (!canvas.ready || !canvas.regions || !canvas.grid || !canvas.dimensions) return;
 
         const blast = this.previewData;
-        const regions = canvas.regions as RegionLayerV14;
         this.#blastData = blast;
         this.#center = {x: 0, y: 0};
 
-        const placement = regions.placeRegion({
+        const placement = canvas.regions.placeRegion({
             name: game.i18n.localize('SR5.PlaceTemplate'),
             color: game.user?.color?.toString() ?? '#ffffff',
             shapes: [{
@@ -277,7 +272,7 @@ export class BlastTemplateFlow {
             },
             preConfirm: persistOnConfirm ? undefined : ({event, shape}) => {
                 const placementEvent = event as RegionPlacementEvent;
-                this.#updateCircle(shape as RegionShape, placementEvent.getLocalPosition(regions));
+                this.#updateCircle(shape as RegionShape, placementEvent.getLocalPosition(canvas.regions));
                 const token = this.#getTokenAtPoint(placementEvent);
                 if (token?.id) {
                     canvas.tokens?.setTargets([token.id], {mode: placementEvent.shiftKey ? 'acquire' : 'replace'});
@@ -303,8 +298,8 @@ export class BlastTemplateFlow {
             return null;
         });
 
-        this.#overlay = regions.preview.addChild(new PIXI.Container());
-        this.#graphics = this.#overlay.addChild(new PIXI.Graphics());
+        this.#overlay = canvas.regions.preview!.addChild(new PIXI.Container());
+        this.#graphics = this.#overlay!.addChild(new PIXI.Graphics());
         this.#refreshBlastOverlay();
 
         return this.#placement;
