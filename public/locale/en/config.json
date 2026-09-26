@@ -143,7 +143,8 @@
             "ApplyTos": {
                 "TestTargetingThisActor": "Test Targeting This Actor",
                 "TargetedActor": "Targeted Actor",
-                "TestItem": "Test via Item"
+                "TestItem": "Test via Item",
+                "ParentItem": "Parent Item"
             },
             "CannotAddTestViaItemToActor": "Cannot add an Active Effect of type 'Test via Item' to an Actor",
             "ValueEditor": "Edit Change Value",

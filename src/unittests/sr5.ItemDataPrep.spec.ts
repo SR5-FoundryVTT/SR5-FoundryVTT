@@ -421,6 +421,41 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.technology.cost.value, 500);
         });
 
+        it('parent-item active effects on equipped nested items apply to the parent item', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'weapon',
+                name: 'Parent Weapon',
+                system: { technology: { cost: { base: 500, value: 500 } } },
+            }]) as SR5Item<'weapon'>[];
+
+            await weapon.createNestedItem({
+                type: 'modification',
+                name: 'Nested Mod',
+                system: { technology: { rating: 2, equipped: true, cost: { base: 100, value: 100 } } },
+                effects: [{
+                    name: 'Parent Cost Modifier',
+                    system: {
+                        targets: [{ id: 'parent', applyTo: 'parent_item' }],
+                        changes: [
+                            { key: 'system.technology.cost', value: '@system.technology.rating * 100', type: 'add', target: 'parent' },
+                        ],
+                    },
+                }],
+            } as Item.Source);
+
+            actor.prepareData();
+            actor.prepareData();
+
+            const nested = weapon.items[0] as SR5Item<'modification'>;
+            assert.strictEqual(weapon.system.technology.cost.value, 700);
+            assert.strictEqual(nested.system.technology.cost.value, 100);
+
+            await weapon.updateNestedItems({ _id: nested.id, system: { technology: { equipped: false } } } as Item.UpdateInput);
+            actor.prepareData();
+            assert.strictEqual(weapon.system.technology.cost.value, 500);
+        });
+
         it('does not apply actor-target item effects to the item itself', async () => {
             const device = await factory.createItem({
                 type: 'device',

@@ -258,31 +258,41 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             HostPrep.prepareDerivedData(this.system);
     }
 
+    /**
+     * Apply this item's own item effects, and the parent item effects of its nested items.
+     * Nested items only change their parent while equipped.
+     */
     private applyItemActiveEffects() {
-        for (const effect of allApplicableDocumentEffects(this, { applyTo: ['item'] })) {
-            const changes = effect.changesForApplyTo('item');
+        for (const effect of allApplicableDocumentEffects(this, { applyTo: ['item'] }))
+            this.applyEffectChanges(effect, effect.changesForApplyTo('item'));
 
-            // prepareData can run more than once without a reset() in between, and ModifiableField.applyChange
-            // only pushes entries. Clear this effect's prior contributions from each targeted ModifiableValue
-            // before re-applying, so repeated passes don't double them.
-            const source = ModifiableValue.effectSource(effect);
-            for (const change of changes) {
-                const altered = { ...change } as unknown as ActiveEffect.ChangeData;
-                SR5ActiveEffect.alterChange(this, altered);
-                const value = SR5ActiveEffect.getModifiableValue(this, altered.key ?? '');
-                if (value) ModifiableValue.removeFromSource(value, source);
-            }
+        for (const item of this.items) {
+            for (const effect of allApplicableDocumentEffects(item, { applyTo: ['parent_item'] }))
+                this.applyEffectChanges(effect, effect.changesForApplyTo('parent_item'), item.isEquipped());
+        }
+    }
 
-            if (effect.disabled || effect.isSuppressed) continue;
+    private applyEffectChanges(effect: SR5ActiveEffect, changes: ReturnType<SR5ActiveEffect['changesForApplyTo']>, active = true) {
+        // prepareData can run more than once without a reset() in between, and ModifiableField.applyChange
+        // only pushes entries. Clear this effect's prior contributions from each targeted ModifiableValue
+        // before re-applying, so repeated passes don't double them.
+        const source = ModifiableValue.effectSource(effect);
+        for (const change of changes) {
+            const altered = { ...change } as unknown as ActiveEffect.ChangeData;
+            SR5ActiveEffect.alterChange(this, altered);
+            const value = SR5ActiveEffect.getModifiableValue(this, altered.key ?? '');
+            if (value) ModifiableValue.removeFromSource(value, source);
+        }
 
-            for (const change of changes) {
-                try {
-                    SR5ActiveEffect.applyChange(this, { ...change, effect } as unknown as ActiveEffect.ChangeData);
-                } catch (error) {
-                    console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of item (${this.name}) / id (${this.id})`);
-                    console.error(error);
-                    ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of item (${this.name}) / id (${this.id})`);
-                }
+        if (!active || effect.disabled || effect.isSuppressed) return;
+
+        for (const change of changes) {
+            try {
+                SR5ActiveEffect.applyChange(this, { ...change, effect } as unknown as ActiveEffect.ChangeData);
+            } catch (error) {
+                console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of item (${this.name}) / id (${this.id})`);
+                console.error(error);
+                ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of item (${this.name}) / id (${this.id})`);
             }
         }
     }

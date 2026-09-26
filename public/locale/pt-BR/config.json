@@ -132,7 +132,8 @@
             "ApplyTos": {
                 "TestTargetingThisActor": "Teste que Tem Este Ator como Alvo",
                 "TargetedActor": "Ator Alvo",
-                "TestItem": "Testar via Item"
+                "TestItem": "Testar via Item",
+                "ParentItem": "Item Pai"
             },
             "CannotAddTestViaItemToActor": "Não é possível adicionar um Efeito Ativo do tipo 'Testar via Item' a um Ator",
             "ValueEditor": "Editar valor da mudança",

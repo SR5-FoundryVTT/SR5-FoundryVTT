@@ -349,7 +349,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         }
         if (targetDoc instanceof SR5Item && change.effect instanceof SR5ActiveEffect) {
             const target = change.effect.targetForChange(change as { target?: string });
-            if (target?.applyTo !== 'item') return {};
+            if (target?.applyTo !== 'item' && target?.applyTo !== 'parent_item') return {};
         }
 
         // Skip applying this change if the target key does not exist on the model.

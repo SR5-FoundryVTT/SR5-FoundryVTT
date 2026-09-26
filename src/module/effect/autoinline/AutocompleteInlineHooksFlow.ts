@@ -49,6 +49,8 @@ export const AutocompleteInlineHooksFlow =  {
                 fieldConfigs: [
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-actor ${field}`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-targeted_actor ${field}`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-item ${field}`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor },
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-parent_item ${field}`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterParentItem },
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-test_all ${field}`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-test_item ${field}`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-test_target ${field}`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
@@ -56,6 +58,8 @@ export const AutocompleteInlineHooksFlow =  {
 
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-actor ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-targeted_actor ${field}`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTargetedActorData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-value-item ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-value-parent_item ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-test_all ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-test_item ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-test_target ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
@@ -65,6 +69,8 @@ export const AutocompleteInlineHooksFlow =  {
                 fieldConfigs: [
                     { selector: `.sr5-effect-value-editor__body.autocomplete-value-actor textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
                     { selector: `.sr5-effect-value-editor__body.autocomplete-value-targeted_actor textarea[name$=".value"]`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTargetedActorData},
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-item textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-parent_item textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
                     { selector: `.sr5-effect-value-editor__body.autocomplete-value-test_all textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                     { selector: `.sr5-effect-value-editor__body.autocomplete-value-test_item textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                     { selector: `.sr5-effect-value-editor__body.autocomplete-value-test_target textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
@@ -86,8 +92,9 @@ export const AutocompleteInlineHooksFlow =  {
     },
 
     /**
-     * Getter to show values for apply-to actor.
-     * 
+     * Getter to show values for apply-to actor, item and parent_item, and keys for apply-to item.
+     * Values always resolve against the effect's own document.
+     *
      * @param EffectConfig The effect config supplying the effect context.
      * @returns Either a SR5Actor or SR5Item source object.
      */
@@ -95,6 +102,22 @@ export const AutocompleteInlineHooksFlow =  {
         const effect = EffectConfig.document;
         if (!effect.parent) return {};
         return effect.parent?.toObject();
+    },
+
+    /**
+     * Getter to show keys for apply-to parent_item.
+     *
+     * A nested item shows its containing item. An item that isn't nested yet, like one in a compendium,
+     * has no parent item, so its own data is shown instead.
+     *
+     * @param EffectConfig The effect config supplying the effect context.
+     * @returns The parent item or effect item source object.
+     */
+    keyGetterParentItem: (EffectConfig: ActiveEffectAutocompleteHost) => {
+        const item = EffectConfig.document.parent;
+        if (!(item instanceof SR5Item)) return {};
+        const parent: unknown = item.parent;
+        return parent instanceof SR5Item ? parent.toObject() : item.toObject();
     },
 
     /**
