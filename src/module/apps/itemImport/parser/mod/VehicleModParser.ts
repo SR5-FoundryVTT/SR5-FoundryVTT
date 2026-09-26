@@ -2,9 +2,14 @@ import { Parser } from '../Parser';
 import { Mod } from '../../schema/VehiclesSchema';
 import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
+import { ChummerFormulaParser } from '../../helper/ChummerFormula';
 
 export class VehicleModParser extends Parser<'modification'> {
     protected readonly parseType = 'modification';
+
+    protected override formulaIdentifiers(system: object) {
+        return { ...super.formulaIdentifiers(system), ...ChummerFormulaParser.VEHICLE };
+    }
 
     protected override getSystem(jsonData: Mod) {
         const system = this.getBaseSystem();

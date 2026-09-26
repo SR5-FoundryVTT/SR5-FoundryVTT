@@ -18,6 +18,24 @@ export interface ChummerFormulaOptions {
 export class ChummerFormulaParser {
     static readonly RATING = '@system.technology.rating';
 
+    /** Chummer names for values of the item a modification sits in. */
+    static readonly PARENT_ITEM = {
+        'Weapon Cost': '@parent.system.technology.cost.base',
+        'Armor Cost': '@parent.system.technology.cost.base',
+        Capacity: '@parent.system.capacity.total',
+    };
+
+    /** Chummer names for values of the vehicle a vehicle modification belongs to. */
+    static readonly VEHICLE = {
+        'Vehicle Cost': '@actor.system.cost',
+        Body: '@actor.system.attributes.body.base',
+        Armor: '@actor.system.armor.rating.base',
+        Speed: '@actor.system.vehicle_stats.speed.base',
+        Handling: '@actor.system.vehicle_stats.handling.base',
+        Acceleration: '@actor.system.vehicle_stats.acceleration.base',
+        Sensor: '@actor.system.vehicle_stats.sensor.base',
+    };
+
     static isFormula(value: string): boolean {
         return /FixedValues\s*\(|\{?Rating\}?|[+*/()]/i.test(value) && !/^\s*[+-]?\d+(?:\.\d+)?[RF]?\s*$/i.test(value);
     }
@@ -106,12 +124,15 @@ export class ChummerFormulaParser {
             if (options.minRating == null) return null;
             entry = entry.replace(/\bMinRating\b/gi, String(options.minRating));
         }
-        const paths = Object.entries(options.identifiers ?? {});
-        for (const [identifier, path] of paths)
-            entry = entry.replace(new RegExp(`\\b${identifier}\\b`, 'g'), path);
         // Chummer's number(predicate) casts a comparison to 0 or 1.
         entry = entry.replace(/number\(([^()]*)\)/gi, (_match, predicate: string) =>
             `((${predicate.replace(/(?<![=!<>])=(?!=)/g, '==')}) ? 1 : 0)`);
+        entry = entry.replace(/\bmod\b/g, '%');
+        // Longer names first, so 'Armor Cost' isn't read as 'Armor'. A reference to a missing
+        // document, like the parent of a compendium item, counts as 0.
+        const paths = Object.entries(options.identifiers ?? {}).sort(([a], [b]) => b.length - a.length);
+        for (const [identifier, path] of paths)
+            entry = entry.replace(new RegExp(`\\b${identifier}\\b`, 'g'), `(${path} ?? 0)`);
         if (!/^[\d\s@.\w+*/%()?:<>=!&|,-]+$/.test(entry)) return null;
         // Whitelist identifiers; no arbitrary Chummer field or function may pass through.
         const references = [this.RATING, ...paths.map(([, path]) => path)];

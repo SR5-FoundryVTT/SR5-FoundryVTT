@@ -9,6 +9,8 @@ import { ModifiableValue } from "../module/mods/ModifiableValue";
 import { Version0_38_0 } from "../module/migrator/versions/Version0_38_0";
 import { ChummerFormulaParser } from '../module/apps/itemImport/helper/ChummerFormula';
 import { Parser } from '../module/apps/itemImport/parser/Parser';
+import { WeaponModParser } from '../module/apps/itemImport/parser/mod/WeaponModParser';
+import { VehicleModParser } from '../module/apps/itemImport/parser/mod/VehicleModParser';
 import { DynamicValueEvaluator } from '../module/effect/DynamicValueEvaluator';
 import { BonusHelper } from '../module/apps/itemImport/helper/BonusHelper';
 import type { BonusSchema } from '../module/apps/itemImport/schema/BonusSchema';
@@ -454,6 +456,92 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             await weapon.updateNestedItems({ _id: nested.id, system: { technology: { equipped: false } } } as Item.UpdateInput);
             actor.prepareData();
             assert.strictEqual(weapon.system.technology.cost.value, 500);
+        });
+
+        it('resolves @actor, @parent and @target references for nested items', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { attributes: { body: { base: 5 } } } });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'weapon',
+                name: 'Parent Weapon',
+                system: { technology: { cost: { base: 500, value: 500 } } },
+            }]) as SR5Item<'weapon'>[];
+
+            await weapon.createNestedItem({
+                type: 'modification',
+                name: 'Nested Mod',
+                system: { technology: { equipped: true, cost: { base: 100, value: 100 } } },
+                effects: [{
+                    name: 'References',
+                    system: {
+                        targets: [{ id: 'item', applyTo: 'item' }, { id: 'parent', applyTo: 'parent_item' }],
+                        changes: [
+                            { key: 'system.technology.cost', value: '@parent.system.technology.cost.base * 0.5 + @actor.system.attributes.body.base', type: 'add', target: 'item' },
+                            { key: 'system.technology.cost', value: '@target.system.technology.cost.base * 0.1', type: 'add', target: 'parent' },
+                        ],
+                    },
+                }],
+            } as Item.Source);
+            actor.prepareData();
+
+            const nested = weapon.items[0] as SR5Item<'modification'>;
+            // 100 + half the weapon's 500 base + body 5.
+            assert.strictEqual(nested.system.technology.cost.value, 355);
+            // 500 + 10% of its own base, added by the nested mod.
+            assert.strictEqual(weapon.system.technology.cost.value, 550);
+
+            const standalone = await factory.createItem({
+                type: 'modification',
+                system: { technology: { cost: { base: 100, value: 100 } } },
+                effects: [{
+                    name: 'Missing Parent',
+                    system: {
+                        targets: [{ id: 'item', applyTo: 'item' }],
+                        changes: [{ key: 'system.technology.cost', value: '(@parent.system.technology.cost.base ?? 0) + 1', type: 'add', target: 'item' }],
+                    },
+                }],
+            });
+            standalone.prepareData();
+            assert.strictEqual(standalone.system.technology.cost.value, 101);
+        });
+
+        it('imports parent and vehicle references and parent-relative availability', async () => {
+            class TestWeaponModParser extends WeaponModParser {
+                protected override async getFolder() { return { id: null } as unknown as Folder; }
+            }
+            class TestVehicleModParser extends VehicleModParser {
+                protected override async getFolder() { return { id: null } as unknown as Folder; }
+            }
+            const data = (fields: Record<string, string>) => ({
+                id: { _TEXT: 'e13eb55b-e957-426a-85ba-1943a936bdf9' },
+                name: { _TEXT: 'Chummer mod' },
+                ...Object.fromEntries(Object.entries(fields).map(([key, _TEXT]) => [key, { _TEXT }])),
+            }) as never;
+            const changes = (source: Item.CreateData) => ((source.effects ?? []) as { system?: { changes?: { key: string; value: string; target: string }[] } }[])
+                .flatMap(effect => effect.system?.changes ?? []);
+
+            const accessory = await new TestWeaponModParser().Parse(data({ rating: '2', cost: 'Weapon Cost * Rating', avail: '+2R' }), 'Weapon_Mod') as Item.CreateData;
+            const cost = changes(accessory).find(change => change.key === 'system.technology.cost')!;
+            assert.include(cost.value, '@parent.system.technology.cost.base');
+            const parentAvail = changes(accessory).find(change => change.key === 'system.technology.availability')!;
+            assert.strictEqual(parentAvail.target, 'parent');
+
+            const vehicleMod = await new TestVehicleModParser().Parse(
+                data({ category: 'Body', slots: '1', cost: 'number(Body = 0) * 500 + Body * 1000' }), 'Vehicle_Mod') as Item.CreateData;
+            const vehicleCost = changes(vehicleMod).find(change => change.key === 'system.technology.cost')!;
+            assert.include(vehicleCost.value, '@actor.system.attributes.body.base');
+
+            // The +2R accessory raises its weapon's availability by 2 and makes it restricted.
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'weapon',
+                name: 'Parent Weapon',
+                system: { technology: { availability: { base: 4, value: 4, restriction: 'none' } } },
+            }]) as SR5Item<'weapon'>[];
+            const { folder: _folder, ...accessoryData } = accessory;
+            foundry.utils.setProperty(accessoryData, 'system.technology.equipped', true);
+            await weapon.createNestedItem(accessoryData as Item.Source);
+            actor.prepareData();
+            assert.strictEqual(weapon.system.technology.availability.label, '6R');
         });
 
         it('does not apply actor-target item effects to the item itself', async () => {

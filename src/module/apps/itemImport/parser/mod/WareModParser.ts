@@ -9,6 +9,10 @@ type WareType = 'bioware' | 'cyberware';
 
 export class WareModParser extends Parser<'modification'> {
     protected readonly parseType = 'modification';
+
+    protected override formulaIdentifiers(system: object) {
+        return { ...super.formulaIdentifiers(system), ...ChummerFormulaParser.PARENT_ITEM };
+    }
     protected categories: (BiowareSchema | CyberwareSchema)['categories']['category'];
     protected wareType: WareType;
 

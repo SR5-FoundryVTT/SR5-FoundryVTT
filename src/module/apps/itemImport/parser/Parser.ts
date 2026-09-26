@@ -60,7 +60,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
 
         // Add technology
         if ('technology' in system && system.technology)
-            this.setTechnology(system.technology, jsonData);
+            this.setTechnology(system.technology, jsonData, this.formulaIdentifiers(system));
 
         this.setImporterFlags(entity, jsonData);
 
@@ -92,11 +92,12 @@ export abstract class Parser<SubType extends SystemEntityType> {
         return entity;
     }
 
-    private setTechnology(technology: TechnologyType, jsonData: ParseData) {
+    private setTechnology(technology: TechnologyType, jsonData: ParseData, identifiers: Record<string, string>) {
         if ('avail' in jsonData && jsonData.avail) {
             const raw = ChummerFormulaParser.firstAlternative(jsonData.avail._TEXT || '');
-            const formula = ChummerFormulaParser.isFormula(raw) && !ChummerFormulaParser.isRelative(raw)
-                ? ChummerFormulaParser.parse(raw, { availability: true, minRating: this.getMinRating(jsonData) }) : null;
+            const isFormula = ChummerFormulaParser.isFormula(raw) || Parser.hasIdentifier(raw, identifiers);
+            const formula = isFormula && !ChummerFormulaParser.isRelative(raw)
+                ? ChummerFormulaParser.parse(raw, { availability: true, minRating: this.getMinRating(jsonData), identifiers }) : null;
             Object.assign(technology.availability, ItemAvailabilityFlow.parseAvailabilityString(formula ? '0' : raw));
             if (formula?.restriction && !formula.restriction.startsWith('['))
                 technology.availability.restriction = ItemAvailabilityFlow.normalizeRestriction(formula.restriction);
@@ -134,22 +135,52 @@ export abstract class Parser<SubType extends SystemEntityType> {
         };
     }
 
+    /** Chummer names this item's formulas may use, mapped to effect value references. */
+    protected formulaIdentifiers(system: object): Record<string, string> {
+        return 'slots' in system ? { Slots: '@system.slots' } : {};
+    }
+
+    /** Whether imported items can sit in another item, so parent-relative values can change it. */
+    protected changesParentItem(system: object): boolean {
+        return this.parseType === 'modification' && 'type' in system
+            && ['weapon', 'armor', 'ware'].includes(String(system.type));
+    }
+
+    private static hasIdentifier(raw: string, identifiers: Record<string, string>) {
+        return Object.keys(identifiers).some(identifier => new RegExp(`\\b${identifier}\\b`).test(raw));
+    }
+
     private addFormulaEffects(entity: Item.CreateData, jsonData: ParseData) {
         const system = entity.system;
         if (!system) return;
-        const changes: Array<{ key: string; value: string; type: 'override'; priority: number; target: string }> = [];
+        type FormulaChange = { key: string; value: string; type: 'override' | 'add'; priority?: number; target: 'item' | 'parent' };
+        const changes: FormulaChange[] = [];
         const override = (key: string, value: string) =>
             changes.push({ key, value, type: 'override', priority: ModifiableValue.Priority.RATING, target: 'item' });
         const minRating = this.getMinRating(jsonData);
-        const identifiers: Record<string, string> = 'slots' in system ? { Slots: '@system.slots' } : {};
+        const identifiers = this.formulaIdentifiers(system);
+        const addToParent = (field: string, raw: string, skip: (reason: string) => void) => {
+            const formula = ChummerFormulaParser.parse(raw, { availability: true, minRating, identifiers });
+            if (!formula) return skip(ChummerFormulaParser.classify(raw, { minRating }));
+            changes.push({ key: field, value: formula.value, type: 'add', target: 'parent' });
+            // A restricted modification makes its parent at least restricted, never less than forbidden.
+            const restriction = formula.restriction === 'restricted'
+                ? "@target.system.technology.availability.restriction == 'forbidden' ? 'forbidden' : 'restricted'"
+                : formula.restriction;
+            if (restriction && restriction !== 'none')
+                changes.push({ key: `${field}.restriction`, value: restriction, type: 'override', priority: ModifiableValue.Priority.RATING, target: 'parent' });
+            ChummerImportCoverage.add(`${field}: parent item`);
+        };
         const add = (field: string, raw: string | undefined, availability = false) => {
             if (!raw) return;
             if (availability) raw = ChummerFormulaParser.firstAlternative(raw);
             const skip = (reason: string) => ChummerImportCoverage.skip(`${field}: ${reason}`, `${entity.name}: ${raw}`);
             // A signed availability or capacity changes the parent; signed slots and cost stay the item's own.
-            if ((availability || field === 'system.capacity.total') && ChummerFormulaParser.isRelative(raw))
+            if ((availability || field === 'system.capacity.total') && ChummerFormulaParser.isRelative(raw)) {
+                if (availability && this.changesParentItem(system)) return addToParent(field, raw, skip);
                 return skip('relative to parent');
-            if (!ChummerFormulaParser.isFormula(raw)) {
+            }
+            if (!ChummerFormulaParser.isFormula(raw) && !Parser.hasIdentifier(raw, identifiers)) {
                 if ((availability && !ItemAvailabilityFlow.parseAvailability(raw).isValid)
                     || (field === 'system.technology.cost' && !Number.isFinite(Number(raw))))
                     skip(ChummerFormulaParser.classify(raw, { minRating }));
@@ -181,11 +212,10 @@ export abstract class Parser<SubType extends SystemEntityType> {
             add('system.slots', slots ?? ChummerFormulaParser.usedCapacity(capacity ?? ''));
         }
         if (!changes.length) return;
+        const targets = [{ id: 'item', applyTo: 'item' }, { id: 'parent', applyTo: 'parent_item' }]
+            .filter(target => changes.some(change => change.target === target.id));
         const effects = (entity as DocCreateData).effects ??= [];
-        effects.push({
-            name: 'Chummer formulas',
-            system: { targets: [{ id: 'item', applyTo: 'item' }], changes },
-        });
+        effects.push({ name: 'Chummer formulas', system: { targets, changes } });
     }
 
     protected setImporterFlags(entity: Actor.CreateData | Item.CreateData, jsonData: ParseData) {

@@ -8,6 +8,10 @@ import { ChummerFormulaParser } from '../../helper/ChummerFormula';
 export class ArmorModParser extends Parser<'modification'> {
     protected readonly parseType = 'modification';
 
+    protected override formulaIdentifiers(system: object) {
+        return { ...super.formulaIdentifiers(system), ...ChummerFormulaParser.PARENT_ITEM };
+    }
+
     protected override getSystem(jsonData: Mod | Gear) {
         const system = this.getBaseSystem();
         system.type = 'armor';
