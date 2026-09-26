@@ -18,9 +18,6 @@ const SCATTER_LABEL_OVERLAP_OFFSET = 10;
 
 type Point = { x: number, y: number };
 type RegionShapeData = { x?: number, y?: number, [key: string]: unknown };
-type RegionShape = {
-    updateSource: (data: Record<string, unknown>) => void
-};
 type RegionPlacementEvent = PIXI.FederatedPointerEvent & {
     getLocalPosition: (displayObject: PIXI.DisplayObject) => Point
 };
@@ -267,12 +264,12 @@ export class BlastTemplateFlow {
             // @ts-expect-error #TODO fvtt-types v14 PlacementOptions omits the internal _destroyPreview option.
             _destroyPreview: persistOnConfirm,
             onMove: ({position, shape}) => {
-                this.#updateCircle(shape as RegionShape, position);
+                this.#updateCircle(shape as foundry.data.CircleShapeData, position);
                 return false;
             },
             preConfirm: persistOnConfirm ? undefined : ({event, shape}) => {
                 const placementEvent = event as RegionPlacementEvent;
-                this.#updateCircle(shape as RegionShape, placementEvent.getLocalPosition(canvas.regions));
+                this.#updateCircle(shape as foundry.data.CircleShapeData, placementEvent.getLocalPosition(canvas.regions));
                 const token = this.#getTokenAtPoint(placementEvent);
                 if (token?.id) {
                     canvas.tokens?.setTargets([token.id], {mode: placementEvent.shiftKey ? 'acquire' : 'replace'});
@@ -313,7 +310,7 @@ export class BlastTemplateFlow {
         }
     }
 
-    #updateCircle(shape: RegionShape, position: Point) {
+    #updateCircle(shape: foundry.data.CircleShapeData, position: Point) {
         const snapped = canvas.grid!.getSnappedPoint(position, {mode: CONST.GRID_SNAPPING_MODES.CENTER});
         shape.updateSource({x: snapped.x, y: snapped.y});
         this.#center = snapped;

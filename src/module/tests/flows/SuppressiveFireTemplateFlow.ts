@@ -19,11 +19,6 @@ interface SuppressiveFireTest extends SuppressiveFireTemplateFlowHost {
 
 type Point = { x: number, y: number };
 
-// TODO: fvtt-types v14 BaseShapeData lacks the updateSource declaration used by Region placement.
-type RegionShape = {
-    updateSource: (data: Record<string, unknown>) => void
-};
-
 /**
  * Handles the placement of a suppressive-fire cone with a selected outer width.
  */
@@ -140,7 +135,7 @@ export class SuppressiveFireTemplateFlow {
             create: true,
             allowRotation: false,
             onMove: ({position, shape}) => {
-                this.#updateShape(shape, position);
+                this.#updateShape(shape as foundry.data.ConeShapeData, position);
                 return false;
             },
         }).then(region => {
@@ -165,7 +160,7 @@ export class SuppressiveFireTemplateFlow {
         this.cancelPreview();
     }
 
-    #updateShape(shape: RegionShape, pointer: Point) {
+    #updateShape(shape: foundry.data.ConeShapeData, pointer: Point) {
         const distancePixels = Math.hypot(pointer.x - this.#base.x, pointer.y - this.#base.y);
         const radius = Math.max(distancePixels, 1);
         const distance = radius / canvas.dimensions!.distancePixels;

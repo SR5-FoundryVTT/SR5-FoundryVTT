@@ -31,11 +31,6 @@ const SHOTGUN_SPREADS: Record<ShotgunChoke, readonly number[]> = {
 
 type Point = { x: number, y: number };
 
-// TODO: fvtt-types v14 BaseShapeData lacks the updateSource declaration used by Region placement.
-type RegionShape = {
-    updateSource: (data: Record<string, unknown>) => void
-};
-
 const lightenColor = (color: number): number => {
     const red = (color >> 16) & 0xff;
     const green = (color >> 8) & 0xff;
@@ -157,7 +152,7 @@ export class ShotgunTemplateFlow {
         this.#placement = canvas.regions.placeRegion({
             name: game.i18n.localize('SR5.Shotgun.Label'),
             color: game.user?.color?.toString() ?? '#ffffff',
-            // @ts-expect-error #TODO: fvtt-types v14 
+            // @ts-expect-error #TODO: fvtt-types v14
             shapes: [this.#getRegionLine(rangeIndex, 0)],
             elevation: {bottom: null, top: null, topInclusive: null},
             levels: [],
@@ -176,7 +171,7 @@ export class ShotgunTemplateFlow {
                 const pointer = {x: position.x, y: position.y};
                 const nextRangeIndex = this.#getRangeIndex(pointer);
                 this.#drawShotgunTemplate(pointer);
-                shape.updateSource(this.#getRegionLine(nextRangeIndex, direction));
+                (shape as foundry.data.LineShapeData).updateSource(this.#getRegionLine(nextRangeIndex, direction));
                 return false;
             },
         }).then(region => {
@@ -249,7 +244,7 @@ export class ShotgunTemplateFlow {
         this.#hoveredRangeIndex = -1;
     }
 
-    #getRegionLine(rangeIndex: number, direction: number): Record<string, unknown> {
+    #getRegionLine(rangeIndex: number, direction: number): foundry.data.LineShapeData.UpdateData {
         const distancePixels = canvas.dimensions!.distancePixels;
         const key = RANGE_KEYS[rangeIndex];
         const startDistance = rangeIndex === 0 ? 0 : this.#ranges[RANGE_KEYS[rangeIndex - 1]].distance;
