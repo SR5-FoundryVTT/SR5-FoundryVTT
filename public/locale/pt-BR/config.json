@@ -679,7 +679,10 @@
             "MissingSkill": "O ator não possui a pericia solicitada.",
             "NoAvailableActorFound": "Nenhum ator disponível foi encontrado para esta ação",
             "SkillWithoutAttribute": "A pericia não tem um atributo configurado.",
-            "TestExpectsVehicleOnly": "Este teste só pode ser feito com um ator do tipo veículo"
+            "TestExpectsVehicleOnly": "Este teste só pode ser feito com um ator do tipo veículo",
+            "NoDriverSelectedForJumpIn": "Nenhum piloto selecionado ou atribuído para saltar.",
+            "ActiveSensorLockFailure": "Falha na trava de sensor ativo!",
+            "VehicleCannotBeOwnDriver": "Um veículo não pode ser o seu próprio motorista."
         },
         "EssenceCost": "Custo de Essência",
         "Expand": "Expandir",
@@ -2090,6 +2093,33 @@
             },
             "ChaseEnvironment": "Ambiente de Perseguição",
             "Clearsight": "Visão Clara",
+            "SubCategory": "Subtipo",
+            "SubCategories": {
+                "Bike": "Bicicleta",
+                "Motorcycle": "Motocicleta",
+                "Car": "Carro",
+                "Truck": "Caminhão",
+                "Boat": "Barco",
+                "Submarine": "Submarino",
+                "Aircraft": "Aeronave",
+                "Rotorcraft": "Helicóptero",
+                "Vtol": "VTOL",
+                "Hovercraft": "Hovercraft",
+                "Ltav": "Dirigível",
+                "Glider": "Planador",
+                "Walker": "Andador",
+                "HeavyEquipment": "Equipamento Pesado",
+                "Military": "Militar / Policial",
+                "Commercial": "Comercial",
+                "MicroDrone": "Micro Drone",
+                "MiniDrone": "Mini Drone",
+                "SmallDrone": "Drone Pequeno",
+                "MediumDrone": "Drone Médio",
+                "LargeDrone": "Drone Grande",
+                "HugeDrone": "Drone Gigante",
+                "AnthroDrone": "Drone Antropomórfico",
+                "MissileDrone": "Drone Míssil"
+            },
             "ControlMode": "Modo de Controle",
             "ControlModes": {
                 "Autopilot": "Piloto Automático",
@@ -2182,7 +2212,11 @@
             "SkillCantBeDefault": "Esta pericia não pode ser lançada, pois não pode ser feita sem perícia",
             "SummoningNotConcluded": "Invocação incompleta. Aguarde o espírito se opor à invocação para determinar o dreno.",
             "TokenSelectionNeeded": "Um ou mais tokens precisam ser selecionados",
-            "NoActorCreatePermission": "Você não tem permissão para criar atores."
+            "NoActorCreatePermission": "Você não tem permissão para criar atores.",
+            "RCCOverAllocated": "Compartilhamento RCC + Redução de Ruído excede o Nível do Dispositivo",
+            "OverAutosoftSlots": "Slots de programa Autosoft excedidos para este drone",
+            "OverSharingLimit": "Autosofts carregados excedem a capacidade do RCC",
+            "TokenMovementLockedJumpedIn": "{vehicle} está sob controle rigger! Movimento do personagem bloqueado."
         },
         "Weapon": {
             "AmmoCount": "Qtd Munição",
@@ -2291,7 +2325,35 @@
         "Wireless": "Conexão Sem Fio",
         "StatusEffects": {
             "Running": "Correndo",
-            "Sprinting": "Corrida Veloz"
+            "Sprinting": "Corrida Veloz",
+            "sr5jumpedIn": "Imerso no Veículo (Movimento Bloqueado)",
+            "sr5riggedVehicle": "Veículo sob Controle Rigger",
+            "sr5sensorLock": "Alvo Travado (Sensor Ativo)",
+            "sr5spunOut": "Derrapou / Descontrolou (Penalidade de Manuseio)"
+        },
+        "Rigger": {
+            "RiggerInterface": "Interface Rigger",
+            "JumpIn": "Saltar para Veículo",
+            "JumpOut": "Sair do Veículo",
+            "JumpedInSuccess": "{rigger} saltou para {vehicle}",
+            "JumpedOutSuccess": "Saiu de {vehicle}",
+            "JumpInTestRequired": "Saltar para o veículo {vehicle} requer um teste.",
+            "JumpedInEffectName": "Imerso ({rigger})",
+            "RiggerMovingVehicle": "{rigger} está pilotando {vehicle}",
+            "GODRiggerInterfaceWarning": "<div class='sr5-god-alert'><div class='god-header'>⚡ DIVISÃO DE VIGILÂNCIA DA GRADE // ALERTA DO SISTEMA</div><div class='god-body'><p><strong>AVISO:</strong> O veículo <em>{vehicle}</em> não possui uma Interface Rigger verificada.</p></div></div>",
+            "MissingRiggerInterface": "O veículo {vehicle} não possui uma Interface Rigger instalada!",
+            "ActiveSensorLock": "Trava de Sensor Ativo",
+            "ActiveSensorLockSuccess": "{attacker} travou sensores em {target} (+{netHits} penalidade de defesa do alvo)"
+        },
+        "Swarm": {
+            "Label": "Enxame",
+            "Toggle": "Alternar Modo Enxame",
+            "IsLeader": "Líder do Enxame",
+            "MemberCount": "{count} Drones",
+            "Bonus": "+{bonus} Bônus",
+            "EffectivePilot": "Piloto: {rating}",
+            "LeaderSelection": "Selecionar Líder do Enxame",
+            "SharedAutosofts": "Autosofts Compartilhados do RCC"
         }
     },
     "TYPES": {
@@ -2329,5 +2391,38 @@
             "vehicle": "Veículo",
             "weapon": "Arma"
         }
+    },
+    "MatrixAttributeDisplayModeName": "Modo de Exibição dos Atributos de Matriz",
+    "MatrixAttributeDisplayModeDescription": "Escolha se os atributos de matriz na ficha serão exibidos em texto completo ou ícones compactos com dicas.",
+    "MatrixAttributeDisplayModeFull": "Rótulos de Texto Completos",
+    "MatrixAttributeDisplayModeIcons": "Apenas Ícones (com Dica)",
+    "RequireRiggerInterfaceName": "Exigir Interface Rigger",
+    "RequireRiggerInterfaceDescription": "Quando ativado, saltar para um veículo sem Interface Rigger instalada é bloqueado.",
+    "AutosoftTargetModeName": "Modo de Alvo do Autosoft",
+    "AutosoftTargetModeDescription": "Escolha se autosofts de mira se vinculam a armas montadas específicas (RAW) ou categorias de armas / perícias.",
+    "AutosoftTargetModeWeapon": "Arma Montada Específica (RAW)",
+    "AutosoftTargetModeCategory": "Categoria de Arma / Perícia (Variante)",
+    "Autosoft": "Autosoft",
+    "AutosoftType": "Tipo de Autosoft",
+    "AutosoftConfigManager": {
+        "Title": "Configurar e Transferir Autosoft",
+        "TargetActor": "Drone / Veículo Alvo",
+        "TargetWeapon": "Arma Alvo (Artilharia)",
+        "TargetModel": "Modelo do Veículo",
+        "NoWeapons": "Nenhuma arma montada no alvo",
+        "NoDrones": "Nenhum drone ou veículo encontrado",
+        "Submit": "Configurar e Transferir",
+        "Cancel": "Cancelar"
+    },
+    "TargetModel": "Modelo Alvo",
+    "TargetWeapon": "Arma Alvo",
+    "ControlMode": "Modo de Controle",
+    "AutosoftTypes": {
+        "Clearsight": "Visão Clara",
+        "Evasion": "Esquiva",
+        "Maneuvering": "Manobra",
+        "Stealth": "Furtividade",
+        "Targeting": "Mira",
+        "ElectronicWarfare": "Guerra Eletrônica"
     }
 }

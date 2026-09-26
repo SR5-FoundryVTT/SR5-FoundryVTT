@@ -17,6 +17,7 @@ import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 import { isElementInstance } from '@/module/utils/dom';
 
 const { fromUuid, fromUuidSync } = foundry.utils;
+const { TextEditor } = foundry.applications.ux;
 
 // Meant for sheet display only. Doesn't use the SR5Item.getChatData approach to avoid changing system data.
 type sheetAction = {
@@ -36,6 +37,16 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
     matrixTargets: Shadowrun.MatrixTargetDocument[];
     // the master device being used to connect to the matrix
     matrixDevice: SR5Item | undefined;
+    rccInfo?: {
+        rccItemId?: string;
+        deviceRating: number;
+        sharing: number;
+        noiseReduction: number;
+        isOverAllocated: boolean;
+        loadedAutosoftsCount: number;
+        isOverSharingLimit: boolean;
+        loadedAutosofts: SR5Item[];
+    };
     // Matrix ICONs that are owned by this actor
     ownedIcons: MatrixTargetDocument[];
 
@@ -48,6 +59,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     // We accept this selection to not be persistant across Foundry sessions.
     selectedMatrixTarget: string | undefined;
     _connectedIconsOpenClose: Record<string, boolean> = {};
+    _rccAllocationDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
     override async _prepareContext(options: Parameters<SR5BaseActorSheet["_prepareContext"]>[0]) {
         const data = await super._prepareContext(options);
@@ -74,6 +86,8 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             setupPAN: SR5MatrixActorSheet.#addAllEquippedWirelessDevicesToPAN,
             removeMarks: SR5MatrixActorSheet.#deleteMarks,
             clearAllMarks: SR5MatrixActorSheet.#clearAllMarks,
+            toggleJumpInIcon: SR5MatrixActorSheet.#toggleJumpInIcon,
+            toggleDroneControlMode: SR5MatrixActorSheet.#toggleDroneControlMode,
         },
     };
 
@@ -255,7 +269,9 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * @param data
      */
     _prepareMatrixDevice(data: MatrixActorSheetData) {
-        data.matrixDevice = this.actor?.getMatrixDevice();
+        const device = this.actor?.getMatrixDevice();
+        data.matrixDevice = device;
+
     }
 
     _prepareOwnedIcons(data: MatrixActorSheetData) {
@@ -308,6 +324,56 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     static async #togglePersonaRunningSilent(this: SR5MatrixActorSheet) {
         await MatrixSheetFlow.toggleRunningSilent(this.actor);
+    }
+
+    static async #toggleJumpInIcon(this: SR5MatrixActorSheet, event: PointerEvent) {
+        event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
+
+        const uuid = SheetFlow.closestUuid(event.target);
+        if (!uuid) return;
+
+        const vehicleActor = (await fromUuid(uuid)) as SR5Actor | null;
+        if (!vehicleActor || !(vehicleActor instanceof SR5Actor) || !vehicleActor.isType('vehicle')) return;
+
+        await this.actor.toggleJumpIn(vehicleActor);
+        void this.render();
+    }
+
+    static async #toggleDroneControlMode(this: SR5MatrixActorSheet, event: PointerEvent) {
+        event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
+
+        const uuid = SheetFlow.closestUuid(event.target);
+        if (!uuid) return;
+
+        const vehicleActor = (await fromUuid(uuid)) as SR5Actor | null;
+        if (!vehicleActor || !(vehicleActor instanceof SR5Actor) || !vehicleActor.isType('vehicle')) return;
+
+        const currentMode = vehicleActor.system.controlMode || 'autopilot';
+
+        // If currently jumped in, jumping out automatically resets it to autopilot
+        if (currentMode === 'rigger') {
+            await this.actor.toggleJumpIn(vehicleActor);
+            void this.render();
+            return;
+        }
+
+        // Toggle between autopilot (Auto mode) and remote (RCC mode)
+        const newMode = currentMode === 'remote' ? 'autopilot' : 'remote';
+
+        // When switching to remote (RCC) mode, if the drone doesn't have an active master,
+        // slave it to the rigger's active equipped RCC if present
+        const updateData: Record<string, any> = { 'system.controlMode': newMode };
+        if (newMode === 'remote' && !vehicleActor.system.master) {
+            const rccItem = this.actor.items.find(i => i.isType('device') && i.system.category === 'rcc' && i.isEquipped());
+            if (rccItem) {
+                updateData['system.master'] = rccItem.uuid;
+            }
+        }
+
+        await vehicleActor.update(updateData);
+        void this.render();
     }
 
     /**
@@ -418,18 +484,21 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         ];
 
         actions = actions.filter(action => {
+            const actionData = action.system.action;
+            if (!actionData) return true;
+
             if (MatrixRules.isSleazeAction(
-                    action.system.action.attribute as ActorAttribute,
-                    action.system.action.attribute2 as ActorAttribute,
-                    action.system.action.limit.attribute as ActorAttribute)
+                    actionData.attribute as ActorAttribute,
+                    actionData.attribute2 as ActorAttribute,
+                    actionData.limit?.attribute as ActorAttribute)
                 && (this.actor.findAttribute('sleaze')?.value ?? 0) <= 0
             ) {
                 return false;
             }
             if (MatrixRules.isAttackAction(
-                    action.system.action.attribute as ActorAttribute,
-                    action.system.action.attribute2 as ActorAttribute,
-                    action.system.action.limit.attribute as ActorAttribute)
+                    actionData.attribute as ActorAttribute,
+                    actionData.attribute2 as ActorAttribute,
+                    actionData.limit?.attribute as ActorAttribute)
                 && (this.actor.findAttribute('attack')?.value ?? 0) <= 0
             ) {
                 return false;
@@ -442,9 +511,10 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         // Prepare sorting and display of a possibly translated document name.
         const sheetActions: sheetAction[] = [];
         for (const action of actions) {
+            const descValue = action.system.description?.value ?? '';
             sheetActions.push({
                 name: PackItemFlow.localizePackAction(action.name),
-                description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(action.system.description.value),
+                description: await TextEditor.enrichHTML(descValue),
                 action,
             });
         }
@@ -471,7 +541,9 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         const marksPlaced = this.actor.getMarksPlaced(target.uuid!);
 
         return actions.filter(action => {
-            const { marks, owner } = action.system.action.category.matrix;
+            const matrixCat = action.system.action?.category?.matrix;
+            if (!matrixCat) return true;
+            const { marks, owner } = matrixCat;
             if (owner) return ownedItem;
             // you can do actions that require marks on your own devices
             return ownedItem || marks <= marksPlaced;

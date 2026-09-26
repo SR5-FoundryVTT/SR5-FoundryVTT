@@ -511,7 +511,11 @@
         "Errors": {
             "LinkLockedReboot": "Un acteur verrouillé par lien ne peut pas être redémarré",
             "MissingSkill": "Le personnage n'a pas la compétence demandée",
-            "SkillWithoutAttribute": "La compétence n'a pas d'attribut assigné"
+            "SkillWithoutAttribute": "La compétence n'a pas d'attribut assigné",
+            "NoDriverSelectedForJumpIn": "Aucun conducteur sélectionné ou assigné pour le saut.",
+            "TestExpectsVehicleOnly": "Ce test ne peut être effectué qu'avec un acteur de type véhicule",
+            "ActiveSensorLockFailure": "Le verrouillage capteur actif a échoué !",
+            "VehicleCannotBeOwnDriver": "Un véhicule ne peut pas être son propre pilote."
         },
         "EssenceCost": "Essence",
         "Expand": "Étendre",
@@ -1416,6 +1420,33 @@
         "Value": "Valeur",
         "VehicleStunImmunity": "Immunité des véhicules aux dégâts étourdissants",
         "Vehicle": {
+            "SubCategory": "Sous-type",
+            "SubCategories": {
+                "Bike": "Vélo",
+                "Motorcycle": "Moto",
+                "Car": "Voiture",
+                "Truck": "Camion",
+                "Boat": "Bateau",
+                "Submarine": "Sous-marin",
+                "Aircraft": "Avion",
+                "Rotorcraft": "Hélicoptère",
+                "Vtol": "ADAV / VTOL",
+                "Hovercraft": "Aéroglisseur",
+                "Ltav": "Dirigeable",
+                "Glider": "Planeur",
+                "Walker": "Marcheur",
+                "HeavyEquipment": "Engin de chantier / Équipement lourd",
+                "Military": "Militaire / Police",
+                "Commercial": "Véhicule commercial",
+                "MicroDrone": "Micro-drone",
+                "MiniDrone": "Mini-drone",
+                "SmallDrone": "Petit drone",
+                "MediumDrone": "Moyen drone",
+                "LargeDrone": "Grand drone",
+                "HugeDrone": "Drone géant",
+                "AnthroDrone": "Drone anthropomorphe",
+                "MissileDrone": "Drone missile"
+            },
             "ChaseEnvironment": "Environnement de poursuite",
             "Clearsight": "Vue dégagée",
             "ControlMode": "Mode Commande",
@@ -1486,7 +1517,11 @@
             "SkillAlreadyExists": "La compétence {name} existe déjà sur l'acteur {actorName} ({actorUuid}). Utilisez chaque nom de compétence une seule fois par catégorie.",
             "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
             "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés",
-            "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs."
+            "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs.",
+            "RCCOverAllocated": "Partage RCC + Réduction de bruit dépasse l'indice d'appareil",
+            "OverAutosoftSlots": "Nombre d'emplacements d'autosoft dépassé pour ce drone",
+            "OverSharingLimit": "Les autosofts chargés dépassent la capacité de partage RCC",
+            "TokenMovementLockedJumpedIn": "{vehicle} est actuellement contrôlé par un rigger ! Déplacement verrouillé."
         },
         "Tooltips": {
             "Actor": {
@@ -1573,7 +1608,68 @@
         "Wounds": "Blessures",
         "StatusEffects": {
             "Running": "Course",
-            "Sprinting": "Sprint"
+            "Sprinting": "Sprint",
+            "sr5jumpedIn": "En commande directe (Déplacement verrouillé)",
+            "sr5riggedVehicle": "Véhicule commandé (Rigger actif)",
+            "sr5sensorLock": "Cible verrouillée (Capteur actif)",
+            "sr5spunOut": "En tête-à-queue (Pénalité de maniabilité)"
+        },
+        "Rigger": {
+            "RiggerInterface": "Interface rigger",
+            "JumpIn": "Sauter dans le véhicule",
+            "JumpOut": "Quitter le véhicule",
+            "JumpedInSuccess": "{rigger} a sauté dans {vehicle}",
+            "JumpedOutSuccess": "A quitté {vehicle}",
+            "JumpInTestRequired": "Le saut dans le véhicule non possédé {vehicle} nécessite un test.",
+            "JumpedInEffectName": "En commande directe ({rigger})",
+            "RiggerMovingVehicle": "{rigger} pilote {vehicle}",
+            "GODRiggerInterfaceWarning": "<div class='sr5-god-alert'><div class='god-header'>⚡ GRID OVERWATCH DIVISION // ALERTE SYSTÈME</div><div class='god-body'><p><strong>AVERTISSEMENT:</strong> Le véhicule <em>{vehicle}</em> ne possède pas de connexion d'interface rigger vérifiée.</p></div></div>",
+            "MissingRiggerInterface": "Le véhicule {vehicle} n'a pas d'interface rigger installée !",
+            "ActiveSensorLock": "Verrouillage Capteur Actif",
+            "ActiveSensorLockSuccess": "{attacker} a verrouillé les capteurs sur {target} (+{netHits} pénalité de défense)"
+        },
+        "Swarm": {
+            "Label": "Essaim",
+            "Toggle": "Activer/Désactiver l'essaim",
+            "IsLeader": "Leader d'essaim",
+            "MemberCount": "{count} Drones",
+            "Bonus": "+{bonus} Bonus",
+            "EffectivePilot": "Pilote: {rating}",
+            "LeaderSelection": "Sélectionner le leader d'essaim",
+            "SharedAutosofts": "Autosofts RCC partagés"
         }
+    },
+    "MatrixAttributeDisplayModeName": "Mode d'affichage des attributs de matrice",
+    "MatrixAttributeDisplayModeDescription": "Choisissez si les attributs de matrice s'affichent sous forme de texte complet ou d'icônes compactes avec infobulles.",
+    "MatrixAttributeDisplayModeFull": "Libellés texte complets",
+    "MatrixAttributeDisplayModeIcons": "Icônes uniquement (avec infobulle)",
+    "RequireRiggerInterfaceName": "Exiger l'interface rigger",
+    "RequireRiggerInterfaceDescription": "Lorsque cette option est activée, le saut dans un véhicule sans interface rigger installée est bloqué.",
+    "AutosoftTargetModeName": "Mode de ciblage des Autosofts",
+    "AutosoftTargetModeDescription": "Choisissez si les autosofts de ciblage s'associent à une arme spécifique (RAW) ou à une catégorie d'armes / compétence de combat.",
+    "AutosoftTargetModeWeapon": "Arme montée spécifique (RAW)",
+    "AutosoftTargetModeCategory": "Catégorie d'arme / Compétence (Variante)",
+    "Autosoft": "Autosoft",
+    "AutosoftType": "Type d'Autosoft",
+    "AutosoftConfigManager": {
+        "Title": "Configurer & Transférer l'Autosoft",
+        "TargetActor": "Drone / Véhicule ciblé",
+        "TargetWeapon": "Arme ciblée (Artillerie)",
+        "TargetModel": "Modèle de véhicule",
+        "NoWeapons": "Aucune arme montée sur la cible",
+        "NoDrones": "Aucun drone ou véhicule possédé trouvé",
+        "Submit": "Configurer & Transférer",
+        "Cancel": "Annuler"
+    },
+    "TargetModel": "Modèle ciblé",
+    "TargetWeapon": "Arme ciblée",
+    "ControlMode": "Mode de contrôle",
+    "AutosoftTypes": {
+        "Clearsight": "Vigilance",
+        "Evasion": "Évasion",
+        "Maneuvering": "Manœuvre",
+        "Stealth": "Furtivité",
+        "Targeting": "Ciblage",
+        "ElectronicWarfare": "Guerre Électronique"
     }
 }

@@ -9,6 +9,16 @@
         }
     },
     "SETTINGS": {
+        "MatrixAttributeDisplayModeName": "Matrix Attribute Display Mode",
+        "MatrixAttributeDisplayModeDescription": "Choose whether matrix attributes on actor sheets render as full text labels or compact icons with hover tooltips.",
+        "MatrixAttributeDisplayModeFull": "Full Text Labels",
+        "MatrixAttributeDisplayModeIcons": "Icons Only (with Tooltip)",
+        "RequireRiggerInterfaceName": "Enforce Rigger Interface Requirement",
+        "RequireRiggerInterfaceDescription": "When enabled, jumping into a vehicle without an installed Rigger Interface is hard-blocked. When disabled (default), G.O.D. issues an in-game alert chat message.",
+        "AutosoftTargetModeCategory": "Weapon Category / Skill (Table Variant)",
+        "AutosoftTargetModeDescription": "Choose whether targeting autosofts bind to specific mounted weapons (RAW) or weapon categories / combat skills.",
+        "AutosoftTargetModeName": "Autosoft Targeting Mode",
+        "AutosoftTargetModeWeapon": "Specific Mounted Weapon (RAW)",
         "ApplyLimitsDescription": "Should Limits be applied to rolls",
         "ApplyLimitsName": "Apply Limits to Rolls",
         "AutomateMultiDefenseModifier": "Automate defense modifier",
@@ -201,9 +211,9 @@
             "AddTarget": "Add Target",
             "ExpiryTriggers": {
                 "CombatStart": "Combat Start",
-                "CombatEnd":   "Combat End",
-                "TurnStart":   "Turn Start",
-                "TurnEnd":     "Turn End",
+                "CombatEnd": "Combat End",
+                "TurnStart": "Turn Start",
+                "TurnEnd": "Turn End",
                 "MyActionStart": "Start of My Action Phase",
                 "MyActionEnd": "End of My Action Phase"
             },
@@ -816,6 +826,85 @@
         "Collapse": "Collapse",
         "CollapseAll": "Collapse All",
         "CommonProgram": "Common Program",
+        "Autosoft": "Autosoft",
+        "AutosoftType": "Autosoft Type",
+        "AutosoftConfigManager": {
+            "Title": "Configure & Transfer Autosoft",
+            "TargetActor": "Target Drone / Vehicle",
+            "TargetWeapon": "Target Weapon (Gunnery)",
+            "TargetModel": "Target Model",
+            "NoWeapons": "No weapons mounted on target",
+            "NoDrones": "No owned drones or vehicles found",
+            "Submit": "Configure & Transfer",
+            "Cancel": "Cancel"
+        },
+        "TargetModel": "Target Model",
+        "TargetWeapon": "Target Weapon",
+        "ControlMode": "Control Mode",
+        "AutosoftTypes": {
+            "Clearsight": "Clearsight",
+            "Evasion": "Evasion",
+            "Maneuvering": "Maneuvering",
+            "Stealth": "Stealth",
+            "Targeting": "Targeting",
+            "ElectronicWarfare": "Electronic Warfare"
+        },
+        "ControlModes": {
+            "Autopilot": "Autopilot",
+            "Remote": "Remote Control",
+            "Rigger": "Jumped-In",
+            "Manual": "Manual"
+        },
+        "Rigger": {
+            "RiggerInterface": "Rigger Interface",
+            "JumpIn": "Jump In",
+            "JumpOut": "Jump Out",
+            "JumpedIn": "Jumped In",
+            "JumpedInVehicleHint": "Jumped into vehicle. Click to open sheet, double-click to view token on canvas.",
+            "JumpedInDriverHint": "Jumped in by rigger. Click to open sheet, double-click to view token on canvas.",
+            "JumpedInSuccess": "{rigger} jumped into {vehicle}",
+            "JumpedOutSuccess": "Jumped out of {vehicle}",
+            "JumpInTestRequired": "Jumping into unowned vehicle {vehicle} requires a test.",
+            "JumpedInEffectName": "Jumped-In ({rigger})",
+            "RiggerMovingVehicle": "{rigger} is piloting {vehicle}",
+            "GODRiggerInterfaceWarning": "<div class='sr5-god-alert'><div class='god-header'>⚡ GRID OVERWATCH DIVISION // SYSTEM ALERT</div><div class='god-body'><p><strong>WARNING:</strong> Vehicle <em>{vehicle}</em> lacks a verified Rigger Interface connection. Direct Neural Interface connection established without hardware link.</p></div></div>",
+            "ResistBiofeedback": "Resist Biofeedback Damage",
+            "BiofeedbackSuffered": "Vehicle {vehicle} took {damage} physical damage. {driver} must resist Biofeedback damage!",
+            "ResistDumpShock": "Resist Dump Shock",
+            "DumpShockSuffered": "{driver} suffered forced ejection from {vehicle} ({reason}).",
+            "DumpShockDeviceDestroyed": "Device Destroyed",
+            "DumpShockConnectionSevered": "Connection Severed",
+            "MissingRiggerInterface": "Vehicle {vehicle} does not have an installed Rigger Interface!",
+            "RepairMatrixDamage": "Repair Matrix Damage",
+            "ActiveSensorLock": "Active Sensor Lock",
+            "ActiveSensorLockSuccess": "{attacker} locked sensors onto {target} (+{netHits} target defense penalty)",
+            "Disoriented": "Disoriented",
+            "SpunOut": "Spun Out",
+            "SpunOutInfo": "{target} has spun out!",
+            "EWarNoiseReductionSuccess": "{actor} gained +{hits} Noise Reduction for 1 round.",
+            "RammingSuccess": "{attacker} rammed {target} dealing {damage} physical damage!",
+            "ResistRammingDamage": "Resist Ramming Damage",
+            "RammingBothDamaged": "{attacker} rammed {target} for {damage} physical damage! {attacker} resists {selfDamage} recoil damage.",
+            "EmergencyExitFailure": "{actor} failed emergency exit and suffers {damage} impact damage!",
+            "EWarNoiseReductionEffect": "E-War Noise Reduction",
+            "JumpInTestFailed": "Failed test to jump into vehicle."
+        },
+        "Swarm": {
+            "Label": "Swarm",
+            "Toggle": "Toggle Swarm",
+            "Drones": "Drones",
+            "Count": "Drone Count"
+        },
+        "RCC": {
+            "Sharing": "Sharing",
+            "NoiseReduction": "Noise Reduction",
+            "SharedAutosofts": "Shared RCC Autosofts",
+            "SharedFromRCC": "Shared from RCC",
+            "ReconfigureTitle": "RCC Reconfigured",
+            "ReconfiguredMessage": "reconfigured RCC attribute array",
+            "SimpleAction": "Simple Action",
+            "SimpleActionInCombat": "Combat Simple Action"
+        },
         "CompendiaSettings": {
             "Description": "These packs will be used for the system. You can override them with your own packs, but you should not remove them.",
             "GeneralActionsPack": {
@@ -1241,6 +1330,8 @@
         "Equipment": "Equipment",
         "Equipped": "Equipped",
         "Errors": {
+            "NoVehicleOwnership": "You do not own this vehicle.",
+            "NoDriverSelectedForJumpIn": "No driver selected or assigned for Jump In.",
             "CantConnectICToGrid": "IC actors can't be connected to a grid network",
             "CantConnectToPAN": "Given document can't be added to PAN network",
             "CantConnectToWAN": "Given document can't be added to WAN network",
@@ -1518,6 +1609,8 @@
         "IncomingFade": "Incoming Fade",
         "Information": "Info",
         "Infos": {
+            "NoMatrixDamageToRepair": "Device has no matrix damage to repair.",
+            "MatrixDamageRepaired": "{device} repaired for {hits} matrix damage.",
             "CantModifyHostContent": "Can't change host data from within an IC actor.",
             "ConsumedEquippedAmmo": "Consumed rounds from equipped ammunition",
             "ResetProgressiveRecoil": "Reset progressive recoil to zero bullets fired"
@@ -2155,6 +2248,10 @@
                 "dice_pool": {
                     "hint": "Dice Pool Modifier to apply",
                     "label": "Dice Pool"
+                },
+                "isRiggerInterface": {
+                    "hint": "Whether this modification functions as a Rigger Interface",
+                    "label": "Rigger Interface"
                 },
                 "modification_category": {
                     "hint": "Category this Modification belongs to",
@@ -2982,7 +3079,9 @@
         },
         "StatusEffects": {
             "Running": "Running",
-            "Sprinting": "Sprinting"
+            "Sprinting": "Sprinting",
+            "JumpedIn": "Jumped-In (Movement Locked)",
+            "RiggedVehicle": "Rigged Vehicle (Rigger Active)"
         },
         "Stock": "Stock",
         "StreetCred": "Street Cred",
@@ -3047,6 +3146,8 @@
         "TemporaryModifiers": "Temporary Modifiers",
         "Test": "Test",
         "TestResults": {
+            "ActiveSensorLockFailure": "Active Sensor Lock failed!",
+            "ActiveSensorLockSuccess": "Active Sensor Lock successful!",
             "AttackBlockedByHardenedArmor": "Attack Hits But Is Blocked By Hardened Armor",
             "AttackBlockedByVehicleArmor": "Attack Hits But Is Blocked By Vehicle Armor",
             "AttackDodged": "Attack Dodged",
@@ -3093,6 +3194,7 @@
             "MeleeAttackTest": "Melee Weapon Attack",
             "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
             "NaturalRecoveryStunTest": "Natural Recovery Stun",
+            "OpposedActiveSensorLockTest": "Opposed Active Sensor Lock",
             "OpposedBruteForceTest": "Oppose Brute Force",
             "OpposedCheckOverwatchScoreTest": "Oppose Check Overwatch Score",
             "OpposedCompileSpriteTest": "Oppose Compilation",
@@ -3284,6 +3386,54 @@
                 "Title": "Condition Monitor Tour",
                 "WoundModifierContent": "This cell denotes that filling it increases your wound modifier by the number written in the cell",
                 "WoundModifierTitle": "Wound Modifier"
+            },
+            "RiggerSwarm": {
+                "Title": "Drone Swarm Creation & Control Tour",
+                "Description": "Step-by-step interactive guide on creating a drone actor, enabling Swarm mode, configuring drone count, and observing companion tiles on the canvas.",
+                "DroneAttributesTitle": "1. Vehicle & Drone Attributes",
+                "DroneAttributesContent": "Creating a drone actor requires setting base vehicle attributes (Pilot, Body, Handling, Speed, Acceleration, Sensor). All stats start at minimum rating 1.",
+                "EnableSwarmTitle": "2. Enable Drone Swarm",
+                "EnableSwarmContent": "In Edit Mode on the Vehicle sheet, locate the Swarm section. Click the 'Swarm:' checkbox to activate swarm leader mode for this drone.",
+                "EnableSwarmActiveTitle": "3. Swarm Active Checkbox Ticked",
+                "EnableSwarmActiveContent": "With Swarm mode active, the checkbox is ticked and reveals the 'Count:' input field for configuring how many identical drones are linked into the swarm.",
+                "SwarmCountTitle": "4. Set Swarm Drone Count",
+                "SwarmCountContent": "Enter the number of drones in the swarm (e.g. 4). A higher drone count boosts effective Pilot rating and teamwork bonuses for autosoft tests.",
+                "CanvasSwarmDisplayTitle": "5. Swarm Companion Tiles on Canvas",
+                "CanvasSwarmDisplayContent": "Switching back to Play Mode displays the leader drone token on the canvas. The remaining 3 companion drones are automatically rendered as locked formation tiles around the leader!",
+                "TokenHUDControlTitle": "6. Token HUD & Real-Time Formation Movement",
+                "TokenHUDControlContent": "Right-click the leader token to access the native SR5 Token HUD for Jump In / Jump Out actions. Dragging the leader token smoothly slides all companion swarm tiles in lockstep across the grid."
+            },
+            "Autosofts": {
+                "Title": "Autosoft Management Guide",
+                "Description": "Comprehensive guide on creating, configuring, and equipping Autosofts for Drones and Rigger Command Consoles.",
+                "AutosoftItemCreationTitle": "Creating Autosoft Items",
+                "AutosoftItemCreationContent": "Autosofts are created as Program items with type 'autosoft'. In Edit Mode, you can configure their rating, type, and target requirements.",
+                "AutosoftTypesTitle": "Autosoft Types & Targeting",
+                "AutosoftTypesContent": "Configure the autosoftType: ClearSight (perception), Evasion (defense), Maneuvering (piloting), Stealth (sneaking), Targeting (gunnery), or Cyberware. Depending on the type, specify target vehicle models or weapon categories.",
+                "AutosoftPlayModeTitle": "Autosoft Play Mode",
+                "AutosoftPlayModeContent": "Switching to Play Mode locks schema editing fields and shows clean property badges for the autosoft rating and target specs.",
+                "EquipAutosoftOnDroneTitle": "Equipping Autosoft on Vehicle",
+                "EquipAutosoftOnDroneContent": "Equip the autosoft on your drone vehicle. The Matrix tab lists active running autosofts along with remaining slot capacity.",
+                "AutosoftEffectsTitle": "Autosoft Effects & Modifiers",
+                "AutosoftEffectsContent": "The Effects tab in Play Mode displays active effects and modifiers provided by equipped autosofts, demonstrating their impact on vehicle tests.",
+                "TargetingSchemasTitle": "Targeting & Model Schemas",
+                "TargetingSchemasContent": "Targeting autosofts require a target weapon model/category. Maneuvering autosofts require a target vehicle model. Autosofts only function when loaded onto matching models or weapons.",
+                "DroneSlotLimitsTitle": "Drone Slot Limits & Capacity Badges",
+                "DroneSlotLimitsContent": "Drones can load up to their Pilot Rating in local autosofts. If more autosofts are loaded than allowed, a warning badge alerts you to slot overflow.",
+                "RCCOverrideHierarchyTitle": "Local vs Shared Hierarchy",
+                "RCCOverrideHierarchyContent": "When a drone connects to an RCC, specific local autosofts on the drone override shared RCC autosofts of the same type. Shared autosofts fill in any unassigned slots."
+            },
+            "MatrixNoise": {
+                "Title": "Matrix Noise & Compensation Guide",
+                "Description": "Learn how distance noise, jamming, static, and RCC Noise Reduction interact during Rigger and Matrix operations.",
+                "OverviewTitle": "Understanding Matrix Noise",
+                "OverviewContent": "Matrix Noise imposes dice pool penalties on Rigger and Matrix tests based on distance, physical barriers, jamming, and grid penalties.",
+                "RCCNoiseVsSharingTitle": "RCC Noise Reduction vs Program Sharing",
+                "RCCNoiseVsSharingContent": "Rigger Command Consoles split Device Rating between Noise Reduction and Program Sharing. Increasing Noise Reduction reduces shared program capacity.",
+                "CalculationTitle": "Noise Compensation Calculation",
+                "CalculationContent": "Total Noise Reduction from RCCs, antennae, and cyberware automatically offsets incoming Noise penalties during dice pool resolution.",
+                "SoftWarningBadgesTitle": "Capacity Soft Warning Badges",
+                "SoftWarningBadgesContent": "If total active shared autosoft ratings exceed RCC Sharing capacity, soft warning badges notify you on the Matrix tab to adjust your allocation."
             }
         },
         "UnderBarrel": "Under Barrel",
@@ -3300,6 +3450,33 @@
                 "Mini": "Mini",
                 "Missile": "Missile",
                 "Small": "Small"
+            },
+            "SubCategory": "Subtype",
+            "SubCategories": {
+                "Bike": "Bike",
+                "Motorcycle": "Motorcycle",
+                "Car": "Car",
+                "Truck": "Truck",
+                "Boat": "Boat",
+                "Submarine": "Submarine",
+                "Aircraft": "Aircraft",
+                "Rotorcraft": "Rotorcraft / Helicopter",
+                "Vtol": "VTOL",
+                "Hovercraft": "Hovercraft",
+                "Ltav": "Lighter-Than-Air Vehicle",
+                "Glider": "Glider",
+                "Walker": "Walker",
+                "HeavyEquipment": "Heavy Equipment",
+                "Military": "Military / Corpsec",
+                "Commercial": "Commercial",
+                "MicroDrone": "Micro Drone",
+                "MiniDrone": "Mini Drone",
+                "SmallDrone": "Small Drone",
+                "MediumDrone": "Medium Drone",
+                "LargeDrone": "Large Drone",
+                "HugeDrone": "Huge Drone",
+                "AnthroDrone": "Anthro Drone",
+                "MissileDrone": "Missile Drone"
             },
             "Category": "Category",
             "ChaseEnvironment": "Chase Environment",
@@ -3367,6 +3544,11 @@
         "Walk": "Walk",
         "WalkingSpeed": "Walking",
         "Warnings": {
+            "HardwareSkillRequired": "Hardware skill > 0 is required for matrix repairs.",
+            "RCCOverAllocated": "RCC Sharing + Noise Reduction exceeds Device Rating",
+            "OverAutosoftSlots": "Autosoft program slots exceeded for this drone",
+            "OverSharingLimit": "Loaded autosofts exceed RCC Sharing capacity",
+            "TokenMovementLockedJumpedIn": "{vehicle} is currently geriggt! Metahuman token movement is locked.",
             "ActorMissingRequirements": "Actor must match the skills awakened or emerged requirement",
             "AlreadyExistingInventory": "An inventory with this name already exists",
             "AlreadyJoinedNetwork": "{name} already joined this network",

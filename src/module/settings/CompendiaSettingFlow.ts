@@ -2,7 +2,7 @@ import { SYSTEM_NAME } from '@/module/constants';
 import { SR5 } from '@/module/config';
 import { Translation } from '@/module/utils/strings';
 
-export type PackType = 'GeneralActionsPack' | 'MatrixActionsPack' | 'ICActionsPack' | 'SkillsPack' | 'SkillGroupsPack' | 'SkillSetsPack';
+export type PackType = 'GeneralActionsPack' | 'MatrixActionsPack' | 'VehicleActionsPack' | 'ICActionsPack' | 'SkillsPack' | 'SkillGroupsPack' | 'SkillSetsPack';
 
 export type PackSelectionConfig = {
     id: PackType;
