@@ -65,7 +65,7 @@ export class InitiativePrep {
         // Apply blitz ini rules.
         if (initiative.blitz) {
             ModifiableValue.addUnique(initiative.current.dice, "SR5.Blitz", 5,
-                { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
+                { type: 'override', priority: ModifiableValue.Priority.TOP }
             );
         }
         ModifiableValue.calcTotal(initiative.current.dice, {min: 0, max: 5});

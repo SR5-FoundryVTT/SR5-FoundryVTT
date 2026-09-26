@@ -36,10 +36,6 @@ export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
         return this.blastTemplateFlow.canPlace;
     }
 
-    override get showSuccessLabel(): boolean {
-        return this.success;
-    }
-
     override get testCategories(): Shadowrun.ActionCategories[] {
         return ['attack', 'attack_thrown']
     }

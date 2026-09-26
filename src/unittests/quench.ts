@@ -36,6 +36,7 @@ import { actorArmorFlowTesting } from './sr5.ActorArmorFlow.spec';
 import { shadowrunDiceSoNiceTesting } from './sr5.DiceSoNice.spec';
 import { scatterRulesTesting } from './ScatterRules.spec';
 import { shadowrunDataStorage } from './sr5.DataStorage.spec';
+import { shadowrunChatMessageLayoutTesting } from './sr5.ChatMessageLayout.spec';
 
 import { Quench, QuenchRegisterBatchFunction, QuenchRegisterBatchOptions } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
@@ -155,6 +156,9 @@ export const quenchRegister = (quench: Quench) => {
     registerBatch(quench, 'shadowrun5e.flow.sr5roll', shadowrunRolling, { displayName: 'SHADOWRUN5e: SR5Roll' });
     registerBatch(quench, 'shadowrun5e.integration.dice_so_nice', shadowrunDiceSoNiceTesting, {
         displayName: 'SHADOWRUN5e: Dice So Nice Integration',
+    });
+    registerBatch(quench, 'shadowrun5e.chat.message_layout', shadowrunChatMessageLayoutTesting, {
+        displayName: 'SHADOWRUN5e: Chat Message Layout',
     });
     registerBatch(quench, 'shadowrun5e.parser.weapon', weaponParserBaseTesting, {
         displayName: 'SHADOWRUN5e: Data Importer Weapon Parsing',

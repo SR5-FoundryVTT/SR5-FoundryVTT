@@ -19,6 +19,7 @@ import fs from 'fs';
 import path from 'path';
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
+import { pathToFileURL } from 'node:url';
 import { compilePack, extractPack } from '@foundryvtt/foundryvtt-cli';
 
 /**
@@ -71,7 +72,13 @@ const RESERVED_FILE_BASENAMES = new Set([
 //  EXECUTION
 // -------------------------------------------------------------------------
 
-(async () => {
+/** Whether this file was run by Node rather than imported by another module. */
+function isExecutedDirectly() {
+    const executedFile = process.argv[1];
+    return executedFile && import.meta.url === pathToFileURL(path.resolve(executedFile)).href;
+}
+
+if (isExecutedDirectly()) void (async () => {
     try {
         await yargs(hideBin(process.argv))
             .command(packageCommand())
@@ -339,7 +346,7 @@ function toPortablePathSegment(name) {
  * @param {boolean} [options.clearSourceId=true]  Should the core sourceId flag be deleted.
  * @param {number} [options.ownership=0]          Value to reset default ownership to.
  */
-function cleanPackEntry(data, { clearSourceId = true, ownership = 0 } = {}) {
+export function cleanPackEntry(data, { clearSourceId = true, ownership = 0 } = {}) {
     if (data.ownership) data.ownership = { default: ownership };
     if (clearSourceId) delete data.flags?.core?.sourceId;
 

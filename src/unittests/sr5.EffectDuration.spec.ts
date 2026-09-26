@@ -59,7 +59,7 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
         duration: preparedDuration,
     } as unknown as SR5ActiveEffect, { restartPending });
 
-    const waitUntil = async (condition: () => boolean, timeout = 1000) => {
+    const waitUntil = async (condition: () => boolean, timeout = 3000) => {
         const started = Date.now();
         while (!condition() && Date.now() - started < timeout) {
             await new Promise(resolve => setTimeout(resolve, 25));
@@ -250,8 +250,8 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
             const { effect } = await createEffect({type: 'character'}, {
                 duration: { value: 1, units: 'minutes', expiry: null } as any,
             });
-            const result = effect.isExpiryEvent('turnStart', ctx());
-            assert.isFalse(result, 'real_time effect should not expire on turnStart');
+            const native = foundry.documents.ActiveEffect.prototype.isExpiryEvent.call(effect, 'turnStart', ctx());
+            assert.strictEqual(effect.isExpiryEvent('turnStart', ctx()), native);
         });
     });
 

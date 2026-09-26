@@ -110,6 +110,109 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(test.pool.value, 10);
         });
 
+        describe('outcome hits', () => {
+            it('reports the rolled hits for a normal test', () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+
+                assert.isFalse(test.extended);
+                assert.strictEqual(test.outcomeHits, test.hits);
+            });
+
+            it('reports the accumulated hits for an extended test', () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+                test.data.extendedInterval = { value: 30, unit: 'minutes' };
+
+                assert.isTrue(test.extended);
+                assert.strictEqual(test.outcomeHits, test.extendedHits);
+            });
+        });
+
+        describe('outcome label visibility', () => {
+            it('shows a generic failure verdict without a threshold', () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+
+                assert.isFalse(test.hasThreshold);
+                assert.strictEqual(test.failureLabel, 'SR5.TestResults.Failure');
+                assert.isTrue(test.showsFailureOutcome);
+            });
+
+            it('never shows the Results placeholder, threshold or not', () => {
+                const test = TestCreator.fromPool(
+                    { pool: 10, threshold: 3 }, { showMessage: false, showDialog: false });
+                Object.defineProperty(test, 'failureLabel', { get: () => 'SR5.TestResults.Results' });
+
+                assert.isTrue(test.hasThreshold);
+                assert.isFalse(test.showsFailureOutcome);
+            });
+        });
+
+        describe('chat card verdict band', () => {
+            const renderCard = async (test): Promise<HTMLElement> => {
+                const html = await foundry.applications.handlebars.renderTemplate(
+                    'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',
+                    await test._prepareMessageTemplateData());
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = html;
+                return wrapper;
+            };
+            const codeLine = (card: HTMLElement) => card.querySelector('.test-code')?.textContent ?? '';
+
+            // The card prints term names without their values, so a zero threshold would be empty parens.
+            it('omits the threshold group when the threshold totals zero', async () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+                ModifiableValue.addUniqueBase(test.data.threshold, 'SR5.StunTrack', 0);
+
+                assert.lengthOf(test.codeTerms.threshold, 1);
+                assert.isFalse(test.hasThreshold);
+
+                assert.notInclude(codeLine(await renderCard(test)), '(');
+            });
+
+            it('renders the threshold group when the threshold applies', async () => {
+                const test = TestCreator.fromPool(
+                    { pool: 10, threshold: 3 }, { showMessage: false, showDialog: false });
+
+                assert.isTrue(test.hasThreshold);
+
+                assert.include(codeLine(await renderCard(test)), '(3)');
+            });
+
+            it('marks a critical glitch even when the test shows a success verdict', async () => {
+                const test = TestCreator.fromPool(
+                    { pool: 10, threshold: 1 }, { showMessage: false, showDialog: false });
+                test.data.values.hits = DataDefaults.createData(
+                    'value_field', { label: 'SR5.Hits', base: 2, value: 2 });
+                Object.defineProperty(test, 'criticalGlitched', { get: () => true });
+
+                assert.isTrue(test.showSuccessLabel);
+
+                const band = (await renderCard(test)).querySelector('.card-test-content--status');
+                assert.exists(band?.querySelector('.glitch-content--critical'));
+                assert.include(band?.textContent ?? '', game.i18n.localize('SR5.GlitchCritical'));
+                assert.equal(band?.querySelector('.test-outcome-hits-value')?.textContent, '2');
+            });
+        });
+
+        describe('description control visibility', () => {
+            it('hides the control when there is nothing to show', async () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+
+                assert.isFalse(test._hasDescriptionContent(''));
+                assert.isFalse(test._hasDescriptionContent({ description: { value: '  ' } }));
+
+                const templateData = await test._prepareMessageTemplateData();
+                assert.isTrue(test._canShowDescription);
+                assert.isFalse(templateData.showDescription);
+            });
+
+            it('keeps the control for description text or properties', () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+
+                assert.isTrue(test._hasDescriptionContent({ description: { value: '<p>Text</p>' } }));
+                assert.isTrue(test._hasDescriptionContent({ properties: ['Semi-Auto'] }));
+            });
+        });
+
         describe('limit usage UI state', () => {
             const COMMON_PARTIAL = 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs';
 
@@ -327,14 +430,14 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
             ModifiableValue.add(valueField, 'Custom Modifier', 3, {
                 type: 'add',
-                priority: ModifiableValue.MANUAL_PRIORITY,
+                priority: ModifiableValue.Priority.MANUAL,
             });
 
             const createdChange = valueField.changes.find(change => change.name === 'Custom Modifier');
             if (!createdChange) assert.fail('Expected manual-priority modifier to exist');
             if (!createdChange) return;
 
-            assert.strictEqual(createdChange.priority, ModifiableValue.MANUAL_PRIORITY);
+            assert.strictEqual(createdChange.priority, ModifiableValue.Priority.MANUAL);
             assert.isTrue(ModifiableValue.isManualChange(createdChange));
         });
 
@@ -432,6 +535,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             assert.isTrue(test.codeTerms.pool.every(term => {
                 return typeof term.tooltipSource === 'string' && term.tooltipSource.length > 0;
             }));
+            assert.isTrue(test.codeTerms.pool.every(term => typeof term.valueText === 'string'));
 
             assert.isTrue(test.codeTerms.threshold.every(term => !term.tooltipSource));
         });

@@ -1,0 +1,76 @@
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{localize "SR5.ItemTypes.Ammo"}}</label>
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label>{{localize "SR5.Damage"}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.damage value=source.system.damage
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        <label style="text-wrap: nowrap" data-tooltip="{{systemFields.replaceDamage.hint}}">
+            {{systemFields.replaceDamage.label}}&nbsp;{{formInput systemFields.replaceDamage value=source.system.replaceDamage
+                                                                  classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        </label>
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.damageType.hint}}">{{systemFields.damageType.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.damageType value=source.system.damageType localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.element.hint}}">{{systemFields.element.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.element value=source.system.element localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.ap.hint}}">{{systemFields.ap.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.ap value=source.system.ap
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        <label style="text-wrap: nowrap" data-tooltip="{{systemFields.replaceAP.hint}}">
+            {{systemFields.replaceAP.label}}&nbsp;{{formInput systemFields.replaceAP value=source.system.replaceAP
+                                                              classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        </label>
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.accuracy.hint}}">{{systemFields.accuracy.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.accuracy value=source.system.accuracy
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.blast.fields.radius.hint}}">{{systemFields.blast.fields.radius.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.blast.fields.radius value=source.system.blast.radius
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.blast.fields.dropoff.hint}}">{{systemFields.blast.fields.dropoff.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.blast.fields.dropoff value=source.system.blast.dropoff
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>

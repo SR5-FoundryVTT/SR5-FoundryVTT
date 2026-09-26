@@ -112,10 +112,6 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         return false;
     }
 
-    override get showSuccessLabel(): boolean {
-        return this.success;
-    }
-
     _selectFireMode(index: number) {
         this.data.fireMode = foundry.utils.deepClone(this.data.fireModes[index]);
     }
