@@ -34,6 +34,8 @@ export const getBlastDamageAtDistance = (blast: BlastTemplateData, distance: num
     const damageValue = blast.damageValue ?? 0;
     if (dropoff === 0 || damageValue <= 0 || distance < 0 || distance > blast.radius) return undefined;
 
-    const damage = damageValue - (Math.floor(distance) * dropoff);
+    const falloffSteps = Math.min(Math.floor(distance), Math.ceil(damageValue / dropoff) - 1);
+    const damage = damageValue - (falloffSteps * dropoff);
+
     return damage > 0 ? damage : undefined;
 };
