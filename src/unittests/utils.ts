@@ -46,9 +46,11 @@ export class SR5TestFactory {
         data: Omit<Item.CreateData, "name"> & { name?: string, type: T },
         context?: Item.ConstructionContext
     ) {
-        const folder = await this.getOrCreateFolderId('Item');
-        const item = await SR5Item.create({ name: `#QUENCH`, folder: folder, ...data }, context) as Item.Stored<T>;
-        this.items.push(item);
+        const folder = context?.parent ? undefined : await this.getOrCreateFolderId('Item');
+        const item = await SR5Item.create({ name: `#QUENCH`, ...(folder ? { folder } : {}), ...data }, context) as Item.Stored<T>;
+        if (!item.isEmbedded) {
+            this.items.push(item);
+        }
         return item;
     }
 

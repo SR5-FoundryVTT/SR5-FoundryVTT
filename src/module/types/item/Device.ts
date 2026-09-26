@@ -24,6 +24,8 @@ export const DevicePartData = () => ({
     managed: new SchemaField(ManagedDeviceData(), { nullable: true, initial: null }),
     atts: new SchemaField(MatrixAttributes(true)),
     slaves: new ArrayField(new DocumentUUIDField({ blank: true, required: true, nullable: false })),
+    sharing: new NumberField({ required: false, initial: 0, min: 0 }),
+    noise_reduction: new NumberField({ required: false, initial: 0, min: 0 }),
 });
 
 export const DeviceData = () => ({
