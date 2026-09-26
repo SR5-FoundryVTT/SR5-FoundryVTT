@@ -1706,6 +1706,16 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return undefined;
     }
 
+    /**
+     * Get the summoner of a spirit
+     */
+    getSummoner(this: SR5Actor): SR5Actor | undefined {
+        if (!this.isType('spirit') || !this.system.summonerUuid) return undefined;
+        const actor = fromUuidSync(this.system.summonerUuid);
+        if (actor && actor instanceof SR5Actor) return actor;
+        return undefined;
+    }
+
     getControlRigRating(): number {
         if (!this.isType('character')) return 0;
         return ModifiableValue.calcTotal(this.system.values.control_rig_rating);

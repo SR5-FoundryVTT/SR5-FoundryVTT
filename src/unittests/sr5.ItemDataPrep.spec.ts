@@ -16,6 +16,7 @@ import { BonusHelper } from '../module/apps/itemImport/helper/BonusHelper';
 import type { BonusSchema } from '../module/apps/itemImport/schema/BonusSchema';
 import type { DocCreateData } from '../module/apps/itemImport/helper/BonusConstant';
 import { ItemAvailabilityFlow } from '../module/item/flows/ItemAvailabilityFlow';
+import { SR5ActiveEffect } from '../module/effect/SR5ActiveEffect';
 
 /**
  * Tests involving data preparation for SR5Item types.
@@ -502,6 +503,70 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             });
             standalone.prepareData();
             assert.strictEqual(standalone.system.technology.cost.value, 101);
+        });
+
+        it('resolves @effect references to the effect rating', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { attributes: { body: { base: 3 } } } });
+            const [item] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'equipment',
+                name: 'Rated Gear',
+                system: { technology: { cost: { base: 100, value: 100 } } },
+                effects: [{
+                    name: 'Rating 4',
+                    system: {
+                        rating: 4,
+                        targets: [{ id: 'item', applyTo: 'item' }, { id: 'actor', applyTo: 'actor' }],
+                        changes: [
+                            { key: 'system.technology.cost', value: '@effect.system.rating * 50', type: 'add', target: 'item' },
+                            { key: 'system.attributes.body', value: '@effect.system.rating', type: 'add', target: 'actor' },
+                        ],
+                    },
+                }],
+            }]) as SR5Item<'equipment'>[];
+            actor.prepareData();
+
+            assert.strictEqual(item.system.technology.cost.value, 300);
+            assert.strictEqual(actor.system.attributes.body.value, 7);
+        });
+
+        it('resolves @driver references to the vehicle driver', async () => {
+            const driver = await factory.createActor({ type: 'character', system: { attributes: { body: { base: 4 } } } });
+            const vehicle = await factory.createActor({ type: 'vehicle' });
+            const [item] = await vehicle.createEmbeddedDocuments('Item', [{
+                type: 'equipment',
+                name: 'Driver Gear',
+                system: { technology: { cost: { base: 100, value: 100 } } },
+                effects: [{
+                    name: 'Driver Body',
+                    system: {
+                        targets: [{ id: 'item', applyTo: 'item' }],
+                        changes: [{ key: 'system.technology.cost', value: '(@driver.system.attributes.body.base ?? 0) * 100', type: 'add', target: 'item' }],
+                    },
+                }],
+            }]) as SR5Item<'equipment'>[];
+
+            vehicle.prepareData();
+            assert.strictEqual(item.system.technology.cost.value, 100);
+
+            await vehicle.addVehicleDriver(driver.uuid);
+            vehicle.prepareData();
+            assert.strictEqual(item.system.technology.cost.value, 500);
+        });
+
+        it('resolves @summoner and @technomancer references', async () => {
+            const character = await factory.createActor({ type: 'character', system: { attributes: { magic: { base: 6 }, resonance: { base: 5 } } } });
+            const spirit = await factory.createActor({ type: 'spirit' });
+            const sprite = await factory.createActor({ type: 'sprite' });
+
+            assert.isUndefined(SR5ActiveEffect.referenceResolver(spirit)('summoner.system.attributes.magic.base'));
+
+            await spirit.addSummoner(character);
+            await sprite.addTechnomancer(character);
+
+            assert.strictEqual(SR5ActiveEffect.referenceResolver(spirit)('summoner.system.attributes.magic.base'), 6);
+            assert.strictEqual(SR5ActiveEffect.referenceResolver(sprite)('technomancer.system.attributes.resonance.base'), 5);
+            // Each reference only resolves on its own actor type.
+            assert.isUndefined(SR5ActiveEffect.referenceResolver(sprite)('summoner.system.attributes.magic.base'));
         });
 
         it('imports parent and vehicle references and parent-relative availability', async () => {

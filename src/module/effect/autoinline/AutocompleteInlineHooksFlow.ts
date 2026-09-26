@@ -138,7 +138,7 @@ export const AutocompleteInlineHooksFlow =  {
 
     /**
      * Values a change can reference: the effect's own document, plus the related documents
-     * SR5ActiveEffect.referenceResolver offers as @actor, @parent and @affected.
+     * SR5ActiveEffect.referenceResolver offers as @actor, @parent, @affected, @effect, @driver, @summoner and @technomancer.
      *
      * @param effect The effect whose change values are completed.
      * @param affected The document the change is applied to.
@@ -152,7 +152,21 @@ export const AutocompleteInlineHooksFlow =  {
             ...(effect.actor && effect.actor !== document ? { actor: effect.actor.toObject() } : {}),
             ...(parent instanceof SR5Item || parent instanceof SR5Actor ? { parent: parent.toObject() } : {}),
             ...(affected ? { affected: affected.toObject() } : {}),
+            ...AutocompleteInlineHooksFlow.relatedValues(effect),
         };
+    },
+
+    /** The values a change can reference as @effect, @driver, @summoner and @technomancer. */
+    relatedValues: (effect: SR5ActiveEffect) => {
+        const document = effect.parent;
+        const actor = document instanceof SR5Item ? document.actorOwner : document;
+        const values: Record<string, object> = { effect: { system: { rating: effect.system.rating } } };
+        if (!(actor instanceof SR5Actor)) return values;
+        for (const role of ['driver', 'summoner', 'technomancer']) {
+            const controller = SR5ActiveEffect.controllingActor(actor, role);
+            if (controller) values[role] = controller.toObject();
+        }
+        return values;
     },
 
     /** The item containing a nested item. */
@@ -224,7 +238,7 @@ export const AutocompleteInlineHooksFlow =  {
             values['actor'] = effect.parent.parent.toObject();
         }
 
-        return values;
+        return { ...values, ...AutocompleteInlineHooksFlow.relatedValues(effect) };
     },
 
     /**
@@ -271,7 +285,7 @@ export const AutocompleteInlineHooksFlow =  {
             const successTest = new SuccessTestClass({});
             const opposedTest = new OpposedTestClass({ against: successTest.data }, {actor: item.actor ?? undefined, item});
             
-            return {data: opposedTest.data};
+            return { data: opposedTest.data, ...AutocompleteInlineHooksFlow.relatedValues(effect) };
         }
         return {};
     }

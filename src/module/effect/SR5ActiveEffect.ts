@@ -441,15 +441,16 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param source Any object style value, either a Foundry document or a plain object
      * @param change A singular ActiveEffect.ChangeData object
      * @param targetDoc The document being changed, whose field type drives the rendering
+     * @param effect The effect the change belongs to, when change data doesn't carry it
      */
-    static resolveDynamicChangeValue(source: any, change: ActiveEffect.ChangeData, targetDoc?: any) {
+    static resolveDynamicChangeValue(source: any, change: ActiveEffect.ChangeData, targetDoc?: any, effect: unknown = change.effect) {
         // Dynamic value present?
         if (typeof change.value !== 'string') return;
         if (change.value.length === 0) return;
 
         // The evaluator resolves @refs itself (keeping string/boolean types), rather than
         // Roll.replaceFormulaData which substitutes strings unquoted and coerces booleans to 1/0.
-        const value = DynamicValueEvaluator.evaluate(change.value, SR5ActiveEffect.referenceResolver(source, targetDoc));
+        const value = DynamicValueEvaluator.evaluate(change.value, SR5ActiveEffect.referenceResolver(source, targetDoc, effect));
 
         const rendered = SR5ActiveEffect.renderValueForField(value, change.key ?? '', targetDoc);
         if (rendered !== undefined) change.value = rendered;
@@ -463,18 +464,27 @@ export class SR5ActiveEffect extends ActiveEffect {
      * - `@actor`: the owning actor, also for nested items
      * - `@parent`: the containing item of a nested item, or the owning actor of an item
      * - `@affected`: the document the change is applied to
+     * - `@effect`: the effect the change belongs to, e.g. `@effect.system.rating`
+     * - `@driver`: the driver of the owning vehicle
+     * - `@summoner`: the summoner of the owning spirit
+     * - `@technomancer`: the technomancer of the owning sprite
      *
      * Other documents may still be preparing while a change applies, so prefer their `.base` values.
+     * Changes to a driver, summoner or technomancer don't prepare the owning actor again, so their
+     * values are only current for changes applied to tests.
      *
      * @param source The document or object the effect belongs to
      * @param targetDoc The document being changed
+     * @param effect The effect the change belongs to
      */
-    static referenceResolver(source: unknown, targetDoc?: unknown) {
+    static referenceResolver(source: unknown, targetDoc?: unknown, effect?: unknown) {
         const related = (source ?? {}) as { actor?: object | null; parent?: object | null };
         const read = (document: object | null | undefined, property: string) =>
             document ? foundry.utils.getProperty(document, property) : undefined;
+        const owner = () => source instanceof SR5Actor ? source
+            : source instanceof SR5Item ? source.actorOwner : related.actor;
 
-        return (path: string): unknown => { 
+        return (path: string): unknown => {
             const own = read(related, path);
             if (own !== undefined) return own;
 
@@ -482,16 +492,39 @@ export class SR5ActiveEffect extends ActiveEffect {
             const property = rest.join('.');
             switch (root) {
                 case 'actor':
-                    return read(source instanceof SR5Actor ? source
-                        : source instanceof SR5Item ? source.actorOwner : related.actor, property);
+                    return read(owner(), property);
+                case 'driver':
+                case 'summoner':
+                case 'technomancer': {
+                    const actor = owner();
+                    return actor instanceof SR5Actor ? read(SR5ActiveEffect.controllingActor(actor, root), property) : undefined;
+                }
                 case 'parent':
                     return read(related.parent, property);
                 case 'affected':
                     return read(targetDoc as object | undefined, property);
+                case 'effect':
+                    return read(effect as object | undefined, property);
                 default:
                     return undefined;
             }
         };
+    }
+
+    /**
+     * The actor controlling a vehicle, spirit or sprite, as the `@driver`, `@summoner` and
+     * `@technomancer` references name it.
+     *
+     * @param actor The controlled actor
+     * @param role The reference root naming the controller
+     */
+    static controllingActor(actor: SR5Actor, role: string): SR5Actor | undefined {
+        switch (role) {
+            case 'driver': return actor.getVehicleDriver();
+            case 'summoner': return actor.getSummoner();
+            case 'technomancer': return actor.getTechnomancer();
+            default: return undefined;
+        }
     }
 
     /**

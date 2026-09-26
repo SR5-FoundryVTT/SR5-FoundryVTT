@@ -205,7 +205,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         effectData.system.changes = effectData.system.changes
             .filter(change => targetedIds.has(change.target))
             .map(change => {
-                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as unknown as ActiveEffect.ChangeData, targetActor);
+                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as unknown as ActiveEffect.ChangeData, targetActor, effect);
                 return change;
             });
 
