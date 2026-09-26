@@ -3,6 +3,7 @@ import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { IconAssign } from "../../iconAssigner/IconAssign";
 import { DataDefaults, SystemEntityType } from "src/module/data/DataDefaults";
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
+import { ItemAvailabilityFlow } from "@/module/item/flows/ItemAvailabilityFlow";
 
 export type ItemSystems = SystemEntityType & Item.ConfiguredSubType;
 
@@ -18,6 +19,7 @@ export type BaseType = {
     description?: string | null;
     notes?: string | null;
     rating?: string | null;
+    maxrating?: string | null;
     avail?: string | null;
     qty?: string | null;
     owncost?: string | null;
@@ -94,14 +96,17 @@ export abstract class Parser<T extends ItemSystems> {
         if (itemData.rating != null)
             technology.rating = Number(itemData.rating) || 0;
 
+        if (itemData.maxrating != null)
+            technology.max_rating = Number(itemData.maxrating) || 0;
+
         if (itemData.avail != null)
-            technology.availability = itemData.avail;
+            Object.assign(technology.availability, ItemAvailabilityFlow.parseAvailabilityString(itemData.avail));
 
         if (itemData.qty != null)
             technology.quantity = Number(itemData.qty) || 0;
 
         if (itemData.owncost != null)
-            technology.cost = Number(itemData.owncost.replace(/[^\d.-]/g, "")) || 0;
+            technology.cost.base = Number(itemData.owncost.replace(/[^\d.-]/g, "")) || 0;
 
         if (itemData.equipped != null)
             technology.equipped = itemData.equipped === "True";
