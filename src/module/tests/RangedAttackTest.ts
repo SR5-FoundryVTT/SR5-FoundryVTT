@@ -13,6 +13,7 @@ import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/W
 import { WeaponRangeOverlayFlow } from './flows/WeaponRangeOverlayFlow';
 import { SuppressiveFireTemplateFlow } from './flows/SuppressiveFireTemplateFlow';
 import { ShotgunTemplateFlow } from './flows/ShotgunTemplateFlow';
+import { BlastTemplateFlow } from './flows/BlastTemplateFlow';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
     damage: DamageType
@@ -37,6 +38,9 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     public rangeOverlayFlow = new WeaponRangeOverlayFlow(this);
     public suppressiveFireTemplateFlow = new SuppressiveFireTemplateFlow(this);
     public shotgunTemplateFlow = new ShotgunTemplateFlow(this);
+    public blastTemplateFlow = new BlastTemplateFlow(this, {
+        prepareTargetData: () => WeaponRangeTestBehavior.prepareTargetData(this),
+    });
 
     override _prepareData(data: DeepPartial<RangedAttackTestData>, options: Partial<TestOptions>): RangedAttackTestData {
         const prepared: DeepPartial<RangedAttackTestData> = super._prepareData(data, options);
@@ -55,13 +59,14 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
             query: '#reset-progressive-recoil',
             on: 'click',
             callback: this._handleResetProgressiveRecoil.bind(this)
-        }, ...this.rangeOverlayFlow.dialogListeners(), ...this.suppressiveFireTemplateFlow.dialogListeners(() => this.data.suppressiveFireWidth), ...this.shotgunTemplateFlow.dialogListeners(() => this.data.ranges, () => this.data.shotgunChoke)]
+        }, ...this.rangeOverlayFlow.dialogListeners(), ...this.suppressiveFireTemplateFlow.dialogListeners(() => this.data.suppressiveFireWidth), ...this.shotgunTemplateFlow.dialogListeners(() => this.data.ranges, () => this.data.shotgunChoke), ...this.blastTemplateFlow.dialogListeners()]
     }
 
     override async _cleanUpAfterDialogCancel() {
         this.rangeOverlayFlow.remove();
         this.suppressiveFireTemplateFlow.cancelPreview();
         this.shotgunTemplateFlow.cancelPreview();
+        await this.blastTemplateFlow.cancelPreview();
         await super._cleanUpAfterDialogCancel();
     }
 
@@ -69,6 +74,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         this.rangeOverlayFlow.remove();
         await this.suppressiveFireTemplateFlow.finalizePreview();
         await this.shotgunTemplateFlow.finalizePreview();
+        await this.blastTemplateFlow.finalizePreview();
         await super._cleanUpAfterDialog();
     }
 
@@ -78,6 +84,10 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
 
     get canPlaceShotgunTemplate(): boolean {
         return this.item?.asType('weapon')?.system.range.ranges.category === 'shotgunFlechette';
+    }
+
+    get canPlaceBlastTemplate(): boolean {
+        return this.blastTemplateFlow.canPlace;
     }
 
     /**

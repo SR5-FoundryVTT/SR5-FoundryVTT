@@ -1,12 +1,14 @@
 import { SR5 } from '../module/config';
 import { SR5TestFactory } from './utils';
 import { SR5Actor } from '../module/actor/SR5Actor';
+import { SR5Item } from '../module/item/SR5Item';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CombatRules } from '../module/rules/CombatRules';
 import { DataDefaults } from '../module/data/DataDefaults';
 import { FireModeRules } from '../module/rules/FireModeRules';
 import { TestCreator } from '../module/tests/TestCreator';
 import { PhysicalDefenseTest } from '../module/tests/PhysicalDefenseTest';
+import { RangedAttackTest } from '../module/tests/RangedAttackTest';
 import { RangesTemplateType } from '../module/types/template/Weapon';
 import { DamageType, DamageTypeType } from 'src/module/types/item/Action';
 type DamageElementType = DamageType['element']['base'];
@@ -17,6 +19,35 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
     const assert: Chai.AssertStatic = context.assert;
 
     after(async () => { await factory.destroy(); });
+
+    describe('RangedAttackTest', () => {
+        it('exposes blast templates for equipped explosive ammo', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'weapon',
+                name: 'Explosive Ammo Weapon',
+                system: { category: 'range' },
+            }]);
+            const ammo = await factory.createItem({
+                type: 'ammo',
+                system: {
+                    technology: { equipped: true },
+                    blast: { radius: 4, dropoff: 1 },
+                },
+            });
+
+            await (weapon as SR5Item<'weapon'>).createNestedItem(ammo.toObject());
+            const test = await TestCreator.fromItem(weapon as SR5Item<'weapon'>, actor, {
+                showDialog: false,
+                showMessage: false,
+            });
+
+            assert.instanceOf(test, RangedAttackTest);
+            const rangedTest = test as RangedAttackTest;
+            assert.isTrue(rangedTest.canPlaceBlastTemplate);
+            assert.deepEqual(rangedTest.blastTemplateFlow.blastData, { radius: 4, dropoff: 1 });
+        });
+    });
 
     describe('Fire Mode Rules', () => {
         it('apply defense modifier per fire mode', () => {
