@@ -11,7 +11,6 @@ import { ChummerFormulaParser } from '../module/apps/itemImport/helper/ChummerFo
 import { Parser } from '../module/apps/itemImport/parser/Parser';
 import { WeaponModParser } from '../module/apps/itemImport/parser/mod/WeaponModParser';
 import { VehicleModParser } from '../module/apps/itemImport/parser/mod/VehicleModParser';
-import { WeaponParserBase } from '../module/apps/itemImport/parser/weapon/WeaponParserBase';
 import { DynamicValueEvaluator } from '../module/effect/DynamicValueEvaluator';
 import { BonusHelper } from '../module/apps/itemImport/helper/BonusHelper';
 import type { BonusSchema } from '../module/apps/itemImport/schema/BonusSchema';
@@ -611,7 +610,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
 
             // Built in, the same accessory is already part of the weapon's cost and availability.
             const builtIn = foundry.utils.deepClone(accessoryData) as unknown as Item.Source;
-            WeaponParserBase.includeInWeapon(builtIn);
+            Parser.includeInParent(builtIn);
             assert.strictEqual((builtIn.system as SR5Item<'modification'>['system']).technology.cost.base, 0);
             assert.isFalse(changes(builtIn).some(change => change.target === 'parent' || change.key === 'system.technology.cost'));
 
@@ -623,6 +622,40 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             await includedWeapon.createNestedItem(builtIn);
             actor.prepareData();
             assert.strictEqual(includedWeapon.system.technology.availability.label, '4');
+        });
+
+        it('drops capacity, cost and parent changes from included armor and vehicle mods', () => {
+            const mod = () => ({
+                type: 'modification',
+                name: 'Included Mod',
+                system: { slots: 2, technology: { cost: { base: 500, value: 500 } } },
+                effects: [{
+                    name: 'Mod Effects',
+                    system: {
+                        targets: [{ id: 'item', applyTo: 'item' }, { id: 'actor', applyTo: 'actor' }],
+                        changes: [
+                            { key: 'system.slots', value: '@system.technology.rating', type: 'override', target: 'item' },
+                            { key: 'system.technology.conceal', value: '1', type: 'add', target: 'item' },
+                            { key: 'system.vehicle_stats.handling', value: '1', type: 'add', target: 'actor' },
+                        ],
+                    },
+                }],
+            }) as unknown as Item.Source;
+            const keys = (item: Item.Source) => (item.effects as { system: { changes: { key: string }[] } }[])
+                .flatMap(effect => effect.system.changes.map(change => change.key));
+            const system = (item: Item.Source) => item.system as SR5Item<'modification'>['system'];
+
+            // An armor's capacity leaves out its included mods, whose own bonuses still count.
+            const armorMod = mod();
+            Parser.includeInParent(armorMod);
+            assert.strictEqual(system(armorMod).slots, 0);
+            assert.strictEqual(system(armorMod).technology.cost.base, 0);
+            assert.deepEqual(keys(armorMod), ['system.technology.conceal', 'system.vehicle_stats.handling']);
+
+            // A vehicle's own stats already include its mods' bonuses.
+            const vehicleMod = mod();
+            Parser.includeInParent(vehicleMod, { parentStats: true });
+            assert.deepEqual(keys(vehicleMod), ['system.technology.conceal']);
         });
 
         it('does not apply actor-target item effects to the item itself', async () => {

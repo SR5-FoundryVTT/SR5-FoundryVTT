@@ -22,6 +22,37 @@ export abstract class Parser<SubType extends SystemEntityType> {
         return (Object.keys(CONFIG.Actor.dataModels) as string[]).includes(this.parseType);
     }
 
+    /**
+     * Turn an item into one included in the weapon, armor or vehicle it's nested in. The parent's
+     * own values already account for it, so drop the item's cost and capacity, and the changes it
+     * makes to its parent item.
+     *
+     * @param item The nested item
+     * @param options.parentStats Also drop changes to the owning actor, for a vehicle whose own
+     *        stats already include the item
+     */
+    public static includeInParent(item: Item.Source, options: { parentStats?: boolean } = {}) {
+        const system = item.system as Partial<SystemType<'modification'>>;
+        if (system.technology) {
+            system.technology.cost.base = 0;
+            system.technology.cost.value = 0;
+        }
+        if (system.slots !== undefined) system.slots = 0;
+
+        const dropped = options.parentStats ? ['parent_item', 'actor'] : ['parent_item'];
+        item.effects = item.effects.filter(effect => {
+            const effectSystem = effect.system as {
+                targets: { id: string; applyTo: string }[];
+                changes: { key: string; target: string }[];
+            };
+            const droppedIds = new Set(effectSystem.targets.filter(target => dropped.includes(target.applyTo)).map(target => target.id));
+            effectSystem.targets = effectSystem.targets.filter(target => !droppedIds.has(target.id));
+            effectSystem.changes = effectSystem.changes.filter(change => !droppedIds.has(change.target)
+                && !change.key.startsWith('system.technology.cost') && change.key !== 'system.slots');
+            return effectSystem.changes.length > 0;
+        });
+    }
+
     protected getBonus(jsonData: ParseData) { return 'bonus' in jsonData ? jsonData.bonus : undefined; }
     protected abstract getFolder(jsonData: ParseData, compendiumKey: CompendiumKey): Promise<Folder>;
     protected async getItems(jsonData: ParseData): Promise<Item.Source[]> { return []; }
