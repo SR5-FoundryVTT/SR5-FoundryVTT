@@ -55,9 +55,9 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
 
     private _getEligibleTargetActors(): SR5Actor[] {
         // Drones/vehicles owned by player
-        return game.actors.filter(actor => {
+        return (game.actors as unknown as SR5Actor[]).filter(actor => {
             return actor.isType('vehicle') && actor.isOwner;
-        }) as SR5Actor[];
+        });
     }
 
     override async _prepareContext(options: Parameters<ApplicationV2['_prepareContext']>[0]) {
