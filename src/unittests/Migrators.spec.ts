@@ -865,6 +865,142 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
     });
 
+    describe('Version0_38_0 vehicle subCategory and swarm migration', () => {
+        it('migrates vehicle subCategory from Chummer importFlags category or image path', () => {
+            const migrator = new Version0_38_0();
+            const actor: any = {
+                type: 'vehicle',
+                img: 'systems/shadowrun5e/dist/icons/vehicle/car.svg',
+                system: {
+                    subCategory: '',
+                    importFlags: {
+                        category: 'Drones: Small',
+                    },
+                },
+            };
+            migrator.migrateActor(actor);
+            assert.strictEqual(actor.system.subCategory, 'small_drone');
+        });
+
+        it('migrates helicopter / rotorcraft subCategory from image path or name', () => {
+            const migrator = new Version0_38_0();
+            const actor: any = {
+                type: 'vehicle',
+                name: 'Ares Dragon Helicopter',
+                img: 'systems/shadowrun5e/dist/icons/vehicle/rotorcraft.svg',
+                system: {
+                    subCategory: '',
+                    category: 'medium', // Default VehicleData value
+                    isDrone: false,
+                    importFlags: {
+                        category: 'Flugzeuge',
+                    },
+                },
+            };
+            migrator.migrateActor(actor);
+            assert.strictEqual(actor.system.subCategory, 'rotorcraft');
+        });
+
+        it('migrates vehicle subCategory using icon evaluation for Bikes and Construction', () => {
+            const migrator = new Version0_38_0();
+            const bikeActor: any = {
+                type: 'vehicle',
+                system: {
+                    subCategory: '',
+                    importFlags: {
+                        category: 'Bikes',
+                    },
+                },
+            };
+            migrator.migrateActor(bikeActor);
+            assert.strictEqual(bikeActor.system.subCategory, 'motorcycle');
+
+            const constructionActor: any = {
+                type: 'vehicle',
+                flags: {
+                    shadowrun5e: {
+                        importFlags: {
+                            category: 'Municipal & Construction',
+                        },
+                    },
+                },
+                system: {
+                    subCategory: '',
+                },
+            };
+            migrator.migrateActor(constructionActor);
+            assert.strictEqual(constructionActor.system.subCategory, 'heavy_equipment');
+
+            const missileDroneActor: any = {
+                type: 'vehicle',
+                system: {
+                    subCategory: '',
+                    importFlags: {
+                        category: 'Drones: Missile',
+                    },
+                },
+            };
+            migrator.migrateActor(missileDroneActor);
+            assert.strictEqual(missileDroneActor.system.subCategory, 'missile_drone');
+        });
+
+        it('migrates legacy isSwarm and swarmCount properties to system.swarm schema', () => {
+            const migrator = new Version0_38_0();
+            const actor: any = {
+                type: 'vehicle',
+                system: {
+                    subCategory: 'micro_drone',
+                    isSwarm: true,
+                    swarmCount: 5,
+                },
+            };
+            migrator.migrateActor(actor);
+            assert.isTrue(actor.system.swarm.active);
+            assert.notProperty(actor.system, 'swarmCount');
+        });
+
+        it('correctly classifies Chevy Suburban and Jet-ski without substring false positives', () => {
+            const migrator = new Version0_38_0();
+            const suburbanActor: any = {
+                type: 'vehicle',
+                name: 'Chevy Suburban',
+                system: {
+                    subCategory: '',
+                },
+            };
+            migrator.migrateActor(suburbanActor);
+            assert.notStrictEqual(suburbanActor.system.subCategory, 'submarine');
+            assert.strictEqual(suburbanActor.system.subCategory, 'truck');
+
+            const jetSkiActor: any = {
+                type: 'vehicle',
+                name: 'Yamaha Jet-ski',
+                system: {
+                    subCategory: '',
+                },
+            };
+            migrator.migrateActor(jetSkiActor);
+            assert.notStrictEqual(jetSkiActor.system.subCategory, 'aircraft');
+            assert.strictEqual(jetSkiActor.system.subCategory, 'boat');
+        });
+
+        it('does not overwrite deliberately chosen aircraft subCategory', () => {
+            const migrator = new Version0_38_0();
+            const aircraftActor: any = {
+                type: 'vehicle',
+                name: 'Custom Jet Plane',
+                system: {
+                    subCategory: 'aircraft',
+                    importFlags: {
+                        category: 'Bikes',
+                    },
+                },
+            };
+            migrator.migrateActor(aircraftActor);
+            assert.strictEqual(aircraftActor.system.subCategory, 'aircraft');
+        });
+    });
+
     describe('Version0_38_0 item-sheet migration', () => {
         it('adds missing ids to nested item effects stored in flags', () => {
             const migrator = new Version0_38_0();
