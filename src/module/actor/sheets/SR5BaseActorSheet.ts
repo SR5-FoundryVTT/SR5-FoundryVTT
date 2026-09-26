@@ -11,6 +11,7 @@ import { SituationModifiersApplication } from '../../apps/SituationModifiersAppl
 import { MoveInventoryDialog } from '../../apps/dialogs/MoveInventoryDialog';
 import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
 import { AutosoftConfigManager } from '@/module/apps/actor/AutosoftConfigManager';
+import { RiggingRules } from '@/module/rules/RiggingRules';
 
 import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { prepareSortedEffects, prepareSortedItemEffects } from '../../effects';
@@ -1650,9 +1651,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 case 'quality':
                     (items as SR5Item<'quality'>[]).sort(sortByQuality);
                     break;
-                case 'program':
-                    items.sort(sortByEquipped);
-                    break;
                 default:
                     items.sort(sortByName);
                     break;
@@ -1684,10 +1682,25 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     _prepareProgramCount(itemTypes: Record<string, SR5Item[]>): string {
         if (!itemTypes.program) return '';
+
+        if (this.actor.isType('vehicle')) {
+            const maxSlots = RiggingRules.getMaxAutosoftSlots(this.actor);
+            const runningCount = RiggingRules.getRunningLocalAutosofts(this.actor).length;
+            return `(${runningCount}/${maxSlots})`;
+        }
+
         if (!this.actor.hasDevicePersona()) return '';
 
-        const active = itemTypes.program.filter(program => program.system.technology?.equipped).length;
         const activeDevice = this.actor.getMatrixDevice();
+        if (!activeDevice) return '';
+
+        if (activeDevice.isType('device') && activeDevice.system.category === 'rcc') {
+            const sharing = Number(activeDevice.system.sharing || 0);
+            const loaded = RiggingRules.getLoadedRCCAutosofts(activeDevice).length;
+            return `(${loaded}/${sharing})`;
+        }
+
+        const active = itemTypes.program.filter(program => program.system.technology?.equipped).length;
         const max = activeDevice?.system.programs ?? 0;
 
         return `(${active}/${max})`;
@@ -2032,6 +2045,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     static async #onToggleEquippedItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        event.stopPropagation();
         if (!isElementInstance(event.target, HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         const item = this.actor.items.get(id);

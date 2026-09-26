@@ -95,9 +95,13 @@ export const RiggingTestDataFlow = {
         else if (actionSkill.startsWith('pilot_')) autosoftType = 'maneuvering';
         else if (test.data.categories?.includes('defense')) autosoftType = 'evasion';
 
-        if (!autosoftType) return;
+        if (!autosoftType && !actionSkill) return;
 
-        const autosoft = RiggingRules.getEffectiveAutosoft(vehicle, autosoftType);
+        const autosoft = RiggingRules.getEffectiveAutosoft(vehicle, autosoftType, {
+            skill: actionSkill,
+            weapon: test.item?.name,
+            model: vehicle.name
+        });
         if (autosoft.rating > 0) {
             // Remove defaulting penalty if skill was added to pool
             if (actionSkill) {

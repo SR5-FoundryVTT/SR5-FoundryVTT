@@ -12,6 +12,8 @@ const { fromUuidSync } = foundry.utils;
 export interface AutosoftConfigManagerContext extends HandlebarsApplicationMixin.RenderContext {
     autosoftType: string;
     autosoftTypes: Record<string, string>;
+    activeSkills: Record<string, string>;
+    selectedSkill: string;
     targetActors: Array<{ uuid: string; name: string; img: string }>;
     selectedTargetActorUuid: string;
     targetWeapons: Array<{ uuid: string; name: string; img: string }>;
@@ -25,6 +27,7 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
     selectedTargetActorUuid: string = '';
     selectedTargetWeaponUuid: string = '';
     selectedAutosoftType: string = '';
+    selectedSkill: string = '';
     targetModel: string = '';
 
     constructor(
@@ -35,6 +38,7 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
         super(options);
         const sys = autosoftItem.system;
         this.selectedAutosoftType = sys.autosoftType || 'clearsight';
+        this.selectedSkill = sys.skill || '';
         this.targetModel = sys.targetModel || '';
         this.selectedTargetWeaponUuid = sys.targetWeapon || '';
 
@@ -60,6 +64,8 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
         const context = await super._prepareContext(options);
         context.autosoftType = this.selectedAutosoftType;
         context.autosoftTypes = SR5.autosoftTypes;
+        context.activeSkills = SR5.activeSkills;
+        context.selectedSkill = this.selectedSkill;
         context.targetModel = this.targetModel;
 
         const eligibleActors = this._getEligibleTargetActors();
@@ -107,6 +113,7 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
         // Prepare item data for update & transfer
         const itemData = this.autosoftItem.toObject();
         itemData.system.autosoftType = this.selectedAutosoftType;
+        itemData.system.skill = this.selectedSkill;
         itemData.system.targetModel = this.targetModel;
         itemData.system.targetWeapon = this.selectedTargetWeaponUuid;
 
@@ -140,6 +147,12 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
             if (e.target instanceof HTMLSelectElement) {
                 this.selectedAutosoftType = e.target.value;
                 void this.render();
+            }
+        });
+
+        root.querySelector<HTMLSelectElement>('[name="skill"]')?.addEventListener('change', (e: Event) => {
+            if (e.target instanceof HTMLSelectElement) {
+                this.selectedSkill = e.target.value;
             }
         });
 

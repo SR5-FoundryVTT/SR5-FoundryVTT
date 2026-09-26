@@ -17,6 +17,11 @@ const ProgramData = () => ({
         initial: 'clearsight',
         choices: SR5.autosoftTypes,
     }),
+    skill: new StringField({
+        required: false,
+        blank: true,
+        initial: '',
+    }),
     targetModel: new StringField({
         required: false,
         initial: '',

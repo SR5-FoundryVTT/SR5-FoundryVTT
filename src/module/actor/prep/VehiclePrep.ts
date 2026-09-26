@@ -13,13 +13,16 @@ import { MatrixRules } from '@/module/rules/MatrixRules';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { ItemPrep } from './functions/ItemPrep';
+import { RiggingRules } from '@/module/rules/RiggingRules';
+import { DataDefaults } from '@/module/data/DataDefaults';
+import type { SR5Actor } from '@/module/actor/SR5Actor';
 
 export class VehiclePrep {
     static prepareBaseData(system: Actor.SystemOfType<'vehicle'>) {
         ModifiableFieldPrep.resetAllModifiers(system);
     }
 
-    static prepareDerivedData(system: Actor.SystemOfType<'vehicle'>, items: SR5Item[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'vehicle'>, items: SR5Item[], actor?: SR5Actor) {
         VehiclePrep.prepareVehicleStats(system);
         VehiclePrep.prepareDeviceAttributes(system);
         VehiclePrep.prepareLimits(system);
@@ -29,6 +32,8 @@ export class VehiclePrep {
         VehiclePrep.prepareAttributesWithBody(system);
         VehiclePrep.prepareAttributeRanges(system);
         
+        VehiclePrep.prepareAutosoftSkills(system, items, actor);
+        VehiclePrep.prepareJumpedInDriverData(system, actor);
         SkillsPrep.prepareSkills(system);
 
         LimitsPrep.prepareLimits(system);
@@ -40,10 +45,203 @@ export class VehiclePrep {
         VehiclePrep.prepareMovement(system);
 
         InitiativePrep.prepareInit('vehicle', system);
+        VehiclePrep.prepareVehicleInitiative(system, actor);
 
         ItemPrep.prepareArmor(system, items);
         CharacterPrep.prepareRecoil(system);
         VehiclePrep.prepareRecoilCompensation(system);
+    }
+
+    /**
+     * Transfer driver's attributes, skills, and Control Rig bonuses to vehicle when jumped in.
+     * When jumped out (autopilot), derived data modifiers and skills are automatically reset.
+     */
+    static prepareJumpedInDriverData(system: Actor.SystemOfType<'vehicle'>, actor?: SR5Actor) {
+        if (!actor || system.controlMode !== 'rigger') return;
+
+        const driver = actor.getVehicleDriver();
+        if (!driver) return;
+
+        // 1. Transfer Driver mental & physical attributes relevant to rigging
+        const attributeKeysToTransfer = ['logic', 'intuition', 'reaction', 'agility', 'willpower'] as const;
+        for (const attKey of attributeKeysToTransfer) {
+            const att = driver.findAttribute(attKey);
+            const rating = att?.value || 0;
+            if (rating > 0) {
+                const attribute = system.attributes[attKey];
+                if (attribute) {
+                    ModifiableValue.addUnique(attribute, 'SR5.Rigger.JumpedIn', rating, { type: 'upgrade' });
+                    AttributesPrep.calculateAttribute(attKey, attribute);
+                }
+            }
+        }
+
+        // 2. Transfer Driver active skills
+        const skillKeysToTransfer = new Set<string>(['gunnery', 'perception', 'sneaking', 'electronic_warfare']);
+        const vehiclePilotSkill = actor.getVehicleTypeSkillName();
+        if (vehiclePilotSkill) {
+            skillKeysToTransfer.add(vehiclePilotSkill);
+        }
+        for (const pSkill of RiggingRules.PilotSkills) {
+            skillKeysToTransfer.add(pSkill);
+        }
+        if (driver.system?.skills?.active) {
+            for (const [skillKey, skill] of Object.entries(driver.system.skills.active)) {
+                if (skill && ((skill.value ?? 0) > 0 || (skill.base ?? 0) > 0)) {
+                    skillKeysToTransfer.add(skillKey);
+                }
+            }
+        }
+
+        for (const skillKey of skillKeysToTransfer) {
+            const driverSkill = driver.findActiveSkill(skillKey);
+            const rating = driverSkill?.value ?? driverSkill?.base ?? 0;
+            if (rating <= 0) continue;
+
+            const existingSkill = system.skills.active[skillKey];
+            if (existingSkill) {
+                ModifiableValue.addUnique(existingSkill, 'SR5.Rigger.JumpedIn', rating, { type: 'upgrade' });
+                ModifiableValue.calcTotal(existingSkill);
+                if (!existingSkill.specs?.length && driverSkill?.specs?.length) {
+                    existingSkill.specs = [...driverSkill.specs];
+                }
+            } else {
+                const skillName = SR5.activeSkills[skillKey] || skillKey;
+                const skillField = DataDefaults.createData('skill_field', {
+                    id: driverSkill?.id || skillKey,
+                    key: skillKey,
+                    name: skillName,
+                    img: driverSkill?.img || 'icons/svg/item-bag.svg',
+                    label: game.i18n.localize(skillName),
+                    base: rating,
+                    attribute: driverSkill?.attribute || 'agility',
+                    canDefault: true,
+                    specs: driverSkill?.specs ? [...driverSkill.specs] : [],
+                });
+                ModifiableValue.addUnique(skillField, 'SR5.Rigger.JumpedIn', rating, { type: 'upgrade' });
+                ModifiableValue.calcTotal(skillField);
+                system.skills.active[skillKey] = skillField;
+            }
+        }
+    }
+
+    /**
+     * Dynamically adjust vehicle initiative based on its active control mode.
+     * - Autopilot: uses onboard Pilot * 2 + 4d6 (default meatspace)
+     * - Rigger: uses driver's Matrix VR initiative (hot-sim/cold-sim)
+     * - Remote: uses driver's remote initiative (matrix VR if in VR, or meatspace/AR)
+     * - Manual: uses driver's meatspace initiative
+     */
+    static prepareVehicleInitiative(system: Actor.SystemOfType<'vehicle'>, actor?: SR5Actor) {
+        if (!actor) return;
+
+        const driver = actor.getVehicleDriver();
+
+        if (system.controlMode === 'rigger') {
+            if (driver) {
+                const driverInit = (driver.system.initiative as any)?.matrix || driver.system.initiative?.current;
+                if (driverInit) {
+                    const constVal = driverInit.constant?.value ?? 0;
+                    const diceVal = driverInit.dice?.value ?? 0;
+
+                    ModifiableValue.addUnique(system.initiative.current.constant, 'SR5.Rigger.JumpedIn', constVal, {
+                        type: 'override',
+                        priority: ModifiableValue.TOP_PRIORITY
+                    });
+                    ModifiableValue.addUnique(system.initiative.current.dice, 'SR5.Rigger.JumpedIn', diceVal, {
+                        type: 'override',
+                        priority: ModifiableValue.TOP_PRIORITY
+                    });
+                    ModifiableValue.calcTotal(system.initiative.current.constant);
+                    ModifiableValue.calcTotal(system.initiative.current.dice, { min: 0, max: 5 });
+                    (system.initiative.current.dice as any).text = `${system.initiative.current.dice.value}d6`;
+                }
+            }
+        } else if (system.controlMode === 'remote') {
+            if (driver) {
+                const driverInit = driver.system.initiative?.current || (driver.system.initiative as any)?.matrix;
+                if (driverInit) {
+                    const constVal = driverInit.constant?.value ?? 0;
+                    const diceVal = driverInit.dice?.value ?? 0;
+
+                    ModifiableValue.addUnique(system.initiative.current.constant, 'SR5.ControlModes.Remote', constVal, {
+                        type: 'override',
+                        priority: ModifiableValue.TOP_PRIORITY
+                    });
+                    ModifiableValue.addUnique(system.initiative.current.dice, 'SR5.ControlModes.Remote', diceVal, {
+                        type: 'override',
+                        priority: ModifiableValue.TOP_PRIORITY
+                    });
+                    ModifiableValue.calcTotal(system.initiative.current.constant);
+                    ModifiableValue.calcTotal(system.initiative.current.dice, { min: 0, max: 5 });
+                    (system.initiative.current.dice as any).text = `${system.initiative.current.dice.value}d6`;
+                }
+            }
+        } else if (system.controlMode === 'manual') {
+            if (driver) {
+                const driverInit = (driver.system.initiative as any)?.meatspace || driver.system.initiative?.current;
+                if (driverInit) {
+                    const constVal = driverInit.constant?.value ?? 0;
+                    const diceVal = driverInit.dice?.value ?? 0;
+
+                    ModifiableValue.addUnique(system.initiative.current.constant, 'SR5.Vehicle.ControlModes.Manual', constVal, {
+                        type: 'override',
+                        priority: ModifiableValue.TOP_PRIORITY
+                    });
+                    ModifiableValue.addUnique(system.initiative.current.dice, 'SR5.Vehicle.ControlModes.Manual', diceVal, {
+                        type: 'override',
+                        priority: ModifiableValue.TOP_PRIORITY
+                    });
+                    ModifiableValue.calcTotal(system.initiative.current.constant);
+                    ModifiableValue.calcTotal(system.initiative.current.dice, { min: 0, max: 5 });
+                    (system.initiative.current.dice as any).text = `${system.initiative.current.dice.value}d6`;
+                }
+            }
+        }
+    }
+
+    /**
+     * Populate and enhance vehicle active skills with running autosoft ratings.
+     * Follows SR5 CRB p. 267: if any local autosoft is running, all RCC shared autosofts are ignored.
+     */
+    static prepareAutosoftSkills(system: Actor.SystemOfType<'vehicle'>, items: SR5Item[], actor?: SR5Actor) {
+        if (!actor) return;
+
+        if (!actor.itemsForType?.get('skill')?.length) {
+            system.skills.active = {};
+        }
+
+        const effectiveAutosofts = RiggingRules.getAllEffectiveAutosofts(actor);
+        if (effectiveAutosofts.length === 0) return;
+
+        for (const autosoft of effectiveAutosofts) {
+            const rating = autosoft.getRating();
+            if (rating <= 0) continue;
+
+            const skillKey = RiggingRules.getSkillForAutosoft(autosoft, actor);
+            if (!skillKey) continue;
+
+            const existingSkill = system.skills.active[skillKey];
+            if (existingSkill) {
+                existingSkill.base = Math.max(existingSkill.base || 0, rating);
+                ModifiableValue.calcTotal(existingSkill);
+            } else {
+                const skillName = SR5.activeSkills[skillKey] || skillKey;
+                const skillField = DataDefaults.createData('skill_field', {
+                    id: autosoft.id || skillKey,
+                    key: skillKey,
+                    name: skillName,
+                    img: autosoft.img || 'icons/svg/item-bag.svg',
+                    label: game.i18n.localize(skillName),
+                    base: rating,
+                    attribute: 'pilot',
+                    canDefault: true,
+                    specs: [],
+                });
+                ModifiableValue.calcTotal(skillField);
+                system.skills.active[skillKey] = skillField;
+            }
+        }
     }
 
     static prepareVehicleStats(system: Actor.SystemOfType<'vehicle'>) {

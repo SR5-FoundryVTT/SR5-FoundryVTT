@@ -117,24 +117,78 @@ export class RiggingRules {
     }
 
     /**
+     * Resolve the target skill key for an autosoft program.
+     * Uses item.system.skill if explicitly set, otherwise infers from autosoftType.
+     */
+    static getSkillForAutosoft(item: SR5Item<'program'>, drone?: SR5Actor): string {
+        if (item.system.skill) return item.system.skill;
+
+        switch (item.system.autosoftType) {
+            case 'clearsight':
+                return 'perception';
+            case 'stealth':
+                return 'sneaking';
+            case 'targeting':
+                return 'gunnery';
+            case 'electronic_warfare':
+                return 'electronic_warfare';
+            case 'maneuvering':
+                return (drone?.isType('vehicle') ? drone.getVehicleTypeSkillName() : undefined) || 'pilot_ground_craft';
+            case 'evasion':
+                return 'gymnastics';
+            default:
+                return '';
+        }
+    }
+
+    /**
+     * Get all effective autosofts running on a drone.
+     * Follows SR5 CRB p. 267: if any local autosoft is running, all RCC shared autosofts are ignored.
+     */
+    static getAllEffectiveAutosofts(drone: SR5Actor): SR5Item<'program'>[] {
+        if (!drone.isType('vehicle')) return [];
+
+        const localAutosofts = this.getRunningLocalAutosofts(drone);
+        if (localAutosofts.length > 0) {
+            return localAutosofts;
+        }
+
+        const masterItem = drone.master;
+        if (masterItem && masterItem.isType('device') && masterItem.system.category === 'rcc') {
+            return this.getLoadedRCCAutosofts(masterItem);
+        }
+
+        return [];
+    }
+
+    /**
      * Resolve effective autosoft rating for a drone action.
      * Hierarchy:
-     * 1. If drone has ANY local running autosofts: use local matching autosoft.
+     * 1. If drone has ANY local running autosofts: use local matching autosoft (RCC ignored).
      * 2. Else if drone is slaved to an active RCC: use RCC loaded matching autosoft.
      * 3. Else rating = 0.
      */
     static getEffectiveAutosoft(
         drone: SR5Actor,
         autosoftType: string,
-        options?: { model?: string; weapon?: string }
+        options?: { model?: string; weapon?: string; skill?: string }
     ): { rating: number; source: 'local' | 'rcc' | 'none'; name?: string } {
         if (!drone.isType('vehicle')) return { rating: 0, source: 'none' };
 
         const droneModel = options?.model || drone.name || '';
         const requestedWeapon = options?.weapon || '';
+        const requestedSkill = options?.skill || '';
 
         const matchesAutosoft = (item: SR5Item<'program'>) => {
-            if (item.system.autosoftType !== autosoftType) return false;
+            const itemSkill = RiggingRules.getSkillForAutosoft(item, drone);
+
+            // If a specific skill is requested, check if item's skill matches
+            if (requestedSkill) {
+                if (itemSkill && itemSkill === requestedSkill) return true;
+                if (item.system.autosoftType !== autosoftType) return false;
+            } else {
+                if (item.system.autosoftType !== autosoftType) return false;
+            }
 
             // Targeting autosoft matches specific targetWeapon if specified
             if (autosoftType === 'targeting' && item.system.targetWeapon && requestedWeapon) {
