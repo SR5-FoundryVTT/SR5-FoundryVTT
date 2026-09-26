@@ -1,0 +1,113 @@
+<section class="spell-like-summary">
+    {{#if (isType item 'spell')}}
+        {{#with (spellDescriptorLine system @root.config)}}
+            <div class="spell-like-summary-descriptors">{{this}}</div>
+        {{/with}}
+        <div class="spell-like-summary-grid spell-like-summary-grid-spell">
+            {{#unless (empty system.type)}}
+                <div class="spell-like-summary-field">
+                    <strong>{{localize "SR5.Spell.Type"}}</strong>
+                    <span>{{localizeOb system.type @root.config.spellTypes}}</span>
+                </div>
+            {{/unless}}
+            {{#unless (empty system.range)}}
+                <div class="spell-like-summary-field">
+                    <strong>{{localize "SR5.Range"}}</strong>
+                    <span>{{localizeOb system.range @root.config.spellRanges}}</span>
+                </div>
+            {{/unless}}
+            {{#if (or system.action.damage.type.value system.action.damage.element.value)}}
+                <div class="spell-like-summary-field">
+                    <strong>{{localize "SR5.Damage"}}</strong>
+                    <span>{{localizeOb system.action.damage.type.value @root.config.damageTypes}}</span>
+                </div>
+            {{/if}}
+            {{#unless (empty system.duration)}}
+                <div class="spell-like-summary-field">
+                    <strong>{{localize "SR5.Duration"}}</strong>
+                    <span>{{localizeOb system.duration @root.config.durations}}</span>
+                </div>
+            {{/unless}}
+            <div class="spell-like-summary-field">
+                <strong>{{localize "SR5.Drain"}}</strong>
+                <span>{{spellDrainCode system.drain}}</span>
+            </div>
+        </div>
+    {{else if (isType item 'ritual')}}
+        <div class="spell-like-summary-grid">
+            {{#unless (empty system.type)}}
+                <div class="spell-like-summary-field">
+                    <strong>{{localize "SR5.Spell.Type"}}</strong>
+                    <span>{{localizeOb system.type @root.config.spellTypes}}</span>
+                </div>
+            {{/unless}}
+            {{#unless (empty system.descriptors)}}
+                <div class="spell-like-summary-field spell-like-summary-field-wide">
+                    <strong>{{systemFields.descriptors.label}}</strong>
+                    <span>{{system.descriptors}}</span>
+                </div>
+            {{/unless}}
+        </div>
+    {{else if (isType item 'complex_form')}}
+        <div class="spell-like-summary-grid">
+            {{#unless (empty system.target)}}
+                <div class="spell-like-summary-field">
+                    <strong>{{systemFields.target.label}}</strong>
+                    <span>{{localizeOb system.target @root.config.matrixTargets}}</span>
+                </div>
+            {{/unless}}
+            {{#unless (empty system.duration)}}
+                <div class="spell-like-summary-field">
+                    <strong>{{systemFields.duration.label}}</strong>
+                    <span>{{localizeOb system.duration @root.config.complexForm.durations}}</span>
+                </div>
+            {{/unless}}
+            <div class="spell-like-summary-field">
+                <strong>{{systemFields.fade.label}}</strong>
+                <span>L{{numberFormat system.fade sign=true}}</span>
+            </div>
+        </div>
+    {{else if (isType item 'critter_power')}}
+        <div class="spell-like-summary-grid">
+            {{#unless (empty system.powerType)}}
+                <div class="spell-like-summary-field">
+                    <strong>{{localize "SR5.Spell.Type"}}</strong>
+                    <span>{{localizeOb system.powerType @root.config.critterPower.types}}</span>
+                </div>
+            {{/unless}}
+            {{#unless (empty system.action.type)}}
+                <div class="spell-like-summary-field">
+                    <strong>{{localize "SR5.Action"}}</strong>
+                    <span>{{localizeOb system.action.type @root.config.actionTypes}}</span>
+                </div>
+            {{/unless}}
+            {{#unless (empty system.range)}}
+                <div class="spell-like-summary-field">
+                    <strong>{{systemFields.range.label}}</strong>
+                    <span>{{localizeOb system.range @root.config.critterPower.ranges}}</span>
+                </div>
+            {{/unless}}
+            {{#unless (empty system.duration)}}
+                <div class="spell-like-summary-field">
+                    <strong>{{systemFields.duration.label}}</strong>
+                    <span>{{localizeOb system.duration @root.config.critterPower.durations}}</span>
+                </div>
+            {{/unless}}
+        </div>
+    {{else if (isType item 'sprite_power')}}
+        <div class="spell-like-summary-grid">
+            {{#unless (empty system.action.type)}}
+                <div class="spell-like-summary-field">
+                    <strong>{{localize "SR5.Action"}}</strong>
+                    <span>{{localizeOb system.action.type @root.config.actionTypes}}</span>
+                </div>
+            {{/unless}}
+            {{#unless (empty system.duration)}}
+                <div class="spell-like-summary-field">
+                    <strong>{{systemFields.duration.label}}</strong>
+                    <span>{{localizeOb system.duration @root.config.spritePower.durations}}</span>
+                </div>
+            {{/unless}}
+        </div>
+    {{/if}}
+</section>

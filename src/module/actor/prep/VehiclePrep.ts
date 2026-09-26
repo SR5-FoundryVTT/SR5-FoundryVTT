@@ -145,11 +145,11 @@ export class VehiclePrep {
 
                     ModifiableValue.addUnique(system.initiative.current.constant, 'SR5.Rigger.JumpedIn', constVal, {
                         type: 'override',
-                        priority: ModifiableValue.TOP_PRIORITY
+                        priority: ModifiableValue.Priority.TOP
                     });
                     ModifiableValue.addUnique(system.initiative.current.dice, 'SR5.Rigger.JumpedIn', diceVal, {
                         type: 'override',
-                        priority: ModifiableValue.TOP_PRIORITY
+                        priority: ModifiableValue.Priority.TOP
                     });
                     ModifiableValue.calcTotal(system.initiative.current.constant);
                     ModifiableValue.calcTotal(system.initiative.current.dice, { min: 0, max: 5 });
@@ -165,11 +165,11 @@ export class VehiclePrep {
 
                     ModifiableValue.addUnique(system.initiative.current.constant, 'SR5.ControlModes.Remote', constVal, {
                         type: 'override',
-                        priority: ModifiableValue.TOP_PRIORITY
+                        priority: ModifiableValue.Priority.TOP
                     });
                     ModifiableValue.addUnique(system.initiative.current.dice, 'SR5.ControlModes.Remote', diceVal, {
                         type: 'override',
-                        priority: ModifiableValue.TOP_PRIORITY
+                        priority: ModifiableValue.Priority.TOP
                     });
                     ModifiableValue.calcTotal(system.initiative.current.constant);
                     ModifiableValue.calcTotal(system.initiative.current.dice, { min: 0, max: 5 });
@@ -185,11 +185,11 @@ export class VehiclePrep {
 
                     ModifiableValue.addUnique(system.initiative.current.constant, 'SR5.Vehicle.ControlModes.Manual', constVal, {
                         type: 'override',
-                        priority: ModifiableValue.TOP_PRIORITY
+                        priority: ModifiableValue.Priority.TOP
                     });
                     ModifiableValue.addUnique(system.initiative.current.dice, 'SR5.Vehicle.ControlModes.Manual', diceVal, {
                         type: 'override',
-                        priority: ModifiableValue.TOP_PRIORITY
+                        priority: ModifiableValue.Priority.TOP
                     });
                     ModifiableValue.calcTotal(system.initiative.current.constant);
                     ModifiableValue.calcTotal(system.initiative.current.dice, { min: 0, max: 5 });

@@ -17,6 +17,7 @@ body,
     --sr5-theme-row-even: rgba(255, 255, 255, 0.08);
     --sr5-theme-shadow: 0 0 10px 5px rgba(235, 181, 49, 0.4);
     --sr5-theme-chat-bg: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.05)), var(--sr5-theme-page-image) repeat;
+    --sr5-theme-chat-body-bg: #14161b;
     --sr5-theme-chat-whisper-bg: linear-gradient(rgba(64, 64, 85, 0.5), rgba(0, 0, 0, 0.5)), var(--sr5-theme-page-image) repeat;
     --sr5-theme-chat-blind-bg: linear-gradient(rgba(87, 51, 87, 0.25), rgba(0, 0, 0, 0.5)), var(--sr5-theme-page-image) repeat;
     --sr5-theme-chat-border: #4b4a44;
@@ -64,6 +65,7 @@ body.theme-light,
     --sr5-theme-row-even: rgba(99, 112, 128, 0.08);
     --sr5-theme-shadow: 0 16px 38px rgba(26, 31, 40, 0.18);
     --sr5-theme-chat-bg: linear-gradient(rgba(246, 248, 251, 0.92), rgba(225, 230, 236, 0.98)), var(--sr5-theme-page-image) repeat;
+    --sr5-theme-chat-body-bg: #e7ebf0;
     --sr5-theme-chat-whisper-bg: linear-gradient(rgba(223, 230, 242, 0.9), rgba(208, 216, 228, 0.96)), var(--sr5-theme-page-image) repeat;
     --sr5-theme-chat-blind-bg: linear-gradient(rgba(235, 228, 241, 0.92), rgba(219, 210, 228, 0.98)), var(--sr5-theme-page-image) repeat;
     --sr5-theme-chat-border: rgba(108, 31, 44, 0.24);
@@ -389,7 +391,6 @@ body.theme-light,
                 justify-content: start;
                 align-items: center;
                 flex-flow: column nowrap;
-                gap: .25rem;
 
                 .sheet-header-resource-container {
                     box-sizing: border-box;
@@ -408,7 +409,7 @@ body.theme-light,
                     }
 
                     .sheet-header-resource-value {
-                        flex: 0 0 4rem;
+                        flex: 0 0 5rem;
                         justify-content: center;
                     }
 

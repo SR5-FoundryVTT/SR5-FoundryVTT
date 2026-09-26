@@ -21,7 +21,7 @@
         }
     ],
     "url": "#{URL}#",
-    "version": "0.37.0",
+    "version": "0.38.0",
     "compatibility": {
         "minimum": "14.363",
         "verified": "14.367",
@@ -30,171 +30,105 @@
     "documentTypes": {
         "Actor": {
             "character": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "ic": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "spirit": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "sprite": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "vehicle": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             }
         },
         "Item": {
             "action": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "ammo": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "armor": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "adept_power": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "bioware": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "call_in_action": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "complex_form": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "contact": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "critter_power": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "cyberware": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "device": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "echo": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "equipment": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "grid": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "host": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "lifestyle": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "metamagic": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "modification": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "program": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "quality": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "ritual": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "sin": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "skill": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "spell": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "sprite_power": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             },
             "weapon": {
-                "htmlFields": [
-                    "description.value"
-                ]
+                "htmlFields": ["description.value"]
             }
         }
     },
     "scripts": [],
-    "esmodules": [
-        "dist/bundle.js"
-    ],
-    "styles": [
-        "dist/bundle.css"
-    ],
+    "esmodules": ["dist/bundle.js"],
+    "styles": ["dist/bundle.css"],
     "languages": [
         {
             "lang": "en",
@@ -359,15 +293,8 @@
     },
     "flags": {
         "hotReload": {
-            "extensions": [
-                "css",
-                "hbs",
-                "html",
-                "json"
-            ],
-            "paths": [
-                "dist"
-            ]
+            "extensions": ["css", "hbs", "html", "json"],
+            "paths": ["dist"]
         }
     },
     "socket": true,
