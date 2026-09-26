@@ -1239,6 +1239,23 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.equal(actor.system.attributes.body.value, 3);
         });
 
+        it('A equipped or wireless only effect should apply for an item without those states', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const items = await actor.createEmbeddedDocuments('Item', [{ type: 'quality', name: 'Test Quality' }]);
+
+            await items[0].createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: {
+                    onlyForEquipped: true,
+                    onlyForWireless: true,
+                    changes: [{ key: 'system.attributes.body', value: '3', type: 'add' }],
+                }
+            }]);
+
+            assert.lengthOf(actor.system.attributes.body.changes, 1);
+            assert.equal(actor.system.attributes.body.value, 3);
+        });
+
         it('A wireless and equipped only effect should not apply for a wired and unequipped item', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const items = await actor.createEmbeddedDocuments('Item', [
