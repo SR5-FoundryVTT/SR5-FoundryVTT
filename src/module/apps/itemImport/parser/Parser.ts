@@ -39,16 +39,27 @@ export abstract class Parser<SubType extends SystemEntityType> {
         }
         if (system.slots !== undefined) system.slots = 0;
 
-        const dropped = options.parentStats ? ['parent_item', 'actor'] : ['parent_item'];
+        Parser.dropChanges(item, options.parentStats ? ['parent_item', 'actor'] : ['parent_item'], ['system.technology.cost', 'system.slots']);
+    }
+
+    /**
+     * Remove an item's effect changes, and any effect left without changes.
+     *
+     * @param item The item whose effects to trim
+     * @param applyTos Drop the changes of targets with these apply-tos
+     * @param keys Drop the changes to keys starting with these paths
+     */
+    public static dropChanges(item: Pick<Item.Source, 'effects'>, applyTos: string[], keys: string[] = []) {
+        if (!item.effects) return;
         item.effects = item.effects.filter(effect => {
             const effectSystem = effect.system as {
                 targets: { id: string; applyTo: string }[];
                 changes: { key: string; target: string }[];
             };
-            const droppedIds = new Set(effectSystem.targets.filter(target => dropped.includes(target.applyTo)).map(target => target.id));
+            const droppedIds = new Set(effectSystem.targets.filter(target => applyTos.includes(target.applyTo)).map(target => target.id));
             effectSystem.targets = effectSystem.targets.filter(target => !droppedIds.has(target.id));
             effectSystem.changes = effectSystem.changes.filter(change => !droppedIds.has(change.target)
-                && !change.key.startsWith('system.technology.cost') && change.key !== 'system.slots');
+                && !keys.some(key => change.key.startsWith(key)));
             return effectSystem.changes.length > 0;
         });
     }

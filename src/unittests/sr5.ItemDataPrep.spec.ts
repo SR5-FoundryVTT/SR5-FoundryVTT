@@ -656,6 +656,12 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             const vehicleMod = mod();
             Parser.includeInParent(vehicleMod, { parentStats: true });
             assert.deepEqual(keys(vehicleMod), ['system.technology.conceal']);
+
+            // An added mod keeps its own cost and slots, but not a change its parent's stats already hold.
+            const addedMod = mod();
+            Parser.dropChanges(addedMod, ['actor']);
+            assert.strictEqual(system(addedMod).slots, 2);
+            assert.deepEqual(keys(addedMod), ['system.slots', 'system.technology.conceal']);
         });
 
         it('does not apply actor-target item effects to the item itself', async () => {
