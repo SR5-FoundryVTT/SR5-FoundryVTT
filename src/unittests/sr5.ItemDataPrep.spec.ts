@@ -11,6 +11,7 @@ import { ChummerFormulaParser } from '../module/apps/itemImport/helper/ChummerFo
 import { Parser } from '../module/apps/itemImport/parser/Parser';
 import { WeaponModParser } from '../module/apps/itemImport/parser/mod/WeaponModParser';
 import { VehicleModParser } from '../module/apps/itemImport/parser/mod/VehicleModParser';
+import { WeaponParserBase } from '../module/apps/itemImport/parser/weapon/WeaponParserBase';
 import { DynamicValueEvaluator } from '../module/effect/DynamicValueEvaluator';
 import { BonusHelper } from '../module/apps/itemImport/helper/BonusHelper';
 import type { BonusSchema } from '../module/apps/itemImport/schema/BonusSchema';
@@ -607,6 +608,21 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             await weapon.createNestedItem(accessoryData as Item.Source);
             actor.prepareData();
             assert.strictEqual(weapon.system.technology.availability.label, '6R');
+
+            // Built in, the same accessory is already part of the weapon's cost and availability.
+            const builtIn = foundry.utils.deepClone(accessoryData) as unknown as Item.Source;
+            WeaponParserBase.includeInWeapon(builtIn);
+            assert.strictEqual((builtIn.system as SR5Item<'modification'>['system']).technology.cost.base, 0);
+            assert.isFalse(changes(builtIn).some(change => change.target === 'parent' || change.key === 'system.technology.cost'));
+
+            const [includedWeapon] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'weapon',
+                name: 'Weapon With Built-in Accessory',
+                system: { technology: { availability: { base: 4, value: 4, restriction: 'none' } } },
+            }]) as SR5Item<'weapon'>[];
+            await includedWeapon.createNestedItem(builtIn);
+            actor.prepareData();
+            assert.strictEqual(includedWeapon.system.technology.availability.label, '4');
         });
 
         it('does not apply actor-target item effects to the item itself', async () => {

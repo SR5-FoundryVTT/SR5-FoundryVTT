@@ -44,10 +44,33 @@ export class WeaponParserBase extends Parser<'weapon'> {
             if (ratingText)
                 system.technology.rating = Number(ratingText) || 0;
 
+            WeaponParserBase.includeInWeapon(item);
             result.push(item);
         }
 
         return result;
+    }
+
+    /**
+     * Turn an accessory into one built into its weapon. The weapon's own cost and availability
+     * already account for it, so drop the accessory's cost and the changes it makes to the weapon.
+     */
+    public static includeInWeapon(item: Item.Source) {
+        const system = item.system as SystemType<'modification'>;
+        system.technology.cost.base = 0;
+        system.technology.cost.value = 0;
+
+        item.effects = item.effects.filter(effect => {
+            const effectSystem = effect.system as {
+                targets: { id: string; applyTo: string }[];
+                changes: { key: string; target: string }[];
+            };
+            const parentIds = new Set(effectSystem.targets.filter(target => target.applyTo === 'parent_item').map(target => target.id));
+            effectSystem.targets = effectSystem.targets.filter(target => !parentIds.has(target.id));
+            effectSystem.changes = effectSystem.changes.filter(change =>
+                !parentIds.has(change.target) && !change.key.startsWith('system.technology.cost'));
+            return effectSystem.changes.length > 0;
+        });
     }
 
     private getSkill(weaponJson: Weapon): string {
