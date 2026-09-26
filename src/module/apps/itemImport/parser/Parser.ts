@@ -165,7 +165,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
             changes.push({ key: field, value: formula.value, type: 'add', target: 'parent' });
             // A restricted modification makes its parent at least restricted, never less than forbidden.
             const restriction = formula.restriction === 'restricted'
-                ? "@target.system.technology.availability.restriction == 'forbidden' ? 'forbidden' : 'restricted'"
+                ? "@affected.system.technology.availability.restriction == 'forbidden' ? 'forbidden' : 'restricted'"
                 : formula.restriction;
             if (restriction && restriction !== 'none')
                 changes.push({ key: `${field}.restriction`, value: restriction, type: 'override', priority: ModifiableValue.Priority.RATING, target: 'parent' });

@@ -462,7 +462,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * name a related document instead:
      * - `@actor`: the owning actor, also for nested items
      * - `@parent`: the containing item of a nested item, or the owning actor of an item
-     * - `@target`: the document the change is applied to
+     * - `@affected`: the document the change is applied to
      *
      * Other documents may still be preparing while a change applies, so prefer their `.base` values.
      *
@@ -486,7 +486,7 @@ export class SR5ActiveEffect extends ActiveEffect {
                         : source instanceof SR5Item ? source.actorOwner : related.actor, property);
                 case 'parent':
                     return read(related.parent, property);
-                case 'target':
+                case 'affected':
                     return read(targetDoc as object | undefined, property);
                 default:
                     return undefined;

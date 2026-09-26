@@ -138,12 +138,12 @@ export const AutocompleteInlineHooksFlow =  {
 
     /**
      * Values a change can reference: the effect's own document, plus the related documents
-     * SR5ActiveEffect.referenceResolver offers as @actor, @parent and @target.
+     * SR5ActiveEffect.referenceResolver offers as @actor, @parent and @affected.
      *
      * @param effect The effect whose change values are completed.
-     * @param target The document the change is applied to.
+     * @param affected The document the change is applied to.
      */
-    referenceValues: (effect: SR5ActiveEffect, target?: { toObject: () => object } | null) => {
+    referenceValues: (effect: SR5ActiveEffect, affected?: { toObject: () => object } | null) => {
         const document = effect.parent;
         if (!document) return {};
         const parent: unknown = document.parent;
@@ -151,7 +151,7 @@ export const AutocompleteInlineHooksFlow =  {
             ...document.toObject(),
             ...(effect.actor && effect.actor !== document ? { actor: effect.actor.toObject() } : {}),
             ...(parent instanceof SR5Item || parent instanceof SR5Actor ? { parent: parent.toObject() } : {}),
-            ...(target ? { target: target.toObject() } : {}),
+            ...(affected ? { affected: affected.toObject() } : {}),
         };
     },
 

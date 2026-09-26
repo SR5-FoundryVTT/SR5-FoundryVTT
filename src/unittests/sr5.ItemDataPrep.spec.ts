@@ -458,7 +458,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.technology.cost.value, 500);
         });
 
-        it('resolves @actor, @parent and @target references for nested items', async () => {
+        it('resolves @actor, @parent and @affected references for nested items', async () => {
             const actor = await factory.createActor({ type: 'character', system: { attributes: { body: { base: 5 } } } });
             const [weapon] = await actor.createEmbeddedDocuments('Item', [{
                 type: 'weapon',
@@ -476,7 +476,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
                         targets: [{ id: 'item', applyTo: 'item' }, { id: 'parent', applyTo: 'parent_item' }],
                         changes: [
                             { key: 'system.technology.cost', value: '@parent.system.technology.cost.base * 0.5 + @actor.system.attributes.body.base', type: 'add', target: 'item' },
-                            { key: 'system.technology.cost', value: '@target.system.technology.cost.base * 0.1', type: 'add', target: 'parent' },
+                            { key: 'system.technology.cost', value: '@affected.system.technology.cost.base * 0.1', type: 'add', target: 'parent' },
                         ],
                     },
                 }],
