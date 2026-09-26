@@ -147,6 +147,10 @@
                 "conditionType": {
                     "hint": "A parte do teste que esta condição filtra."
                 },
+                "rating": {
+                    "hint": "O nível deste efeito. As mudanças podem se basear nele, então aumentá-lo atualiza todas de uma vez.",
+                    "label": "Nível"
+                },
                 "targetName": {
                     "label": "Nome do Alvo"
                 }

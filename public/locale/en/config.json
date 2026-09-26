@@ -174,6 +174,10 @@
                     "hint": "Apply for wireless active only",
                     "label": "Wireless Only"
                 },
+                "rating": {
+                    "hint": "The strength of this effect. Changes can scale with it, so raising it updates them all at once.",
+                    "label": "Rating"
+                },
                 "selection_attributes": {
                     "hint": "Filter the test based on Attributes used",
                     "label": "Attributes Filter"
