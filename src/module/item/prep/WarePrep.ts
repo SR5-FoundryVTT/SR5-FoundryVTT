@@ -1,8 +1,6 @@
 import { SR } from "../../constants";
-import { Helpers } from "../../helpers";
 import type { SR5Item } from "../SR5Item";
-import { ItemCostFlow } from "../flows/ItemCostFlow";
-import { ItemAvailabilityFlow } from "../flows/ItemAvailabilityFlow";
+import { ModifiableValue } from "@/module/mods/ModifiableValue";
 
 
 /**
@@ -34,7 +32,7 @@ export const WarePrep = {
             return essence + (mod.system.essence * quantity);
         }, 0);
 
-        system.technology.calculated.essence.value += modificationEssence;
+        ModifiableValue.setUnique(system.technology.essence, 'SR5.ItemTypes.Modification', modificationEssence, { type: 'add' });
     },
 
     /**
@@ -44,7 +42,6 @@ export const WarePrep = {
      * @param technology The system technology section to be altered
      */
     prepareGrade(system: Item.SystemOfType<'bioware' | 'cyberware'>) {
-        const rating = system.technology.rating || 0;
         let grade = system.grade;
 
         // Old versions could contain malformed grade values. Leave automated grade calculation to newer version. (<0.27.0)
@@ -54,39 +51,18 @@ export const WarePrep = {
         }
 
         if (grade === 'standard') {
-            system.technology.calculated.essence.value = system.essence;
-            system.technology.calculated.essence.adjusted = false;
+            ModifiableValue.remove(system.technology.essence, 'SR5.Grade');
+            ModifiableValue.remove(system.technology.cost, 'SR5.Grade');
+            ModifiableValue.remove(system.technology.availability, 'SR5.Grade');
             return;
         }
 
         const essenceMod = SR.gradeModifiers[grade].essence ?? 1;
-        const availMod = SR.gradeModifiers[grade].avail ?? 0;
         const costMod = SR.gradeModifiers[grade].cost ?? 1;
+        const availMod = SR.gradeModifiers[grade].avail ?? 0;
 
-        // Alter essence values.
-        const floatEssence = Number(system.essence || 0) * essenceMod;
-        const actualEssence = Helpers.roundTo(floatEssence, 4);
-        system.technology.calculated.essence.adjusted = true;
-
-        // Alter availability values and code.
-        let availability = String(system.technology.availability ?? 0);
-        let availParts = ItemAvailabilityFlow.parseAvailibility(availability);
-        if (!availParts) {
-            availability += availMod ? (availMod > 0 ? ` (+${availMod})` : ` (${availMod})`) : '';
-        } else {
-            const { value } = ItemAvailabilityFlow.prepareAvailabilityValue(availability, system.technology.calculated.availability.adjusted, rating);
-            availParts = ItemAvailabilityFlow.parseAvailibility(value);
-            const actualAvailibility = availParts.availability + availMod;
-            availability = `${actualAvailibility}${availParts.restriction}`;
-        }
-
-        // Alter cost by grade modifier.
-        const baseCost = Number(system.technology.cost ?? 0);
-        const { value } = ItemCostFlow.prepareCostValue(baseCost, system.technology.calculated.cost.adjusted, rating);
-        const actualCost = value * costMod;
-
-        system.technology.calculated.essence.value = actualEssence;
-        system.technology.calculated.availability.value = availability;
-        system.technology.calculated.cost.value = actualCost;
-    }
+        ModifiableValue.addUnique(system.technology.essence, 'SR5.Grade', essenceMod, { type: 'multiply', priority: ModifiableValue.Priority.GRADE });
+        ModifiableValue.addUnique(system.technology.cost, 'SR5.Grade', costMod, { type: 'multiply', priority: ModifiableValue.Priority.GRADE });
+        ModifiableValue.setUnique(system.technology.availability, 'SR5.Grade', availMod, { type: 'add', priority: ModifiableValue.Priority.GRADE });
+    },
 }

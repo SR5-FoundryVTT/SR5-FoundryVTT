@@ -1020,9 +1020,9 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             await withPackReadCounter(async (reads) => {
                 const created = await SR5Actor.create(
                     [
-                        { name: '#QUENCH', folder, type: 'character', items: [importedSkill] },
-                        { name: '#QUENCH', folder, type: 'character' },
-                        { name: '#QUENCH', folder, type: 'spirit' },
+                        { name: '#QUENCH Imported', folder, type: 'character', items: [importedSkill] },
+                        { name: '#QUENCH Character', folder, type: 'character' },
+                        { name: '#QUENCH Spirit', folder, type: 'spirit' },
                     ],
                 );
                 factory.actors.push(...created);
@@ -1030,7 +1030,11 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 assert.strictEqual(reads(), 3);
                 for (const actor of created) assert.isNotEmpty(actor.items.filter(item => item.type === 'skill'));
 
-                const pistols = created[0].items.filter(item => item.name === 'Pistols');
+                // Creating documents in a batch does not guarantee they come back in request order.
+                const importedActor = created.find(actor => actor.name === '#QUENCH Imported');
+                assert.exists(importedActor);
+
+                const pistols = importedActor!.items.filter(item => item.name === 'Pistols');
                 assert.lengthOf(pistols, 1);
                 assert.strictEqual(foundry.utils.getProperty(pistols[0], 'system.skill.rating'), 6);
             });

@@ -1,9 +1,8 @@
 import { SR5 } from "@/module/config";
 import { SR5Item } from "../../SR5Item";
-import { Helpers } from "../../../helpers";
 import { ModifiableValue } from "../../../mods/ModifiableValue";
-import { ItemCostFlow } from "../../flows/ItemCostFlow";
 import { DataDefaults } from "@/module/data/DataDefaults";
+import { Helpers } from "@/module/helpers";
 import { TechnologyType } from "src/module/types/template/Technology";
 import { ItemAvailabilityFlow } from "../../flows/ItemAvailabilityFlow";
 import { AttributesPrep } from "@/module/actor/prep/functions/AttributesPrep";
@@ -104,13 +103,8 @@ export const TechnologyPrep = {
      * @param item The item for additional data
      * @param technology The system technology section to be altered
      */
-    prepareAvailability(item: SR5Item, technology: TechnologyType) {
-        const availability = String(technology.availability ?? 0);
-
-        const {adjusted, value} = ItemAvailabilityFlow.prepareAvailabilityValue(availability, technology.calculated.availability.adjusted, item.getRating());
-
-        technology.calculated.availability.adjusted = adjusted;
-        technology.calculated.availability.value = value;
+    prepareAvailability(technology: TechnologyType) {
+        ItemAvailabilityFlow.calculateValue(technology.availability);
     },
 
     /**
@@ -119,12 +113,12 @@ export const TechnologyPrep = {
      * @param item The item for additional data
      * @param technology The system technology section to be altered
      */
-    prepareCost(item: SR5Item, technology: TechnologyType) {
-        const baseCost = Number(technology.cost ?? 0);
-        const rating = item.getRating();
+    prepareCost(technology: TechnologyType) {
+        ModifiableValue.calcTotal(technology.cost, { decimal: true });
+    },
 
-        const { value } = ItemCostFlow.prepareCostValue(baseCost, technology.calculated.cost.adjusted, rating);
-
-        technology.calculated.cost.value = value;
+    /** Calculate essence values */
+    prepareEssence(technology: TechnologyType) {
+        technology.essence.value = Helpers.roundTo(ModifiableValue.calcTotal(technology.essence, { decimal: true }), 4);
     },
 }

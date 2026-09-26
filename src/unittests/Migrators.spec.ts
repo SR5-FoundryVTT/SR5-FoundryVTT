@@ -6,6 +6,8 @@ import { VersionMigration } from '@/module/migrator/VersionMigration';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 import { Version0_36_0 } from 'src/module/migrator/versions/Version0_36_0';
 import { Version0_37_0 } from 'src/module/migrator/versions/Version0_37_0';
+import { Version0_38_0 } from 'src/module/migrator/versions/Version0_38_0';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -860,6 +862,180 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.lengthOf(effect.system.targets, 1);
             assert.strictEqual(effect.system.targets[0].applyTo, 'actor');
             assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id);
+        });
+    });
+
+    describe('Version0_38_0 item-sheet migration', () => {
+        it('adds missing ids to nested item effects stored in flags', () => {
+            const migrator = new Version0_38_0();
+            const item: any = {
+                flags: {
+                    shadowrun5e: {
+                        embeddedItems: [{
+                            name: 'Nested Mod',
+                            type: 'modification',
+                            effects: [{ name: 'Nested Effect' }],
+                            flags: {
+                                shadowrun5e: {
+                                    embeddedItems: [{
+                                        name: 'Deep Nested Mod',
+                                        type: 'modification',
+                                        effects: [{ name: 'Deep Nested Effect' }],
+                                    }],
+                                },
+                            },
+                        }],
+                    },
+                },
+                system: {},
+            };
+
+            migrator.migrateItem(item);
+
+            const nested = item.flags.shadowrun5e.embeddedItems[0];
+            const deepNested = nested.flags.shadowrun5e.embeddedItems[0];
+            assert.isString(nested._id);
+            assert.isString(nested.effects[0]._id);
+            assert.isString(deepNested._id);
+            assert.isString(deepNested.effects[0]._id);
+        });
+
+        it('migrates technology cost and availability into base/value fields', () => {
+            const migrator = new Version0_38_0();
+            const item: any = {
+                system: {
+                    technology: {
+                        cost: 500,
+                        availability: '6R',
+                        calculated: {
+                            essence: { value: 0, adjusted: false },
+                            cost: { value: 500, adjusted: false },
+                            availability: { value: '6R', adjusted: false },
+                        },
+                    },
+                },
+            };
+
+            assert.isTrue(migrator.handlesItem(item));
+            migrator.migrateItem(item);
+
+            assert.deepEqual(item.system.technology.cost, { base: 500, value: 500, changes: [] });
+            assert.deepEqual(item.system.technology.availability, {
+                base: 6,
+                value: 6,
+                changes: [],
+                restriction: 'restricted',
+                label: '6R',
+            });
+            assert.deepEqual(item.system.technology.essence, { base: 0, value: 0, changes: [] });
+            assert.notProperty(item.system.technology, 'calculated');
+        });
+
+        it('moves ware essence into technology essence base', () => {
+            const migrator = new Version0_38_0();
+            const item: any = {
+                type: 'cyberware',
+                system: {
+                    essence: 0.5,
+                    grade: 'alpha',
+                    technology: {
+                        cost: 500,
+                        availability: '6R',
+                        calculated: {
+                            essence: { value: 0.4, adjusted: false },
+                            cost: { value: 500, adjusted: false },
+                            availability: { value: '6R', adjusted: false },
+                        },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+
+            assert.deepEqual(item.system.technology.essence, { base: 0.5, value: 0.5, changes: [] });
+        });
+
+        it('turns an adjusted cost into a rating multiplier effect and keeps existing effects', () => {
+            const migrator = new Version0_38_0();
+            const existingEffect = { _id: 'existing', name: 'Existing effect' };
+            const item: any = {
+                effects: [existingEffect],
+                system: {
+                    technology: {
+                        rating: 4,
+                        cost: 100,
+                        availability: '3R',
+                        calculated: {
+                            cost: { value: 400, adjusted: true },
+                            availability: { value: '3R', adjusted: false },
+                        },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+
+            assert.deepEqual(item.system.technology.cost, { base: 100, value: 100, changes: [] });
+            assert.strictEqual(item.system.technology.availability.restriction, 'restricted');
+            assert.strictEqual(item.effects.length, 2);
+            assert.strictEqual(item.effects[0], existingEffect);
+            const effect = item.effects[1];
+            assert.isString(effect._id);
+            assert.strictEqual(effect.flags.shadowrun5e.ratingMultiplier, 'cost');
+            assert.strictEqual(effect.system.targets[0].applyTo, 'item');
+            assert.strictEqual(effect.system.changes[0].value, '@system.technology.rating');
+            assert.strictEqual(effect.system.changes[0].priority, 1);
+            assert.isNotTrue(effect.system.onlyForEquipped);
+            assert.isNotTrue(effect.system.onlyForWireless);
+        });
+
+        it('migrates an availability-only rating multiplier', () => {
+            const migrator = new Version0_38_0();
+            const item: any = {
+                system: {
+                    technology: {
+                        rating: 0,
+                        cost: 100,
+                        availability: '3F',
+                        calculated: {
+                            cost: { adjusted: false },
+                            availability: { adjusted: true },
+                        },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+
+            assert.strictEqual(item.system.technology.availability.base, 3);
+            assert.strictEqual(item.system.technology.availability.restriction, 'forbidden');
+            assert.deepEqual(item.system.technology.availability.changes, []);
+            assert.strictEqual(item.effects.length, 1);
+            assert.strictEqual(item.effects[0].flags.shadowrun5e.ratingMultiplier, 'availability');
+            assert.strictEqual(item.effects[0].name, `${game.i18n.localize('SR5.Rating')} ${game.i18n.localize('SR5.Availability')}`);
+            assert.strictEqual(item.effects[0].system.changes[0].priority, ModifiableValue.Priority.RATING);
+        });
+
+        it('skips the availability rating multiplier when the legacy availability could not be parsed', () => {
+            const migrator = new Version0_38_0();
+            const item: any = {
+                system: {
+                    technology: {
+                        rating: 4,
+                        cost: 100,
+                        availability: '(Rating * 3)R',
+                        calculated: {
+                            cost: { adjusted: true },
+                            availability: { adjusted: true },
+                        },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+
+            assert.strictEqual(item.effects.length, 1);
+            assert.strictEqual(item.effects[0].flags.shadowrun5e.ratingMultiplier, 'cost');
         });
     });
 };

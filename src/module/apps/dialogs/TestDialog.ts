@@ -263,16 +263,6 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
 
             const button = event.currentTarget as HTMLButtonElement;
             const source = button.dataset.source;
-            if (!source) return;
-
-            if (LinksHelpers.isUuid(source)) {
-                const effect = await fromUuid(source);
-                if (effect instanceof ActiveEffect) {
-                    await effect.sheet?.render(true);
-                    return;
-                }
-            }
-
             await LinksHelpers.openSource(source);
         });
 
@@ -353,7 +343,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         ModifiableValue.add(valueField, name, safeValue, {
             type: 'add',
             enabled: true,
-            priority: ModifiableValue.MANUAL_PRIORITY,
+            priority: ModifiableValue.Priority.MANUAL,
         });
 
         this.test.prepareBaseValues();
@@ -406,7 +396,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             } else if (valueField.value !== numericValue) {
                 ModifiableValue.addUnique(
                     valueField, 'SR5.ManualOverride', numericValue,
-                    { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
+                    { type: 'override', priority: ModifiableValue.Priority.TOP }
                 );
             }
         }

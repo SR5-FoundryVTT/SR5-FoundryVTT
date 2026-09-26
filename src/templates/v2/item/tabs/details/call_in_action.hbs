@@ -1,0 +1,55 @@
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{localize (objValue @root.config.itemTypes item.type)}}</label>
+    </div>
+</div>
+
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.actor_type.hint}}">{{systemFields.actor_type.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.actor_type value=source.system.actor_type localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+
+{{#if (eq system.actor_type 'sprite')}}
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label data-tooltip="{{systemFields.sprite.fields.type.hint}}">{{systemFields.sprite.fields.type.label}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput systemFields.sprite.fields.type value=source.system.sprite.type
+                        classes="short" rootId=@root.rootId disabled=(or @root.isPlayMode (isDefined sprite))}}
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label data-tooltip="{{systemFields.sprite.fields.level.hint}}">{{systemFields.sprite.fields.level.label}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput systemFields.sprite.fields.level value=source.system.sprite.level
+                        classes="short" rootId=@root.rootId disabled=(or @root.isPlayMode (isDefined sprite))}}
+        </div>
+    </div>
+{{else if (eq system.actor_type 'spirit')}}
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label data-tooltip="{{systemFields.spirit.fields.type.hint}}">{{systemFields.spirit.fields.type.label}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput systemFields.spirit.fields.type value=source.system.spirit.type localize=true
+                        classes="short" rootId=@root.rootId disabled=(or @root.isPlayMode (isDefined spirit))}}
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label data-tooltip="{{systemFields.spirit.fields.force.hint}}">{{systemFields.spirit.fields.force.label}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput systemFields.spirit.fields.force value=source.system.spirit.force
+                        classes="short" rootId=@root.rootId disabled=(or @root.isPlayMode (isDefined spirit))}}
+        </div>
+    </div>
+{{/if}}

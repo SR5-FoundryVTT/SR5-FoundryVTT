@@ -18,3 +18,12 @@ export function isElementInstance<T extends ElementConstructor>(value: unknown, 
     if (!value || typeof value !== 'object') return false;
     return foundry.utils.isElementInstanceOf(value as HTMLElement, cls);
 }
+
+/** Give non-button controls native-style Enter and Space activation. */
+export function activateOnKey(element: HTMLElement) {
+    element.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        element.click();
+    });
+}
