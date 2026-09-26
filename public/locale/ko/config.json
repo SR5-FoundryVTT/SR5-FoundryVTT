@@ -3071,6 +3071,7 @@
             "MeleeAttackTest": "근거리 무기 공격",
             "NaturalRecoveryPhysicalTest": "물리 자연 회복",
             "NaturalRecoveryStunTest": "기절 자연 회복",
+            "OpposedActiveSensorLockTest": "능동 센서 조준 대항",
             "OpposedBruteForceTest": "브루트 포스 대항",
             "OpposedCheckOverwatchScoreTest": "감시 점수 확인 대항",
             "OpposedCompileSpriteTest": "컴파일 경쟁\n",

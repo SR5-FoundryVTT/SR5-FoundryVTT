@@ -71,8 +71,8 @@ export const MatrixTargetingFlow = {
      * This is unrelated to the PAN -- this is based on whether the actor "owns" the item in terms of Shadowrun ownership
      * @param actor
      */
-    prepareOwnIcons(actor: SR5Actor): MatrixTargetDocument[] {
-        const targets: MatrixTargetDocument[] = [];
+    prepareOwnIcons(actor: SR5Actor): Shadowrun.MarkedDocument[] {
+        const targets: Shadowrun.MarkedDocument[] = [];
 
         if (!actor.uuid) return [];
 
@@ -92,7 +92,9 @@ export const MatrixTargetingFlow = {
                         runningSilent: token.actor.isRunningSilent(),
                         network: this._getNetworkName(token.actor.network),
                         type,
-                        icons: []
+                        icons: [],
+                        marks: 0,
+                        markId: null,
                     });
                 }
             }
@@ -115,25 +117,82 @@ export const MatrixTargetingFlow = {
                     runningSilent: slave.isRunningSilent(),
                     network: this._getNetworkName(slave.network),
                     type,
-                    icons: []
+                    icons: [],
+                    marks: 0,
+                    markId: null,
                 });
             }
         }
         this._dedupeTargetsByDocumentUuid(targets);
 
-        // add ourselves to the front so that our own Persona sits at the top
-        const type = MatrixNetworkFlow.getDocumentType(actor);
-        targets.unshift({
+        if (actor.isType('vehicle')) {
+            const isControlled = actor.system.controlMode === 'remote' || actor.system.controlMode === 'rigger';
+            const driver = actor.getVehicleDriver();
+            const masterDevice = actor.master;
+            const masterActor = masterDevice?.actorOwner;
+            const riggerActor = driver || masterActor;
+
+            const droneTarget: Shadowrun.MarkedDocument = {
+                name: actor.getToken()?.name ?? actor.name,
+                document: actor as Actor.Stored,
+                token: actor.getToken(),
+                runningSilent: actor.isRunningSilent(),
+                network: this._getNetworkName(actor.network),
+                type: MatrixNetworkFlow.getDocumentType(actor),
+                icons: [],
+                marks: 0,
+                markId: null,
+            };
+
+            if (isControlled && riggerActor) {
+                const riggerTarget: Shadowrun.MarkedDocument = {
+                    name: riggerActor.getToken()?.name ?? riggerActor.name,
+                    document: riggerActor as Actor.Stored,
+                    token: riggerActor.getToken(),
+                    runningSilent: riggerActor.isRunningSilent(),
+                    network: this._getNetworkName(riggerActor.network),
+                    type: MatrixNetworkFlow.getDocumentType(riggerActor),
+                    icons: [droneTarget],
+                    marks: 0,
+                    markId: null,
+                };
+                return [riggerTarget];
+            }
+
+            return [droneTarget];
+        }
+
+        // For characters/other actors, separate controlled drones (indented) from autopilot ones (top-level)
+        const controlledTargets: Shadowrun.MarkedDocument[] = [];
+        const autonomousTargets: Shadowrun.MarkedDocument[] = [];
+
+        for (const target of targets) {
+            const doc = target.document;
+            if (doc instanceof SR5Actor && doc.type === 'vehicle') {
+                const mode = (doc.system as any)?.controlMode;
+                if (mode === 'remote' || mode === 'rigger') {
+                    controlledTargets.push(target);
+                } else {
+                    autonomousTargets.push(target);
+                }
+            } else {
+                controlledTargets.push(target);
+            }
+        }
+
+        const selfTarget: Shadowrun.MarkedDocument = {
             name: actor.getToken()?.name ?? actor.name,
             document: actor as Actor.Stored,
             token: actor.getToken(),
             runningSilent: actor.isRunningSilent(),
             network: this._getNetworkName(actor.network),
-            type,
-            icons: []
-        });
+            type: MatrixNetworkFlow.getDocumentType(actor),
+            icons: controlledTargets,
+            marks: 0,
+            markId: null,
+        };
 
-        return targets;
+        return [selfTarget, ...autonomousTargets];
     },
 
     /**

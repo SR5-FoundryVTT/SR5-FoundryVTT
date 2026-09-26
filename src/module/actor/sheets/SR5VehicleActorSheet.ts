@@ -294,4 +294,30 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         });
         void this.render();
     }
+
+    static readonly ALLOWED_VEHICLE_MATRIX_ACTION_IDS = new Set([
+        '6PNPh9hLcxNOb54v', // Reboot Device
+        'wqBonUcDlt2i6E4l', // Jack Out
+    ]);
+
+    static readonly ALLOWED_VEHICLE_MATRIX_ACTION_UUIDS = new Set([
+        'Compendium.shadowrun5e.sr5e-matrix-actions.Item.6PNPh9hLcxNOb54v',
+        'Compendium.shadowrun5e.sr5e-matrix-actions.Item.wqBonUcDlt2i6E4l',
+    ]);
+
+    override async _prepareMatrixActions() {
+        const actions = await super._prepareMatrixActions();
+        return actions.filter(({ action }) => {
+            if (!action) return false;
+            const id = action.id || action._id;
+            const uuid = action.uuid;
+            const sourceId = ((action.flags as any)?.core?.sourceId as string) || ((action._stats as any)?.compendiumSource as string) || '';
+
+            return (id != null && SR5VehicleActorSheet.ALLOWED_VEHICLE_MATRIX_ACTION_IDS.has(id))
+                || (uuid != null && SR5VehicleActorSheet.ALLOWED_VEHICLE_MATRIX_ACTION_UUIDS.has(uuid))
+                || SR5VehicleActorSheet.ALLOWED_VEHICLE_MATRIX_ACTION_UUIDS.has(sourceId)
+                || sourceId.endsWith('6PNPh9hLcxNOb54v')
+                || sourceId.endsWith('wqBonUcDlt2i6E4l');
+        });
+    }
 }

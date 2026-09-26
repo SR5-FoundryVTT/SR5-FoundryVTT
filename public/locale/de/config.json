@@ -850,6 +850,9 @@
             "RiggerInterface": "Riggeranpassung",
             "JumpIn": "Hineinspringen",
             "JumpOut": "Hinausspringen",
+            "JumpedIn": "Hineingesprungen",
+            "JumpedInVehicleHint": "In Fahrzeug hineingesprungen. Klick öffnet Bogen, Doppelklick zeigt Token.",
+            "JumpedInDriverHint": "Von Rigger gesteuert. Klick öffnet Bogen, Doppelklick zeigt Token.",
             "JumpedInSuccess": "{rigger} ist in {vehicle} hineingesprungen",
             "JumpedOutSuccess": "Aus {vehicle} hinausgesprungen",
             "JumpInTestRequired": "Das Hineinspringen in das fremde Fahrzeug {vehicle} erfordert eine Probe.",
@@ -2222,6 +2225,10 @@
                     "hint": "Würfelpoolmodifikator der Modifikation",
                     "label": "Würfelpool"
                 },
+                "isRiggerInterface": {
+                    "hint": "Ob diese Modifikation als Rigger-Interface (Riggeranpassung) fungiert",
+                    "label": "Rigger-Interface"
+                },
                 "modification_category": {
                     "hint": "Kategorie der Modifikation",
                     "label": "Kategorie"
@@ -3153,6 +3160,7 @@
             "MeleeAttackTest": "Nahkampfangriff",
             "NaturalRecoveryPhysicalTest": "Natürliche körperliche Genesung",
             "NaturalRecoveryStunTest": "Natürliche geistige Genesung",
+            "OpposedActiveSensorLockTest": "Widerstehe aktiver Zielerfassung",
             "OpposedBruteForceTest": "Widerstehe Brute Force",
             "OpposedCheckOverwatchScoreTest": "Widerstehe Overwatch-Wert prüfen",
             "OpposedCompileSpriteTest": "Widerstehe Kompilierung",

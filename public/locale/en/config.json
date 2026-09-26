@@ -848,6 +848,9 @@
             "RiggerInterface": "Rigger Interface",
             "JumpIn": "Jump In",
             "JumpOut": "Jump Out",
+            "JumpedIn": "Jumped In",
+            "JumpedInVehicleHint": "Jumped into vehicle. Click to open sheet, double-click to view token on canvas.",
+            "JumpedInDriverHint": "Jumped in by rigger. Click to open sheet, double-click to view token on canvas.",
             "JumpedInSuccess": "{rigger} jumped into {vehicle}",
             "JumpedOutSuccess": "Jumped out of {vehicle}",
             "JumpInTestRequired": "Jumping into unowned vehicle {vehicle} requires a test.",
@@ -2229,6 +2232,10 @@
                     "hint": "Dice Pool Modifier to apply",
                     "label": "Dice Pool"
                 },
+                "isRiggerInterface": {
+                    "hint": "Whether this modification functions as a Rigger Interface",
+                    "label": "Rigger Interface"
+                },
                 "modification_category": {
                     "hint": "Category this Modification belongs to",
                     "label": "Modification Category"
@@ -3167,6 +3174,7 @@
             "MeleeAttackTest": "Melee Weapon Attack",
             "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
             "NaturalRecoveryStunTest": "Natural Recovery Stun",
+            "OpposedActiveSensorLockTest": "Opposed Active Sensor Lock",
             "OpposedBruteForceTest": "Oppose Brute Force",
             "OpposedCheckOverwatchScoreTest": "Oppose Check Overwatch Score",
             "OpposedCompileSpriteTest": "Oppose Compilation",

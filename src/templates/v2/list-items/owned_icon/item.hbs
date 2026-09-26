@@ -24,8 +24,7 @@
         </div>
 
         <div class="list-item-icons midd-icons">
-            {{!-- Add Icons for what the Owner of an item can do --}}
-            {{#if (isType item.document 'vehicle')}}
+            {{#if (and (isType @root.actor 'character') (isType item.document 'vehicle'))}}
                 {{#if (eq item.document.system.controlMode 'remote')}}
                     <button class="icon sr5-icon active"
                             data-action="toggleDroneControlMode"

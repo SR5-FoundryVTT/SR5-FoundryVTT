@@ -52,6 +52,19 @@
                     </button>
                 </div>
             {{/if}}
+            {{#if jumpedInActor}}
+                <div class="basic-row jumped-in-indicator"
+                     data-action="handleJumpedActorClick"
+                     data-uuid="{{jumpedInActor.uuid}}"
+                     data-tooltip="{{#if (isType actor 'character')}}{{localize "SR5.Rigger.JumpedInVehicleHint"}}{{else}}{{localize "SR5.Rigger.JumpedInDriverHint"}}{{/if}}"
+                     style="cursor: pointer; display: flex; align-items: center; gap: 6px; background: rgba(0, 150, 255, 0.15); border: 1px solid rgba(0, 150, 255, 0.35); border-radius: 4px; padding: 2px 8px;">
+                    <i class="fas fa-vr-cardboard" style="color: #4dabf7;"></i>
+                    <img src="{{jumpedInActor.img}}" style="width: 18px; height: 18px; border-radius: 3px; object-fit: cover; border: none;" />
+                    <span style="font-weight: bold; font-size: 0.9em; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        {{jumpedInActor.name}}
+                    </span>
+                </div>
+            {{/if}}
         </div>
         <div class="split-container">
             <div>
