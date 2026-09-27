@@ -1,13 +1,15 @@
-# pip install requests lxml
+# pip install lxml
 
 from __future__ import annotations
 
+import io
 import re
 import sys
 import argparse
-import requests
+import urllib.request
 from pathlib import Path
 from collections import defaultdict, Counter
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from lxml import etree  # type: ignore
 
@@ -130,7 +132,8 @@ class ChildCount:
 
 Structure = dict[str, NodeInfo]
 Multiplicity = defaultdict[str, defaultdict[str, ChildCount]]  # parent path -> child tag -> counts
-Source = tuple[str | None, Structure, Multiplicity]  # (subtree path or None for the whole tree, struct, mult)
+Subtree = tuple[str, Structure, Multiplicity]  # (path of the subtree, struct, mult)
+Source = tuple[str | None, Structure, Multiplicity]  # like Subtree, with None for the whole tree
 
 
 def new_multiplicity() -> Multiplicity:
@@ -245,7 +248,7 @@ def analyse_xml(root: etree._Element) -> tuple[Structure, Multiplicity]:
     return struct, mult
 
 
-def merge_structs(sources: list[Source], base_name: str = "merged") -> tuple[Structure, Multiplicity]:
+def merge_structs(sources: Sequence[Source], base_name: str = "merged") -> tuple[Structure, Multiplicity]:
     """
     Merges several structures into one. A source with a path contributes only the subtree
     under that path, re-rooted at base_name; a source without one contributes its whole tree.
@@ -299,7 +302,7 @@ def build_type(
     struct: Structure,
     mult: Multiplicity,
     depth: int = 0,
-    second_defs: dict[str, list[Source]] | None = None,
+    second_defs: dict[str, list[Subtree]] | None = None,
     add_translate: bool = True,
 ) -> str:
     """
@@ -394,7 +397,7 @@ def generate_header(imports: list[str], body: str) -> str:
 def generate_ts(struct: Structure, mult: Multiplicity, root_tag: str, file_stem: str,
                 depth: int = 0, add_translate: bool = True) -> str:
     """Generates the full TypeScript schema file."""
-    second_defs: dict[str, list[Source]] = {}
+    second_defs: dict[str, list[Subtree]] = {}
     root_type = build_type(root_tag, struct, mult, depth, second_defs, add_translate)
 
     interfaces: list[tuple[str, str]] = []
@@ -423,33 +426,17 @@ def load_xml(xml_name: str, xml_dir: Path | None) -> etree._Element:
         return etree.parse(str(xml_dir / xml_name)).getroot()
 
     url = f"https://raw.githubusercontent.com/{OWNER}/{REPO}/{BRANCH}/Chummer/data/{xml_name}"
-    response = requests.get(url)
-    response.raise_for_status()
-    return etree.fromstring(response.content)
+    with urllib.request.urlopen(url, timeout=60) as response:
+        return etree.fromstring(response.read())
 
 
-def write_schema(file_name: str, content: str) -> None:
-    (OUT_DIR / file_name).write_text(content, encoding="utf-8", newline="\n")
-
-# -------------------------------------------------------------------
-# Main Function
-# -------------------------------------------------------------------
-
-def main(xml_dir: Path | None = None) -> None:
-    """Main entry point to generate all schemas."""
-    sys.stdout.reconfigure(encoding="utf-8")  # the console may not handle the emoji below
-
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    for old_file in [*OUT_DIR.glob("*.ts"), *OUT_DIR.glob("error.xml")]:
-        old_file.unlink()
-    print("🧹  cleared old .ts files")
-
-    write_schema("Types.ts", UTILITY_TYPES_TS)
-    print("✔  generated Types.ts")
+def generate_schemas(xml_dir: Path | None) -> dict[str, str]:
+    """Generates every schema file in memory, as file name -> content."""
+    schemas = {"Types.ts": UTILITY_TYPES_TS}
 
     files_in_merge = {name for group, _ in MERGE_GROUPS for name in group}
     merge_inputs: dict[str, tuple[Structure, Multiplicity]] = {}
-    extracted: dict[str, list[Source]] = defaultdict(list)
+    extracted: dict[str, list[Subtree]] = defaultdict(list)  # interface name -> sources
 
     for xml_name in FILES:
         root = load_xml(xml_name, xml_dir)
@@ -462,24 +449,52 @@ def main(xml_dir: Path | None = None) -> None:
 
         stem = xml_name.removesuffix(".xml")
         file_name = f"{stem.capitalize()}Schema.ts"
-        write_schema(file_name, generate_ts(struct, mult, qname(root), stem))
+        schemas[file_name] = generate_ts(struct, mult, qname(root), stem)
         print(f"✔  {xml_name} → schema/{file_name}")
 
-        for tag in EXTRACT_TAGS:
-            extracted[tag] += [(path, struct, mult) for path in struct if path.endswith(f"/{tag}")]
+        for tag, interface_name in EXTRACT_TAGS.items():
+            extracted[interface_name] += [(path, struct, mult) for path in struct if path.endswith(f"/{tag}")]
 
     for file_names, out_name in MERGE_GROUPS:
         sources: list[Source] = [(None, *merge_inputs[name]) for name in file_names]
-        write_schema(f"{out_name}Schema.ts", generate_ts(*merge_structs(sources), "chummer", out_name))
+        schemas[f"{out_name}Schema.ts"] = generate_ts(*merge_structs(sources), "chummer", out_name)
         print(f"✔  merged {file_names} → schema/{out_name}Schema.ts")
 
-    for tag, interface_name in EXTRACT_TAGS.items():
-        if not extracted[tag]:
-            continue
-        struct, mult = merge_structs(extracted[tag])
+    # Tags sharing an interface (forbidden and required) are merged into one.
+    for interface_name, subtrees in extracted.items():
+        struct, mult = merge_structs(subtrees)
         ts_code = generate_ts(struct, mult, "merged", interface_name.removesuffix("Schema"), 2, False)
-        write_schema(f"{interface_name}.ts", normalize_interface_body(ts_code))
-        print(f"✔  compiled {tag} → schema/{interface_name}.ts")
+        schemas[f"{interface_name}.ts"] = normalize_interface_body(ts_code)
+        tags = [tag for tag, name in EXTRACT_TAGS.items() if name == interface_name]
+        print(f"✔  compiled {' + '.join(tags)} → schema/{interface_name}.ts")
+
+    return schemas
+
+
+def write_schemas(schemas: dict[str, str]) -> None:
+    """Writes the schemas and removes the files that are no longer generated."""
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    for old_file in [*OUT_DIR.glob("*.ts"), *OUT_DIR.glob("error.xml")]:
+        if old_file.name not in schemas:
+            old_file.unlink()
+            print(f"🧹  removed schema/{old_file.name}")
+
+    for file_name, content in schemas.items():
+        (OUT_DIR / file_name).write_text(content, encoding="utf-8", newline="\n")
+    print(f"✔  wrote {len(schemas)} files to schema/")
+
+# -------------------------------------------------------------------
+# Main Function
+# -------------------------------------------------------------------
+
+def main(xml_dir: Path | None = None) -> None:
+    """Main entry point to generate all schemas."""
+    # The console may not handle the emoji below.
+    if isinstance(sys.stdout, io.TextIOWrapper):
+        sys.stdout.reconfigure(encoding="utf-8")
+
+    # Everything is generated before anything is written, so a failure leaves the schemas as they were.
+    write_schemas(generate_schemas(xml_dir))
 
 
 if __name__ == "__main__":

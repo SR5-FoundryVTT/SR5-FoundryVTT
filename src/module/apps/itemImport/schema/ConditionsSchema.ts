@@ -55,7 +55,7 @@ export interface ConditionsSchema {
         };
         attributearray?: { $: { NOT?: string; operation: "exists"; }; };
         category?: { _TEXT: "Drugs"; };
-        name?: { _TEXT: "Altskin" | "Binoculars (2050)" | "Goggles (2050)"; };
+        name?: { _TEXT: "Altskin" | "Binoculars (2050)" | "Goggles (2050)" | "Microphone, Laser"; };
     };
     lifestyle?: { _TEXT: "Bolt Hole" | "Traveler"; };
     oneof?: {
@@ -63,8 +63,10 @@ export interface ConditionsSchema {
         armormod?: { _TEXT: "Responsive Interface Gear: Armor"; $: { sameparent: "True"; }; };
         bioware?: OneOrMany<{ _TEXT: string; }>;
         characterquality?: Many<{ _TEXT: "SINner (Corporate Limited)" | "SINner (Corporate)"; }>;
-        critterpower?: { _TEXT: "Essence Drain"; };
-        cyberware?: { _TEXT: "Control Rig" | "Reaction Enhancers" | "Wired Reflexes"; };
+        critterpower?: { _TEXT: string; };
+        cyberware?: OneOrMany<{ _TEXT: string; }>;
+        cyberwarecontains?: { _TEXT: "Cybereyes" | "Liminal" | "Skull"; };
+        depenabled?: Empty;
         ess?: OneOrMany<{ _TEXT: IntegerString; $?: { grade: string; }; }>;
         gameplayoption?: { _TEXT: "Prime Runner"; };
         gear?: { _TEXT: "Fake SIN"; $: { minrating: IntegerString; }; };
@@ -85,14 +87,15 @@ export interface ConditionsSchema {
             spell?: { _TEXT: "Shapechange" | "[Critter] Form"; };
             tradition?: { _TEXT: "Buddhism" | "Chaos Magic" | "Islam" | "Red Magic" | "Sioux" | "Wicca" | "Wuxing"; };
         }>;
-        lifestylequality?: Many<{ _TEXT: string; }>;
+        lifestylequality?: OneOrMany<{ _TEXT: string; }>;
         magenabled?: Empty;
         metamagic?: { _TEXT: "Spell Shaping"; };
         metamagicart?: { _TEXT: "Advanced Ritual Casting" | "Geomancy"; };
         metatype?: OneOrMany<{ _TEXT: "A.I." | "Centaur" | "Dwarf" | "Elf" | "Human" | "Naga" | "Ork" | "Pixie" | "Sasquatch" | "Troll"; }>;
-        metatypecategory?: { _TEXT: "Shapeshifter"; };
+        metatypecategory?: OneOrMany<{ _TEXT: "Metasapient" | "Shapeshifter"; }>;
         power?: { _TEXT: string; };
         quality?: OneOrMany<{ _TEXT: string; }>;
+        resenabled?: Empty;
         skill?: OneOrMany<{
             name: { _TEXT: string; };
             spec?: { _TEXT: string; };
@@ -142,14 +145,18 @@ export interface ConditionsSchema {
                 };
                 useskill: { $: { NOT: string; operation: "exists"; }; };
             };
-            ammo?: OneOrMany<{ _TEXT: "(belt)" | "(c)" | "(d)" | "(m)" | "Energy" | "External Source"; $: { operation: "contains"; }; }>;
-            ammocategory?: Many<{ _TEXT: "Grenade Launchers" | "Missile Launchers"; }>;
+            accessorymounts?: {
+                mount: { _TEXT: "Stock"; };
+            };
+            ammo?: OneOrMany<{ _TEXT: "(belt)" | "(c)" | "(cy)" | "(d)" | "(m)" | "Energy" | "External Source"; $: { operation: "contains"; }; }>;
+            ammocategory?: OneOrMany<{ _TEXT: "Grenade Launchers" | "Missile Launchers" | "Shotguns"; }>;
             category?: OneOrMany<{ _TEXT: string; $?: { operation: "contains"; }; }>;
             conceal?: { _TEXT: IntegerString; $: { operation: "lessthanequals"; }; };
             name?: OneOrMany<{ _TEXT: string; }>;
-            spec?: OneOrMany<{ _TEXT: "Bow" | "Grenade Launchers" | "Missile Launchers"; }>;
-            spec2?: Many<{ _TEXT: "Grenade Launchers" | "Missile Launchers"; }>;
-            useskill?: OneOrMany<{ _TEXT: "Heavy Weapons" | "Longarms"; }>;
+            spec?: OneOrMany<{ _TEXT: "Bow" | "Grenade Launchers" | "Missile Launchers" | "Revolvers" | "Shotguns"; }>;
+            spec2?: Many<{ _TEXT: "Grenade Launchers" | "Missile Launchers" | "Revolvers" | "Shotguns"; }>;
+            type?: { _TEXT: "Melee"; };
+            useskill?: OneOrMany<{ _TEXT: "Heavy Weapons" | "Longarms" | "Pistols"; }>;
         }>;
         accessorymounts?: {
             mount: { _TEXT: "Stock"; };
@@ -164,7 +171,7 @@ export interface ConditionsSchema {
     };
     weaponmountdetails?: {
         control: OneOrMany<{ _TEXT: "Manual [SR5]" | "None" | "Remote [SR5]"; }>;
-        flexibility: { _TEXT: "Flexible [SR5]" | "None"; };
-        visibility: { _TEXT: "External [SR5]" | "None"; };
+        flexibility: OneOrMany<{ _TEXT: "Flexible [SR5]" | "None"; }>;
+        visibility: OneOrMany<{ _TEXT: "External [SR5]" | "None"; }>;
     };
 };
