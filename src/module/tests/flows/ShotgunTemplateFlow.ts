@@ -186,16 +186,28 @@ export class ShotgunTemplateFlow {
         });
     }
 
-    cancelPreview() {
+    async cancelPreview() {
         this.#destroyPreviewOverlay();
         if (this.#placement) {
+            const placement = this.#placement;
             canvas.regions._cancelPlacement();
             this.#placement = undefined;
+            await placement;
         }
+
+        const regionId = this.#placedRegionId;
+        this.#placedRegionId = undefined;
+        if (regionId) await canvas.scene?.deleteEmbeddedDocuments('Region', [regionId]);
     }
 
-    finalizePreview() {
-        this.cancelPreview();
+    async finalizePreview() {
+        this.#destroyPreviewOverlay();
+        if (!this.#placement) return;
+
+        const placement = this.#placement;
+        canvas.regions._cancelPlacement();
+        this.#placement = undefined;
+        await placement;
     }
 
     #drawShotgunTemplate(pointer: Point) {

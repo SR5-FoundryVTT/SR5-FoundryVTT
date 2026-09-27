@@ -149,15 +149,26 @@ export class SuppressiveFireTemplateFlow {
         });
     }
 
-    cancelPreview() {
-        if (!this.#placement) return;
+    async cancelPreview() {
+        if (this.#placement) {
+            const placement = this.#placement;
+            canvas.regions._cancelPlacement();
+            this.#placement = undefined;
+            await placement;
+        }
 
-        canvas.regions._cancelPlacement();
-        this.#placement = undefined;
+        const regionId = this.#placedRegionId;
+        this.#placedRegionId = undefined;
+        if (regionId) await canvas.scene?.deleteEmbeddedDocuments('Region', [regionId]);
     }
 
-    finalizePreview() {
-        this.cancelPreview();
+    async finalizePreview() {
+        if (!this.#placement) return;
+
+        const placement = this.#placement;
+        canvas.regions._cancelPlacement();
+        this.#placement = undefined;
+        await placement;
     }
 
     #updateShape(shape: foundry.data.ConeShapeData, pointer: Point) {

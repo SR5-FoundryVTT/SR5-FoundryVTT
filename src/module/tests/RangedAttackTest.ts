@@ -64,8 +64,8 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
 
     override async _cleanUpAfterDialogCancel() {
         this.rangeOverlayFlow.remove();
-        this.suppressiveFireTemplateFlow.cancelPreview();
-        this.shotgunTemplateFlow.cancelPreview();
+        await this.suppressiveFireTemplateFlow.cancelPreview();
+        await this.shotgunTemplateFlow.cancelPreview();
         await this.blastTemplateFlow.cancelPreview();
         await super._cleanUpAfterDialogCancel();
     }
