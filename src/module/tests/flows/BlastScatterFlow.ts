@@ -58,7 +58,10 @@ export const BlastScatterFlow = {
 
         const direction = directionRoll.diceResults.reduce((total, value) => total + value, 0);
         const rolledDistance = distanceRoll.diceResults.reduce((total, value) => total + value, 0);
-        const result = resolveScatterRoll(direction, rolledDistance, scatterTest.hits.value);
+        const doubleDistance = kind !== 'spell'
+            && scatterTest.glitched
+            && !scatterTest.criticalGlitched;
+        const result = resolveScatterRoll(direction, rolledDistance, scatterTest.hits.value, doubleDistance);
         if (!result) return;
 
         await this.createMessage(

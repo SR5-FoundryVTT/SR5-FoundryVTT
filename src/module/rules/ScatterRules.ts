@@ -14,20 +14,22 @@ export interface ScatterOffset {
     y: number
 }
 
-/** 
- * Resolve an SR5 Scatter Diagram result and reduce its distance by test hits. 
+/**
+ * Resolve scatter distance by reducing it for test hits before optional doubling.
  * 
+ * See SR5#182 'Determine Scatter' for the rules on how scatter direction and distance are determined.
  */
-export function resolveScatterRoll(direction: number, rolledDistance: number, hits = 0): ScatterRollResult | undefined {
+export function resolveScatterRoll(direction: number, rolledDistance: number, hits = 0, doubleDistance = false): ScatterRollResult | undefined {
     if (!Number.isInteger(direction) || direction < 2 || direction > 12) return;
     if (!Number.isInteger(rolledDistance) || rolledDistance < 1) return;
     if (!Number.isInteger(hits) || hits < 0) return;
 
+    const distance = Math.max(rolledDistance - hits, 0);
     return {
         direction: direction as ScatterDirection,
         rolledDistance,
         hits,
-        distance: Math.max(rolledDistance - hits, 0),
+        distance: doubleDistance ? distance * 2 : distance,
     };
 }
 

@@ -16,6 +16,15 @@ export const scatterRulesTesting = (context: QuenchBatchContext) => {
             });
         });
 
+        it('doubles the remaining scatter distance when requested', () => {
+            assert.deepEqual(resolveScatterRoll(9, 5, 2, true), {
+                direction: 9,
+                rolledDistance: 5,
+                hits: 2,
+                distance: 6,
+            });
+        });
+
         it('allows a zero final distance after hit reduction', () => {
             assert.deepEqual(resolveScatterRoll(7, 1, 1), {
                 direction: 7,
