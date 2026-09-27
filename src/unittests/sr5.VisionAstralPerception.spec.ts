@@ -14,7 +14,46 @@ import {
     shouldSuppressPhysicalLightVision,
 } from '@/module/vision/astralPerception/astralVisibility';
 import { SR5VisionSource } from '@/module/vision/SR5VisionSource';
+import { SenseFilterResolver } from '@/module/vision/SenseFilterResolver';
+import { AstralAuraFilter } from '@/module/vision/astralPerception/astralAuraFilter';
+import { AstralBackgroundVisionShader } from '@/module/vision/astralPerception/astralShaders';
+import { essenceBucket, getAstralTier } from '@/module/vision/astralPerception/astralSignature';
 import { SR5TestFactory } from './utils';
+
+/** A detection target whose actor has the given type, visibility targets, statuses and Essence. */
+const astralTarget = (options: {
+    type?: string;
+    special?: string;
+    physical?: boolean;
+    hasAura?: boolean;
+    astralActive?: boolean;
+    affectedBySpell?: boolean;
+    essence?: number;
+    invisible?: boolean;
+    actor?: boolean;
+} = {}) => ({
+    document: {
+        actor: options.actor === false ? null : {
+            type: options.type ?? 'character',
+            system: {
+                special: options.special ?? 'mundane',
+                attributes: { essence: { value: options.essence ?? 6 } },
+                visibilityChecks: {
+                    targets: {
+                        physical: { active: options.physical ?? true, thermographic: 'warm' },
+                        astral: {
+                            hasAura: options.hasAura ?? true,
+                            astralActive: options.astralActive ?? false,
+                            affectedBySpell: options.affectedBySpell ?? false,
+                        },
+                        matrix: { hasIcon: false, runningSilent: false },
+                    },
+                },
+            },
+            statuses: new Set(options.invisible ? [CONFIG.specialStatusEffects.INVISIBLE] : []),
+        },
+    },
+}) as any;
 
 export const shadowrunVisionAstralPerception = (context: QuenchBatchContext) => {
     const { describe, it, after } = context;
@@ -142,6 +181,80 @@ export const shadowrunVisionAstralPerception = (context: QuenchBatchContext) => 
             assert.isFalse(isBlinded?.call({ data: { visionMode: ASTRAL_PERCEPTION_VISION_MODE } }));
             assert.strictEqual(CONFIG.Canvas.visionModes.astralPerception.canvas.shader,
                 foundry.canvas.rendering.shaders.ColorAdjustmentsSamplerShader);
+        });
+
+        it('renders the astral world always lit, grey and gently animated', () => {
+            const visionMode = CONFIG.Canvas.visionModes.astralPerception as any;
+            const { DISABLED } = foundry.canvas.perception.VisionMode.LIGHTING_VISIBILITY;
+            for (const layer of ['background', 'illumination', 'coloration', 'darkness']) {
+                assert.strictEqual(visionMode.lighting[layer].visibility, DISABLED, layer);
+            }
+            assert.isFalse(visionMode.vision.darkness.adaptive);
+            assert.strictEqual(visionMode.vision.background.shader, AstralBackgroundVisionShader);
+            assert.isBelow(visionMode.canvas.uniforms.saturation, 0, 'the physical world is faded');
+            assert.isTrue(visionMode.animated);
+
+            const isAnimated = Object.getOwnPropertyDescriptor(SR5VisionSource.prototype, 'isAnimated')?.get;
+            // photosensitiveMode is a getter reading a client setting, so shadow it on the canvas instance.
+            Object.defineProperty(canvas, 'photosensitiveMode', { value: true, configurable: true });
+            try {
+                assert.isFalse(isAnimated?.call({ data: { visionMode: ASTRAL_PERCEPTION_VISION_MODE } }));
+            } finally {
+                delete (canvas as any).photosensitiveMode;
+            }
+        });
+
+        it('sorts targets into the astral tiers of SR5#312', () => {
+            assert.strictEqual(getAstralTier(astralTarget({ type: 'spirit', physical: false, astralActive: true })), 'form');
+            assert.strictEqual(getAstralTier(astralTarget({ astralActive: true })), 'awakened');
+            assert.strictEqual(getAstralTier(astralTarget({ special: 'magic' })), 'awakened');
+            assert.strictEqual(getAstralTier(astralTarget()), 'aura');
+            assert.strictEqual(getAstralTier(astralTarget({ hasAura: false, affectedBySpell: true })), 'aura');
+            assert.strictEqual(getAstralTier(astralTarget({ type: 'vehicle', hasAura: false })), 'shadow');
+            assert.strictEqual(getAstralTier(astralTarget({ actor: false })), 'shadow', 'a token without an actor');
+            assert.isNull(getAstralTier(astralTarget({ type: 'sprite', physical: false, hasAura: false })));
+
+            assert.strictEqual(essenceBucket({ system: { attributes: { essence: { value: 1.8 } } } }), 2);
+            assert.strictEqual(essenceBucket({ system: { attributes: { essence: { value: 0.1 } } } }), 1);
+            assert.strictEqual(essenceBucket({ system: {} }), 6);
+        });
+
+        it('sees non-living things as shadows and auras through invisibility', () => {
+            const mode = new AstralPerceptionDetectionMode({
+                id: 'astralPerception',
+                label: 'Astral Perception',
+                type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
+            });
+            const astral = { visionMode: { id: ASTRAL_PERCEPTION_VISION_MODE } } as any;
+            const physical = { visionMode: { id: 'basic' } } as any;
+
+            assert.isTrue((mode as any)._canDetect(astral, astralTarget({ type: 'vehicle', hasAura: false })));
+            assert.isTrue((mode as any)._canDetect(astral, astralTarget({ invisible: true })));
+            assert.isFalse((mode as any)._canDetect(astral, astralTarget({ type: 'sprite', physical: false, hasAura: false })));
+            assert.isFalse((mode as any)._canDetect(physical, astralTarget()));
+        });
+
+        it('draws each astral tier with its own shared aura, dimmed by Essence', () => {
+            const shadow = AstralAuraFilter.forSignature('shadow') as any;
+            const full = AstralAuraFilter.forSignature('aura', 6) as any;
+            const chromed = AstralAuraFilter.forSignature('aura', 1) as any;
+            const form = AstralAuraFilter.forSignature('form', 1) as any;
+
+            assert.strictEqual(AstralAuraFilter.forSignature('aura', 6), full, 'filters are shared');
+            assert.strictEqual(form, AstralAuraFilter.forSignature('form', 6), 'astral forms have no Essence to lose');
+            assert.strictEqual(shadow.outerStrength, 0, 'shadows have no aura');
+            assert.isBelow(shadow.uniforms.spriteAlpha, 1, 'shadows are faded');
+            assert.isBelow(chromed.outerStrength, full.outerStrength, 'cyberware thins an aura');
+            assert.isAbove(chromed.outerStrength, 0, 'even a thin aura shows');
+            assert.isAbove(form.outerStrength, full.outerStrength, 'astral forms outshine auras');
+            assert.isAtLeast(form.padding, form.uniforms.distance, 'the halo fits its padding');
+
+            const marker = AstralPerceptionDetectionMode.getDetectionFilter()!;
+            assert.strictEqual(SenseFilterResolver.resolve(astralTarget({ essence: 1 }) as Token, marker), chromed);
+            assert.strictEqual(
+                SenseFilterResolver.resolve(astralTarget({ type: 'vehicle', hasAura: false }) as Token, marker),
+                shadow,
+            );
         });
 
         it('suppresses physical light shortcuts for astral-only vision', () => {

@@ -1,6 +1,6 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { PerceptionFlow } from '@/module/vision/PerceptionFlow';
-import { PerceptionResolver } from '@/module/vision/PerceptionResolver';
+import { ASTRAL_PERCEPTION_POWER_ID, PerceptionResolver } from '@/module/vision/PerceptionResolver';
 import { SR5TestFactory } from './utils';
 
 const actorData = (overrides: Record<string, unknown> = {}): any => ({
@@ -62,6 +62,36 @@ export const shadowrunVisionFoundation = (context: QuenchBatchContext) => {
             });
             assert.isTrue(PerceptionResolver.resolve(mundaneOverride).astral.perception);
             assert.isTrue(PerceptionResolver.resolve(mundaneOverride).astral.projection);
+        });
+
+        it('grants adepts astral perception through the Astral Perception power', () => {
+            const power = (name: string, importFlags: Record<string, string> | null = null) =>
+                ({ type: 'adept_power', name, system: { importFlags } });
+            const adept = (type: string, items: unknown[], override = 'default') => ({
+                ...actorData({ magic: { type, astralPerceptionOverride: override, astralProjectionOverride: 'default' } }),
+                items,
+            });
+
+            const byId = adept('adept', [power('Astralwahrnehmung', { sourceid: ASTRAL_PERCEPTION_POWER_ID, name: '' })]);
+            const byImportName = adept('mystic_adept', [power('Renamed', { sourceid: '', name: 'Astral Perception' })]);
+            const byName = adept('adept', [power(' astral perception ')]);
+            assert.isTrue(PerceptionResolver.resolve(byId).astral.perception, 'by Chummer id');
+            assert.isTrue(PerceptionResolver.resolve(byImportName).astral.perception, 'by imported name');
+            assert.isTrue(PerceptionResolver.resolve(byName).astral.perception, 'by name');
+            assert.isFalse(PerceptionResolver.resolve(byName).astral.projection, 'adepts never project');
+
+            assert.isFalse(PerceptionResolver.resolve(adept('adept', [power('Killing Hands')])).astral.perception);
+            assert.isFalse(PerceptionResolver.resolve(adept('mundane', [power('Astral Perception')])).astral.perception);
+            assert.isFalse(
+                PerceptionResolver.resolve(adept('adept', [power('Astral Perception')], 'deny')).astral.perception,
+                'a GM override still wins',
+            );
+        });
+
+        it('gives new spirits a warm heat signature for when they materialize', async () => {
+            const spirit = await factory.createActor({ type: 'spirit' });
+            assert.strictEqual(spirit.system.visibilityChecks.targets.physical.thermographic, 'warm');
+            assert.isFalse(spirit.system.visibilityChecks.targets.physical.active);
         });
 
         it('uses active grants and removes them when the effect is disabled', async () => {

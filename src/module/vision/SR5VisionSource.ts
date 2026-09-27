@@ -15,6 +15,12 @@ export class SR5VisionSource extends foundry.canvas.sources.PointVisionSource {
         return super.isBlinded;
     }
 
+    /** The drifting glow of astral perception holds still in photosensitive mode. */
+    override get isAnimated() {
+        if (this.data.visionMode === ASTRAL_PERCEPTION_VISION_MODE && canvas.photosensitiveMode) return false;
+        return super.isAnimated;
+    }
+
     override _getPolygonConfiguration() {
         const config = super._getPolygonConfiguration();
         if (this.data.visionMode !== ULTRASOUND_VISION_MODE) return config;

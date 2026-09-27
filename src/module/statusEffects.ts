@@ -50,6 +50,31 @@ const SRStatus = [
         },
     },
     {
+        // SR5#314 a manifesting astral being is seen as a ghostly image; see physicalDetectionMode.
+        id: 'sr5manifesting',
+        name: 'SR5.StatusEffects.Manifesting',
+        img: 'icons/svg/aura.svg',
+        hud: false,
+    },
+    {
+        // SR5#303 a materialized spirit has a physical body and is dual-natured.
+        id: 'sr5materialized',
+        name: 'SR5.StatusEffects.Materialized',
+        img: 'icons/svg/mystery-man.svg',
+        hud: false,
+        system: {
+            targets: [{ id: 'actor', applyTo: 'actor' }],
+            changes: [
+                {
+                    key: 'system.visibilityChecks.targets.physical.active',
+                    type: 'override',
+                    value: true,
+                    target: 'actor',
+                },
+            ],
+        },
+    },
+    {
         id: 'sr5run',
         name: 'SR5.StatusEffects.Running',
         img: 'systems/shadowrun5e/dist/icons/status-effects/run.svg',

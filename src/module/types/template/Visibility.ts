@@ -23,7 +23,8 @@ const PerceptionTargetsData = (spaces: SpaceTypes) => ({
         active: new BooleanField({ initial: spaces.includes('meatspace') }),
         thermographic: new StringField({
             required: true,
-            initial: spaces.includes('meatspace') ? 'warm' : 'none',
+            // Astral beings read warm once they take a physical body by materializing.
+            initial: spaces.includes('meatspace') || spaces.includes('astralActive') ? 'warm' : 'none',
             choices: SR5.thermographicSignatures,
             label: 'SR5.Vision.ThermographicSignature',
             hint: 'SR5.Vision.ThermographicSignatureHint',

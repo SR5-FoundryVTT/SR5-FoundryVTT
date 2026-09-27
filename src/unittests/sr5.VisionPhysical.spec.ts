@@ -11,8 +11,17 @@ import { SR5TestFactory } from './utils';
 import { BonusHelper } from '@/module/apps/itemImport/helper/BonusHelper';
 import { SR5VisionSource } from '@/module/vision/SR5VisionSource';
 import { ULTRASOUND_COLOR } from '@/module/vision/ultrasoundVision/ultrasoundShaders';
-import AstralPerceptionDetectionMode from '@/module/vision/astralPerception/astralPerceptionDetectionMode';
-import { SR5Token } from '@/module/token/SR5Token';
+import { SenseFilterResolver } from '@/module/vision/SenseFilterResolver';
+import { AstralAuraFilter } from '@/module/vision/astralPerception/astralAuraFilter';
+import { HeatSignatureFilter } from '@/module/vision/thermographicVision/heatSignatureFilter';
+import AugmentedRealityVisionDetectionMode from '@/module/vision/augmentedReality/arDetectionMode';
+import {
+    PhysicalAllDetectionMode,
+    PhysicalInvisibilityDetectionMode,
+    PhysicalTremorDetectionMode,
+} from '@/module/vision/physicalVision/coreDetectionModes';
+import { shouldSuppressPhysicalLightVision } from '@/module/vision/astralPerception/astralVisibility';
+import { MANIFEST_STATUS } from '@/module/vision/astralProjection/ManifestationState';
 
 const SIGHT = foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT;
 const SOUND = foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SOUND;
@@ -37,16 +46,22 @@ const actorData = (metatype: string, changes: Record<string, unknown> = {}): any
     items: [],
 });
 
-const target = (active = true, invisible = false, thermographic = 'warm') =>
+const target = (active = true, invisible = false, thermographic = 'warm', manifesting = false) =>
     ({
         document: {
             actor: {
                 system: {
                     visibilityChecks: {
-                        targets: { physical: { active, thermographic } },
+                        targets: {
+                            physical: { active, thermographic },
+                            matrix: { hasIcon: true, runningSilent: false },
+                        },
                     },
                 },
-                statuses: new Set(invisible ? [CONFIG.specialStatusEffects.INVISIBLE] : []),
+                statuses: new Set([
+                    ...(invisible ? [CONFIG.specialStatusEffects.INVISIBLE] : []),
+                    ...(manifesting ? [MANIFEST_STATUS] : []),
+                ]),
             },
         },
     }) as any;
@@ -249,7 +264,7 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             }
         });
 
-        it('outlines tokens that astral perception or ultrasound vision would leave unlit', function () {
+        it('draws tokens that astral perception or ultrasound vision would leave unlit', function () {
             if (!canvas.ready) this.skip();
 
             const effects = canvas.effects as any;
@@ -257,19 +272,25 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             const sources = (...modes: string[]) => {
                 effects.visionSources = modes.map(id => ({ active: true, visionMode: { id } }));
             };
-            const filter = () => (SR5Token as any).nonOpticalSenseFilter();
+            const resolve = (detected: PIXI.Filter | null = null) => SenseFilterResolver.resolve(target(), detected);
 
             try {
                 sources('ultrasound');
-                assert.strictEqual(filter(), UltrasoundDetectionMode.getDetectionFilter());
+                assert.strictEqual(resolve(), UltrasoundDetectionMode.getDetectionFilter());
                 sources('astralPerception', 'astralPerception');
-                assert.strictEqual(filter(), AstralPerceptionDetectionMode.getDetectionFilter());
+                assert.strictEqual(resolve(), AstralAuraFilter.forSignature('shadow'), 'unlit things are grey shadows');
                 sources('basic');
-                assert.isNull(filter(), 'normal vision renders tokens lit');
+                assert.isNull(resolve(), 'normal vision renders tokens lit');
                 sources('ultrasound', 'basic');
-                assert.isNull(filter(), 'another source still lights the scene');
+                assert.isNull(resolve(), 'another source still lights the scene');
+                sources('ultrasound', 'astralPerception');
+                assert.isNull(resolve(), 'mixed non-optical senses share no look');
                 sources();
-                assert.isNull(filter());
+                assert.isNull(resolve());
+
+                const outline = UltrasoundDetectionMode.getDetectionFilter()!;
+                sources('astralPerception');
+                assert.strictEqual(resolve(outline), outline, 'a filter of another sense is kept');
             } finally {
                 effects.visionSources = originalSources;
             }
@@ -286,12 +307,15 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
                 warm: [1, 0.55, 0, 1],
                 hot: [1, 0.1, 0, 1],
             };
+            const marker = ThermographicVisionDetectionMode.getDetectionFilter();
 
             const filters: Record<string, any> = {};
             for (const [signature, color] of Object.entries(expectedColors)) {
-                assert.isTrue((mode as any)._canDetect(visionSource(), target(true, false, signature)));
-                const filter = ThermographicVisionDetectionMode.getDetectionFilter() as any;
+                const heatTarget = target(true, false, signature);
+                assert.isTrue((mode as any)._canDetect(visionSource(), heatTarget));
+                const filter = SenseFilterResolver.resolve(heatTarget, marker) as any;
                 assert.instanceOf(filter, foundry.canvas.rendering.filters.GlowOverlayFilter);
+                assert.strictEqual(filter, HeatSignatureFilter.forTarget(heatTarget), `${signature} filter is shared`);
                 assert.deepEqual(Array.from(filter.uniforms.glowColor), color, signature);
                 assert.isAtLeast(filter.padding, filter.uniforms.distance, `${signature} halo fits its padding`);
                 filters[signature] = filter;
@@ -308,7 +332,7 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             assert.isBelow(hot.pulse.period, warm.pulse.period, 'hot pulses faster than warm');
 
             assert.isFalse((mode as any)._canDetect(visionSource(), target(true, false, 'none')));
-            assert.isUndefined(ThermographicVisionDetectionMode.getDetectionFilter());
+            assert.isNull(HeatSignatureFilter.forTarget(target(true, false, 'none')));
         });
 
         it('uses a pulsing gray wave outline for ultrasound targets', () => {
@@ -331,6 +355,48 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             ];
 
             for (const mode of modes) assert.isFalse((mode as any)._canDetect(visionSource(), astralTarget), mode.id);
+        });
+
+        it("keeps augmented reality and Foundry's other senses off the astral plane", () => {
+            const astralTarget = target(false, true);
+            const physicalTarget = target(true, true);
+            const astralViewer = { ...visionSource(), visionMode: { id: 'astralPerception' } };
+            const ar = new AugmentedRealityVisionDetectionMode({ id: 'augmentedReality', label: 'AR', type: SIGHT });
+            const modes = [
+                ar,
+                new PhysicalInvisibilityDetectionMode({ id: 'seeInvisibility', label: 'See', type: SIGHT }),
+                new PhysicalAllDetectionMode({ id: 'seeAll', label: 'All', type: SIGHT }),
+                new PhysicalTremorDetectionMode({ id: 'feelTremor', label: 'Tremor', type: SIGHT }),
+            ];
+
+            assert.isTrue((ar as any)._canDetect(visionSource(), physicalTarget), 'AR shows a physical icon');
+            for (const mode of modes) {
+                assert.isFalse((mode as any)._canDetect(visionSource(), astralTarget), mode.id);
+                assert.isFalse((mode as any)._canDetect(astralViewer, physicalTarget), `${mode.id} astral viewer`);
+            }
+        });
+
+        it('shows a manifesting being to eyes but not to technology', () => {
+            const manifest = target(false, false, 'warm', true);
+            const detects = (mode: foundry.canvas.perception.DetectionMode) =>
+                (mode as any)._canDetect(visionSource(), manifest);
+
+            assert.isTrue(detects(new PhysicalSightDetectionMode({ id: 'basicSight', label: 'Sight', type: SIGHT })));
+            assert.isTrue(detects(new LowlightVisionDetectionMode({ id: 'lowlight', label: 'Low-Light', type: SIGHT })));
+            assert.isFalse(detects(new ThermographicVisionDetectionMode({ id: 'thermographic', label: 'Thermo', type: SIGHT })));
+            assert.isFalse(detects(new UltrasoundDetectionMode({ id: 'ultrasound', label: 'Ultrasound', type: SOUND })));
+            assert.isFalse(detects(new AugmentedRealityVisionDetectionMode({ id: 'augmentedReality', label: 'AR', type: SIGHT })));
+        });
+
+        it('lets lights reveal a manifesting being', () => {
+            const token = (manifesting: boolean) => Object.assign(
+                Object.create(foundry.canvas.placeables.Token.prototype),
+                target(false, false, 'warm', manifesting),
+            );
+            const physicalSource = { active: true, visionMode: { id: 'basic' } } as any;
+
+            assert.isFalse(shouldSuppressPhysicalLightVision(token(true), [physicalSource]));
+            assert.isTrue(shouldSuppressPhysicalLightVision(token(false), [physicalSource]));
         });
 
         it('uses a wall-aware, angle-independent physical collision for ultrasound', () => {

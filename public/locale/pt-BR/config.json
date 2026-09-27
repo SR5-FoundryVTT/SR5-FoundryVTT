@@ -2212,6 +2212,11 @@
             "CannotControlAstralProjection": "Você não possui a projeção astral deste ator.",
             "AlreadyProjectingAstrally": "Este ator já está em projeção astral.",
             "AstralToggleFailed": "Não foi possível alternar a visão astral. Veja o console para detalhes.",
+            "ToggleManifestation": "Alternar Manifestação",
+            "ToggleMaterialization": "Alternar Materialização",
+            "CannotManifest": "Apenas espíritos e formas astrais podem se manifestar.",
+            "CannotMaterialize": "Apenas espíritos podem se materializar.",
+            "CannotControlAstralState": "Você não é dono deste ator.",
             "AstralPerceptionOverride": "Substituição de percepção astral",
             "AstralPerceptionOverrideHint": "Substituição do MJ para permitir ou impedir que este ator use percepção astral.",
             "AstralProjectionOverride": "Substituição de projeção astral",
@@ -2384,6 +2389,8 @@
         "Wireless": "Conexão Sem Fio",
         "StatusEffects": {
             "AstralPerception": "Percepção Astral",
+            "Manifesting": "Manifestando",
+            "Materialized": "Materializado",
             "Running": "Correndo",
             "Sprinting": "Corrida Veloz"
         }

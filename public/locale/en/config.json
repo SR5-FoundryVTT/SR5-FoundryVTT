@@ -2986,6 +2986,8 @@
         },
         "StatusEffects": {
             "AstralPerception": "Astral Perception",
+            "Manifesting": "Manifesting",
+            "Materialized": "Materialized",
             "Running": "Running",
             "Sprinting": "Sprinting"
         },
@@ -3374,6 +3376,11 @@
             "CannotControlAstralProjection": "You do not own this actor's astral projection.",
             "AlreadyProjectingAstrally": "This actor is already astrally projecting.",
             "AstralToggleFailed": "Astral vision could not be toggled. See the console for details.",
+            "ToggleManifestation": "Toggle Manifestation",
+            "ToggleMaterialization": "Toggle Materialization",
+            "CannotManifest": "Only spirits and astral forms can manifest.",
+            "CannotMaterialize": "Only spirits can materialize.",
+            "CannotControlAstralState": "You do not own this actor.",
             "AstralPerceptionOverride": "Astral perception override",
             "AstralPerceptionOverrideHint": "GM override for whether this actor may use astral perception.",
             "AstralProjectionOverride": "Astral projection override",

@@ -1,5 +1,5 @@
 import AstralPerceptionDetectionMode from './astralPerception/astralPerceptionDetectionMode';
-import AstralPerceptionBackgroundVisionShader  from './astralPerception/astralPerceptionBackgroundShader';
+import { AstralBackgroundVisionShader } from './astralPerception/astralShaders';
 import ThermographicVisionDetectionMode from './thermographicVision/thermographicDetectionMode';
 import LowlightVisionDetectionMode from './lowlightVision/lowlightDetectionMode';
 import AugmentedRealityVisionDetectionMode from './augmentedReality/arDetectionMode';
@@ -13,19 +13,37 @@ import {
     PhysicalLightPerceptionDetectionMode,
     PhysicalSightDetectionMode,
 } from './physicalVision/physicalDetectionMode';
+import {
+    PhysicalAllDetectionMode,
+    PhysicalInvisibilityDetectionMode,
+    PhysicalTremorDetectionMode,
+} from './physicalVision/coreDetectionModes';
+import { MANIFEST_STATUS, MATERIALIZE_STATUS } from './astralProjection/ManifestationState';
 import { AstralAwareCanvasVisibility } from './astralPerception/astralVisibility';
 import { SR5VisionSource } from './SR5VisionSource';
 
 export default class VisionConfigurator {
     static configurePhysicalSight() {
-        const basicSight = CONFIG.Canvas.detectionModes.basicSight;
-        const lightPerception = CONFIG.Canvas.detectionModes.lightPerception;
-        CONFIG.Canvas.detectionModes.basicSight = new PhysicalSightDetectionMode(
-            basicSight.toObject(),
-        ) as unknown as typeof basicSight;
-        CONFIG.Canvas.detectionModes.lightPerception = new PhysicalLightPerceptionDetectionMode(
-            lightPerception.toObject(),
-        ) as unknown as typeof lightPerception;
+        const modes = CONFIG.Canvas.detectionModes;
+        const replace = (id: string, Mode: typeof foundry.canvas.perception.DetectionMode) => {
+            const mode = modes[id];
+            if (mode) modes[id] = new Mode(mode.toObject()) as unknown as typeof mode;
+        };
+        replace('basicSight', PhysicalSightDetectionMode);
+        replace('lightPerception', PhysicalLightPerceptionDetectionMode);
+        // Foundry's other senses stay on the physical plane as well.
+        replace('seeInvisibility', PhysicalInvisibilityDetectionMode);
+        replace('senseInvisibility', PhysicalInvisibilityDetectionMode);
+        replace('feelTremor', PhysicalTremorDetectionMode);
+        replace('seeAll', PhysicalAllDetectionMode);
+        replace('senseAll', PhysicalAllDetectionMode);
+    }
+
+    /** Let tokens react when their actor manifests or materializes, see SR5Token._onApplyStatusEffect. */
+    static configureStatuses() {
+        const special = CONFIG.specialStatusEffects as Record<string, string>;
+        special.MANIFEST = MANIFEST_STATUS;
+        special.MATERIALIZE = MATERIALIZE_STATUS;
     }
 
     static configureAstralPerception() {
@@ -38,27 +56,28 @@ export default class VisionConfigurator {
             walls: true,
             type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
         });
-  
+
+        // SR5#312 the astral plane is always lit by the glow of life, so no scene lighting or darkness applies.
+        const { LIGHTING_VISIBILITY } = foundry.canvas.perception.VisionMode;
         CONFIG.Canvas.visionModes.astralPerception = new foundry.canvas.perception.VisionMode({
             id: 'astralPerception',
             label: 'SR5.Vision.AstralPerception',
             canvas: {
                 shader: foundry.canvas.rendering.shaders.ColorAdjustmentsSamplerShader,
-                uniforms: {
-                    saturation: 5,
-                    tint: AstralPerceptionBackgroundVisionShader.COLOR_TINT,
-                },
+                uniforms: { contrast: -0.15, saturation: -0.9, exposure: -0.45 },
             },
             lighting: {
-                background: { visibility: foundry.canvas.perception.VisionMode.LIGHTING_VISIBILITY.DISABLED },
-                illumination: { visibility: foundry.canvas.perception.VisionMode.LIGHTING_VISIBILITY.DISABLED },
-                coloration: { visibility: foundry.canvas.perception.VisionMode.LIGHTING_VISIBILITY.DISABLED },
+                background: { visibility: LIGHTING_VISIBILITY.DISABLED },
+                illumination: { visibility: LIGHTING_VISIBILITY.DISABLED },
+                coloration: { visibility: LIGHTING_VISIBILITY.DISABLED },
+                darkness: { visibility: LIGHTING_VISIBILITY.DISABLED },
             },
             vision: {
                 darkness: { adaptive: false },
-                background: { shader: AstralPerceptionBackgroundVisionShader },
+                defaults: { attenuation: 0, contrast: -0.1, saturation: -0.85, brightness: 1 },
+                background: { shader: AstralBackgroundVisionShader },
             },
-        });
+        }, { animated: true });
     }
 
     static configureThermographicVision() {

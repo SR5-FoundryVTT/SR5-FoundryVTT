@@ -13,6 +13,7 @@ import {
     getProjectionState,
     isAstralForm,
 } from './AstralProjectionState';
+import { isManifesting, MANIFEST_STATUS } from './ManifestationState';
 
 export const ASTRAL_WALK_METERS = 100;
 export const ASTRAL_RUN_METERS = 5000;
@@ -375,6 +376,8 @@ export class AstralProjectionFlow {
     private static async restoreActor(actor: SR5Actor | null, initiativeMode: string) {
         if (!actor) return;
         if (actor.isToken && !foundry.utils.fromUuidSync(actor.token!.uuid!)) return;
+        // Only an astral form can manifest, so it ends with the projection.
+        if (isManifesting(actor)) await actor.toggleStatusEffect(MANIFEST_STATUS, { active: false });
         const projecting = !!actor.getFlag(SYSTEM_NAME, FLAGS.AstralProjecting);
         if (!projecting && actor.system.initiative?.perception === initiativeMode) return;
         await actor.update({

@@ -1,6 +1,11 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
 import { AstralRegionFlow } from '@/module/vision/astralRegions/AstralRegionFlow';
 import { ULTRASOUND_VISION_MODE } from '@/module/vision/ultrasoundVision/ultrasoundDetectionMode';
+import { SenseFilterResolver } from '@/module/vision/SenseFilterResolver';
+import { getProjectionForm } from '@/module/vision/astralProjection/AstralProjectionState';
+import { MANIFEST_STATUS, MATERIALIZE_STATUS } from '@/module/vision/astralProjection/ManifestationState';
+import { ManifestationFilter } from '@/module/vision/astralProjection/manifestationFilter';
+import { getPhysicalPresence } from '@/module/vision/physicalVision/physicalDetectionMode';
 
 export class SR5Token extends foundry.canvas.placeables.Token {
     /**
@@ -24,27 +29,47 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         return astralPath ? [astralPath as typeof path, true] : [path, constrained];
     }
 
-    /**
-     * Astral perception and ultrasound vision disable scene lighting, so a token they don't detect through
-     * their own detection mode, like the observer's own token or a target found by basic sight, renders
-     * unlit and disappears into the dark. Outline it the way that sense outlines what it detects.
-     */
+    /** Swap the detection filter for the one matching this token and the current viewers' senses. */
     override get isVisible() {
         const visible = super.isVisible;
-        if (visible && !this.detectionFilter) this.detectionFilter = SR5Token.nonOpticalSenseFilter();
+        if (visible) this.detectionFilter = SenseFilterResolver.resolve(this, this.detectionFilter) ?? null;
         return visible;
     }
 
-    /** The detection filter of the non-optical vision mode every active vision source shares, if any. */
-    private static nonOpticalSenseFilter() {
-        const active = canvas.effects.visionSources.filter(source => source.active);
-        const modes = new Set(active.map(source => source.visionMode?.id));
-        if (modes.size !== 1) return null;
-        const [mode] = modes;
-        if (mode !== 'astralPerception' && mode !== ULTRASOUND_VISION_MODE) return null;
-        const detectionMode = CONFIG.Canvas.detectionModes[mode]?.constructor as
-            typeof foundry.canvas.perception.DetectionMode | undefined;
-        return detectionMode?.getDetectionFilter() ?? null;
+    /** Filter showing this token as a manifesting astral being, while it is one. */
+    private manifestFilter: ManifestationFilter | null = null;
+
+    /**
+     * Manifesting and materializing change which senses detect this token and how it looks. The astral form of
+     * an unlinked body isn't among the actor's dependent tokens, so it is refreshed along with its body.
+     */
+    protected override _onApplyStatusEffect(statusId: string, active: boolean) {
+        super._onApplyStatusEffect(statusId, active);
+        if (statusId !== MANIFEST_STATUS && statusId !== MATERIALIZE_STATUS) return;
+        canvas.perception.update({ refreshVision: true });
+        this._updateSpecialStatusFilterEffects();
+        const form = getProjectionForm(this.document)?.object as SR5Token | null | undefined;
+        form?._updateSpecialStatusFilterEffects();
+    }
+
+    protected override _updateSpecialStatusFilterEffects() {
+        super._updateSpecialStatusFilterEffects();
+        const mesh = this.mesh;
+        if (!mesh) return;
+        const manifesting = getPhysicalPresence(this) === 'manifest';
+        if (manifesting && !this.manifestFilter) this.manifestFilter = ManifestationFilter.create() as ManifestationFilter;
+        if (!this.manifestFilter) return;
+        this.manifestFilter.enabled = manifesting;
+        mesh.filters ??= [];
+        if (manifesting && !mesh.filters.includes(this.manifestFilter)) mesh.filters.push(this.manifestFilter);
+    }
+
+    protected override _removeAllFilterEffects() {
+        super._removeAllFilterEffects();
+        const filters = this.mesh?.filters;
+        const index = this.manifestFilter && filters ? filters.indexOf(this.manifestFilter) : -1;
+        if (index >= 0) filters!.splice(index, 1);
+        this.manifestFilter = null;
     }
 
     /** Astral perception and ultrasound aren't optical, and ultrasound works in any light. */

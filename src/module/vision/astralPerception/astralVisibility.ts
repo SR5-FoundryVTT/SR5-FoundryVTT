@@ -1,10 +1,10 @@
-import { hasPhysicalPresence, isAstralVisionSource } from '../physicalVision/physicalDetectionMode';
+import { isAstralVisionSource, isOpticallyPresent } from '../physicalVision/physicalDetectionMode';
 
 export const shouldSuppressPhysicalLightVision = (
     target: object | null | undefined,
     visionSources: Iterable<foundry.canvas.sources.PointVisionSource>,
 ) => {
-    if (target instanceof Token && !hasPhysicalPresence(target)) return true;
+    if (target instanceof foundry.canvas.placeables.Token && !isOpticallyPresent(target)) return true;
     const activeSources = Array.from(visionSources).filter(source => source.active);
     return activeSources.length > 0 && activeSources.every(source => isAstralVisionSource(source));
 };

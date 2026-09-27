@@ -7,7 +7,12 @@ import {
     AstralProjectionFlow,
 } from '@/module/vision/astralProjection/AstralProjectionFlow';
 import { SR5TestFactory } from './utils';
-import { hasPhysicalPresence } from '@/module/vision/physicalVision/physicalDetectionMode';
+import { getPhysicalPresence, hasPhysicalPresence } from '@/module/vision/physicalVision/physicalDetectionMode';
+import { ManifestationFlow } from '@/module/vision/astralProjection/ManifestationFlow';
+import { MANIFEST_STATUS, MATERIALIZE_STATUS } from '@/module/vision/astralProjection/ManifestationState';
+import { AstralRegionFlow } from '@/module/vision/astralRegions/AstralRegionFlow';
+import { getAstralTier } from '@/module/vision/astralPerception/astralSignature';
+import ThermographicVisionDetectionMode from '@/module/vision/thermographicVision/thermographicDetectionMode';
 import AstralPerceptionDetectionMode from '@/module/vision/astralPerception/astralPerceptionDetectionMode';
 import { ActorRollDataFlow } from '@/module/actor/flows/ActorRollDataFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
@@ -59,6 +64,73 @@ export const shadowrunVisionProjection = (context: QuenchBatchContext) => {
         ]);
         return { scene, body };
     };
+
+    describe('Manifestation', () => {
+        const createSpirit = async () => {
+            const spirit = await factory.createActor({ type: 'spirit' });
+            const scene = await factory.createScene({});
+            const [token] = await scene.createEmbeddedDocuments('Token', [{ actorId: spirit.id, actorLink: true }]);
+            return { spirit, token };
+        };
+
+        it('manifests an astral form while its body stays solid, until it returns', async () => {
+            const actor = await createMagician();
+            const { body } = await createBody(actor);
+            const form = await AstralProjectionFlow.project(body);
+            assert.exists(form);
+            if (!form) return;
+
+            assert.isTrue(ManifestationFlow.canManifest(form));
+            assert.isFalse(ManifestationFlow.canManifest(body), 'a physical body has nothing to manifest');
+            assert.isFalse(ManifestationFlow.canMaterialize(form), 'only spirits materialize');
+
+            assert.isTrue(await ManifestationFlow.toggleManifest(form));
+            assert.strictEqual(getPhysicalPresence({ document: form } as any), 'manifest');
+            assert.strictEqual(getPhysicalPresence({ document: body } as any), 'solid');
+
+            await AstralProjectionFlow.returnToBody(form);
+            assert.isFalse(actor.statuses.has(MANIFEST_STATUS), 'manifesting ends with the projection');
+        });
+
+        it('materializes a spirit into a solid, warm and still astral being', async () => {
+            const { spirit, token } = await createSpirit();
+            const thermographic = new ThermographicVisionDetectionMode({
+                id: 'thermographic',
+                label: 'Thermographic',
+                type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
+            });
+            const viewer = { visionMode: { id: 'basic' } } as any;
+
+            assert.strictEqual(getPhysicalPresence({ document: token } as any), 'none');
+            assert.isTrue(AstralRegionFlow.isAstralOnly(token));
+
+            assert.isTrue(await ManifestationFlow.toggleMaterialize(token));
+            assert.isTrue(spirit.statuses.has(MATERIALIZE_STATUS));
+            assert.strictEqual(getPhysicalPresence({ document: token } as any), 'solid');
+            assert.isTrue((thermographic as any)._canDetect(viewer, { document: token }));
+            assert.isFalse(AstralRegionFlow.isAstralOnly(token));
+            assert.strictEqual(getAstralTier({ document: token } as any), 'form', 'it stays astrally real');
+
+            assert.isTrue(await ManifestationFlow.toggleManifest(token));
+            assert.isFalse(spirit.statuses.has(MATERIALIZE_STATUS), 'manifesting replaces materializing');
+            assert.strictEqual(getPhysicalPresence({ document: token } as any), 'manifest');
+            assert.isFalse((thermographic as any)._canDetect(viewer, { document: token }));
+
+            assert.isFalse(await ManifestationFlow.toggleManifest(token));
+            assert.strictEqual(getPhysicalPresence({ document: token } as any), 'none');
+        });
+
+        it('refuses manifestation to other kinds of actors', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const scene = await factory.createScene({});
+            const [token] = await scene.createEmbeddedDocuments('Token', [{ actorId: actor.id, actorLink: true }]);
+
+            assert.isFalse(await ManifestationFlow.toggleManifest(token));
+            assert.isFalse(await ManifestationFlow.toggleMaterialize(token));
+            assert.isFalse(actor.statuses.has(MANIFEST_STATUS));
+            assert.isFalse(actor.statuses.has(MATERIALIZE_STATUS));
+        });
+    });
 
     describe('Astral projection', () => {
         it('allows full magicians and explicit overrides only', async () => {

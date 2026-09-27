@@ -2,10 +2,11 @@ import { Helpers } from '@/module/helpers';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { AstralPerceptionFlow } from '@/module/vision/astralPerception/AstralPerceptionFlow';
 import { AstralProjectionFlow } from '@/module/vision/astralProjection/AstralProjectionFlow';
+import { ManifestationFlow } from '@/module/vision/astralProjection/ManifestationFlow';
 
 export class VisionHUD {
     static onRenderTokenHUD(
-        _app: foundry.applications.hud.TokenHUD,
+        app: foundry.applications.hud.TokenHUD,
         html: HTMLElement,
         context: foundry.applications.hud.TokenHUD.RenderContext & { _id?: string },
         _options: foundry.applications.hud.TokenHUD.RenderOptions,
@@ -25,6 +26,31 @@ export class VisionHUD {
         if (AstralProjectionFlow.canProject(actor)) {
             leftColumn.append(this.astralProjectionControl(token));
         }
+        if (ManifestationFlow.canManifest(token.document)) {
+            leftColumn.append(this.toggleControl({
+                className: 'sr5-manifestation',
+                label: 'SR5.Vision.ToggleManifestation',
+                icon: 'fa-person-rays',
+                active: ManifestationFlow.isManifesting(token.document),
+                toggle: () => this.rerenderAfter(app, ManifestationFlow.toggleManifest(token.document)),
+            }));
+        }
+        if (ManifestationFlow.canMaterialize(token.document)) {
+            leftColumn.append(this.toggleControl({
+                className: 'sr5-materialization',
+                label: 'SR5.Vision.ToggleMaterialization',
+                icon: 'fa-person-burst',
+                active: ManifestationFlow.isMaterialized(token.document),
+                toggle: () => this.rerenderAfter(app, ManifestationFlow.toggleMaterialize(token.document)),
+            }));
+        }
+    }
+
+    /** Manifesting and materializing exclude each other, so the HUD redraws to show both buttons' states. */
+    private static async rerenderAfter(app: foundry.applications.hud.TokenHUD, toggle: Promise<boolean>) {
+        const active = await toggle;
+        void app.render();
+        return active;
     }
 
     private static astralPerceptionControl(token: Token) {

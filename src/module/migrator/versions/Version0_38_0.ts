@@ -50,7 +50,8 @@ export class Version0_38_0 extends VersionMigration {
         visibility.targets.matrix ??= {};
 
         visibility.targets.physical.active ??= ['character', 'critter', 'vehicle'].includes(actor.type);
-        visibility.targets.physical.thermographic ??= visibility.meat?.hasHeat ? 'warm' : 'none';
+        // Spirits read warm once materialized, like a new spirit does.
+        visibility.targets.physical.thermographic ??= visibility.meat?.hasHeat || actor.type === 'spirit' ? 'warm' : 'none';
         visibility.targets.astral.hasAura ??= !!visibility.astral?.hasAura;
         visibility.targets.astral.astralActive ??= !!visibility.astral?.astralActive;
         visibility.targets.astral.affectedBySpell ??= !!visibility.astral?.affectedBySpell;
