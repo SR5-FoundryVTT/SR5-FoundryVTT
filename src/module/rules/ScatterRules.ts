@@ -130,9 +130,9 @@ export const ScatterRules = {
                 return '2d6';
             case 'grenade_launcher':
                 return '3d6';
-            case 'rocket_launcher':
-                return '4d6';
             case 'missile_launcher':
+                return '4d6';
+            case 'rocket_launcher':
                 return '5d6';
             case 'spell':
                 return '2d6';
