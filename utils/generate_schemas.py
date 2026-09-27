@@ -19,7 +19,7 @@ from io import BytesIO
 # Repository details for fetching XML files if no local path is provided
 OWNER = "chummer5a"
 REPO = "chummer5a"
-BRANCH = "8544ecee1ad3edccc0853b7821067542130a5c68"  # v5.226.91
+BRANCH = "291d9562b9f6c093e3f2c2f28c535ff340ecb3ef"  # v5.226.194
 
 # String length threshold for inline union literals
 STRING_LIMIT = 100
@@ -84,7 +84,7 @@ MERGE_GROUPS = [
 # List of XML files to process
 FILES = [
     'actions.xml', 'armor.xml', 'bioware.xml', 'complexforms.xml', 'critterpowers.xml',
-    'critters.xml', 'cyberware.xml', 'echoes.xml', 'gear.xml', 'metatypes.xml',
+    'critters.xml', 'cyberware.xml', 'echoes.xml', 'gear.xml', 'lifestyles.xml', 'metatypes.xml',
     'powers.xml', 'qualities.xml', 'skills.xml', 'spells.xml', 'vehicles.xml', 'weapons.xml',
 ]
 

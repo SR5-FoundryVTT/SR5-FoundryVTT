@@ -13,6 +13,7 @@ import { CritterPowerImporter } from "../importer/CritterPowerImporter";
 import { BulkImportMode, DataImporter } from "../importer/DataImporter";
 import { EchoesImporter } from "../importer/EchoesImporter";
 import { GearImporter } from "../importer/GearImporter";
+import { LifestyleImporter } from "../importer/LifestyleImporter";
 import { QualityImporter } from "../importer/QualityImporter";
 import { SkillImporter } from "../importer/SkillImporter";
 import { SpellImporter } from "../importer/SpellImporter";
@@ -97,8 +98,8 @@ export class BulkImporter extends BaseClass {
     private static readonly githubConfig = {
         owner: "chummer5a",
         repo: "chummer5a",
-        version: "v5.226.91",
-        branch: "8544ecee1ad3edccc0853b7821067542130a5c68",
+        version: "v5.226.194",
+        branch: "291d9562b9f6c093e3f2c2f28c535ff340ecb3ef",
     } as const;
 
     static readonly SUPPORTED_LANGUAGES = [
@@ -141,6 +142,7 @@ export class BulkImporter extends BaseClass {
         new WeaponModImporter(),
         new WeaponImporter(),
         new GearImporter(),
+        new LifestyleImporter(),
         new VehicleModImporter(),
         new VehicleImporter(),
         new SpellImporter(),

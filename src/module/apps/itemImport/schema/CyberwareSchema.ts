@@ -119,6 +119,8 @@ export interface Cyberware {
             };
         }>;
     };
+    weaponcategories?: { _TEXT: string; };
+    weaponfilter?: { _TEXT: "not(cyberware) and not(hide)"; };
     wirelessbonus?: {
         limitmodifier?: Many<{
             condition: { _TEXT: "LimitCondition_Skillwires"; };

@@ -57,10 +57,12 @@ export interface ConditionsSchema {
         category?: { _TEXT: "Drugs"; };
         name?: { _TEXT: "Altskin" | "Binoculars (2050)" | "Goggles (2050)"; };
     };
+    lifestyle?: { _TEXT: "Bolt Hole" | "Traveler"; };
     oneof?: {
         accessory?: OneOrMany<{ _TEXT: string; }>;
         armormod?: { _TEXT: "Responsive Interface Gear: Armor"; $: { sameparent: "True"; }; };
         bioware?: OneOrMany<{ _TEXT: string; }>;
+        characterquality?: Many<{ _TEXT: "SINner (Corporate Limited)" | "SINner (Corporate)"; }>;
         critterpower?: { _TEXT: "Essence Drain"; };
         cyberware?: { _TEXT: "Control Rig" | "Reaction Enhancers" | "Wired Reflexes"; };
         ess?: OneOrMany<{ _TEXT: IntegerString; $?: { grade: string; }; }>;
@@ -83,6 +85,7 @@ export interface ConditionsSchema {
             spell?: { _TEXT: "Shapechange" | "[Critter] Form"; };
             tradition?: { _TEXT: "Buddhism" | "Chaos Magic" | "Islam" | "Red Magic" | "Sioux" | "Wicca" | "Wuxing"; };
         }>;
+        lifestylequality?: Many<{ _TEXT: string; }>;
         magenabled?: Empty;
         metamagic?: { _TEXT: "Spell Shaping"; };
         metamagicart?: { _TEXT: "Advanced Ritual Casting" | "Geomancy"; };

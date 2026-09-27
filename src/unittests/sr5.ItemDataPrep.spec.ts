@@ -11,6 +11,7 @@ import { ChummerFormulaParser } from '../module/apps/itemImport/helper/ChummerFo
 import { Parser } from '../module/apps/itemImport/parser/Parser';
 import { WeaponModParser } from '../module/apps/itemImport/parser/mod/WeaponModParser';
 import { VehicleModParser } from '../module/apps/itemImport/parser/mod/VehicleModParser';
+import { LifestyleParser } from '../module/apps/itemImport/parser/misc/LifestyleParser';
 import { DynamicValueEvaluator } from '../module/effect/DynamicValueEvaluator';
 import { BonusHelper } from '../module/apps/itemImport/helper/BonusHelper';
 import type { BonusSchema } from '../module/apps/itemImport/schema/BonusSchema';
@@ -662,6 +663,25 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             Parser.dropChanges(addedMod, ['actor']);
             assert.strictEqual(system(addedMod).slots, 2);
             assert.deepEqual(keys(addedMod), ['system.slots', 'system.technology.conceal']);
+        });
+
+        it('imports base lifestyles with their type and monthly cost', async () => {
+            class TestLifestyleParser extends LifestyleParser {
+                protected override async getFolder() { return { id: null } as unknown as Folder; }
+            }
+            const parse = async (name: string, cost: string) => await new TestLifestyleParser().Parse({
+                id: { _TEXT: 'e13eb55b-e957-426a-85ba-1943a936bdf9' },
+                name: { _TEXT: name },
+                cost: { _TEXT: cost },
+            } as never, 'Lifestyle') as Item.CreateData;
+
+            const medium = (await parse('Medium', '5000')).system as SR5Item<'lifestyle'>['system'];
+            assert.strictEqual(medium.type, 'medium');
+            assert.strictEqual(medium.cost, 5000);
+
+            const boltHole = (await parse('Bolt Hole', '1000')).system as SR5Item<'lifestyle'>['system'];
+            assert.strictEqual(boltHole.type, 'other');
+            assert.strictEqual(boltHole.cost, 1000);
         });
 
         it('does not apply actor-target item effects to the item itself', async () => {
