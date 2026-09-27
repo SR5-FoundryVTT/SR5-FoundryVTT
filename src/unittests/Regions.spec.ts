@@ -90,7 +90,8 @@ export const regionsTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(getBlastDamageAtDistance(blast, 0), 16);
             assert.strictEqual(getBlastDamageAtDistance(blast, 2), 12);
             assert.strictEqual(getBlastDamageAtDistance(blast, 2.9), 12);
-            assert.strictEqual(getBlastDamageAtDistance(blast, 8), 2);
+            assert.strictEqual(getBlastDamageAtDistance(blast, 7.9), 2);
+            assert.isUndefined(getBlastDamageAtDistance(blast, 8));
             assert.isUndefined(getBlastDamageAtDistance(blast, 9));
         });
     });
