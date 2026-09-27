@@ -4,6 +4,7 @@ import { SR5Item } from '@/module/item/SR5Item';
 import type { PerceptionCapabilitiesType } from '@/module/types/template/Visibility';
 import { PerceptionResolver } from './PerceptionResolver';
 import { ULTRASOUND_RANGE_METERS } from './ultrasoundVision/ultrasoundDetectionMode';
+import { AUGMENTED_REALITY_RANGE_METERS } from './augmentedReality/arDetectionMode';
 import { isAstralForm } from './astralProjection/AstralProjectionState';
 
 type RefreshDocument = SR5Actor | SR5Item | ActiveEffect | TokenDocument;
@@ -53,12 +54,15 @@ export class PerceptionFlow {
         sceneUnit = 'm',
     ) {
         const next = foundry.utils.deepClone(detectionModes);
-        // 50 m is only the default for a newly granted ultrasound sense; a range the GM set on the token stays.
+        // Rules ranges are only the defaults of a newly granted sense; a range the GM set on the token stays.
         const ultrasoundRange = detectionModes.ultrasound?.range ?? this.metersToSceneUnits(ULTRASOUND_RANGE_METERS, sceneUnit);
+        const arRange = detectionModes.augmentedReality?.range
+            ?? this.metersToSceneUnits(AUGMENTED_REALITY_RANGE_METERS, sceneUnit);
         const managed = {
             lowlight: { enabled: capabilities.physical.lowLight, range },
             thermographic: { enabled: capabilities.physical.thermographic, range },
             ultrasound: { enabled: capabilities.physical.ultrasound, range: ultrasoundRange },
+            augmentedReality: { enabled: capabilities.matrix.augmentedReality, range: arRange },
         };
 
         for (const [id, sense] of Object.entries(managed)) {

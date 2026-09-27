@@ -136,6 +136,9 @@ export default class VisionConfigurator {
             id: 'augmentedReality',
             label: 'SR5.Vision.AugmentedReality',
             type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
+            // Icons are spotted through the antenna, not line of sight (SR5#235).
+            walls: false,
+            angle: false,
         });
     }
 }

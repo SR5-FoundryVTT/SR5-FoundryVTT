@@ -65,6 +65,7 @@ import { MatrixHooks } from './tests/hooks/MatrixHooks';
 import { MatrixResistTest } from './tests/MatrixResistTest';
 import { OpposedBruteForceTest } from './tests/OpposedBruteForceTest';
 import { OpposedHackOnTheFlyTest } from './tests/OpposedHackOnTheFlyTest';
+import { OpposedTraceIconTest } from './tests/OpposedTraceIconTest';
 import { MatrixDefenseTest } from './tests/MatrixDefenseTest';
 import { MatrixTest } from './tests/MatrixTest';
 import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
@@ -298,6 +299,7 @@ ___________________
                 OpposedBruteForceTest,
                 HackOnTheFlyTest,
                 OpposedHackOnTheFlyTest,
+                OpposedTraceIconTest,
                 MatrixResistTest,
                 BiofeedbackResistTest,
                 CheckOverwatchScoreTest,
@@ -353,6 +355,7 @@ ___________________
                 OpposedRitualTest,
                 OpposedBruteForceTest,
                 OpposedHackOnTheFlyTest,
+                OpposedTraceIconTest,
                 OpposedCheckOverwatchScoreTest,
                 OpposedMatrixTest
             },

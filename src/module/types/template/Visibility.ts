@@ -15,6 +15,10 @@ const PerceptionCapabilitiesData = (spaces: SpaceTypes) => ({
         perception: new BooleanField({ initial: spaces.includes('astralActive') }),
         projection: new BooleanField(),
     }),
+    matrix: new SchemaField({
+        // Granted on top of the commlink, cyberdeck or RCC that gives augmented reality.
+        augmentedReality: new BooleanField(),
+    }),
 });
 
 /** How an actor can be perceived by others. */
@@ -35,8 +39,11 @@ const PerceptionTargetsData = (spaces: SpaceTypes) => ({
         astralActive: new BooleanField({ initial: spaces.includes('astralActive') }),
         affectedBySpell: new BooleanField(),
     }),
+    // Overrides of the icon worked out from the actor's wireless devices.
     matrix: new SchemaField({
+        // Without it the actor has no icon, whatever it carries.
         hasIcon: new BooleanField({ initial: spaces.includes('matrix') }),
+        // Forces every icon of the actor to run silent.
         runningSilent: new BooleanField(),
     }),
 });

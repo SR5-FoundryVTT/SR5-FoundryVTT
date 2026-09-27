@@ -85,6 +85,7 @@ export const FLAGS = {
     AstralProjection: 'astralProjection',
     AstralProjecting: 'astralProjecting',
     AstralProjectionOperation: 'AstralProjectionOperation',
+    TracedIcons: 'tracedIcons',
 } as const;
 export const CORE_NAME = 'core';
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';

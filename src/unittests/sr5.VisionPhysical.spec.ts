@@ -14,7 +14,12 @@ import { ULTRASOUND_COLOR } from '@/module/vision/ultrasoundVision/ultrasoundSha
 import { SenseFilterResolver } from '@/module/vision/SenseFilterResolver';
 import { AstralAuraFilter } from '@/module/vision/astralPerception/astralAuraFilter';
 import { HeatSignatureFilter } from '@/module/vision/thermographicVision/heatSignatureFilter';
-import AugmentedRealityVisionDetectionMode from '@/module/vision/augmentedReality/arDetectionMode';
+import AugmentedRealityVisionDetectionMode, {
+    AUGMENTED_REALITY_RANGE_METERS,
+} from '@/module/vision/augmentedReality/arDetectionMode';
+import AugmentedRealityFilter from '@/module/vision/augmentedReality/arFilter';
+import { getMatrixIconState } from '@/module/vision/augmentedReality/matrixIcon';
+import { MatrixTraceFlow } from '@/module/vision/augmentedReality/MatrixTraceFlow';
 import {
     PhysicalAllDetectionMode,
     PhysicalInvisibilityDetectionMode,
@@ -65,6 +70,55 @@ const target = (active = true, invisible = false, thermographic = 'warm', manife
             },
         },
     }) as any;
+
+/** An equipped item with the given wireless mode, like a commlink or smartgun. */
+const wirelessItem = (wireless: string, type = 'device', category = 'commlink', equipped = true) =>
+    ({ type, system: { category, technology: { equipped, wireless } } });
+
+/** An actor carrying the given items, to work out its Matrix icon from. */
+const iconActor = (
+    items: unknown[],
+    options: { type?: string; special?: string; matrix?: object; silent?: boolean } = {},
+) => ({
+    type: options.type ?? 'character',
+    system: {
+        special: options.special ?? 'mundane',
+        matrix: { running_silent: !!options.silent },
+        visibilityChecks: { targets: { matrix: { hasIcon: true, runningSilent: false, ...options.matrix } } },
+    },
+    items,
+}) as any;
+
+/** A persona with marks on, and traces of, the given icon uuids. */
+const tracer = (traced: string[], marked: string[] = traced) => {
+    const flags: Record<string, unknown> = { tracedIcons: traced };
+    return {
+        getFlag: (_scope: string, key: string) => flags[key],
+        setFlag: async (_scope: string, key: string, value: unknown) => { flags[key] = value; },
+        getMarksPlaced: (uuid: string) => marked.includes(uuid) ? 1 : 0,
+        flags,
+    };
+};
+
+/** A detection target carrying its persona on a commlink. */
+const deviceTarget = (options: { invisible?: boolean; active?: boolean } = {}) => ({
+    document: {
+        actor: {
+            uuid: 'Actor.runner',
+            hasActorPersona: () => false,
+            getMatrixDevice: () => ({ uuid: 'Actor.runner.Item.commlink' }),
+            system: {
+                visibilityChecks: {
+                    targets: {
+                        physical: { active: options.active ?? true, thermographic: 'warm' },
+                        matrix: { hasIcon: true, runningSilent: false },
+                    },
+                },
+            },
+            statuses: new Set(options.invisible ? [CONFIG.specialStatusEffects.INVISIBLE] : []),
+        },
+    },
+}) as any;
 
 const visionSource = (darkness = false) =>
     ({
@@ -361,6 +415,8 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             const astralTarget = target(false, true);
             const physicalTarget = target(true, true);
             const astralViewer = { ...visionSource(), visionMode: { id: 'astralPerception' } };
+            const tracingViewer = { ...visionSource(), object: { actor: tracer(['Actor.runner.Item.commlink']) } };
+            const astralTracingViewer = { ...tracingViewer, visionMode: { id: 'astralPerception' } };
             const ar = new AugmentedRealityVisionDetectionMode({ id: 'augmentedReality', label: 'AR', type: SIGHT });
             const modes = [
                 ar,
@@ -369,7 +425,9 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
                 new PhysicalTremorDetectionMode({ id: 'feelTremor', label: 'Tremor', type: SIGHT }),
             ];
 
-            assert.isTrue((ar as any)._canDetect(visionSource(), physicalTarget), 'AR shows a physical icon');
+            assert.isTrue((ar as any)._canDetect(tracingViewer, deviceTarget()), 'AR shows a traced physical icon');
+            assert.isFalse((ar as any)._canDetect(astralTracingViewer, deviceTarget()), 'not to an astral viewer');
+            assert.isFalse((ar as any)._canDetect(tracingViewer, deviceTarget({ active: false })), 'nor off the plane');
             for (const mode of modes) {
                 assert.isFalse((mode as any)._canDetect(visionSource(), astralTarget), mode.id);
                 assert.isFalse((mode as any)._canDetect(astralViewer, physicalTarget), `${mode.id} astral viewer`);
@@ -455,6 +513,110 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             assert.deepEqual(reconcile({ enabled: true, range: 80 }), { enabled: true, range: 80 });
             assert.deepEqual(reconcile({ enabled: false, range: 80 }), { enabled: true, range: 80 });
             assert.deepEqual(reconcile({ enabled: true, range: null }), { enabled: true, range: ULTRASOUND_RANGE_METERS });
+        });
+    });
+
+    describe('Augmented reality', () => {
+        it('works out the Matrix icon from wireless devices, with the visibility targets as overrides', () => {
+            const commlink = (wireless: string, equipped = true) => wirelessItem(wireless, 'device', 'commlink', equipped);
+            const smartgun = wirelessItem('online', 'weapon', '');
+
+            assert.strictEqual(getMatrixIconState(iconActor([])), 'none', 'nothing wireless, nothing in the Matrix');
+            assert.strictEqual(getMatrixIconState(iconActor([commlink('online')])), 'visible');
+            assert.strictEqual(getMatrixIconState(iconActor([commlink('silent')])), 'silent');
+            assert.strictEqual(getMatrixIconState(iconActor([commlink('offline')])), 'none');
+            assert.strictEqual(getMatrixIconState(iconActor([commlink('online', false)])), 'none', 'unequipped');
+            assert.strictEqual(
+                getMatrixIconState(iconActor([commlink('silent'), smartgun])),
+                'visible',
+                'a wireless weapon shows up apart from a silent PAN',
+            );
+
+            assert.strictEqual(getMatrixIconState(iconActor([commlink('online')], { matrix: { hasIcon: false } })), 'none');
+            assert.strictEqual(
+                getMatrixIconState(iconActor([commlink('online')], { matrix: { runningSilent: true } })),
+                'silent',
+            );
+
+            assert.strictEqual(getMatrixIconState(iconActor([], { type: 'vehicle' })), 'visible', 'a vehicle is a device');
+            assert.strictEqual(getMatrixIconState(iconActor([], { type: 'vehicle', silent: true })), 'silent');
+            assert.strictEqual(getMatrixIconState(iconActor([], { special: 'resonance' })), 'visible', 'a living persona');
+        });
+
+        it('gives augmented reality to wireless commlink, cyberdeck and RCC users and technomancers', () => {
+            const resolve = (items: unknown[], special = 'mundane') =>
+                PerceptionResolver.resolve({ ...actorData('human', { special }), items }).matrix.augmentedReality;
+
+            assert.isFalse(resolve([]));
+            assert.isTrue(resolve([wirelessItem('online', 'device', 'commlink')]));
+            assert.isTrue(resolve([wirelessItem('silent', 'device', 'cyberdeck')]));
+            assert.isTrue(resolve([wirelessItem('online', 'device', 'rcc')]));
+            assert.isFalse(resolve([wirelessItem('offline', 'device', 'commlink')]), 'wireless off');
+            assert.isFalse(resolve([wirelessItem('online', 'device', 'commlink', false)]), 'not equipped');
+            assert.isFalse(resolve([wirelessItem('online', 'weapon', '')]), 'a smartgun is no display');
+            assert.isTrue(resolve([], 'resonance'));
+
+            const granted = actorData('human');
+            granted.system.visibilityChecks.capabilities.matrix = { augmentedReality: true };
+            assert.isTrue(PerceptionResolver.resolve(granted).matrix.augmentedReality, 'an effect can grant it');
+        });
+
+        it('gives augmented reality a 100 m range the GM can change', () => {
+            const capabilities = PerceptionResolver.resolve(actorData('human'));
+            capabilities.matrix.augmentedReality = true;
+            const reconcile = (existing: Record<string, { enabled: boolean; range: number | null }>) =>
+                PerceptionFlow.reconcileDetectionModes(existing, capabilities, 10000, 'm').augmentedReality;
+
+            assert.deepEqual(reconcile({}), { enabled: true, range: AUGMENTED_REALITY_RANGE_METERS });
+            assert.deepEqual(reconcile({ augmentedReality: { enabled: true, range: 30 } }), { enabled: true, range: 30 });
+
+            capabilities.matrix.augmentedReality = false;
+            assert.notProperty(
+                PerceptionFlow.reconcileDetectionModes({ augmentedReality: { enabled: true, range: 30 } }, capabilities, 10000),
+                'augmentedReality',
+            );
+        });
+
+        it('locates only traced icons, as long as a mark remains, through invisibility and at any range', () => {
+            const ar = new AugmentedRealityVisionDetectionMode({ id: 'augmentedReality', label: 'AR', type: SIGHT });
+            const viewer = (persona: ReturnType<typeof tracer>) => ({ ...visionSource(), object: { actor: persona } });
+            const device = 'Actor.runner.Item.commlink';
+
+            assert.isFalse((ar as any)._canDetect(viewer(tracer([])), deviceTarget()), 'spotting reveals no location');
+            assert.isTrue((ar as any)._canDetect(viewer(tracer([device])), deviceTarget({ invisible: true })));
+            assert.isFalse((ar as any)._canDetect(viewer(tracer([device], [])), deviceTarget()), 'without a mark');
+            assert.isTrue((ar as any)._testRange(), 'a trace has no range');
+            assert.strictEqual(AugmentedRealityVisionDetectionMode.getDetectionFilter(), AugmentedRealityFilter.located());
+            assert.isTrue(AugmentedRealityFilter.located().locatesOnly, 'a located token shows as its marker');
+        });
+
+        it('stores traces on the icon marks land on and ends them with the last mark', async () => {
+            const persona = tracer([], ['Actor.runner.Item.commlink', 'Actor.drone']);
+            await MatrixTraceFlow.trace(persona, deviceTarget().document.actor);
+            await MatrixTraceFlow.trace(persona, { uuid: 'Actor.drone' });
+            assert.deepEqual(persona.flags.tracedIcons, ['Actor.runner.Item.commlink', 'Actor.drone']);
+
+            const drone = { uuid: 'Actor.drone', hasActorPersona: () => true, getMatrixDevice: () => undefined };
+            assert.isTrue(MatrixTraceFlow.isTraced(persona, drone));
+
+            assert.deepEqual(
+                MatrixTraceFlow.pruneUpdate(persona, [{ uuid: 'Actor.drone', marks: 2 }]),
+                { 'flags.shadowrun5e.tracedIcons': ['Actor.drone'] },
+            );
+            assert.deepEqual(MatrixTraceFlow.pruneUpdate(persona, [
+                { uuid: 'Actor.drone', marks: 1 },
+                { uuid: 'Actor.runner.Item.commlink', marks: 3 },
+            ]), {}, 'nothing to prune');
+            assert.deepEqual(MatrixTraceFlow.pruneUpdate(tracer([]), []), {}, 'no traces, no update');
+        });
+
+        it('dims icon outlines with distance', () => {
+            const near = AugmentedRealityFilter.forDistance(0);
+            const far = AugmentedRealityFilter.forDistance(1);
+            assert.strictEqual(AugmentedRealityFilter.forDistance(0.1), near, 'filters are shared');
+            assert.isBelow(far.outerStrength, near.outerStrength);
+            assert.isAbove(far.outerStrength, 0);
+            assert.isFalse(near.locatesOnly, 'an outline goes over a token the viewer sees');
         });
     });
 };

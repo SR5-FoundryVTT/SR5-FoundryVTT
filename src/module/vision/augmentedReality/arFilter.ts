@@ -1,34 +1,60 @@
-//todo: v10 foundry-vtt-types 
-export default class AugmentedRealityVisionFilter extends foundry.canvas.rendering.filters.AbstractBaseFilter {
-    static override defaultUniforms = {
-        luminanceThreshold: 0.5,
-        alphaThreshold: 0.1,
-    };
+import { type GlowPulse, PulsingGlowOverlayFilter } from '@/module/vision/filters/pulsingGlowFilter';
 
-  /**
-   * fragment shader based on the following snippets:
-   * @link https://gitlab.com/peginc/swade/-/blob/develop/src/module/vision/InfravisionFilter.ts?ref_type=heads
-   */
-  static override fragmentShader = `
-    varying vec2 vTextureCoord;
-uniform sampler2D uSampler;
-uniform float luminanceThreshold;
-uniform float alphaThreshold;
+type Color = [number, number, number, number];
 
-#define RED vec4(1.0, 0.0, 0.0, 1.0)
-#define YELLOW vec4(1.0, 1.0, 0.0, 1.0)
-#define BLUE vec4(0.0, 0.0, 1.0, 1.0)
-#define GREEN vec4(0.0, 1.0, 0.0, 1.0)
+const AR_COLOR: Color = [0.35, 1.0, 0.6, 1.0];
 
-void main(void) {
-    vec4 texColor = texture2D(uSampler, vTextureCoord);
-    float luminance = dot(vec3(0.30, 0.59, 0.11), texColor.rgb);
-    if ( texColor.a > alphaThreshold ) {
-        gl_FragColor = mix(vec4(0.1, 0.1, 0.5, 1.0), vec4(0.4, 0.4, 0.8, 1.0), (luminance - 0.5) * 2.0);;
-        gl_FragColor.rgb *= 0.1 + 0.25 + 0.75 * pow( 16.0 * vTextureCoord.x * vTextureCoord.y * (1.0 - vTextureCoord.x) * (1.0 - vTextureCoord.y), 0.15 );
-        gl_FragColor.a = texColor.a;
-    } else {
-        gl_FragColor = vec4(0.0);
+/** Distance steps of the icon overlay; farther icons are dimmer (SR5#217). */
+const DISTANCE_STEPS = 4;
+
+/** How dim an icon at the edge of augmented reality range gets. */
+const MIN_DISTANCE_FACTOR = 0.35;
+
+const LOCATOR_PULSE: GlowPulse = { min: 0.6, max: 1.4, period: 1500 };
+
+/**
+ * The outline augmented reality draws around a device icon's owner.
+ *
+ * Foundry's glow knocks out the sprite, so over a token the viewer sees, it only adds the icon's outline; alone,
+ * it marks where a traced icon is without showing its owner.
+ */
+export default class AugmentedRealityFilter extends PulsingGlowOverlayFilter {
+    private static readonly overlays: AugmentedRealityFilter[] = [];
+    private static locator: AugmentedRealityFilter | null = null;
+
+    /** Whether this filter stands alone for a token only found through a trace. */
+    locatesOnly = false;
+
+    /**
+     * The overlay of an icon on a token the viewer sees.
+     *
+     * @param fraction Distance to the icon as a fraction of augmented reality range, from 0 to 1.
+     */
+    static forDistance(fraction: number) {
+        const step = Math.min(DISTANCE_STEPS - 1, Math.max(0, Math.floor(fraction * DISTANCE_STEPS)));
+        return this.overlays[step] ??= this.createOverlay(step);
     }
-}`;
+
+    /** The marker of a traced icon, showing where it is. */
+    static located() {
+        if (this.locator) return this.locator;
+        const filter = this.create({ glowColor: AR_COLOR, distance: 10 }) as AugmentedRealityFilter;
+        filter.fitPadding(10);
+        filter.innerStrength = 2;
+        filter.outerStrength = 4;
+        filter.pulse = LOCATOR_PULSE;
+        filter.animated = true;
+        filter.locatesOnly = true;
+        return this.locator = filter;
+    }
+
+    private static createOverlay(step: number) {
+        const factor = 1 - (1 - MIN_DISTANCE_FACTOR) * (step / (DISTANCE_STEPS - 1));
+        const filter = this.create({ glowColor: AR_COLOR, distance: 8 }) as AugmentedRealityFilter;
+        filter.fitPadding(8);
+        filter.innerStrength = 2 * factor;
+        filter.outerStrength = 4 * factor;
+        filter.animated = false;
+        return filter;
+    }
 }

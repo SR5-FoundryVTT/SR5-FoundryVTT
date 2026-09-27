@@ -3,6 +3,7 @@ import { SR5Item } from "../../item/SR5Item";
 import { SR5Actor } from "../SR5Actor";
 import { MatrixMarksType } from "@/module/types/template/Matrix";
 import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
+import { MatrixTraceFlow } from "@/module/vision/augmentedReality/MatrixTraceFlow";
 
 /**
  * This flow handles everything around matrix mark management.
@@ -84,7 +85,10 @@ export const ActorMarksFlow = {
 
         const marksData = MarksStorage.setMarks(matrixData.marks, target, persona.getMarksPlaced(target.uuid), marks, options);
 
-        await persona.update({ system: { matrix: { marks: marksData } } });
+        await persona.update({
+            system: { matrix: { marks: marksData } },
+            ...MatrixTraceFlow.pruneUpdate(persona, marksData),
+        });
         await MarksStorage.storeRelations(persona.uuid, marksData);
     },
 
@@ -96,7 +100,7 @@ export const ActorMarksFlow = {
         if (!matrixData) return;
 
         // Delete all markId properties from ActorData
-        await persona.update({ system: { matrix: { marks: [] } } });
+        await persona.update({ system: { matrix: { marks: [] } }, ...MatrixTraceFlow.pruneUpdate(persona, []) });
         if (persona.uuid) await MarksStorage.storeRelations(persona.uuid, []);
     },
 
@@ -107,7 +111,10 @@ export const ActorMarksFlow = {
         if (!persona.isMatrixActor) return;
 
         const marksData = persona.matrixData()?.marks.filter(mark => mark.uuid !== uuid) ?? [];
-        await persona.update({ system: { matrix: { marks: marksData } } });
+        await persona.update({
+            system: { matrix: { marks: marksData } },
+            ...MatrixTraceFlow.pruneUpdate(persona, marksData),
+        });
         if (persona.uuid) await MarksStorage.storeRelations(persona.uuid, marksData);
     },
 

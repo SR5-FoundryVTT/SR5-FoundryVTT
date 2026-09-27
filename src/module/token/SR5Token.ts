@@ -2,6 +2,7 @@ import { FLAGS, SYSTEM_NAME } from '../constants';
 import { AstralRegionFlow } from '@/module/vision/astralRegions/AstralRegionFlow';
 import { ULTRASOUND_VISION_MODE } from '@/module/vision/ultrasoundVision/ultrasoundDetectionMode';
 import { SenseFilterResolver } from '@/module/vision/SenseFilterResolver';
+import type AugmentedRealityFilter from '@/module/vision/augmentedReality/arFilter';
 import { getProjectionForm } from '@/module/vision/astralProjection/AstralProjectionState';
 import { MANIFEST_STATUS, MATERIALIZE_STATUS } from '@/module/vision/astralProjection/ManifestationState';
 import { ManifestationFilter } from '@/module/vision/astralProjection/manifestationFilter';
@@ -34,6 +35,22 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         const visible = super.isVisible;
         if (visible) this.detectionFilter = SenseFilterResolver.resolve(this, this.detectionFilter) ?? null;
         return visible;
+    }
+
+    /** A token only found through a trace shows as its icon's marker, not as whatever carries it. */
+    override _refreshVisibility() {
+        super._refreshVisibility();
+        if ((this.detectionFilter as AugmentedRealityFilter | null)?.locatesOnly) this.mesh!.visible = false;
+    }
+
+    /** The marker of a traced icon is drawn from the hidden mesh, which Pixi neither renders nor moves. */
+    override _renderDetectionFilter(renderer: PIXI.Renderer) {
+        const mesh = this.mesh;
+        if (!mesh || mesh.visible) return super._renderDetectionFilter(renderer);
+        mesh.visible = true;
+        mesh.updateTransform();
+        super._renderDetectionFilter(renderer);
+        mesh.visible = false;
     }
 
     /** Filter showing this token as a manifesting astral being, while it is one. */

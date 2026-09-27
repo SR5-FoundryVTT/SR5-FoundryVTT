@@ -1,10 +1,15 @@
 import type { PerceptionCapabilitiesType } from '@/module/types/template/Visibility';
 import { SR5 } from '@/module/config';
+import { hasAugmentedRealityDevice } from './augmentedReality/matrixIcon';
 
 type PerceptionItem = {
     type: string;
     name?: string | null;
-    system?: { importFlags?: { sourceid?: string; name?: string } | null };
+    system?: {
+        importFlags?: { sourceid?: string; name?: string } | null;
+        category?: string;
+        technology?: { equipped?: boolean; wireless?: string } | null;
+    };
 };
 
 type PerceptionActor = {
@@ -24,7 +29,8 @@ export class PerceptionResolver {
      * Resolve which senses an actor has.
      *
      * Active Effect grants are already part of the prepared capabilities, as actor preparation applies
-     * actor and item effects. Magical eligibility is added on top, with explicit GM overrides applied last.
+     * actor and item effects. Magical eligibility and the augmented reality of Matrix devices are added on top,
+     * with explicit GM overrides applied last.
      */
     static resolve(actor: PerceptionActor): PerceptionCapabilitiesType {
         const capabilities = actor.system.visibilityChecks?.capabilities;
@@ -37,6 +43,10 @@ export class PerceptionResolver {
             astral: {
                 perception: !!capabilities?.astral?.perception,
                 projection: !!capabilities?.astral?.projection,
+            },
+            matrix: {
+                augmentedReality: !!capabilities?.matrix?.augmentedReality
+                    || hasAugmentedRealityDevice(actor),
             },
         };
 
