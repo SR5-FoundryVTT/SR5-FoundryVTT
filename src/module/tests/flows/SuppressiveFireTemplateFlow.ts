@@ -119,7 +119,7 @@ export class SuppressiveFireTemplateFlow {
                 radius: 1,
                 angle: 0,
                 rotation: 0,
-                curvature: 'round',
+                curvature: 'flat',
                 gridBased: false,
             }],
             elevation: {bottom: null, top: null, topInclusive: null},
@@ -162,11 +162,10 @@ export class SuppressiveFireTemplateFlow {
 
     #updateShape(shape: foundry.data.ConeShapeData, pointer: Point) {
         const distancePixels = Math.hypot(pointer.x - this.#base.x, pointer.y - this.#base.y);
-        const radius = Math.max(distancePixels, 1);
-        const distance = radius / canvas.dimensions!.distancePixels;
+        const distance = Math.max(distancePixels / canvas.dimensions!.distancePixels, this.#width / 2);
+        const radius = distance * canvas.dimensions!.distancePixels;
         const angle = Math.atan2(pointer.y - this.#base.y, pointer.x - this.#base.x);
-        const effectiveWidth = Math.min(this.#width, distance * Math.PI * 2);
-        const coneAngle = effectiveWidth / distance * 180 / Math.PI;
+        const coneAngle = 2 * Math.atan((this.#width / 2) / distance) * 180 / Math.PI;
         shape.updateSource({
             x: this.#base.x,
             y: this.#base.y,
