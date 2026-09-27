@@ -419,17 +419,14 @@ export class BlastTemplateFlow {
     }
 
     #getTokenAtPoint(event: RegionPlacementEvent): TokenDocument | undefined {
-        const resolution = canvas.app?.renderer?.resolution ?? 1;
-        const point = {
-            x: event.global.x * resolution,
-            y: event.global.y * resolution,
-        };
-        const token = event.target instanceof foundry.canvas.placeables.Token ?
-            event.target :
-            canvas.tokens?.placeables.find(candidate => {
-                if (!candidate.visible || !candidate.renderable) return false;
-                return candidate.getBounds().contains(point.x, point.y);
-            });
+        const tokens = canvas.tokens;
+        if (!tokens) return;
+
+        const point = event.getLocalPosition(tokens);
+        const token = tokens.placeables.find(candidate => {
+            if (!candidate.visible || !candidate.renderable) return false;
+            return candidate.bounds.contains(point.x, point.y);
+        });
         return token?.document;
     }
 
