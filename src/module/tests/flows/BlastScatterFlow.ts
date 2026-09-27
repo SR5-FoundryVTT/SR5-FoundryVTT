@@ -32,13 +32,13 @@ export const BlastScatterFlow = {
      * Will be called both after all success full tests and for post test template placements through chat message. 
      */
     async handle(test: SuccessTest): Promise<void> {
-        //      Is the same instance of an import used across references when using a const object?
-        //      Should we use a class instead to avoid having to complicate things with sets...
         if (this.handledTests.has(test)) return;
         
-        // Scatter only applies on failed tests. Allow action threshold configuration to apply
-        // instead of a fixed hit amount check for grenades.
-        if (test.success) return;
+        // If user applied some custom threshold, scatter only applies based on that.
+        if (test.threshold.value > 0 && test.success) return;
+        // Inject default threshold when no threshold has been configured.
+        // NOTE: Do  not use test threshold, as the user must be able to zero it (GM might want to), while the action might have defined one.
+        if (test.data.action.threshold.base === 0 && test.netHits.value >= ScatterRules.scatterThreshold) return;
 
         // Scatter only applies for tests implementig a blastTemplateFlow.
         const scatterTest = test as ScatterTest;
@@ -60,9 +60,6 @@ export const BlastScatterFlow = {
         const rolledDistance = distanceRoll.diceResults.reduce((total, value) => total + value, 0);
         const result = resolveScatterRoll(direction, rolledDistance, scatterTest.hits.value);
         if (!result) return;
-
-        // await this.showDice(scatterTest, directionRoll);
-        // await this.showDice(scatterTest, distanceRoll);
 
         await this.createMessage(
             scatterTest,

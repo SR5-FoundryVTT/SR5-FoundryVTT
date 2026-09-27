@@ -137,5 +137,10 @@ export const ScatterRules = {
             case 'spell':
                 return '2d6';
         }
-    }
+    },
+
+    /**
+     * Default scatter threshold for thrown weapon and magic tests. See SR5#181 / SR5.283
+     */
+    scatterThreshold: 3,
 }
