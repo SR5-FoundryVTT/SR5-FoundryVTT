@@ -3011,7 +3011,6 @@
             "Label": "Suppressive Fire",
             "Mode": "Suppressive Mode",
             "Modes": {
-                "Double": "Double (20 m)",
                 "Enhanced": "Enhanced (5 m)",
                 "Normal": "Normal (10 m)"
             }

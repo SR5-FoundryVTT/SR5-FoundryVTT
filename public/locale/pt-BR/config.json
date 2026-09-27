@@ -1852,7 +1852,6 @@
             "Label": "Fogo de Supressão",
             "Mode": "Modo de Supressão",
             "Modes": {
-                "Double": "Duplo (20 m)",
                 "Enhanced": "Aprimorado (5 m)",
                 "Normal": "Normal (10 m)"
             }

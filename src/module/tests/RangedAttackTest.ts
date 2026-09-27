@@ -128,7 +128,6 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         return [
             { value: suppressiveFireArcs.enhanced, label: game.i18n.localize('SR5.SuppressiveFire.Modes.Enhanced') },
             { value: suppressiveFireArcs.normal, label: game.i18n.localize('SR5.SuppressiveFire.Modes.Normal') },
-            { value: suppressiveFireArcs.double, label: game.i18n.localize('SR5.SuppressiveFire.Modes.Double') },
         ];
     }
 

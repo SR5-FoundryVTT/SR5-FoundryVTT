@@ -1383,7 +1383,6 @@
             "Label": "Tir de suppression",
             "Mode": "Mode de suppression",
             "Modes": {
-                "Double": "Double (20 m)",
                 "Enhanced": "Renforcé (5 m)",
                 "Normal": "Normal (10 m)"
             }

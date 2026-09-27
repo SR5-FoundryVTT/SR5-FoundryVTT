@@ -109,17 +109,15 @@ export const FireModeRules = {
     },
 
     /**
-     * The available suppressive fire modes and arc widths in meters according to 
+     * The available suppressive fire arc widths in meters according to
      * - SR5#179 'Suppressive Fire'
      * - RG#120 'Enhanced Suppression'
-     * - #TODO: tamif#2025 'double'?
      * @returns 
      */
     suppressiveFireArcs: function() {
         return {
             enhanced: 5,
-            normal: 10,
-            double: 20
+            normal: 10
         }
     },
 
