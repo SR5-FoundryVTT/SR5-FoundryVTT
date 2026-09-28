@@ -78,7 +78,7 @@ export class WeaponRangeTestBehavior {
      *
      * This will overwrite the default weapon range selection.
      */
-    private static prepareTargetRanges(test: WeaponRangeTest) {
+    static prepareTargetRanges(test: WeaponRangeTest) {
         if (foundry.utils.isEmpty(test.data.ranges)) return;
         if (!test.actor) return;
         if (!test.hasTargets) return;
@@ -121,6 +121,10 @@ export class WeaponRangeTestBehavior {
 
     static prepareDocumentData(test:WeaponRangeTest, rangesAccessor: (weapon: SR5Item<'weapon'>) => RangeType){
         WeaponRangeTestBehavior.prepareWeaponRanges(test, rangesAccessor);
+        WeaponRangeTestBehavior.prepareTargetRanges(test);
+    }
+
+    static prepareTargetData(test: WeaponRangeTest) {
         WeaponRangeTestBehavior.prepareTargetRanges(test);
     }
 

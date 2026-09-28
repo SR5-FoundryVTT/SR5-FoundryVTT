@@ -161,24 +161,24 @@
     min-width: 0;
 
     > label {
-      flex: 1 1 auto;
+      flex: 0 1 35%;
       min-width: 0;
       margin: 0;
     }
 
     > input[type='text'],
     > input[type='number'] {
-      flex: 0 0 3.4rem;
-      min-width: 3.4rem;
-      max-width: 3.4rem;
-      width: 3.4rem;
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: none;
+      width: auto;
       height: 24px;
       text-align: center;
     }
 
     > select {
-      flex: 0 1 56%;
-      min-width: 6rem;
+      flex: 1 1 0;
+      min-width: 0;
       width: auto;
       height: 24px;
     }
@@ -212,8 +212,8 @@
 
   .dialog-content-common > div > .form-group.fire-mode-select-row:not(.modifiable-value):not(.toggle-checkbox-row) > select,
   .dialog-content-common > div > .form-group.range-select-row:not(.modifiable-value):not(.toggle-checkbox-row) > select {
-    flex: 0 1 65%;
-    min-width: 8.75rem;
+    flex: 1 1 0;
+    min-width: 0;
   }
 
   .modifiable-value {
@@ -667,6 +667,19 @@
 
 body.theme-light .application.sr5v2.form-dialog:not(.theme-dark),
 .application.sr5v2.form-dialog.theme-light {
+  .ui-control {
+    border-color: transparent;
+    background: var(--sr5v2-button-bg);
+    box-shadow: 0 1px 2px rgba(34, 42, 51, 0.18), inset 0 1px rgba(255, 255, 255, 0.55);
+  }
+
+  .ui-control:hover,
+  .ui-control:focus-visible {
+    border-color: transparent;
+    background: var(--sr5v2-button-hover-bg);
+    box-shadow: 0 2px 4px rgba(34, 42, 51, 0.22), inset 0 1px rgba(255, 255, 255, 0.35);
+  }
+
   .window-content select {
     color-scheme: light;
 

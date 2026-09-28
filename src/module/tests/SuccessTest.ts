@@ -1,5 +1,4 @@
 import { SR5 } from "../config";
-import Template from "../template";
 import { Helpers } from "../helpers";
 import { SR5Die } from "../rolls/SR5Die";
 import { SR5Item } from "../item/SR5Item";
@@ -528,7 +527,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * it's behavior without the need to sub-class TestDialog.
      */
     _testDialogListeners() {
-        return [] as TestDialogListener[]
+        return [] as TestDialogListener[];
     }
 
     /**
@@ -1871,7 +1870,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             followupActions: this._prepareFollowupActionsTemplateData(),
             resistActions: this._prepareResistActionsTemplateData(),
             resultActions: this._prepareResultActionsTemplateData(),
-            previewTemplate: this._canPlaceBlastTemplate,
             // Without content the toggle would open an empty panel, so drop the control with it.
             showDescription: this._canShowDescription && this._hasDescriptionContent(description),
             description,
@@ -1900,16 +1898,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         };
 
         return Boolean(text?.value?.trim()) || Boolean(properties?.length);
-    }
-
-    /**
-     * Indicate if this test can be used to place a blast template using the shown chat message.
-     *
-     * This is indicated by the source items ability to cause an area of effect blast and which kind
-     * of test is used.
-     */
-    get _canPlaceBlastTemplate(): boolean {
-        return this.item?.hasBlastTemplate || false;
     }
 
     /**
@@ -2072,7 +2060,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         $(html).find('.show-roll').on('click', this._chatToggleCardRolls.bind(this));
         $(html).find('.show-description').on('click', this._chatToggleCardDescription.bind(this));
         $(html).find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet.bind(Helpers));
-        $(html).find('.place-template').on('click', this._placeItemBlastZoneTemplate.bind(this));
         $(html).find('.result-action').on('click', this._castResultAction.bind(this));
         $(html).find('.chat-select-link').on('click', this._selectSceneToken.bind(this));
         $(html).find('.test-action').on('click', this._castTestAction.bind(this));
@@ -2259,32 +2246,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!item) return console.error("Shadowrun 5e | Item doesn't exist for uuid", uuid);
 
         void item.castAction(event);
-    }
-
-    /**
-     * Items with an area of effect will allow users to place a measuring template matching the items blast values.
-     *
-     * @param event A PointerEvent triggered from anywhere within the chat-card
-     */
-    static async _placeItemBlastZoneTemplate(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        // Get test data from message.
-        const element = $(event.currentTarget as HTMLElement);
-        const card = element.closest<HTMLElement>('.chat-message');
-        const messageId = card.data('messageId');
-        const test = await TestCreator.fromMessage(messageId);
-        if (!test) return;
-
-        // Get item used in test
-        await test.populateDocuments();
-
-        // Place template based on last used spell force for the item.
-        if (!test.item) return;
-        const template = Template.fromItem(test.item);
-        if (!template) return;
-        await template.drawPreview();
     }
 
     /**

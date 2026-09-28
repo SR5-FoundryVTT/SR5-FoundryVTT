@@ -241,6 +241,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (technology) {
             ModifiableValue.calcTotal(technology.conceal);
             TechnologyPrep.prepareCost(technology);
+            TechnologyPrep.prepareEssence(technology);
             TechnologyPrep.prepareAvailability(technology);
             TechnologyPrep.calculateAttributes(this.system.attributes!);
         }
@@ -1126,6 +1127,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     canBeEquipped(this: SR5Item): boolean {
+        // critter and sprite powers use their optional state as their equipped state
+        if (this.isType('critter_power', 'sprite_power')) return true;
         // currently only technology items with technology can be equipped
         return !!this.getTechnologyData();
     }

@@ -416,13 +416,13 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(unequippedDevice.system.technology.cost.value, 100);
         });
 
-        it('keeps ware grade cost and availability adjustments', async () => {
+        it('keeps ware grade essence, cost and availability adjustments', async () => {
             const ware = await factory.createItem({
                 type: 'cyberware',
                 system: {
                     grade: 'alpha',
-                    essence: 1,
                     technology: {
+                        essence: { base: 1 },
                         availability: { base: 6, restriction: 'restricted', label: '6R' },
                         cost: { base: 100, value: 100 },
                     },
@@ -433,6 +433,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(ware.system.technology.availability.value, 8);
             assert.strictEqual(ware.system.technology.availability.label, '8R');
             assert.strictEqual(ware.system.technology.cost.value, 120);
+            assert.strictEqual(ware.system.technology.essence.value, 0.8);
         });
 
         it('loads migrated rating effects on an unequipped item', async () => {

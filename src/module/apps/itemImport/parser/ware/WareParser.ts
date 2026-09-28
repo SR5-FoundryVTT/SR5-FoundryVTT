@@ -20,7 +20,7 @@ export class WareParser extends Parser<'bioware' | 'cyberware'> {
 
         const essence = (jsonData.ess._TEXT || '0').match(/[0-9]\.?[0-9]*/g);
         if (essence)
-            system.essence = parseFloat(essence[0]);
+            system.technology.essence.base = parseFloat(essence[0]);
 
         const capacity = (jsonData.capacity._TEXT || '0').match(/[0-9]+/g);
         if (capacity)

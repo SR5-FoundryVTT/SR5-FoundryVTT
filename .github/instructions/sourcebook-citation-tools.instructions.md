@@ -13,6 +13,6 @@ name: "Sourcebook Citation Tool Preference"
   - `mcp_sourcebook-ci_lookup_citation_heading`
 - Use `mcp_sourcebook-ci_lookup_citation_sourcebook_text` only when the user explicitly asks for full-book text.
 - If the MCP lookup returns a large temporary result file, read that file instead of scraping the markdown with shell commands.
-- Treat `mcp_sourcebook-ci_rebuild_sourcebook_assets` as a repair step, not a default lookup step.
+- If lookup fails, report the MCP error rather than invoking an unavailable repair tool or reading the sourcebook corpus directly.
 - Summaries, validations, and code reviews should be grounded in the returned excerpt, not in memory or paraphrase alone.
 - If the citation result is ambiguous, say so explicitly instead of guessing.
