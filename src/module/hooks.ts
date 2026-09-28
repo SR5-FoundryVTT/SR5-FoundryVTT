@@ -38,6 +38,9 @@ import { SR5SpriteActorSheet } from "./actor/sheets/SR5SpriteActorSheet";
 import { SR5Die } from './rolls/SR5Die';
 import { SR5Roll } from "./rolls/SR5Roll";
 import { SuccessTest } from "./tests/SuccessTest";
+import { BlastTemplateFlow } from './tests/flows/BlastTemplateFlow';
+import { SuppressiveFireTemplateFlow } from './tests/flows/SuppressiveFireTemplateFlow';
+import { ShotgunTemplateFlow } from './tests/flows/ShotgunTemplateFlow';
 import { TeamworkTest } from "./actor/flows/TeamworkFlow";
 import { OpposedTest } from "./tests/OpposedTest";
 import { PhysicalDefenseTest } from "./tests/PhysicalDefenseTest";
@@ -142,6 +145,7 @@ import { Skill } from './types/item/Skill';
 import { SR5SkillSheet } from './item/sheets/SR5SkillSheet';
 import { SkillGroupFlow } from './actor/flows/SkillGroupFlow';
 import { OpposedMatrixTest } from './tests/OpposedMatrixTest';
+import { BlastScatterFlow } from './tests/flows/BlastScatterFlow';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -174,6 +178,7 @@ export class HooksManager {
         Hooks.on('updateItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('deleteItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
+        Hooks.on('sr5_afterTestComplete', (test: SuccessTest) => { void BlastScatterFlow.handle(test); });
         Hooks.on('renderChatMessageHTML', HooksManager.chatMessageListeners.bind(HooksManager));
         // Register and update managed extended tests from finished test rolls.
         Hooks.on('sr5_afterTestComplete', (test: SuccessTest) => { void ExtendedTestFlow.handleTestComplete(test); });
@@ -728,6 +733,9 @@ ___________________
 
     static async chatMessageListeners(message: ChatMessage, html, data) {
         await SuccessTest.chatMessageListeners(message, html, data);
+        BlastTemplateFlow.chatMessageListeners(html, test => BlastScatterFlow.handle(test));
+        SuppressiveFireTemplateFlow.chatMessageListeners(html);
+        ShotgunTemplateFlow.chatMessageListeners(html);
         await OpposedTest.chatMessageListeners(message, html, data);
         await ActionFollowupFlow.chatMessageListeners(message, html, data);
         await TeamworkTest.chatMessageListeners(message, html);
