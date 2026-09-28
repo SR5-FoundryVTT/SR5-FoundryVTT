@@ -13,3 +13,68 @@
                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
     </div>
 </div>
+
+{{#if (or (eq system.type 'autosoft') (eq item.system.type 'autosoft') (eq source.system.type 'autosoft'))}}
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label data-tooltip="{{systemFields.autosoftType.hint}}">{{localize "SR5.AutosoftType"}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput systemFields.autosoftType value=source.system.autosoftType localize=true
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        </div>
+    </div>
+
+    {{#if (or (eq system.autosoftType 'maneuvering') (eq system.autosoftType 'stealth') (eq system.autosoftType 'evasion') (eq item.system.autosoftType 'maneuvering') (eq item.system.autosoftType 'stealth') (eq item.system.autosoftType 'evasion') (eq source.system.autosoftType 'maneuvering') (eq source.system.autosoftType 'stealth') (eq source.system.autosoftType 'evasion'))}}
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="{{systemFields.targetModel.hint}}">{{localize "SR5.TargetModel"}}</label>
+            </div>
+            <div class="list-item-col">
+                {{#if @root.actorModels}}
+                    <select name="system.targetModel" {{#if @root.isPlayMode}}disabled{{/if}}>
+                        {{#each @root.actorModels}}
+                            <option value="{{this.value}}" {{#if (eq this.value @root.source.system.targetModel)}}selected{{/if}}>{{this.label}}</option>
+                        {{/each}}
+                    </select>
+                {{else}}
+                    {{formInput systemFields.targetModel value=source.system.targetModel
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{/if}}
+            </div>
+        </div>
+    {{/if}}
+
+    {{#if (or (eq system.autosoftType 'targeting') (eq item.system.autosoftType 'targeting') (eq source.system.autosoftType 'targeting'))}}
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="{{systemFields.targetWeapon.hint}}">{{localize "SR5.TargetWeapon"}}</label>
+            </div>
+            <div class="list-item-col">
+                {{#if (eq @root.autosoftTargetMode 'category')}}
+                    {{#if @root.weaponCategoryOptions}}
+                        <select name="system.targetWeapon" {{#if @root.isPlayMode}}disabled{{/if}}>
+                            {{#each @root.weaponCategoryOptions}}
+                                <option value="{{this.value}}" {{#if (eq this.value @root.source.system.targetWeapon)}}selected{{/if}}>{{this.label}}</option>
+                            {{/each}}
+                        </select>
+                    {{else}}
+                        {{formInput systemFields.targetWeapon value=source.system.targetWeapon
+                                    rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{/if}}
+                {{else}}
+                    {{#if @root.actorWeapons}}
+                        <select name="system.targetWeapon" {{#if @root.isPlayMode}}disabled{{/if}}>
+                            {{#each @root.actorWeapons}}
+                                <option value="{{this.value}}" {{#if (eq this.value @root.source.system.targetWeapon)}}selected{{/if}}>{{this.label}}</option>
+                            {{/each}}
+                        </select>
+                    {{else}}
+                        {{formInput systemFields.targetWeapon value=source.system.targetWeapon
+                                    rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{/if}}
+                {{/if}}
+            </div>
+        </div>
+    {{/if}}
+{{/if}}

@@ -2,6 +2,7 @@ import { TestCreator } from "@/module/tests/TestCreator";
 import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { SR5 } from '@/module/config';
+import { RiggingRules } from '@/module/rules/RiggingRules';
 
 export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -189,6 +190,149 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
 
             // speed limit + control rig, unaffected by vehicle damaged handling penalty
             assert.equal(test!.limit.value, 6);
+        });
+
+        it('Calculates max autosoft slots and resolves local autosoft rating for autonomous drones', async () => {
+            const drone = await factory.createActor({
+                type: 'vehicle',
+                system: {
+                    isDrone: true,
+                    controlMode: 'autopilot',
+                    vehicle_stats: {
+                        pilot: { base: 4 },
+                        sensor: { base: 3 }
+                    }
+                }
+            });
+
+            assert.equal(RiggingRules.getMaxAutosoftSlots(drone), 2);
+
+            // Add local Clearsight autosoft
+            const autosoft = await factory.createItem({
+                type: 'program',
+                system: {
+                    type: 'autosoft',
+                    autosoftType: 'clearsight',
+                    technology: { rating: 3, equipped: true }
+                }
+            }, { parent: drone } as any);
+
+            const effective = RiggingRules.getEffectiveAutosoft(drone, 'clearsight');
+            assert.equal(effective.rating, 3);
+            assert.equal(effective.source, 'local');
+
+            const test = await TestCreator.fromPackAction(SR5.packNames.GeneralActionsPack, 'drone_perception', drone, testOptions);
+            assert.notEqual(test, undefined);
+            await test!.execute();
+
+            // Dice pool should be Pilot (4) + Clearsight Autosoft (3) = 7
+            assert.equal(test!.pool.value, 7);
+        });
+
+        it('Inherits RCC loaded autosofts for slaved drones when no local autosofts are active', async () => {
+            const driver = await createDriver();
+
+            // Create RCC device item on driver
+            const rcc = await factory.createItem({
+                type: 'device',
+                system: {
+                    category: 'rcc',
+                    sharing: 3,
+                    noise_reduction: 2,
+                    technology: { rating: 5, equipped: true }
+                }
+            }, { parent: driver } as any);
+
+            // Add shared autosoft to RCC owner
+            await factory.createItem({
+                type: 'program',
+                system: {
+                    type: 'autosoft',
+                    autosoftType: 'maneuvering',
+                    technology: { rating: 4, equipped: true }
+                }
+            }, { parent: driver } as any);
+
+            const rccInfo = RiggingRules.getRCCSharingInfo(rcc);
+            assert.equal(rccInfo.sharing, 3);
+            assert.equal(rccInfo.isOverAllocated, false);
+            assert.equal(rccInfo.loadedAutosoftsCount, 1);
+
+            // Create drone slaved to RCC
+            const drone = await factory.createActor({
+                type: 'vehicle',
+                system: {
+                    isDrone: true,
+                    controlMode: 'autopilot',
+                    master: rcc.uuid,
+                    vehicle_stats: {
+                        pilot: { base: 3 },
+                        handling: { base: 4 },
+                        speed: { base: 4 }
+                    }
+                }
+            });
+
+            const effective = RiggingRules.getEffectiveAutosoft(drone, 'maneuvering');
+            assert.equal(effective.rating, 4);
+            assert.equal(effective.source, 'rcc');
+        });
+
+        it('Clamps noise reduction in _preUpdate when sharing + noise reduction exceeds device rating', async () => {
+            const driver = await createDriver();
+
+            const rcc = await factory.createItem({
+                type: 'device',
+                system: {
+                    category: 'rcc',
+                    sharing: 3,
+                    noise_reduction: 2,
+                    technology: { rating: 5, equipped: true }
+                }
+            }, { parent: driver } as any);
+
+            assert.equal(rcc.getRating(), 5);
+
+            // Update sharing so total sharing (5) + noise_reduction (2) would be 7 > 5
+            await rcc.update({ system: { sharing: 5 } });
+
+            // Hardware device rating stays 5, noise_reduction clamped to 0
+            assert.equal(rcc.getRating(), 5);
+            assert.equal((rcc.system as any).sharing, 5);
+            assert.equal((rcc.system as any).noise_reduction, 0);
+        });
+
+        it('Calculates Drone Swarm Pilot rating and applies Swarm bonus to autonomous rolls', async () => {
+            const droneLeader = await factory.createActor({
+                type: 'vehicle',
+                system: {
+                    isDrone: true,
+                    swarm: {
+                        active: true,
+                        count: 3
+                    },
+                    controlMode: 'autopilot',
+                    vehicle_stats: {
+                        pilot: { base: 3 },
+                        sensor: { base: 3 }
+                    }
+                }
+            });
+
+            const swarmInfo = RiggingRules.getSwarmPilotInfo(droneLeader);
+            // Pilot in swarm (3) + (3 drones - 1) = 5.
+            assert.equal(swarmInfo.highestPilot, 3);
+            assert.equal(swarmInfo.memberCount, 3);
+            assert.equal(swarmInfo.swarmPilot, 5);
+            // Leader pilot is 3, so bonus = 5 - 3 = 2.
+            assert.equal(swarmInfo.bonus, 2);
+
+            const test = await TestCreator.fromPackAction(SR5.packNames.GeneralActionsPack, 'drone_perception', droneLeader, testOptions);
+            assert.notEqual(test, undefined);
+            await test!.execute();
+
+            // Dice pool should include Pilot (3) + Swarm Bonus (2) = 5
+            assert.equal(test!.pool.value, 5);
         });
     });
 };

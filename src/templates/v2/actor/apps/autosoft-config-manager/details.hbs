@@ -1,0 +1,61 @@
+<div class="fill-container autosoft-config-details">
+    <div class="list-item">
+        <div class="list-item-start">
+            <label>{{localize "SR5.AutosoftType"}}</label>
+        </div>
+        <div class="list-item-col">
+            <select name="autosoftType">
+                {{#each autosoftTypes as |label key|}}
+                    <option value="{{key}}" {{#if (eq key ../autosoftType)}}selected{{/if}}>{{localize label}}</option>
+                {{/each}}
+            </select>
+        </div>
+    </div>
+
+    <div class="list-item">
+        <div class="list-item-start">
+            <label>{{localize "SR5.AutosoftConfigManager.TargetActor"}}</label>
+        </div>
+        <div class="list-item-col">
+            {{#if targetActors.length}}
+                <select name="targetActorUuid">
+                    {{#each targetActors}}
+                        <option value="{{this.uuid}}" {{#if (eq this.uuid ../selectedTargetActorUuid)}}selected{{/if}}>{{this.name}}</option>
+                    {{/each}}
+                </select>
+            {{else}}
+                <span class="warning-text" style="color: #ff6464;">{{localize "SR5.AutosoftConfigManager.NoDrones"}}</span>
+            {{/if}}
+        </div>
+    </div>
+
+    {{#if isTargeting}}
+        <div class="list-item">
+            <div class="list-item-start">
+                <label>{{localize "SR5.AutosoftConfigManager.TargetWeapon"}}</label>
+            </div>
+            <div class="list-item-col">
+                {{#if targetWeapons.length}}
+                    <select name="targetWeaponUuid">
+                        {{#each targetWeapons}}
+                            <option value="{{this.uuid}}" {{#if (eq this.uuid ../selectedTargetWeaponUuid)}}selected{{/if}}>{{this.name}}</option>
+                        {{/each}}
+                    </select>
+                {{else}}
+                    <span class="warning-text" style="color: #ff6464;">{{localize "SR5.AutosoftConfigManager.NoWeapons"}}</span>
+                {{/if}}
+            </div>
+        </div>
+    {{/if}}
+
+    {{#if isModelRequired}}
+        <div class="list-item">
+            <div class="list-item-start">
+                <label>{{localize "SR5.AutosoftConfigManager.TargetModel"}}</label>
+            </div>
+            <div class="list-item-col">
+                <input type="text" name="targetModel" value="{{targetModel}}" placeholder="e.g. Ares Roadmaster" />
+            </div>
+        </div>
+    {{/if}}
+</div>

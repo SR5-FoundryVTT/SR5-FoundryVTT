@@ -1,20 +1,44 @@
-import {SR5Actor} from "../SR5Actor";
+import { SR5Actor } from "../SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
 import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { Helpers } from '@/module/helpers';
 import { MatrixRules } from '@/module/rules/MatrixRules';
+import { RiggingRules } from '@/module/rules/RiggingRules';
 import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { isElementInstance } from '@/module/utils/dom';
+import { TestCreator } from '@/module/tests/TestCreator';
+import { SR5 } from '@/module/config';
 
 interface VehicleSheetDataFields extends MatrixActorSheetData {
     isVehicle: boolean;
     vehicle: {
         driver: SR5Actor|undefined,
         master: SR5Item | undefined
-    }
+    };
     modifications: SR5Item<'modification'>[];
+    autosoftInfo: {
+        maxSlots: number;
+        runningCount: number;
+        isOverSlots: boolean;
+        runningAutosofts: SR5Item[];
+    };
+    swarmInfo: {
+        swarmPilot: number;
+        highestPilot: number;
+        memberCount: number;
+        bonus: number;
+    };
+    rccInfo?: {
+        deviceRating: number;
+        sharing: number;
+        noiseReduction: number;
+        isOverAllocated: boolean;
+        loadedAutosoftsCount: number;
+        isOverSharingLimit: boolean;
+        loadedAutosofts: SR5Item[];
+    };
 }
 
 export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFields> {
@@ -43,6 +67,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             removeVehicleDriver: SR5VehicleActorSheet.#removeVehicleDriver,
             toggleChaseEnvironment: SR5VehicleActorSheet.#toggleChaseEnvironment,
             toggleOffRoad: SR5VehicleActorSheet.#toggleOffRoad,
+            toggleProgramEquipped: SR5VehicleActorSheet.#toggleProgramEquipped,
         }
     }
 
@@ -65,7 +90,8 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             'cyberware',
             'device',
             'equipment',
-            'modification'
+            'modification',
+            'program',
         ];
     }
 
@@ -76,6 +102,27 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         data.vehicle = this._prepareVehicleFields();
         data.modifications = this._prepareEquippedModifications();
         data.isVehicle = true;
+
+        const maxSlots = RiggingRules.getMaxAutosoftSlots(this.actor);
+        const runningAutosofts = RiggingRules.getRunningLocalAutosofts(this.actor);
+        const runningCount = runningAutosofts.length;
+
+        data.autosoftInfo = {
+            maxSlots,
+            runningCount,
+            isOverSlots: runningCount > maxSlots,
+            runningAutosofts
+        };
+
+        data.swarmInfo = RiggingRules.getSwarmPilotInfo(this.actor);
+
+        if (data.vehicle.master && data.vehicle.master.isType('device') && data.vehicle.master.system.category === 'rcc') {
+            const info = RiggingRules.getRCCSharingInfo(data.vehicle.master);
+            data.rccInfo = {
+                ...info,
+                loadedAutosofts: RiggingRules.getLoadedRCCAutosofts(data.vehicle.master)
+            };
+        }
 
         return data;
     }
@@ -241,5 +288,24 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
         await MatrixNetworkFlow.removeSlaveFromMaster(this.actor);
         await this.render();
+    }
+
+    static async #toggleProgramEquipped(this: SR5VehicleActorSheet, event: Event) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        const itemId = SheetFlow.closestAction(event.target)?.dataset?.itemId;
+        if (!itemId) return;
+        const item = this.actor.items.get(itemId);
+        if (!item || !item.system.technology) return;
+
+        const isCurrentlyEquipped = item.isEquipped();
+        await item.update({
+            system: {
+                technology: {
+                    equipped: !isCurrentlyEquipped
+                }
+            }
+        });
+        void this.render();
     }
 }
