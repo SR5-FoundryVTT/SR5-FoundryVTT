@@ -29,7 +29,8 @@ export class WeaponParserBase extends Parser<'weapon'> {
         const result: Item.Source[] = [];
         for (const accessory of accessories) {
             const name = accessory.name._TEXT;
-            const item = itemMap.get(name);
+            // A weapon can list the same accessory twice, which must become separate items.
+            const item = foundry.utils.deepClone(itemMap.get(name));
 
             if (!item) {
                 console.warn(`[Accessory Missing]\nWeapon: ${jsonData.name._TEXT}\nAccessory: ${name}`);
@@ -44,6 +45,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
             if (ratingText)
                 system.technology.rating = Number(ratingText) || 0;
 
+            Parser.includeInParent(item);
             result.push(item);
         }
 

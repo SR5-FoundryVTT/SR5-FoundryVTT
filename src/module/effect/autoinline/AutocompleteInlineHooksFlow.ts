@@ -1,4 +1,5 @@
 import { SR5Item } from "../../item/SR5Item";
+import { SR5Actor } from "../../actor/SR5Actor";
 import { OpposedTest } from "../../tests/OpposedTest";
 import { SuccessTest } from "../../tests/SuccessTest";
 import { TestCreator } from "../../tests/TestCreator";
@@ -49,6 +50,8 @@ export const AutocompleteInlineHooksFlow =  {
                 fieldConfigs: [
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-actor ${field}`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-targeted_actor ${field}`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-item ${field}`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterItem },
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-parent_item ${field}`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterParentItem },
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-test_all ${field}`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-test_item ${field}`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-test_target ${field}`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
@@ -56,6 +59,8 @@ export const AutocompleteInlineHooksFlow =  {
 
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-actor ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-targeted_actor ${field}`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTargetedActorData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-value-item ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterItem},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-value-parent_item ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterParentItem},
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-test_all ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-test_item ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-test_target ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
@@ -65,6 +70,8 @@ export const AutocompleteInlineHooksFlow =  {
                 fieldConfigs: [
                     { selector: `.sr5-effect-value-editor__body.autocomplete-value-actor textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
                     { selector: `.sr5-effect-value-editor__body.autocomplete-value-targeted_actor textarea[name$=".value"]`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTargetedActorData},
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-item textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterItem},
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-parent_item textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterParentItem},
                     { selector: `.sr5-effect-value-editor__body.autocomplete-value-test_all textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                     { selector: `.sr5-effect-value-editor__body.autocomplete-value-test_item textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                     { selector: `.sr5-effect-value-editor__body.autocomplete-value-test_target textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
@@ -86,15 +93,86 @@ export const AutocompleteInlineHooksFlow =  {
     },
 
     /**
-     * Getter to show values for apply-to actor.
-     * 
+     * Getter to show keys for apply-to item.
+     *
      * @param EffectConfig The effect config supplying the effect context.
      * @returns Either a SR5Actor or SR5Item source object.
      */
+    keyGetterItem: (EffectConfig: ActiveEffectAutocompleteHost) => {
+        return EffectConfig.document.parent?.toObject() ?? {};
+    },
+
+    /**
+     * Getter to show keys for apply-to parent_item.
+     *
+     * A nested item shows its containing item. An item that isn't nested yet, like one in a compendium,
+     * has no parent item, so its own data is shown instead.
+     *
+     * @param EffectConfig The effect config supplying the effect context.
+     * @returns The parent item or effect item source object.
+     */
+    keyGetterParentItem: (EffectConfig: ActiveEffectAutocompleteHost) => {
+        const item = EffectConfig.document.parent;
+        if (!(item instanceof SR5Item)) return {};
+        return AutocompleteInlineHooksFlow.parentItem(item)?.toObject() ?? item.toObject();
+    },
+
+    /** Getter to show values for apply-to actor; the change targets the owning actor. */
     valueGetterActor: (EffectConfig: ActiveEffectAutocompleteHost) => {
         const effect = EffectConfig.document;
-        if (!effect.parent) return {};
-        return effect.parent?.toObject();
+        return AutocompleteInlineHooksFlow.referenceValues(effect, effect.actor);
+    },
+
+    /** Getter to show values for apply-to item; the change targets the effect's own item. */
+    valueGetterItem: (EffectConfig: ActiveEffectAutocompleteHost) => {
+        const effect = EffectConfig.document;
+        return AutocompleteInlineHooksFlow.referenceValues(effect, effect.parent);
+    },
+
+    /** Getter to show values for apply-to parent_item; the change targets the containing item. */
+    valueGetterParentItem: (EffectConfig: ActiveEffectAutocompleteHost) => {
+        const effect = EffectConfig.document;
+        const item = effect.parent;
+        return AutocompleteInlineHooksFlow.referenceValues(effect, item instanceof SR5Item ? AutocompleteInlineHooksFlow.parentItem(item) : null);
+    },
+
+    /**
+     * Values a change can reference: the effect's own document, plus the related documents
+     * SR5ActiveEffect.referenceResolver offers as @actor, @parent, @affected, @effect, @driver, @summoner and @technomancer.
+     *
+     * @param effect The effect whose change values are completed.
+     * @param affected The document the change is applied to.
+     */
+    referenceValues: (effect: SR5ActiveEffect, affected?: { toObject: () => object } | null) => {
+        const document = effect.parent;
+        if (!document) return {};
+        const parent: unknown = document.parent;
+        return {
+            ...document.toObject(),
+            ...(effect.actor && effect.actor !== document ? { actor: effect.actor.toObject() } : {}),
+            ...(parent instanceof SR5Item || parent instanceof SR5Actor ? { parent: parent.toObject() } : {}),
+            ...(affected ? { affected: affected.toObject() } : {}),
+            ...AutocompleteInlineHooksFlow.relatedValues(effect),
+        };
+    },
+
+    /** The values a change can reference as @effect, @driver, @summoner and @technomancer. */
+    relatedValues: (effect: SR5ActiveEffect) => {
+        const document = effect.parent;
+        const actor = document instanceof SR5Item ? document.actorOwner : document;
+        const values: Record<string, object> = { effect: { system: { rating: effect.system.rating } } };
+        if (!(actor instanceof SR5Actor)) return values;
+        for (const role of ['driver', 'summoner', 'technomancer']) {
+            const controller = SR5ActiveEffect.controllingActor(actor, role);
+            if (controller) values[role] = controller.toObject();
+        }
+        return values;
+    },
+
+    /** The item containing a nested item. */
+    parentItem: (item: SR5Item): SR5Item | null => {
+        const parent: unknown = item.parent;
+        return parent instanceof SR5Item ? parent : null;
     },
 
     /**
@@ -160,7 +238,7 @@ export const AutocompleteInlineHooksFlow =  {
             values['actor'] = effect.parent.parent.toObject();
         }
 
-        return values;
+        return { ...values, ...AutocompleteInlineHooksFlow.relatedValues(effect) };
     },
 
     /**
@@ -207,7 +285,7 @@ export const AutocompleteInlineHooksFlow =  {
             const successTest = new SuccessTestClass({});
             const opposedTest = new OpposedTestClass({ against: successTest.data }, {actor: item.actor ?? undefined, item});
             
-            return {data: opposedTest.data};
+            return { data: opposedTest.data, ...AutocompleteInlineHooksFlow.relatedValues(effect) };
         }
         return {};
     }

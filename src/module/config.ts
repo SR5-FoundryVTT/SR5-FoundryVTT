@@ -1340,6 +1340,7 @@ export const SR5 = {
     effectApplyTo: {
         'actor': 'SR5.FOUNDRY.Actor',
         'item': 'SR5.FOUNDRY.Item',
+        'parent_item': 'SR5.ActiveEffect.ApplyTos.ParentItem',
         'targeted_actor': 'SR5.ActiveEffect.ApplyTos.TargetedActor',
         'test_all': 'SR5.Test',
         'test_item': 'SR5.ActiveEffect.ApplyTos.TestItem',

@@ -18,13 +18,13 @@ export class WareParser extends Parser<'bioware' | 'cyberware'> {
     protected override getSystem(jsonData: Bioware | Cyberware) {
         const system = this.getBaseSystem();
 
-        const essence = (jsonData.ess._TEXT || '0').match(/[0-9]\.?[0-9]*/g);
-        if (essence)
-            system.technology.essence.base = parseFloat(essence[0]);
+        const essence = Number(jsonData.ess._TEXT);
+        if (Number.isFinite(essence))
+            system.technology.essence.base = essence;
 
-        const capacity = (jsonData.capacity._TEXT || '0').match(/[0-9]+/g);
-        if (capacity)
-            system.capacity.total = parseInt(capacity[0]);
+        const capacity = Number(jsonData.capacity._TEXT.replace(/^\[|\]$/g, ''));
+        if (Number.isFinite(capacity))
+            system.capacity.total = capacity;
 
         return system;
     }

@@ -12,6 +12,12 @@ export const WarePrep = {
         equippedMods: SR5Item<'modification'>[] = []
     ) {
         WarePrep.prepareCapacity(system, equippedMods);
+    },
+
+    prepareDerivedData(
+        system: Item.SystemOfType<'bioware' | 'cyberware'>,
+        equippedMods: SR5Item<'modification'>[] = []
+    ) {
         WarePrep.prepareGrade(system);
         WarePrep.prepareEssence(system, equippedMods);
     },

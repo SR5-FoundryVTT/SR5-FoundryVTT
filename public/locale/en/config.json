@@ -152,7 +152,8 @@
             "ApplyTos": {
                 "TestTargetingThisActor": "Test Targeting This Actor",
                 "TargetedActor": "Targeted Actor",
-                "TestItem": "Test via Item"
+                "TestItem": "Test via Item",
+                "ParentItem": "Parent Item"
             },
             "CannotAddTestViaItemToActor": "Cannot add an Active Effect of type 'Test via Item' to an Actor",
             "ValueEditor": "Edit Change Value",
@@ -181,6 +182,10 @@
                 "onlyForWireless": {
                     "hint": "Apply for wireless active only",
                     "label": "Wireless Only"
+                },
+                "rating": {
+                    "hint": "The strength of this effect. Changes can scale with it, so raising it updates them all at once.",
+                    "label": "Rating"
                 },
                 "selection_attributes": {
                     "hint": "Filter the test based on Attributes used",

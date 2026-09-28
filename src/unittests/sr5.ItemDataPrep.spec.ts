@@ -7,6 +7,17 @@ import { TechnologyPrep } from "../module/item/prep/functions/TechnologyPrep";
 import { ArmorPrep } from "../module/item/prep/functions/ArmorPrep";
 import { ModifiableValue } from "../module/mods/ModifiableValue";
 import { Version0_38_0 } from "../module/migrator/versions/Version0_38_0";
+import { ChummerFormulaParser } from '../module/apps/itemImport/helper/ChummerFormula';
+import { Parser } from '../module/apps/itemImport/parser/Parser';
+import { WeaponModParser } from '../module/apps/itemImport/parser/mod/WeaponModParser';
+import { VehicleModParser } from '../module/apps/itemImport/parser/mod/VehicleModParser';
+import { LifestyleParser } from '../module/apps/itemImport/parser/misc/LifestyleParser';
+import { DynamicValueEvaluator } from '../module/effect/DynamicValueEvaluator';
+import { BonusHelper } from '../module/apps/itemImport/helper/BonusHelper';
+import type { BonusSchema } from '../module/apps/itemImport/schema/BonusSchema';
+import type { DocCreateData } from '../module/apps/itemImport/helper/BonusConstant';
+import { ItemAvailabilityFlow } from '../module/item/flows/ItemAvailabilityFlow';
+import { SR5ActiveEffect } from '../module/effect/SR5ActiveEffect';
 
 /**
  * Tests involving data preparation for SR5Item types.
@@ -17,6 +28,166 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
     const assert: Chai.AssertStatic = context.assert;
 
     after(async () => { await factory.destroy(); });
+
+    describe('Chummer formula import', () => {
+        it('imports fixed cost and mixed availability as rating-dependent item effects', async () => {
+            class DeviceParser extends Parser<'device'> {
+                protected readonly parseType = 'device';
+                protected async getFolder() { return { id: null } as unknown as Folder; }
+            }
+            const source = await new DeviceParser().Parse({
+                id: { _TEXT: 'e13eb55b-e957-426a-85ba-1943a936bdf9' },
+                name: { _TEXT: 'Rating lookup' },
+                rating: { _TEXT: '3' },
+                cost: { _TEXT: 'FixedValues(39000,149000,217000)' },
+                avail: { _TEXT: 'FixedValues(8R,12R,20F)' },
+                wirelessbonus: {
+                    specificskill: { name: { _TEXT: 'Pistols' }, bonus: { _TEXT: '2' } },
+                },
+            } as never, 'Gear') as Item.CreateData;
+            assert.isTrue((source.effects as ActiveEffect.CreateData[]).some(effect => effect.system?.onlyForWireless));
+            const { folder: _folder, ...itemData } = source;
+            const device = await factory.createItem({ ...itemData, type: 'device' });
+
+            assert.strictEqual(device.system.technology.cost.value, 39000);
+            assert.strictEqual(device.system.technology.availability.label, '8R');
+            await device.update({ system: { technology: { rating: 2 } } });
+            device.prepareData();
+            assert.strictEqual(device.system.technology.cost.value, 149000);
+            assert.strictEqual(device.system.technology.availability.label, '12R');
+            await device.update({ system: { technology: { rating: 3 } } });
+            device.prepareData();
+            assert.strictEqual(device.system.technology.availability.label, '20F');
+            device.prepareData();
+            assert.strictEqual(device.system.technology.cost.value, 217000);
+
+            const wireless = device.effects.find(effect => effect.system.onlyForWireless)!;
+            assert.isTrue(wireless.isSuppressed);
+            await device.update({ system: { technology: { wireless: 'online' } } });
+            assert.isFalse(wireless.isSuppressed);
+        });
+
+        it('translates arithmetic and Chummer boolean casts without accepting parent references', () => {
+            const formula = ChummerFormulaParser.parse('4000 * Rating - 2000 * number(Rating > 1)');
+            assert.exists(formula);
+            assert.strictEqual(DynamicValueEvaluator.evaluate(formula!.value, path =>
+                path === 'system.technology.rating' ? 2 : undefined), 6000);
+            assert.isNull(ChummerFormulaParser.parse('Weapon Cost * Rating'));
+            assert.isNull(ChummerFormulaParser.parse('Rating * Body'));
+            assert.isFalse(ItemAvailabilityFlow.parseAvailability('12R or Gear').isValid);
+            const slots = ChummerFormulaParser.parse('FixedValues(4,8)')!;
+            assert.strictEqual(DynamicValueEvaluator.evaluate(slots.value, path =>
+                path === 'system.technology.rating' ? 3 : undefined), 8);
+        });
+
+        it('separates own capacity, parent capacity and parent-relative values', async () => {
+            assert.deepEqual(ChummerFormulaParser.splitCapacity('8/[6]'), { own: '8', used: '6' });
+            assert.deepEqual(ChummerFormulaParser.splitCapacity('Rating/[1]'), { own: 'Rating', used: '1' });
+            assert.deepEqual(ChummerFormulaParser.splitCapacity('[-Rating]'), { used: '-Rating' });
+            assert.deepEqual(ChummerFormulaParser.splitCapacity('4'), { own: '4' });
+            assert.isTrue(ChummerFormulaParser.isRelative('+(Rating * 2)'));
+            assert.isTrue(ChummerFormulaParser.isRelative('[-Rating]'));
+            assert.isFalse(ChummerFormulaParser.isRelative('Rating * 2'));
+            assert.strictEqual(ChummerFormulaParser.firstAlternative('12R or Gear'), '12R');
+            assert.strictEqual(ChummerFormulaParser.variableMinimum('Variable(50-500)'), 50);
+            assert.strictEqual(ChummerFormulaParser.classify('20000 + (99 * Gear Cost)'), 'requires child item');
+            assert.strictEqual(ChummerFormulaParser.classify('Parent Cost * 5'), 'requires parent item');
+            assert.strictEqual(ChummerFormulaParser.classify('1000 + 4000*number(Body >= 4)'), 'requires vehicle stats');
+            assert.strictEqual(ChummerFormulaParser.classify('(Rating - MinRating + 1) * 5000'), 'requires metatype minimum');
+            assert.strictEqual(ChummerFormulaParser.classify('[*]'), 'wildcard');
+
+            assert.isNull(ChummerFormulaParser.parse('Slots * 100'));
+            const slotCost = ChummerFormulaParser.parse('Slots * 100', { identifiers: { Slots: '@system.slots' } })!;
+            assert.strictEqual(DynamicValueEvaluator.evaluate(slotCost.value, path =>
+                path === 'system.slots' ? 3 : undefined), 300);
+
+            class DeviceParser extends Parser<'device'> {
+                protected readonly parseType = 'device';
+                protected async getFolder() { return { id: null } as unknown as Folder; }
+            }
+            const parse = async (data: Record<string, string>) => {
+                const source = await new DeviceParser().Parse({
+                    id: { _TEXT: 'e13eb55b-e957-426a-85ba-1943a936bdf9' },
+                    name: { _TEXT: 'Chummer device' },
+                    ...Object.fromEntries(Object.entries(data).map(([key, _TEXT]) => [key, { _TEXT }])),
+                } as never, 'Gear') as Item.CreateData;
+                const effects = (source.effects ?? []) as { system?: { changes?: { key: string }[] } }[];
+                return {
+                    technology: (source.system as Item.SystemOfType<'device'>).technology,
+                    changes: effects.flatMap(effect => effect.system?.changes ?? []).map(change => change.key),
+                };
+            };
+
+            const relative = await parse({ rating: '6', avail: '+(Rating *2)', cost: 'Rating * 100' });
+            assert.notInclude(relative.changes, 'system.technology.availability');
+            assert.include(relative.changes, 'system.technology.cost');
+            assert.strictEqual(relative.technology.availability.label, '+(Rating *2)');
+
+            const alternative = await parse({ avail: '12R or Gear', cost: 'Variable(50-500)' });
+            assert.strictEqual(alternative.technology.availability.base, 12);
+            assert.strictEqual(alternative.technology.availability.restriction, 'restricted');
+            assert.strictEqual(alternative.technology.cost.base, 50);
+
+            const fromCharacter = await parse({ rating: '{STRMaximum}' });
+            assert.strictEqual(fromCharacter.technology.rating, 1);
+            assert.strictEqual(fromCharacter.technology.max_rating, 0);
+        });
+
+        it('calculates ware essence and capacity after item formula effects', async () => {
+            const essence = ChummerFormulaParser.parse('Rating * 0.1')!;
+            const capacity = ChummerFormulaParser.parse('Rating * 4')!;
+            const ware = await factory.createItem({
+                type: 'cyberware',
+                system: {
+                    grade: 'alpha', capacity: { total: 0 },
+                    technology: { rating: 2, availability: { base: 0, restriction: 'restricted' } },
+                },
+                effects: [{
+                    name: 'Chummer formulas',
+                    system: {
+                        targets: [{ id: 'item', applyTo: 'item' }],
+                        changes: [
+                            { key: 'system.technology.essence', value: essence.value, type: 'override', priority: ModifiableValue.Priority.RATING, target: 'item' },
+                            { key: 'system.capacity.total', value: capacity.value, type: 'override', target: 'item' },
+                            { key: 'system.technology.cost', value: '@system.technology.rating * 1000', type: 'override', priority: ModifiableValue.Priority.RATING, target: 'item' },
+                            { key: 'system.technology.availability', value: '@system.technology.rating * 3', type: 'override', priority: ModifiableValue.Priority.RATING, target: 'item' },
+                        ],
+                    },
+                }],
+            });
+            ware.prepareData();
+            assert.closeTo(ware.system.technology.essence.value, 0.16, 0.00001);
+            assert.strictEqual(ware.system.capacity.total, 8);
+            assert.strictEqual(ware.system.technology.cost.value, 2400);
+            assert.strictEqual(ware.system.technology.availability.label, '8R');
+            await ware.update({ system: { technology: { rating: 3 } } });
+            ware.prepareData();
+            assert.closeTo(ware.system.technology.essence.value, 0.24, 0.00001);
+            assert.strictEqual(ware.system.capacity.total, 12);
+            assert.strictEqual(ware.system.technology.cost.value, 3600);
+            assert.strictEqual(ware.system.technology.availability.label, '11R');
+            await ware.update({ system: { grade: 'standard' } });
+            ware.prepareData();
+            assert.closeTo(ware.system.technology.essence.value, 0.3, 0.00001);
+            assert.strictEqual(ware.system.technology.cost.value, 3000);
+            assert.strictEqual(ware.system.technology.availability.label, '9R');
+        });
+
+        it('imports supported wireless and reputation bonuses as effects', () => {
+            const wireless = { name: 'Wireless gear', system: { technology: { rating: 1 } }, effects: [] } as unknown as DocCreateData;
+            BonusHelper.addBonus(wireless, {
+                specificskill: { name: { _TEXT: 'Pistols' }, bonus: { _TEXT: '2' } },
+            } as BonusSchema, { onlyForWireless: true });
+            assert.isTrue(wireless.effects![0].system.onlyForWireless);
+
+            const quality = { name: 'Blandness', system: {}, effects: [] } as unknown as DocCreateData;
+            BonusHelper.addBonus(quality, {
+                notoriety: { _TEXT: '-1' }, publicawareness: { _TEXT: '-2' },
+            } as BonusSchema);
+            assert.deepEqual(quality.effects!.map(effect => effect.system.changes[0].key),
+                ['system.notoriety', 'system.public_awareness']);
+        });
+    });
 
     describe('TechnologyData preparation', () => {
         it('Calculate the correct device item condition monitor', async () => {
@@ -252,6 +423,265 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(nested.system.technology.cost.changes.length, 1);
             assert.strictEqual(nested.system.technology.cost.value, 150);
             assert.strictEqual(weapon.system.technology.cost.value, 500);
+        });
+
+        it('parent-item active effects on equipped nested items apply to the parent item', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'weapon',
+                name: 'Parent Weapon',
+                system: { technology: { cost: { base: 500, value: 500 } } },
+            }]) as SR5Item<'weapon'>[];
+
+            await weapon.createNestedItem({
+                type: 'modification',
+                name: 'Nested Mod',
+                system: { technology: { rating: 2, equipped: true, cost: { base: 100, value: 100 } } },
+                effects: [{
+                    name: 'Parent Cost Modifier',
+                    system: {
+                        targets: [{ id: 'parent', applyTo: 'parent_item' }],
+                        changes: [
+                            { key: 'system.technology.cost', value: '@system.technology.rating * 100', type: 'add', target: 'parent' },
+                        ],
+                    },
+                }],
+            } as Item.Source);
+
+            actor.prepareData();
+            actor.prepareData();
+
+            const nested = weapon.items[0] as SR5Item<'modification'>;
+            assert.strictEqual(weapon.system.technology.cost.value, 700);
+            assert.strictEqual(nested.system.technology.cost.value, 100);
+
+            await weapon.updateNestedItems({ _id: nested.id, system: { technology: { equipped: false } } } as Item.UpdateInput);
+            actor.prepareData();
+            assert.strictEqual(weapon.system.technology.cost.value, 500);
+        });
+
+        it('resolves @actor, @parent and @affected references for nested items', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { attributes: { body: { base: 5 } } } });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'weapon',
+                name: 'Parent Weapon',
+                system: { technology: { cost: { base: 500, value: 500 } } },
+            }]) as SR5Item<'weapon'>[];
+
+            await weapon.createNestedItem({
+                type: 'modification',
+                name: 'Nested Mod',
+                system: { technology: { equipped: true, cost: { base: 100, value: 100 } } },
+                effects: [{
+                    name: 'References',
+                    system: {
+                        targets: [{ id: 'item', applyTo: 'item' }, { id: 'parent', applyTo: 'parent_item' }],
+                        changes: [
+                            { key: 'system.technology.cost', value: '@parent.system.technology.cost.base * 0.5 + @actor.system.attributes.body.base', type: 'add', target: 'item' },
+                            { key: 'system.technology.cost', value: '@affected.system.technology.cost.base * 0.1', type: 'add', target: 'parent' },
+                        ],
+                    },
+                }],
+            } as Item.Source);
+            actor.prepareData();
+
+            const nested = weapon.items[0] as SR5Item<'modification'>;
+            // 100 + half the weapon's 500 base + body 5.
+            assert.strictEqual(nested.system.technology.cost.value, 355);
+            // 500 + 10% of its own base, added by the nested mod.
+            assert.strictEqual(weapon.system.technology.cost.value, 550);
+
+            const standalone = await factory.createItem({
+                type: 'modification',
+                system: { technology: { cost: { base: 100, value: 100 } } },
+                effects: [{
+                    name: 'Missing Parent',
+                    system: {
+                        targets: [{ id: 'item', applyTo: 'item' }],
+                        changes: [{ key: 'system.technology.cost', value: '(@parent.system.technology.cost.base ?? 0) + 1', type: 'add', target: 'item' }],
+                    },
+                }],
+            });
+            standalone.prepareData();
+            assert.strictEqual(standalone.system.technology.cost.value, 101);
+        });
+
+        it('resolves @effect references to the effect rating', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { attributes: { body: { base: 3 } } } });
+            const [item] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'equipment',
+                name: 'Rated Gear',
+                system: { technology: { cost: { base: 100, value: 100 } } },
+                effects: [{
+                    name: 'Rating 4',
+                    system: {
+                        rating: 4,
+                        targets: [{ id: 'item', applyTo: 'item' }, { id: 'actor', applyTo: 'actor' }],
+                        changes: [
+                            { key: 'system.technology.cost', value: '@effect.system.rating * 50', type: 'add', target: 'item' },
+                            { key: 'system.attributes.body', value: '@effect.system.rating', type: 'add', target: 'actor' },
+                        ],
+                    },
+                }],
+            }]) as SR5Item<'equipment'>[];
+            actor.prepareData();
+
+            assert.strictEqual(item.system.technology.cost.value, 300);
+            assert.strictEqual(actor.system.attributes.body.value, 7);
+        });
+
+        it('resolves @driver references to the vehicle driver', async () => {
+            const driver = await factory.createActor({ type: 'character', system: { attributes: { body: { base: 4 } } } });
+            const vehicle = await factory.createActor({ type: 'vehicle' });
+            const [item] = await vehicle.createEmbeddedDocuments('Item', [{
+                type: 'equipment',
+                name: 'Driver Gear',
+                system: { technology: { cost: { base: 100, value: 100 } } },
+                effects: [{
+                    name: 'Driver Body',
+                    system: {
+                        targets: [{ id: 'item', applyTo: 'item' }],
+                        changes: [{ key: 'system.technology.cost', value: '(@driver.system.attributes.body.base ?? 0) * 100', type: 'add', target: 'item' }],
+                    },
+                }],
+            }]) as SR5Item<'equipment'>[];
+
+            vehicle.prepareData();
+            assert.strictEqual(item.system.technology.cost.value, 100);
+
+            await vehicle.addVehicleDriver(driver.uuid);
+            vehicle.prepareData();
+            assert.strictEqual(item.system.technology.cost.value, 500);
+        });
+
+        it('resolves @summoner and @technomancer references', async () => {
+            const character = await factory.createActor({ type: 'character', system: { attributes: { magic: { base: 6 }, resonance: { base: 5 } } } });
+            const spirit = await factory.createActor({ type: 'spirit' });
+            const sprite = await factory.createActor({ type: 'sprite' });
+
+            assert.isUndefined(SR5ActiveEffect.referenceResolver(spirit)('summoner.system.attributes.magic.base'));
+
+            await spirit.addSummoner(character);
+            await sprite.addTechnomancer(character);
+
+            assert.strictEqual(SR5ActiveEffect.referenceResolver(spirit)('summoner.system.attributes.magic.base'), 6);
+            assert.strictEqual(SR5ActiveEffect.referenceResolver(sprite)('technomancer.system.attributes.resonance.base'), 5);
+            // Each reference only resolves on its own actor type.
+            assert.isUndefined(SR5ActiveEffect.referenceResolver(sprite)('summoner.system.attributes.magic.base'));
+        });
+
+        it('imports parent and vehicle references and parent-relative availability', async () => {
+            class TestWeaponModParser extends WeaponModParser {
+                protected override async getFolder() { return { id: null } as unknown as Folder; }
+            }
+            class TestVehicleModParser extends VehicleModParser {
+                protected override async getFolder() { return { id: null } as unknown as Folder; }
+            }
+            const data = (fields: Record<string, string>) => ({
+                id: { _TEXT: 'e13eb55b-e957-426a-85ba-1943a936bdf9' },
+                name: { _TEXT: 'Chummer mod' },
+                ...Object.fromEntries(Object.entries(fields).map(([key, _TEXT]) => [key, { _TEXT }])),
+            }) as never;
+            const changes = (source: Item.CreateData) => ((source.effects ?? []) as { system?: { changes?: { key: string; value: string; target: string }[] } }[])
+                .flatMap(effect => effect.system?.changes ?? []);
+
+            const accessory = await new TestWeaponModParser().Parse(data({ rating: '2', cost: 'Weapon Cost * Rating', avail: '+2R' }), 'Weapon_Mod') as Item.CreateData;
+            const cost = changes(accessory).find(change => change.key === 'system.technology.cost')!;
+            assert.include(cost.value, '@parent.system.technology.cost.base');
+            const parentAvail = changes(accessory).find(change => change.key === 'system.technology.availability')!;
+            assert.strictEqual(parentAvail.target, 'parent');
+
+            const vehicleMod = await new TestVehicleModParser().Parse(
+                data({ category: 'Body', slots: '1', cost: 'number(Body = 0) * 500 + Body * 1000' }), 'Vehicle_Mod') as Item.CreateData;
+            const vehicleCost = changes(vehicleMod).find(change => change.key === 'system.technology.cost')!;
+            assert.include(vehicleCost.value, '@actor.system.attributes.body.base');
+
+            // The +2R accessory raises its weapon's availability by 2 and makes it restricted.
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'weapon',
+                name: 'Parent Weapon',
+                system: { technology: { availability: { base: 4, value: 4, restriction: 'none' } } },
+            }]) as SR5Item<'weapon'>[];
+            const { folder: _folder, ...accessoryData } = accessory;
+            foundry.utils.setProperty(accessoryData, 'system.technology.equipped', true);
+            await weapon.createNestedItem(accessoryData as Item.Source);
+            actor.prepareData();
+            assert.strictEqual(weapon.system.technology.availability.label, '6R');
+
+            // Built in, the same accessory is already part of the weapon's cost and availability.
+            const builtIn = foundry.utils.deepClone(accessoryData) as unknown as Item.Source;
+            Parser.includeInParent(builtIn);
+            assert.strictEqual((builtIn.system as SR5Item<'modification'>['system']).technology.cost.base, 0);
+            assert.isFalse(changes(builtIn).some(change => change.target === 'parent' || change.key === 'system.technology.cost'));
+
+            const [includedWeapon] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'weapon',
+                name: 'Weapon With Built-in Accessory',
+                system: { technology: { availability: { base: 4, value: 4, restriction: 'none' } } },
+            }]) as SR5Item<'weapon'>[];
+            await includedWeapon.createNestedItem(builtIn);
+            actor.prepareData();
+            assert.strictEqual(includedWeapon.system.technology.availability.label, '4');
+        });
+
+        it('drops capacity, cost and parent changes from included armor and vehicle mods', () => {
+            const mod = () => ({
+                type: 'modification',
+                name: 'Included Mod',
+                system: { slots: 2, technology: { cost: { base: 500, value: 500 } } },
+                effects: [{
+                    name: 'Mod Effects',
+                    system: {
+                        targets: [{ id: 'item', applyTo: 'item' }, { id: 'actor', applyTo: 'actor' }],
+                        changes: [
+                            { key: 'system.slots', value: '@system.technology.rating', type: 'override', target: 'item' },
+                            { key: 'system.technology.conceal', value: '1', type: 'add', target: 'item' },
+                            { key: 'system.vehicle_stats.handling', value: '1', type: 'add', target: 'actor' },
+                        ],
+                    },
+                }],
+            }) as unknown as Item.Source;
+            const keys = (item: Item.Source) => (item.effects as { system: { changes: { key: string }[] } }[])
+                .flatMap(effect => effect.system.changes.map(change => change.key));
+            const system = (item: Item.Source) => item.system as SR5Item<'modification'>['system'];
+
+            // An armor's capacity leaves out its included mods, whose own bonuses still count.
+            const armorMod = mod();
+            Parser.includeInParent(armorMod);
+            assert.strictEqual(system(armorMod).slots, 0);
+            assert.strictEqual(system(armorMod).technology.cost.base, 0);
+            assert.deepEqual(keys(armorMod), ['system.technology.conceal', 'system.vehicle_stats.handling']);
+
+            // A vehicle's own stats already include its mods' bonuses.
+            const vehicleMod = mod();
+            Parser.includeInParent(vehicleMod, { parentStats: true });
+            assert.deepEqual(keys(vehicleMod), ['system.technology.conceal']);
+
+            // An added mod keeps its own cost and slots, but not a change its parent's stats already hold.
+            const addedMod = mod();
+            Parser.dropChanges(addedMod, ['actor']);
+            assert.strictEqual(system(addedMod).slots, 2);
+            assert.deepEqual(keys(addedMod), ['system.slots', 'system.technology.conceal']);
+        });
+
+        it('imports base lifestyles with their type and monthly cost', async () => {
+            class TestLifestyleParser extends LifestyleParser {
+                protected override async getFolder() { return { id: null } as unknown as Folder; }
+            }
+            const parse = async (name: string, cost: string) => await new TestLifestyleParser().Parse({
+                id: { _TEXT: 'e13eb55b-e957-426a-85ba-1943a936bdf9' },
+                name: { _TEXT: name },
+                cost: { _TEXT: cost },
+            } as never, 'Lifestyle') as Item.CreateData;
+
+            const medium = (await parse('Medium', '5000')).system as SR5Item<'lifestyle'>['system'];
+            assert.strictEqual(medium.type, 'medium');
+            assert.strictEqual(medium.cost, 5000);
+
+            const boltHole = (await parse('Bolt Hole', '1000')).system as SR5Item<'lifestyle'>['system'];
+            assert.strictEqual(boltHole.type, 'other');
+            assert.strictEqual(boltHole.cost, 1000);
         });
 
         it('does not apply actor-target item effects to the item itself', async () => {

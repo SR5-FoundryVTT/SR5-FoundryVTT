@@ -7,7 +7,7 @@ export interface BonusSchema {
     accel?: { _TEXT: IntegerString | "+Rating" | "Rating"; };
     actiondicepool?: { $: { category: "Matrix"; }; };
     activeskillkarmacost?: Many<{
-        condition: { _TEXT: "career"; };
+        condition: { _TEXT: "/character/created"; };
         max?: { _TEXT: IntegerString; };
         min?: { _TEXT: IntegerString; };
         name: Empty;
@@ -57,12 +57,15 @@ export interface BonusSchema {
     };
     addspell?: { _TEXT: "Alter Ballistics"; $: { alchemical: "True"; }; };
     addspirit?: Empty | OneOrMany<{
+        $?: { ratingdivisor: IntegerString; skill: "Summoning"; };
         addtoselected?: { _TEXT: "False"; };
         spirit?: OneOrMany<{ _TEXT: string; }>;
     }>;
     addware?: {
-        grade: { _TEXT: "None"; };
-        name: { _TEXT: "Busted Ware"; };
+        grade?: { _TEXT: "None"; };
+        id?: { _TEXT: "961eac53-0c43-4b19-8741-2872177a3a4c"; };
+        name?: { _TEXT: "Busted Ware"; };
+        rating?: { _TEXT: IntegerString; };
         type: { _TEXT: "Cyberware"; };
     };
     addweapon?: {
@@ -135,6 +138,7 @@ export interface BonusSchema {
     dodge?: { _TEXT: IntegerString | "-Rating" | "Rating"; };
     drainresist?: { _TEXT: IntegerString; };
     drainvalue?: { _TEXT: IntegerString; };
+    drugpositiveattributemodifier?: Many<{ _TEXT: IntegerString; $: { category: "Custom Drugs" | "Drugs"; }; }>;
     electricityarmor?: { _TEXT: IntegerString | "Rating"; };
     enableattribute?: {
         name: { _TEXT: "MAG" | "RES"; };
@@ -170,14 +174,14 @@ export interface BonusSchema {
     judgeintentionsdefense?: { _TEXT: IntegerString | "Rating"; };
     judgeintentionsoffense?: { _TEXT: "-Rating"; };
     knowledgeskillkarmacost?: Many<{
-        condition?: { _TEXT: "career"; };
+        condition?: { _TEXT: "/character/created"; };
         max?: { _TEXT: IntegerString; };
         min?: { _TEXT: IntegerString; };
         name: Empty;
         val: { _TEXT: IntegerString | "-number(Rating >= 2)" | "-number(Rating >= 3)"; };
     }>;
     knowledgeskillkarmacostmin?: {
-        condition: { _TEXT: "career"; };
+        condition: { _TEXT: "/character/created"; };
         max: { _TEXT: IntegerString; };
         name: Empty;
         val: { _TEXT: IntegerString; };
@@ -350,13 +354,13 @@ export interface BonusSchema {
         name: { _TEXT: string; };
     }>;
     skillcategorykarmacost?: {
-        condition: { _TEXT: "career"; };
+        condition: { _TEXT: "/character/created"; };
         min: { _TEXT: IntegerString; };
         name: { _TEXT: "Academic" | "Language" | "Professional" | "Street"; };
         val: { _TEXT: IntegerString; };
     };
     skillcategorykarmacostmultiplier?: OneOrMany<{
-        condition?: { _TEXT: "create"; };
+        condition?: { _TEXT: "/character/created = false"; };
         name: { _TEXT: "Academic" | "Professional" | "Social Active" | "Technical Active"; };
         val: { _TEXT: IntegerString; };
     }>;
@@ -365,7 +369,7 @@ export interface BonusSchema {
         val: { _TEXT: IntegerString; };
     };
     skillcategoryspecializationkarmacostmultiplier?: OneOrMany<{
-        condition?: { _TEXT: "create"; };
+        condition?: { _TEXT: "/character/created = false"; };
         name: { _TEXT: "Academic" | "Professional" | "Technical Active"; };
         val: { _TEXT: IntegerString; };
     }>;
@@ -413,6 +417,7 @@ export interface BonusSchema {
     }>;
     speed?: { _TEXT: IntegerString | "+Rating" | "Rating"; };
     spellcategory?: {
+        condition: { _TEXT: "not(/spell/alchemical)"; };
         name: { _TEXT: "Combat" | "Detection" | "Health" | "Illusion" | "Manipulation"; };
         val: { _TEXT: "Rating"; };
     };
@@ -479,10 +484,8 @@ export interface BonusSchema {
         value: { _TEXT: IntegerString; };
     };
     weaponcategorydice?: {
-        category: {
-            name: { _TEXT: "Bows"; };
-            value: { _TEXT: IntegerString; };
-        };
+        bonus: { _TEXT: IntegerString; };
+        name: { _TEXT: "Bows"; };
     };
     weaponcategorydv?: {
         bonus: { _TEXT: IntegerString; };

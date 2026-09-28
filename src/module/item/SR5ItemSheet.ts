@@ -959,32 +959,31 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
-    static async #editEffect(this: SR5ItemSheet, event: MouseEvent) {
-        const effectId = SheetFlow.closestEffectId(event.target);
-        const effect = this.item.effects.get(effectId);
-        if (effect instanceof SR5ActiveEffect) {
-            await effect.sheet?.render(true);
-        } else {
-            const uuid = SheetFlow.closestUuid(event.target);
-            const doc = fromUuidSync(uuid);
-            if (doc instanceof SR5ActiveEffect) {
-                await doc.sheet?.render(true);
-            }
+    /**
+     * The effect a sheet element refers to: one of this item's own effects, or one of its nested items.
+     * Nested item effects aren't embedded documents, so fromUuidSync can't retrieve them.
+     */
+    private listedEffect(target: EventTarget | null): SR5ActiveEffect | undefined {
+        const effect = this.item.effects.get(SheetFlow.closestEffectId(target));
+        if (effect instanceof SR5ActiveEffect) return effect;
+
+        const uuid = SheetFlow.closestUuid(target);
+        for (const item of this.item.items) {
+            const nested = item.effects.find(nestedEffect => nestedEffect.uuid === uuid);
+            if (nested instanceof SR5ActiveEffect) return nested;
         }
+
+        const document = fromUuidSync(uuid);
+        return document instanceof SR5ActiveEffect ? document : undefined;
+    }
+
+    static async #editEffect(this: SR5ItemSheet, event: MouseEvent) {
+        await this.listedEffect(event.target)?.sheet?.render(true);
     }
 
     static async #toggleEffect(this: SR5ItemSheet, event: MouseEvent) {
-        const effectId = SheetFlow.closestEffectId(event.target);
-        const effect = this.item.effects.get(effectId);
-        if (effect instanceof SR5ActiveEffect) {
-            await effect.update({ disabled: !effect.disabled })
-        } else {
-            const uuid = SheetFlow.closestUuid(event.target);
-            const doc = await fromUuid(uuid);
-            if (doc instanceof SR5ActiveEffect) {
-                await doc.update({ disabled: !doc.disabled })
-            }
-        }
+        const effect = this.listedEffect(event.target);
+        if (effect) await effect.update({ disabled: !effect.disabled });
     }
 
     static async #deleteEffect(this: SR5ItemSheet, event: MouseEvent) {
@@ -1052,17 +1051,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 label: "SR5.ContextOptions.EditEffect",
                 icon: "<i class='fas fa-pen-to-square'></i>",
                 callback: async (target: HTMLElement) => {
-                    const id = SheetFlow.closestEffectId(target);
-                    const item = this.item.effects.get(id);
-                    if (item) {
-                        await item.sheet?.render(true)
-                    } else {
-                        const uuid = SheetFlow.closestUuid(target);
-                        const effect = fromUuidSync(uuid);
-                        if (effect && effect instanceof SR5ActiveEffect) {
-                            await effect.sheet?.render(true);
-                        }
-                    }
+                    await this.listedEffect(target)?.sheet?.render(true);
                 }
             },
             {

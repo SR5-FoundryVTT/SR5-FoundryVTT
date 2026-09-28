@@ -2,9 +2,14 @@ import { Parser } from '../Parser';
 import { Mod } from '../../schema/VehiclesSchema';
 import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
+import { ChummerFormulaParser } from '../../helper/ChummerFormula';
 
 export class VehicleModParser extends Parser<'modification'> {
     protected readonly parseType = 'modification';
+
+    protected override formulaIdentifiers(system: object) {
+        return { ...super.formulaIdentifiers(system), ...ChummerFormulaParser.VEHICLE };
+    }
 
     protected override getSystem(jsonData: Mod) {
         const system = this.getBaseSystem();
@@ -12,9 +17,9 @@ export class VehicleModParser extends Parser<'modification'> {
 
         system.modification_category = jsonData.category._TEXT?.toLowerCase() as any;
 
-        const slots = jsonData.slots._TEXT.match(/[0-9]\.?[0-9]*/g);
-        if (slots)
-            system.slots = Number(slots[0]);
+        const slots = Number(jsonData.slots._TEXT);
+        if (Number.isFinite(slots))
+            system.slots = slots;
 
         return system;
     }

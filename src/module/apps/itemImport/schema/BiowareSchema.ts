@@ -7,8 +7,11 @@ import { Empty, Many, OneOrMany, IntegerString } from './Types';
 export interface Bioware {
     addtoparentess?: Empty;
     addweapon?: Empty | { _TEXT: string; };
+    allowdrug?: {
+        drugcategory: Many<{ _TEXT: "BTLs" | "Custom Drugs" | "Drugs" | "Toxins"; }>;
+    };
     allowgear?: {
-        gearcategory: Many<{ _TEXT: "Chemicals" | "Custom" | "Custom Drug" | "Drugs" | "Toxins"; }>;
+        gearcategory: Many<{ _TEXT: "Chemicals" | "Custom"; }>;
     };
     allowsubsystems?: {
         category: { _TEXT: "Chemical Gland Modifications"; };

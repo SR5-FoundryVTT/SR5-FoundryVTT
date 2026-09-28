@@ -5,6 +5,7 @@ import { ParseData, Schemas } from "../parser/Types";
 import { ImportHelper as IH } from '../helper/ImportHelper';
 import { ChummerFileXML, CompendiumKey, Constants } from './Constants';
 import CompendiumCollection = foundry.documents.collections.CompendiumCollection;
+import { ChummerImportCoverage } from '../helper/ChummerImportCoverage';
 
 export type BulkImportMode = 'add' | 'update' | 'replace' | 'clean';
 
@@ -52,8 +53,13 @@ export abstract class DataImporter {
      * @param xml - The XML string to parse and import.
      */
     public async parse(xml: string) {
+        ChummerImportCoverage.reset();
         const schema = await DataImporter._xml2json(xml);
-        return this._parse(schema);
+        try {
+            return await this._parse(schema);
+        } finally {
+            ChummerImportCoverage.report(this.files.join(', '));
+        }
     }
 
     /**
