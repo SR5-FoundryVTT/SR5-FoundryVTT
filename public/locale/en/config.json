@@ -3398,6 +3398,7 @@
         },
         "Vision": {
             "AstralPerception": "Astral Perception",
+            "AstralProjection": "Astral Projection",
             "CannotPerceiveAstrally": "This actor cannot use astral perception.",
             "ToggleAstralPerception": "Toggle Astral Perception",
             "BeginAstralProjection": "Begin Astral Projection",

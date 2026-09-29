@@ -4,7 +4,9 @@ import { PerceptionFlow } from '@/module/vision/PerceptionFlow';
 import { PerceptionResolver } from '@/module/vision/PerceptionResolver';
 
 export const ASTRAL_PERCEPTION_STATUS = 'sr5astralPerception';
-export const ASTRAL_PERCEPTION_VISION_MODE = 'astralPerception';
+import { ASTRAL_PERCEPTION_VISION_MODE, ASTRAL_PROJECTION_VISION_MODE } from './astralVisionModes';
+
+export { ASTRAL_PERCEPTION_VISION_MODE, ASTRAL_PROJECTION_VISION_MODE };
 
 export interface PreviousTokenVision {
     sight: Record<string, unknown>;
@@ -67,11 +69,27 @@ export class AstralPerceptionFlow {
         };
     }
 
-    /** Sight and detection modes of a token seeing astrally, based on the given token source. */
+    /**
+     * Sight and detection modes of a token perceiving astrally, based on the given token source.
+     *
+     * The perceiver stays dual-natured: physical senses keep working at their own range, and astral
+     * perception is added on top.
+     */
     static astralVision(token: TokenDocument, source: Token.Source) {
+        return {
+            sight: { ...source.sight, enabled: true, visionMode: ASTRAL_PERCEPTION_VISION_MODE },
+            detectionModes: PerceptionFlow.reconcilePerceivingDetectionModes(
+                source.detectionModes,
+                PerceptionFlow.senseRange(token),
+            ),
+        };
+    }
+
+    /** Sight and detection modes of a projected astral form, which only senses the astral plane. */
+    static astralProjectionVision(token: TokenDocument, source: Token.Source) {
         const range = PerceptionFlow.senseRange(token);
         return {
-            sight: { ...source.sight, enabled: true, range, visionMode: ASTRAL_PERCEPTION_VISION_MODE },
+            sight: { ...source.sight, enabled: true, range, visionMode: ASTRAL_PROJECTION_VISION_MODE },
             detectionModes: PerceptionFlow.reconcileAstralDetectionModes(source.detectionModes, range),
         };
     }

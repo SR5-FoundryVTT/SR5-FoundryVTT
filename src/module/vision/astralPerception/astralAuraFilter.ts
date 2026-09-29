@@ -11,20 +11,31 @@ type Color = [number, number, number];
 interface AuraLook {
     /** Aura color. */
     glow: Color;
-    /** Halo width in pixels. */
+    /** Halo width in pixels of a full aura. */
     distance: number;
     innerStrength: number;
     outerStrength: number;
-    /** A brighter band hugging the silhouette, for beings active on the astral plane. */
-    rim: number;
+    /**
+     * Bright rings around the silhouette, at fixed distances from it. Their count tells the tiers apart without
+     * relying on color: none for a living aura, one for an Awakened aura, two for an astral form.
+     */
+    rings: 0 | 1 | 2;
     /** Added to the sprite's saturation; -1 is fully grey. */
     saturation: number;
     brightness: number;
     tint: Color;
     alpha: number;
     pulse: GlowPulse | null;
-    /** Whether a lower Essence dims the aura. Astral forms have no Essence to lose. */
+    /** Whether a lower Essence thins the aura. Astral forms have no Essence to lose. */
     followsEssence: boolean;
+}
+
+export interface AuraOptions {
+    /**
+     * Draw only the aura around a token seen physically, leaving its sprite as it is: the astral plane overlaid on
+     * the physical one while perceiving (SR5#312).
+     */
+    overlay?: boolean;
 }
 
 const WHITE: Color = [1, 1, 1];
@@ -32,9 +43,18 @@ const WHITE: Color = [1, 1, 1];
 /** The least an aura dims to at Essence 1, so heavily augmented beings stay visible. */
 const MIN_ESSENCE_FACTOR = 0.35;
 
+/** The narrowest halo, in pixels, so a thin aura still reads as a halo. */
+const MIN_HALO_DISTANCE = 5;
+
+/** Brightness of the rings on top of the aura color, towards white. */
+const RING_WHITENESS = 0.45;
+
 /**
  * SR5#312: non-living things are grey shadows, living auras shine in color, and astral forms are brighter
- * still. Awakened auras carry a rim, the look of beings active on the astral plane.
+ * still. Tiers also differ in ring count and brightness, so they read in any color vision and in greyscale.
+ *
+ * Seen only astrally, a being's sprite takes on the color of its aura, so it doesn't pass for being seen
+ * physically.
  */
 const AURA_LOOKS: Readonly<Record<AstralTier, AuraLook>> = {
     shadow: {
@@ -42,7 +62,7 @@ const AURA_LOOKS: Readonly<Record<AstralTier, AuraLook>> = {
         distance: 2,
         innerStrength: 0,
         outerStrength: 0,
-        rim: 0,
+        rings: 0,
         saturation: -1,
         brightness: 0.6,
         tint: [0.8, 0.85, 0.95],
@@ -52,39 +72,39 @@ const AURA_LOOKS: Readonly<Record<AstralTier, AuraLook>> = {
     },
     aura: {
         glow: [1.0, 0.8, 0.45],
-        distance: 8,
+        distance: 12,
         innerStrength: 1.5,
         outerStrength: 2.5,
-        rim: 0,
-        saturation: 0.15,
-        brightness: 0.9,
-        tint: WHITE,
+        rings: 0,
+        saturation: -0.3,
+        brightness: 1,
+        tint: [1.0, 0.88, 0.7],
         alpha: 1,
         pulse: { min: 0.85, max: 1.15, period: 5000 },
         followsEssence: true,
     },
     awakened: {
         glow: [0.7, 0.45, 1.0],
-        distance: 12,
+        distance: 14,
         innerStrength: 2,
-        outerStrength: 4,
-        rim: 0.8,
-        saturation: 0.25,
-        brightness: 1,
-        tint: WHITE,
+        outerStrength: 3.5,
+        rings: 1,
+        saturation: -0.3,
+        brightness: 1.05,
+        tint: [0.88, 0.78, 1.0],
         alpha: 1,
         pulse: { min: 0.8, max: 1.25, period: 3500 },
         followsEssence: true,
     },
     form: {
         glow: [0.55, 0.95, 1.0],
-        distance: 14,
+        distance: 18,
         innerStrength: 3,
-        outerStrength: 6,
-        rim: 1,
-        saturation: 0.4,
-        brightness: 1.25,
-        tint: WHITE,
+        outerStrength: 5,
+        rings: 2,
+        saturation: 0,
+        brightness: 1.2,
+        tint: [0.8, 1.0, 1.0],
         alpha: 1,
         pulse: { min: 0.9, max: 1.3, period: 3000 },
         followsEssence: false,
@@ -92,16 +112,17 @@ const AURA_LOOKS: Readonly<Record<AstralTier, AuraLook>> = {
 };
 
 /**
- * How a token looks to astral perception: its sprite, recolored for its astral tier, inside an aura.
+ * How a token looks to astral sight: its sprite, recolored for its astral tier, inside an aura with the tier's
+ * rings. As an overlay it leaves the sprite alone and only adds the aura.
  *
  * Detection filters render the token alone with this filter, so it draws the sprite itself rather than
- * knocking it out like Foundry's glow. The glow loop is Foundry's GlowOverlayFilter, itself based on
- * https://github.com/pixijs/filters/tree/main/filters/glow (MIT).
+ * knocking it out like Foundry's glow.
  */
 export class AstralAuraFilter extends PulsingGlowOverlayFilter {
     private static readonly cache = new Map<number, AstralAuraFilter>();
 
     tier: AstralTier = 'shadow';
+    overlay = false;
 
     static override get defaultUniforms() {
         return {
@@ -111,20 +132,21 @@ export class AstralAuraFilter extends PulsingGlowOverlayFilter {
             spriteSaturation: 0,
             spriteBrightness: 1,
             spriteAlpha: 1,
-            rimStrength: 0,
+            rings: 0,
+            ringColor: WHITE,
         };
     }
 
     /** The shared filter of a tier at an Essence bucket. */
-    static forSignature(tier: AstralTier, bucket = MAX_ESSENCE_BUCKET) {
+    static forSignature(tier: AstralTier, bucket = MAX_ESSENCE_BUCKET, { overlay = false }: AuraOptions = {}) {
         const look = AURA_LOOKS[tier];
         const effectiveBucket = look.followsEssence
             ? Math.min(MAX_ESSENCE_BUCKET, Math.max(1, Math.round(bucket)))
             : MAX_ESSENCE_BUCKET;
-        const key = ASTRAL_TIERS.indexOf(tier) * (MAX_ESSENCE_BUCKET + 1) + effectiveBucket;
+        const key = (ASTRAL_TIERS.indexOf(tier) * (MAX_ESSENCE_BUCKET + 1) + effectiveBucket) * 2 + Number(overlay);
         let filter = this.cache.get(key);
         if (!filter) {
-            filter = this.createForSignature(tier, effectiveBucket);
+            filter = this.createForSignature(tier, effectiveBucket, overlay);
             this.cache.set(key, filter);
         }
         return filter;
@@ -135,25 +157,36 @@ export class AstralAuraFilter extends PulsingGlowOverlayFilter {
      *
      * @param fallback Tier of a target that has none, like a sprite showing because its token is controlled.
      */
-    static forTarget(target: Parameters<typeof getAstralSignature>[0], fallback: AstralTier | null = null) {
+    static forTarget(
+        target: Parameters<typeof getAstralSignature>[0],
+        fallback: AstralTier | null = null,
+        options: AuraOptions = {},
+    ) {
         const signature = getAstralSignature(target, fallback);
-        return signature ? this.forSignature(signature.tier, signature.bucket) : null;
+        return signature ? this.forSignature(signature.tier, signature.bucket, options) : null;
     }
 
-    private static createForSignature(tier: AstralTier, bucket: number) {
+    private static createForSignature(tier: AstralTier, bucket: number, overlay: boolean) {
         const look = AURA_LOOKS[tier];
         const essence = look.followsEssence ? Math.max(MIN_ESSENCE_FACTOR, bucket / MAX_ESSENCE_BUCKET) : 1;
+        // Cyberware narrows the halo as well as dimming it, so Essence doesn't rest on brightness alone.
+        const distance = look.outerStrength
+            ? Math.max(MIN_HALO_DISTANCE, Math.round(look.distance * (0.5 + 0.5 * essence)))
+            : look.distance;
         const filter = this.create({
-            distance: look.distance,
+            distance,
+            quality: this.qualityForPerformance(),
             glowColor: [...look.glow, 0.5 + 0.5 * essence],
-            spriteTint: look.tint,
-            spriteSaturation: look.saturation,
-            spriteBrightness: look.brightness,
-            spriteAlpha: look.alpha,
-            rimStrength: look.rim * essence,
+            spriteTint: overlay ? WHITE : look.tint,
+            spriteSaturation: overlay ? 0 : look.saturation,
+            spriteBrightness: overlay ? 1 : look.brightness,
+            spriteAlpha: overlay ? 0 : look.alpha,
+            rings: look.rings,
+            ringColor: look.glow.map(channel => channel + (1 - channel) * RING_WHITENESS),
         }) as AstralAuraFilter;
-        filter.fitPadding(look.distance);
+        filter.fitPadding(distance);
         filter.tier = tier;
+        filter.overlay = overlay;
         filter.innerStrength = look.innerStrength * essence;
         filter.outerStrength = look.outerStrength * essence;
         filter.pulse = look.pulse;
@@ -177,36 +210,17 @@ export class AstralAuraFilter extends PulsingGlowOverlayFilter {
     uniform float spriteSaturation;
     uniform float spriteBrightness;
     uniform float spriteAlpha;
-    uniform float rimStrength;
+    uniform float rings;
+    uniform vec3 ringColor;
 
     ${this.CONSTANTS}
-    const float DIST = ${distance.toFixed(0)}.0;
-    const float ANGLE_STEP_SIZE = min(${(1 / quality / distance).toFixed(7)}, PI * 2.0);
-    const float ANGLE_STEP_NUM = ceil(PI * 2.0 / ANGLE_STEP_SIZE);
-    const float MAX_TOTAL_ALPHA = ANGLE_STEP_NUM * DIST * (DIST + 1.0) / 2.0;
-
     ${this.PERCEIVED_BRIGHTNESS}
-
-    float getClip(in vec2 uv) {
-      return step(3.5,
-       step(inputClamp.x, uv.x) +
-       step(inputClamp.y, uv.y) +
-       step(uv.x, inputClamp.z) +
-       step(uv.y, inputClamp.w));
-    }
+    ${this.glowSample(quality, distance)}
 
     void main(void) {
-      vec2 px = inputSize.zw;
-      float totalAlpha = 0.0;
-      for (float angle = 0.0; angle < PI * 2.0; angle += ANGLE_STEP_SIZE) {
-        vec2 direction = vec2(cos(angle), sin(angle)) * px;
-        for (float curDistance = 0.0; curDistance < DIST; curDistance++) {
-          vec2 displaced = vTextureCoord + direction * (curDistance + 1.0);
-          vec4 sampled = texture2D(uSampler, displaced) * getClip(displaced);
-          totalAlpha += (DIST - curDistance) * smoothstep(0.5, 1.0, sampled.a);
-        }
-      }
-      float coverage = totalAlpha / MAX_TOTAL_ALPHA;
+      vec2 glow = glowSample(vTextureCoord);
+      float coverage = glow.x;
+      float dist = glow.y;
 
       // The sprite, recolored for its tier. Textures are premultiplied, so unmultiply before recoloring.
       vec4 tex = texture2D(uSampler, vTextureCoord);
@@ -218,15 +232,29 @@ export class AstralAuraFilter extends PulsingGlowOverlayFilter {
 
       // The aura seeps into the silhouette's edges...
       float inner = min(1.0, (1.0 - coverage) * innerStrength * smoothstep(0.6, 1.0, tex.a)) * glowColor.a;
-      sprite = mix(sprite, vec4(glowColor.rgb * a, a), inner);
+      float innerAlpha = tex.a * inner;
+      sprite = sprite * (1.0 - inner) + vec4(glowColor.rgb * innerAlpha, innerAlpha);
 
-      // ...and shines around it, with a brighter band close to the silhouette for astrally active beings.
+      // ...and shines around it as a halo that fades out across its whole width...
       float outside = 1.0 - smoothstep(0.35, 1.0, tex.a);
-      float rim = rimStrength * smoothstep(0.25, 0.45, coverage);
-      float glowAlpha = min(1.0 - sprite.a, clamp((coverage * outerStrength + rim) * outside, 0.0, 1.0));
-      glowAlpha *= glowColor.a;
+      float room = 1.0 - sprite.a;
+      float falloff = 1.0 - clamp((dist - 1.0) / DIST, 0.0, 1.0);
+      float halo = pow(falloff, 1.3) * clamp(outerStrength * 0.3, 0.0, 0.9);
 
-      gl_FragColor = (sprite + vec4(glowColor.rgb * glowAlpha, glowAlpha)) * alpha;
+      // ...with steady rings at fixed distances, each set off by a dark band, that don't follow its pulse.
+      float first = step(0.5, rings);
+      float second = step(1.5, rings);
+      float ringMask = max(first * lineAt(dist, 3.0, 0.6), second * lineAt(dist, 8.0, 0.6));
+      float bandMask = max(first * lineAt(dist, 3.0, 1.8), second * lineAt(dist, 8.0, 1.8));
+      float edgeMask = clamp(bandMask - ringMask, 0.0, 1.0);
+
+      float haloAlpha = min(room, max(halo, edgeMask * 0.8) * outside * glowColor.a);
+      float ringAlpha = min(room, ringMask * outside * max(glowColor.a, 0.75));
+      vec3 haloColor = glowColor.rgb * (1.0 - 0.8 * edgeMask);
+
+      vec4 color = vec4(haloColor * haloAlpha, haloAlpha);
+      color = color * (1.0 - ringAlpha) + vec4(ringColor * ringAlpha, ringAlpha);
+      gl_FragColor = (sprite + color) * alpha;
     }`;
     }
 }

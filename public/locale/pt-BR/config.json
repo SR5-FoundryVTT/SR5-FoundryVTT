@@ -2234,6 +2234,7 @@
                     "Contribution": "Vento regional"
                 }
             },
+            "AstralProjection": "Projeção Astral",
             "CannotPerceiveAstrally": "Este ator não pode usar percepção astral.",
             "ToggleAstralPerception": "Alternar Percepção Astral",
             "BeginAstralProjection": "Iniciar Projeção Astral",

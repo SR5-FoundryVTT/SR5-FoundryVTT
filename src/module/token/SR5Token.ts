@@ -7,6 +7,7 @@ import { getProjectionForm } from '@/module/vision/astralProjection/AstralProjec
 import { MANIFEST_STATUS, MATERIALIZE_STATUS } from '@/module/vision/astralProjection/ManifestationState';
 import { ManifestationFilter } from '@/module/vision/astralProjection/manifestationFilter';
 import { getPhysicalPresence } from '@/module/vision/physicalVision/physicalDetectionMode';
+import { isAstralVisionMode } from '@/module/vision/astralPerception/astralVisionModes';
 
 export class SR5Token extends foundry.canvas.placeables.Token {
     /**
@@ -30,10 +31,24 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         return astralPath ? [astralPath as typeof path, true] : [path, constrained];
     }
 
-    /** Swap the detection filter for the one matching this token and the current viewers' senses. */
+    /** Filters drawn over this token after its detection filter, like an aura or a Matrix icon. */
+    private readonly senseOverlays: PIXI.Filter[] = [];
+
+    /**
+     * Swap the detection filter for the one matching this token and the current viewers' senses, and gather the
+     * overlays of senses layered on top. Without a detection filter of its own, the first overlay takes its place
+     * so Foundry renders the filter pass at all.
+     */
     override get isVisible() {
         const visible = super.isVisible;
-        if (visible) this.detectionFilter = SenseFilterResolver.resolve(this, this.detectionFilter) ?? null;
+        const overlays = this.senseOverlays;
+        if (!visible) {
+            overlays.length = 0;
+            return visible;
+        }
+        const primary = SenseFilterResolver.resolve(this, this.detectionFilter) ?? null;
+        SenseFilterResolver.collectOverlays(this, primary, overlays);
+        this.detectionFilter = primary ?? overlays.shift() ?? null;
         return visible;
     }
 
@@ -43,14 +58,27 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         if ((this.detectionFilter as AugmentedRealityFilter | null)?.locatesOnly) this.mesh!.visible = false;
     }
 
-    /** The marker of a traced icon is drawn from the hidden mesh, which Pixi neither renders nor moves. */
+    /**
+     * Render the detection filter, then each sense overlay on top of it.
+     *
+     * The marker of a traced icon is drawn from the hidden mesh, which Pixi neither renders nor moves.
+     */
     override _renderDetectionFilter(renderer: PIXI.Renderer) {
         const mesh = this.mesh;
-        if (!mesh || mesh.visible) return super._renderDetectionFilter(renderer);
-        mesh.visible = true;
-        mesh.updateTransform();
+        if (!mesh) return;
+        const hidden = !mesh.visible;
+        if (hidden) {
+            mesh.visible = true;
+            mesh.updateTransform();
+        }
         super._renderDetectionFilter(renderer);
-        mesh.visible = false;
+        const primary = this.detectionFilter;
+        for (const overlay of this.senseOverlays) {
+            this.detectionFilter = overlay;
+            super._renderDetectionFilter(renderer);
+        }
+        this.detectionFilter = primary;
+        if (hidden) mesh.visible = false;
     }
 
     /** Filter showing this token as a manifesting astral being, while it is one. */
@@ -89,11 +117,11 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         this.manifestFilter = null;
     }
 
-    /** Astral perception and ultrasound aren't optical, and ultrasound works in any light. */
+    /** Astral sight and ultrasound aren't optical, and ultrasound works in any light. */
     override _getVisionBlindedStates() {
         const states = super._getVisionBlindedStates();
         const { visionMode } = this.document.sight;
-        if (visionMode === 'astralPerception' || visionMode === ULTRASOUND_VISION_MODE) states.blind = false;
+        if (isAstralVisionMode(visionMode) || visionMode === ULTRASOUND_VISION_MODE) states.blind = false;
         if (visionMode === ULTRASOUND_VISION_MODE) states.darkness = false;
         return states;
     }

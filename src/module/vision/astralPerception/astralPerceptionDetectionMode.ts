@@ -1,5 +1,5 @@
 import { AstralRegionFlow } from '../astralRegions/AstralRegionFlow';
-import { isAstralVisionSource } from '../physicalVision/physicalDetectionMode';
+import { isAstralSightSource } from '../physicalVision/physicalDetectionMode';
 import { AstralAuraFilter } from './astralAuraFilter';
 import { getAstralTier } from './astralSignature';
 
@@ -19,7 +19,7 @@ export default class AstralPerceptionDetectionMode extends foundry.canvas.percep
     override _canDetect(
         ...[visionSource, target]: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>
     ) {
-        return isAstralVisionSource(visionSource) && getAstralTier(target) !== null;
+        return isAstralSightSource(visionSource) && getAstralTier(target) !== null;
     }
 
     override _testPoint(...args: Parameters<foundry.canvas.perception.DetectionMode['_testPoint']>) {

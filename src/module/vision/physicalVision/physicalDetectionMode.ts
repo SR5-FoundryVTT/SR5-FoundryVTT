@@ -1,5 +1,9 @@
 import { isAstralForm } from '@/module/vision/astralProjection/AstralProjectionState';
 import { isManifesting } from '@/module/vision/astralProjection/ManifestationState';
+import {
+    ASTRAL_PROJECTION_VISION_MODE,
+    isAstralVisionMode,
+} from '@/module/vision/astralPerception/astralVisionModes';
 
 type DetectionTarget = Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>[1] | undefined;
 
@@ -37,13 +41,21 @@ export const isInvisiblePhysicalTarget = (target: DetectionTarget) => {
     return getPhysicalTargetActor(target)?.statuses.has(CONFIG.specialStatusEffects.INVISIBLE) ?? false;
 };
 
-export const isAstralVisionSource = (
-    visionSource: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>[0],
-) => visionSource?.visionMode?.id === 'astralPerception';
+type VisionSourceLike = { visionMode?: { id?: string | null } | null } | null | undefined;
+
+/**
+ * Whether a vision source belongs to a projected astral form, which has no physical senses (SR5#313).
+ * A perceiving body stays dual-natured, so its physical senses keep working.
+ */
+export const isAstralProjectionSource = (visionSource: VisionSourceLike) =>
+    visionSource?.visionMode?.id === ASTRAL_PROJECTION_VISION_MODE;
+
+/** Whether a vision source senses the astral plane, by perceiving or projecting. */
+export const isAstralSightSource = (visionSource: VisionSourceLike) => isAstralVisionMode(visionSource?.visionMode?.id);
 
 export class PhysicalSightDetectionMode extends foundry.canvas.perception.DetectionMode {
     override _canDetect(...args: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>) {
-        return !isAstralVisionSource(args[0])
+        return !isAstralProjectionSource(args[0])
             && isOpticallyPresent(args[1])
             && !isInvisiblePhysicalTarget(args[1])
             && super._canDetect(...args);

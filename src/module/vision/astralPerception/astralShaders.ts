@@ -60,3 +60,40 @@ export class AstralBackgroundVisionShader extends BackgroundVisionShader {
         return true;
     }
 }
+
+/**
+ * The physical world seen while perceiving astrally (SR5#312): the astral plane is overlaid on it, so the world
+ * keeps its light and colors, faded, under the same drifting glow of life.
+ */
+export class AstralPerceptionBackgroundVisionShader extends BackgroundVisionShader {
+    static override defaultUniforms = {
+        ...super.defaultUniforms,
+        glowColor: AstralBackgroundVisionShader.defaultUniforms.glowColor,
+        shimmerIntensity: AstralBackgroundVisionShader.defaultUniforms.shimmerIntensity,
+    };
+
+    static override _createFragmentShader() {
+        return `
+    ${this.SHADER_HEADER}
+    ${this.PERCEIVED_BRIGHTNESS}
+    ${this.PRNG}
+    ${this.NOISE}
+    ${this.FBM(3, 1.0)}
+
+    uniform vec3 glowColor;
+    uniform float shimmerIntensity;
+
+    void main() {
+      ${this.FRAGMENT_BEGIN}
+      ${this.ADJUSTMENTS}
+      ${AstralBackgroundVisionShader.AMBIENT_GLOW}
+      ${this.BACKGROUND_TECHNIQUES}
+      ${this.FALLOFF}
+      ${this.FRAGMENT_END}
+    }`;
+    }
+
+    override get isRequired() {
+        return true;
+    }
+}

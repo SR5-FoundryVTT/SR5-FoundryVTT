@@ -13,11 +13,11 @@ import { SR5VisionSource } from '@/module/vision/SR5VisionSource';
 import { ULTRASOUND_COLOR } from '@/module/vision/ultrasoundVision/ultrasoundShaders';
 import { SenseFilterResolver } from '@/module/vision/SenseFilterResolver';
 import { AstralAuraFilter } from '@/module/vision/astralPerception/astralAuraFilter';
-import { HeatSignatureFilter } from '@/module/vision/thermographicVision/heatSignatureFilter';
+import { HEAT_GLOWS, HeatSignatureFilter } from '@/module/vision/thermographicVision/heatSignatureFilter';
 import AugmentedRealityVisionDetectionMode, {
     AUGMENTED_REALITY_RANGE_METERS,
 } from '@/module/vision/augmentedReality/arDetectionMode';
-import AugmentedRealityFilter from '@/module/vision/augmentedReality/arFilter';
+import AugmentedRealityFilter, { noiseBucket } from '@/module/vision/augmentedReality/arFilter';
 import { getMatrixIconState } from '@/module/vision/augmentedReality/matrixIcon';
 import { MatrixTraceFlow } from '@/module/vision/augmentedReality/MatrixTraceFlow';
 import {
@@ -235,6 +235,15 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
 
             const isBlinded = Object.getOwnPropertyDescriptor(SR5VisionSource.prototype, 'isBlinded')?.get;
             assert.isFalse(isBlinded?.call({ data: { visionMode: 'ultrasound' } }));
+
+            const isAnimated = Object.getOwnPropertyDescriptor(SR5VisionSource.prototype, 'isAnimated')?.get;
+            // photosensitiveMode is a getter reading a client setting, so shadow it on the canvas instance.
+            Object.defineProperty(canvas, 'photosensitiveMode', { value: true, configurable: true });
+            try {
+                assert.isFalse(isAnimated?.call({ data: { visionMode: 'ultrasound' } }), 'sonar pings hold still');
+            } finally {
+                delete (canvas as any).photosensitiveMode;
+            }
         });
 
         it('keeps the vision range for ultrasound vision and lets glass stop it', function () {
@@ -318,7 +327,7 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             }
         });
 
-        it('draws tokens that astral perception or ultrasound vision would leave unlit', function () {
+        it('draws tokens that astral projection or ultrasound vision would leave unlit', function () {
             if (!canvas.ready) this.skip();
 
             const effects = canvas.effects as any;
@@ -331,19 +340,21 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             try {
                 sources('ultrasound');
                 assert.strictEqual(resolve(), UltrasoundDetectionMode.getDetectionFilter());
-                sources('astralPerception', 'astralPerception');
+                sources('astralProjection', 'astralProjection');
                 assert.strictEqual(resolve(), AstralAuraFilter.forSignature('shadow'), 'unlit things are grey shadows');
+                sources('astralPerception');
+                assert.isNull(resolve(), 'a perceiving body still sees the lit physical world');
                 sources('basic');
                 assert.isNull(resolve(), 'normal vision renders tokens lit');
                 sources('ultrasound', 'basic');
                 assert.isNull(resolve(), 'another source still lights the scene');
-                sources('ultrasound', 'astralPerception');
+                sources('ultrasound', 'astralProjection');
                 assert.isNull(resolve(), 'mixed non-optical senses share no look');
                 sources();
                 assert.isNull(resolve());
 
                 const outline = UltrasoundDetectionMode.getDetectionFilter()!;
-                sources('astralPerception');
+                sources('astralProjection');
                 assert.strictEqual(resolve(outline), outline, 'a filter of another sense is kept');
             } finally {
                 effects.visionSources = originalSources;
@@ -356,11 +367,9 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
                 label: 'Thermographic',
                 type: SIGHT,
             });
-            const expectedColors = {
-                cold: [0.25, 0.5, 1, 1],
-                warm: [1, 0.55, 0, 1],
-                hot: [1, 0.1, 0, 1],
-            };
+            const expectedColors = Object.fromEntries(
+                Object.entries(HEAT_GLOWS).map(([signature, glow]) => [signature, glow.color]),
+            );
             const marker = ThermographicVisionDetectionMode.getDetectionFilter();
 
             const filters: Record<string, any> = {};
@@ -384,6 +393,15 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             assert.isNull(cold.pulse);
             assert.isTrue(warm.animated && hot.animated, 'warm and hot glows pulse');
             assert.isBelow(hot.pulse.period, warm.pulse.period, 'hot pulses faster than warm');
+
+            // Readable without color: more isotherms and a brighter color the hotter the signature.
+            assert.deepEqual([cold, warm, hot].map(filter => filter.uniforms.bands), [1, 2, 3]);
+            const luminance = (filter: any) => {
+                const [r, g, b] = filter.uniforms.glowColor;
+                return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            };
+            assert.isBelow(luminance(cold), luminance(warm), 'warm is brighter than cold');
+            assert.isBelow(luminance(warm), luminance(hot), 'hot is brighter than warm');
 
             assert.isFalse((mode as any)._canDetect(visionSource(), target(true, false, 'none')));
             assert.isNull(HeatSignatureFilter.forTarget(target(true, false, 'none')));
@@ -414,9 +432,10 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
         it("keeps augmented reality and Foundry's other senses off the astral plane", () => {
             const astralTarget = target(false, true);
             const physicalTarget = target(true, true);
-            const astralViewer = { ...visionSource(), visionMode: { id: 'astralPerception' } };
+            const astralViewer = { ...visionSource(), visionMode: { id: 'astralProjection' } };
             const tracingViewer = { ...visionSource(), object: { actor: tracer(['Actor.runner.Item.commlink']) } };
-            const astralTracingViewer = { ...tracingViewer, visionMode: { id: 'astralPerception' } };
+            const astralTracingViewer = { ...tracingViewer, visionMode: { id: 'astralProjection' } };
+            const perceivingTracingViewer = { ...tracingViewer, visionMode: { id: 'astralPerception' } };
             const ar = new AugmentedRealityVisionDetectionMode({ id: 'augmentedReality', label: 'AR', type: SIGHT });
             const modes = [
                 ar,
@@ -426,7 +445,11 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             ];
 
             assert.isTrue((ar as any)._canDetect(tracingViewer, deviceTarget()), 'AR shows a traced physical icon');
-            assert.isFalse((ar as any)._canDetect(astralTracingViewer, deviceTarget()), 'not to an astral viewer');
+            assert.isFalse((ar as any)._canDetect(astralTracingViewer, deviceTarget()), 'not to a projected viewer');
+            assert.isTrue(
+                (ar as any)._canDetect(perceivingTracingViewer, deviceTarget()),
+                'a perceiving viewer keeps its augmented reality',
+            );
             assert.isFalse((ar as any)._canDetect(tracingViewer, deviceTarget({ active: false })), 'nor off the plane');
             for (const mode of modes) {
                 assert.isFalse((mode as any)._canDetect(visionSource(), astralTarget), mode.id);
@@ -610,13 +633,57 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             assert.deepEqual(MatrixTraceFlow.pruneUpdate(tracer([]), []), {}, 'no traces, no update');
         });
 
-        it('dims icon outlines with distance', () => {
-            const near = AugmentedRealityFilter.forDistance(0);
-            const far = AugmentedRealityFilter.forDistance(1);
+        it('dims icon brackets with distance and garbles them with Matrix noise', () => {
+            const near = AugmentedRealityFilter.forDistance(0) as any;
+            const far = AugmentedRealityFilter.forDistance(1) as any;
             assert.strictEqual(AugmentedRealityFilter.forDistance(0.1), near, 'filters are shared');
-            assert.isBelow(far.outerStrength, near.outerStrength);
-            assert.isAbove(far.outerStrength, 0);
-            assert.isFalse(near.locatesOnly, 'an outline goes over a token the viewer sees');
+            assert.isBelow(far.uniforms.intensity, near.uniforms.intensity);
+            assert.isAbove(far.uniforms.intensity, 0);
+            assert.isFalse(near.locatesOnly, 'brackets go over a token the viewer sees');
+            assert.strictEqual(near.uniforms.silhouette, 1, 'the icon outlines its owner');
+            assert.strictEqual(near.uniforms.crosshair, 0);
+            assert.strictEqual(near.uniforms.dropout, 0, 'no noise, no dropout');
+            assert.isFalse(near.animated, 'a clean icon holds still');
+
+            const noisy = AugmentedRealityFilter.forDistance(0, noiseBucket(5)) as any;
+            assert.notStrictEqual(noisy, near, 'noise has its own filter');
+            assert.isAbove(noisy.uniforms.dropout, 0);
+            assert.isTrue(noisy.animated);
+            assert.deepEqual([0, 1, 3, 4, 6, 7, 20].map(noiseBucket), [0, 1, 1, 2, 2, 3, 3]);
+
+            const locator = AugmentedRealityFilter.located() as any;
+            assert.strictEqual(locator.uniforms.crosshair, 1, 'a traced icon shows a crosshair');
+            assert.strictEqual(locator.uniforms.silhouette, 0, 'without its owner');
+            assert.isAtLeast(locator.padding, locator.uniforms.pad, 'the brackets fit the padding');
+        });
+
+        it('stacks the icon brackets over the look of another sense', function () {
+            if (!canvas.ready) this.skip();
+
+            const effects = canvas.effects as any;
+            const originalSources = effects.visionSources;
+            const heatTarget = { ...deviceTarget(), center: { x: 0, y: 0 } };
+            heatTarget.document.actor.type = 'character';
+            heatTarget.document.actor.items = [wirelessItem('online')];
+            const viewer = {
+                actor: tracer([]),
+                document: {
+                    detectionModes: { augmentedReality: { enabled: true, range: null } },
+                    getFlag: () => undefined,
+                },
+            };
+            effects.visionSources = [{ active: true, visionMode: { id: 'basic' }, object: viewer, x: 0, y: 0 }];
+
+            try {
+                const heat = HeatSignatureFilter.forSignature('warm');
+                const overlays = SenseFilterResolver.collectOverlays(heatTarget, heat, []);
+                assert.deepEqual(overlays, [AugmentedRealityFilter.forDistance(0)], 'brackets go on top of the heat');
+
+                const locator = AugmentedRealityFilter.located();
+                assert.isEmpty(SenseFilterResolver.collectOverlays(heatTarget, locator, []), 'a locator stands alone');
+            } finally {
+                effects.visionSources = originalSources;
+            }
         });
     });
 };

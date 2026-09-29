@@ -1,12 +1,16 @@
-import { isAstralVisionSource, isOpticallyPresent } from '../physicalVision/physicalDetectionMode';
+import { isAstralProjectionSource, isOpticallyPresent } from '../physicalVision/physicalDetectionMode';
 
+/**
+ * Whether lights that grant vision must not reveal the target: it isn't there to physical eyes, or every viewer is
+ * a projected form without physical senses. A perceiving body still sees by light.
+ */
 export const shouldSuppressPhysicalLightVision = (
     target: object | null | undefined,
     visionSources: Iterable<foundry.canvas.sources.PointVisionSource>,
 ) => {
     if (target instanceof foundry.canvas.placeables.Token && !isOpticallyPresent(target)) return true;
     const activeSources = Array.from(visionSources).filter(source => source.active);
-    return activeSources.length > 0 && activeSources.every(source => isAstralVisionSource(source));
+    return activeSources.length > 0 && activeSources.every(source => isAstralProjectionSource(source));
 };
 
 export class AstralAwareCanvasVisibility extends foundry.canvas.groups.CanvasVisibility {

@@ -247,7 +247,7 @@ export class AstralProjectionFlow {
 
         return {
             ...bodySource,
-            ...AstralPerceptionFlow.astralVision(body, bodySource),
+            ...AstralPerceptionFlow.astralProjectionVision(body, bodySource),
             _id: formId,
             name: game.i18n.format('SR5.Vision.AstralFormName', { name: body.name }),
             alpha: ASTRAL_FORM_ALPHA,

@@ -1,5 +1,12 @@
 import AstralPerceptionDetectionMode from './astralPerception/astralPerceptionDetectionMode';
-import { AstralBackgroundVisionShader } from './astralPerception/astralShaders';
+import {
+    AstralBackgroundVisionShader,
+    AstralPerceptionBackgroundVisionShader,
+} from './astralPerception/astralShaders';
+import {
+    ASTRAL_PERCEPTION_VISION_MODE,
+    ASTRAL_PROJECTION_VISION_MODE,
+} from './astralPerception/astralVisionModes';
 import ThermographicVisionDetectionMode from './thermographicVision/thermographicDetectionMode';
 import LowlightVisionDetectionMode from './lowlightVision/lowlightDetectionMode';
 import AugmentedRealityVisionDetectionMode from './augmentedReality/arDetectionMode';
@@ -57,11 +64,29 @@ export default class VisionConfigurator {
             type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
         });
 
-        // SR5#312 the astral plane is always lit by the glow of life, so no scene lighting or darkness applies.
+        // SR5#312 a perceiving body sees the astral plane overlaid on the physical world, which keeps its light
+        // and colors, faded under the glow of life. Auras are drawn over the tokens, see SenseFilterResolver.
         const { LIGHTING_VISIBILITY } = foundry.canvas.perception.VisionMode;
         CONFIG.Canvas.visionModes.astralPerception = new foundry.canvas.perception.VisionMode({
-            id: 'astralPerception',
+            id: ASTRAL_PERCEPTION_VISION_MODE,
             label: 'SR5.Vision.AstralPerception',
+            canvas: {
+                shader: foundry.canvas.rendering.shaders.ColorAdjustmentsSamplerShader,
+                uniforms: { contrast: -0.05, saturation: -0.65, exposure: -0.15 },
+            },
+            vision: {
+                // The fade marks perceiving in any light, instead of growing with the darkness level.
+                darkness: { adaptive: false },
+                defaults: { attenuation: 0, contrast: -0.05, saturation: -0.65, brightness: 0 },
+                background: { shader: AstralPerceptionBackgroundVisionShader },
+            },
+        }, { animated: true });
+
+        // SR5#312-313 a projected form sees only the astral plane, always lit by the glow of life, so no scene
+        // lighting or darkness applies.
+        CONFIG.Canvas.visionModes.astralProjection = new foundry.canvas.perception.VisionMode({
+            id: ASTRAL_PROJECTION_VISION_MODE,
+            label: 'SR5.Vision.AstralProjection',
             canvas: {
                 shader: foundry.canvas.rendering.shaders.ColorAdjustmentsSamplerShader,
                 uniforms: { contrast: -0.15, saturation: -0.9, exposure: -0.45 },

@@ -16,6 +16,11 @@ import ThermographicVisionDetectionMode from '@/module/vision/thermographicVisio
 import AstralPerceptionDetectionMode from '@/module/vision/astralPerception/astralPerceptionDetectionMode';
 import { ActorRollDataFlow } from '@/module/actor/flows/ActorRollDataFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
+import { PerceptionFlow } from '@/module/vision/PerceptionFlow';
+import {
+    ASTRAL_PERCEPTION_VISION_MODE,
+    ASTRAL_PROJECTION_VISION_MODE,
+} from '@/module/vision/astralPerception/astralVisionModes';
 
 const waitFor = async (predicate: () => boolean, timeout = 1500) => {
     const started = Date.now();
@@ -179,8 +184,16 @@ export const shadowrunVisionProjection = (context: QuenchBatchContext) => {
             assert.strictEqual(form.elevation, body.elevation, 'the form starts at the body elevation');
             assert.isFalse(body.sight.enabled, 'the body stops contributing vision');
             assert.isTrue(form.sight.enabled);
-            assert.strictEqual(form.sight.visionMode, 'astralPerception');
+            assert.strictEqual(form.sight.visionMode, ASTRAL_PROJECTION_VISION_MODE, 'the form sees only the astral plane');
             assert.isTrue(form.detectionModes.astralPerception.enabled);
+            assert.isFalse(form.detectionModes.basicSight.enabled, 'without physical sight');
+
+            // Forms projected while perception and projection shared a vision mode pick up the projection one.
+            if (PerceptionFlow.isRefreshEnabled(form)) {
+                form.updateSource({ sight: { visionMode: ASTRAL_PERCEPTION_VISION_MODE } });
+                PerceptionFlow.refreshTokenSource(form);
+                assert.strictEqual(form.sight.visionMode, ASTRAL_PROJECTION_VISION_MODE);
+            }
             assert.isFalse(hasPhysicalPresence({ document: form } as any));
             const astralDetection = new AstralPerceptionDetectionMode({
                 id: 'astralPerception',
@@ -188,7 +201,7 @@ export const shadowrunVisionProjection = (context: QuenchBatchContext) => {
                 type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
             });
             assert.isTrue(
-                (astralDetection as any)._canDetect({ visionMode: { id: 'astralPerception' } }, { document: form }),
+                (astralDetection as any)._canDetect({ visionMode: { id: ASTRAL_PERCEPTION_VISION_MODE } }, { document: form }),
             );
             assert.deepEqual(AstralProjectionFlow.getMovementRates(form), {
                 walk: ASTRAL_WALK_METERS,

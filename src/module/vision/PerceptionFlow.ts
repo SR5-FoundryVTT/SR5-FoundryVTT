@@ -6,6 +6,7 @@ import { PerceptionResolver } from './PerceptionResolver';
 import { ULTRASOUND_RANGE_METERS } from './ultrasoundVision/ultrasoundDetectionMode';
 import { AUGMENTED_REALITY_RANGE_METERS } from './augmentedReality/arDetectionMode';
 import { isAstralForm } from './astralProjection/AstralProjectionState';
+import { ASTRAL_PROJECTION_VISION_MODE } from './astralPerception/astralVisionModes';
 
 type RefreshDocument = SR5Actor | SR5Item | ActiveEffect | TokenDocument;
 
@@ -84,6 +85,16 @@ export class PerceptionFlow {
         return next;
     }
 
+    /** A perceiving token keeps its physical senses and adds astral perception to them (SR5#312). */
+    static reconcilePerceivingDetectionModes(
+        detectionModes: Record<string, { enabled: boolean; range: number | null }>,
+        range: number,
+    ) {
+        const next = foundry.utils.deepClone(detectionModes);
+        next.astralPerception = { enabled: true, range };
+        return next;
+    }
+
     static detectionModeUpdate(
         current: Record<string, { enabled: boolean; range: number | null }>,
         next: Record<string, { enabled: boolean; range: number | null }>,
@@ -113,16 +124,36 @@ export class PerceptionFlow {
         if (!this.isRefreshEnabled(token) || !token.actor) return false;
         const source = token.toObject();
         const range = this.senseRange(token);
-        const astralActive = !!token.getFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision) || isAstralForm(token);
-        const detectionModes = astralActive
-            ? this.reconcileAstralDetectionModes(source.detectionModes, range)
-            : this.reconcileDetectionModes(
+        const changes: Record<string, unknown> = {};
+        let detectionModes: Record<string, { enabled: boolean; range: number | null }>;
+        if (isAstralForm(token)) {
+            detectionModes = this.reconcileAstralDetectionModes(source.detectionModes, range);
+            // Forms projected before perception and projection had their own vision modes still perceive.
+            if (source.sight.visionMode !== ASTRAL_PROJECTION_VISION_MODE) {
+                changes.sight = { visionMode: ASTRAL_PROJECTION_VISION_MODE };
+            }
+        } else {
+            detectionModes = this.reconcileDetectionModes(
                 source.detectionModes,
                 PerceptionResolver.resolve(token.actor),
                 range,
                 token.parent?.grid.units,
             );
+            const previous = token.getFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision) as
+                { sight?: { range?: number | null } } | undefined;
+            if (previous) {
+                detectionModes = this.reconcilePerceivingDetectionModes(detectionModes, range);
+                // Bodies that started perceiving while perception still replaced physical sight get it back.
+                if (detectionModes.basicSight?.enabled === false) delete detectionModes.basicSight;
+                // Their sight also took the astral sense range, which would let them see in the dark.
+                const physicalRange = previous.sight?.range ?? 0;
+                if ((source.sight.range ?? 0) >= SENSE_RANGE && physicalRange < SENSE_RANGE) {
+                    changes.sight = { range: physicalRange };
+                }
+            }
+        }
         token.updateSource({
+            ...changes,
             detectionModes: this.detectionModeUpdate(source.detectionModes, detectionModes) as any,
         });
         if (token.parent !== canvas.scene) return false;

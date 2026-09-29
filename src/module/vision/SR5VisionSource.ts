@@ -1,23 +1,25 @@
-import { ASTRAL_PERCEPTION_VISION_MODE } from './astralPerception/AstralPerceptionFlow';
+import { isAstralVisionMode } from './astralPerception/astralVisionModes';
 import { ULTRASOUND_VISION_MODE } from './ultrasoundVision/ultrasoundDetectionMode';
 
 /**
  * Vision source with the SR5 senses that don't rely on light.
  *
- * Neither astral perception nor ultrasound is blinded by darkness. Ultrasound can't penetrate materials
+ * Neither astral sight nor ultrasound is blinded by darkness. Ultrasound can't penetrate materials
  * transparent to optical sensors, like glass (SR5#446), so it collides with walls the way movement does.
  * Its radius is the token's vision range, which the GM controls.
  */
 export class SR5VisionSource extends foundry.canvas.sources.PointVisionSource {
     override get isBlinded() {
-        if (this.data.visionMode === ASTRAL_PERCEPTION_VISION_MODE) return false;
+        if (isAstralVisionMode(this.data.visionMode)) return false;
         if (this.data.visionMode === ULTRASOUND_VISION_MODE) return false;
         return super.isBlinded;
     }
 
-    /** The drifting glow of astral perception holds still in photosensitive mode. */
+    /** The drifting glow of astral sight and the sonar pings of ultrasound hold still in photosensitive mode. */
     override get isAnimated() {
-        if (this.data.visionMode === ASTRAL_PERCEPTION_VISION_MODE && canvas.photosensitiveMode) return false;
+        const { visionMode } = this.data;
+        const animatedBySR5 = isAstralVisionMode(visionMode) || visionMode === ULTRASOUND_VISION_MODE;
+        if (canvas.photosensitiveMode && animatedBySR5) return false;
         return super.isAnimated;
     }
 

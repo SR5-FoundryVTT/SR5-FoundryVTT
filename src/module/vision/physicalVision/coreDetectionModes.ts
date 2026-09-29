@@ -1,6 +1,6 @@
 import {
     hasPhysicalPresence,
-    isAstralVisionSource,
+    isAstralProjectionSource,
     isOpticallyPresent,
 } from '@/module/vision/physicalVision/physicalDetectionMode';
 
@@ -18,23 +18,23 @@ type AllArgs = Parameters<foundry.canvas.perception.DetectionModeAll['_canDetect
  */
 export class PhysicalInvisibilityDetectionMode extends DetectionModeInvisibility {
     override _canDetect(...args: InvisibilityArgs) {
-        return !isAstralVisionSource(args[0]) && isOpticallyPresent(args[1]) && super._canDetect(...args);
+        return !isAstralProjectionSource(args[0]) && isOpticallyPresent(args[1]) && super._canDetect(...args);
     }
 }
 
 /** Foundry's tremorsense, which needs a body touching the ground: astral and manifesting beings have none. */
 export class PhysicalTremorDetectionMode extends DetectionModeTremor {
     override _canDetect(...args: TremorArgs) {
-        return !isAstralVisionSource(args[0]) && hasPhysicalPresence(args[1]) && super._canDetect(...args);
+        return !isAstralProjectionSource(args[0]) && hasPhysicalPresence(args[1]) && super._canDetect(...args);
     }
 }
 
 /**
  * Foundry's see and sense all, limited to what exists on the physical plane. Astral beings are only perceived
- * astrally, and an astral viewer keeps its aura rendering instead of this mode's outline.
+ * astrally, and a projected viewer keeps its aura rendering instead of this mode's outline.
  */
 export class PhysicalAllDetectionMode extends DetectionModeAll {
     override _canDetect(...args: AllArgs) {
-        return !isAstralVisionSource(args[0]) && isOpticallyPresent(args[1]) && super._canDetect(...args);
+        return !isAstralProjectionSource(args[0]) && isOpticallyPresent(args[1]) && super._canDetect(...args);
     }
 }
