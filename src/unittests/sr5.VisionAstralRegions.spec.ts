@@ -64,6 +64,7 @@ export const shadowrunVisionAstralRegions = (context: QuenchBatchContext) => {
         it('registers barriers and wards that block movement but not sight by default', async () => {
             assert.exists(CONFIG.RegionBehavior.dataModels[ASTRAL_BARRIER_REGION_BEHAVIOR]);
             assert.exists(CONFIG.RegionBehavior.dataModels[ASTRAL_WARD_REGION_BEHAVIOR]);
+            assert.includeMembers(RegionBehavior.TYPES, [ASTRAL_BARRIER_REGION_BEHAVIOR, ASTRAL_WARD_REGION_BEHAVIOR]);
 
             const scene = await createScene();
             for (const type of [ASTRAL_BARRIER_REGION_BEHAVIOR, ASTRAL_WARD_REGION_BEHAVIOR] as const) {

@@ -458,6 +458,14 @@ ___________________
         CONFIG.RegionBehavior.dataModels[ASTRAL_BARRIER_REGION_BEHAVIOR] = AstralBarrierRegionBehavior;
         CONFIG.RegionBehavior.dataModels[ASTRAL_WARD_REGION_BEHAVIOR] = AstralWardRegionBehavior;
         CONFIG.RegionBehavior.dataModels[ENVIRONMENT_REGION_BEHAVIOR] = EnvironmentalRegionBehavior;
+        // Keep document validation in sync when Foundry serves an older package model.
+        const regionTypes = [ASTRAL_BARRIER_REGION_BEHAVIOR, ASTRAL_WARD_REGION_BEHAVIOR, ENVIRONMENT_REGION_BEHAVIOR];
+        const regionModel = game.model.RegionBehavior as Record<string, object>;
+        const documentTypes = game.documentTypes.RegionBehavior as string[];
+        for (const type of regionTypes) {
+            regionModel[type] ??= {};
+            if (!documentTypes.includes(type)) documentTypes.push(type);
+        }
         CONFIG.RegionBehavior.typeIcons[ASTRAL_BARRIER_REGION_BEHAVIOR] = 'fa-solid fa-shield-halved';
         CONFIG.RegionBehavior.typeIcons[ASTRAL_WARD_REGION_BEHAVIOR] = 'fa-solid fa-shield';
         CONFIG.RegionBehavior.typeIcons[ENVIRONMENT_REGION_BEHAVIOR] = 'fa-solid fa-cloud-sun';
@@ -580,6 +588,11 @@ ___________________
     }
 
     static async ready() {
+        for (const scene of game.scenes) {
+            for (const region of scene.regions) {
+                if (region.behaviors.invalidDocumentIds.size) region.behaviors.initialize();
+            }
+        }
         await IconAssign.refreshIconFiles();
 
         if (game.user?.isGM) {

@@ -72,6 +72,7 @@ export const shadowrunVisionEnvironmentalRegions = (context: QuenchBatchContext)
     describe('Environmental Regions', () => {
         it('registers one behavior with safe defaults and constrained fields', async () => {
             assert.exists(CONFIG.RegionBehavior.dataModels[ENVIRONMENT_REGION_BEHAVIOR]);
+            assert.include(RegionBehavior.TYPES, ENVIRONMENT_REGION_BEHAVIOR);
 
             const scene = await createScene();
             const { region, behavior } = await createRegion(scene);
@@ -196,6 +197,19 @@ export const shadowrunVisionEnvironmentalRegions = (context: QuenchBatchContext)
             const worse = actor.getSituationModifiers(token);
             assert.strictEqual(worse.getTotalFor('environmental', { reapply: true }), -6);
             assert.deepInclude(worse.environmental.applied.active, { light: -6, glare: 0 }, 'a worse selection stays');
+        });
+
+        it('uses the later Region when light and glare have equal severity', async () => {
+            const scene = await createScene();
+            const actor = await factory.createActor({ type: 'character', system: {} });
+            const token = await createToken(scene, actor.id, 100, 100);
+            await createRegion(scene, environment({ lightGlare: 'light-moderate' }));
+            await createRegion(scene, environment({ lightGlare: 'glare-moderate' }));
+
+            assert.deepInclude(EnvironmentalRegionFlow.ratingsAtToken(token).physical, { light: 0, glare: -3 });
+            const modifiers = actor.getSituationModifiers(token);
+            assert.strictEqual(modifiers.getTotalFor('environmental', { reapply: true }), -3);
+            assert.deepInclude(modifiers.environmental.applied.active, { light: 0, glare: -3 });
         });
 
         it('uses the exact source token and does not persist ratings to a linked actor', async () => {
