@@ -13,7 +13,13 @@ import { SR5VisionSource } from '@/module/vision/SR5VisionSource';
 import { ULTRASOUND_COLOR } from '@/module/vision/ultrasoundVision/ultrasoundShaders';
 import { SenseFilterResolver } from '@/module/vision/SenseFilterResolver';
 import { AstralAuraFilter } from '@/module/vision/astralPerception/astralAuraFilter';
-import { HEAT_GLOWS, HeatSignatureFilter } from '@/module/vision/thermographicVision/heatSignatureFilter';
+import {
+    ACCESSIBLE_HEAT_GLOWS,
+    AccessibleHeatSignatureFilter,
+    HEAT_GLOWS,
+    type HeatSignature,
+    HeatSignatureFilter,
+} from '@/module/vision/thermographicVision/heatSignatureFilter';
 import AugmentedRealityVisionDetectionMode, {
     AUGMENTED_REALITY_RANGE_METERS,
 } from '@/module/vision/augmentedReality/arDetectionMode';
@@ -367,24 +373,25 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
                 label: 'Thermographic',
                 type: SIGHT,
             });
-            const expectedColors = Object.fromEntries(
-                Object.entries(HEAT_GLOWS).map(([signature, glow]) => [signature, glow.color]),
-            );
             const marker = ThermographicVisionDetectionMode.getDetectionFilter();
+            const signatures: HeatSignature[] = ['cold', 'warm', 'hot'];
 
-            const filters: Record<string, any> = {};
-            for (const [signature, color] of Object.entries(expectedColors)) {
+            for (const signature of signatures) {
                 const heatTarget = target(true, false, signature);
                 assert.isTrue((mode as any)._canDetect(visionSource(), heatTarget));
-                const filter = SenseFilterResolver.resolve(heatTarget, marker) as any;
-                assert.instanceOf(filter, foundry.canvas.rendering.filters.GlowOverlayFilter);
-                assert.strictEqual(filter, HeatSignatureFilter.forTarget(heatTarget), `${signature} filter is shared`);
-                assert.deepEqual(Array.from(filter.uniforms.glowColor), color, signature);
-                assert.isAtLeast(filter.padding, filter.uniforms.distance, `${signature} halo fits its padding`);
-                filters[signature] = filter;
+                const filter = SenseFilterResolver.resolve(heatTarget, marker);
+                assert.instanceOf(filter, HeatSignatureFilter);
+                assert.strictEqual(filter, HeatSignatureFilter.forSignature(signature), `${signature} filter is shared`);
             }
-            const { cold, warm, hot } = filters;
 
+            const [cold, warm, hot] = signatures.map(signature => HeatSignatureFilter.forSignature(signature, false)) as any[];
+            for (const [index, signature] of signatures.entries()) {
+                const filter = [cold, warm, hot][index];
+                assert.notInstanceOf(filter, AccessibleHeatSignatureFilter, signature);
+                assert.deepEqual(Array.from(filter.uniforms.glowColor), HEAT_GLOWS[signature].color, signature);
+                assert.isTrue(filter.uniforms.knockout, `${signature} hides the art`);
+                assert.isAtLeast(filter.padding, filter.uniforms.distance, `${signature} halo fits its padding`);
+            }
             assert.isBelow(cold.uniforms.distance, warm.uniforms.distance, 'warm halo is wider than cold');
             assert.isBelow(warm.uniforms.distance, hot.uniforms.distance, 'hot halo is wider than warm');
             assert.isBelow(cold.outerStrength, warm.outerStrength, 'warm glows brighter than cold');
@@ -394,7 +401,24 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             assert.isTrue(warm.animated && hot.animated, 'warm and hot glows pulse');
             assert.isBelow(hot.pulse.period, warm.pulse.period, 'hot pulses faster than warm');
 
-            // Readable without color: more isotherms and a brighter color the hotter the signature.
+            assert.isFalse((mode as any)._canDetect(visionSource(), target(true, false, 'none')));
+            assert.isNull(HeatSignatureFilter.forTarget(target(true, false, 'none')));
+        });
+
+        it('reads thermographic signatures without color in photosensitive mode', () => {
+            const signatures: HeatSignature[] = ['cold', 'warm', 'hot'];
+            const [cold, warm, hot] = signatures.map(signature => HeatSignatureFilter.forSignature(signature, true)) as any[];
+
+            for (const [index, signature] of signatures.entries()) {
+                const filter = [cold, warm, hot][index];
+                assert.instanceOf(filter, AccessibleHeatSignatureFilter, signature);
+                assert.notStrictEqual(filter, HeatSignatureFilter.forSignature(signature, false), `${signature} has its own filter`);
+                assert.deepEqual(Array.from(filter.uniforms.glowColor), ACCESSIBLE_HEAT_GLOWS[signature].color, signature);
+                assert.isFalse(filter.animated, `${signature} is steady`);
+                assert.isAtLeast(filter.padding, filter.uniforms.distance, `${signature} halo fits its padding`);
+            }
+
+            // More isotherms and a brighter color the hotter the signature.
             assert.deepEqual([cold, warm, hot].map(filter => filter.uniforms.bands), [1, 2, 3]);
             const luminance = (filter: any) => {
                 const [r, g, b] = filter.uniforms.glowColor;
@@ -402,9 +426,6 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             };
             assert.isBelow(luminance(cold), luminance(warm), 'warm is brighter than cold');
             assert.isBelow(luminance(warm), luminance(hot), 'hot is brighter than warm');
-
-            assert.isFalse((mode as any)._canDetect(visionSource(), target(true, false, 'none')));
-            assert.isNull(HeatSignatureFilter.forTarget(target(true, false, 'none')));
         });
 
         it('uses a pulsing gray wave outline for ultrasound targets', () => {

@@ -5,63 +5,66 @@ import { getPhysicalTargetActor } from '@/module/vision/physicalVision/physicalD
 export type HeatSignature = Exclude<ThermographicSignature, 'none'>;
 
 interface HeatGlow {
-    /**
-     * Heat color. The palette gets brighter as it gets hotter, so the signatures read in any color vision and in
-     * greyscale.
-     */
     color: [number, number, number, number];
     /** Halo width in pixels. */
     distance: number;
     innerStrength: number;
     outerStrength: number;
-    /** Isotherm lines around the silhouette, counting up with the heat so they don't rely on color. */
-    bands: 1 | 2 | 3;
     pulse: GlowPulse | null;
 }
 
-/** Hotter signatures glow wider, brighter and with more isotherms; a cold one is a dim, steady rim. */
+interface AccessibleHeatGlow extends Omit<HeatGlow, 'pulse'> {
+    /** Isotherm lines around the silhouette, counting up with the heat so they don't rely on color. */
+    bands: 1 | 2 | 3;
+}
+
+/** Hotter signatures glow wider, brighter and faster; a cold one only shows a thin, steady rim. */
 export const HEAT_GLOWS: Readonly<Record<HeatSignature, HeatGlow>> = {
-    cold: { color: [0.3, 0.45, 0.95, 1.0], distance: 8, innerStrength: 1, outerStrength: 1.5, bands: 1, pulse: null },
+    cold: { color: [0.25, 0.5, 1.0, 1.0], distance: 6, innerStrength: 2, outerStrength: 2, pulse: null },
     warm: {
-        color: [1.0, 0.55, 0.15, 1.0],
-        distance: 12,
-        innerStrength: 1.5,
-        outerStrength: 2.5,
-        bands: 2,
-        pulse: { min: 0.9, max: 1.2, period: 4000 },
+        color: [1.0, 0.55, 0.0, 1.0],
+        distance: 10,
+        innerStrength: 3,
+        outerStrength: 3.5,
+        pulse: { min: 0.9, max: 1.4, period: 4000 },
     },
     hot: {
-        color: [1.0, 0.95, 0.65, 1.0],
-        distance: 16,
-        innerStrength: 2,
-        outerStrength: 4,
-        bands: 3,
-        pulse: { min: 0.85, max: 1.3, period: 2500 },
+        color: [1.0, 0.1, 0.0, 1.0],
+        distance: 15,
+        innerStrength: 4,
+        outerStrength: 6,
+        pulse: { min: 0.8, max: 1.6, period: 2500 },
     },
 };
 
 /**
- * How thermographic vision shows a heat source: its silhouette filled with heat, hottest at the core, inside a
- * faint halo crossed by isotherm lines. It replaces the sprite, since thermographic vision sees heat, not the
- * picture.
+ * The heat glows of photosensitive mode, where nothing pulses. The palette gets brighter as it gets hotter and the
+ * isotherms count up, so the signatures read in any color vision and in greyscale.
+ */
+export const ACCESSIBLE_HEAT_GLOWS: Readonly<Record<HeatSignature, AccessibleHeatGlow>> = {
+    cold: { color: [0.3, 0.45, 0.95, 1.0], distance: 8, innerStrength: 2, outerStrength: 1.5, bands: 1 },
+    warm: { color: [1.0, 0.55, 0.15, 1.0], distance: 12, innerStrength: 3, outerStrength: 2.5, bands: 2 },
+    hot: { color: [1.0, 0.95, 0.65, 1.0], distance: 16, innerStrength: 4, outerStrength: 4, bands: 3 },
+};
+
+/**
+ * Foundry's glow outline, with a halo and pulse that follow the target's thermographic signature. The art is knocked
+ * out, since thermographic vision sees heat, not the picture.
+ *
+ * In photosensitive mode, Foundry's accessibility option, the signature shows as an AccessibleHeatSignatureFilter.
  */
 export class HeatSignatureFilter extends PulsingGlowOverlayFilter {
-    private static readonly cache = new Map<HeatSignature, HeatSignatureFilter>();
-
-    static override get defaultUniforms() {
-        return {
-            ...super.defaultUniforms,
-            knockout: false,
-            bands: 1,
-        };
-    }
+    private static readonly cache = new Map<string, HeatSignatureFilter>();
 
     /** The shared filter of a signature. */
-    static forSignature(signature: HeatSignature) {
-        let filter = this.cache.get(signature);
+    static forSignature(signature: HeatSignature, accessible = !!canvas.photosensitiveMode) {
+        const key = `${signature}:${accessible}`;
+        let filter = HeatSignatureFilter.cache.get(key);
         if (!filter) {
-            filter = this.createForSignature(signature);
-            this.cache.set(signature, filter);
+            filter = accessible
+                ? AccessibleHeatSignatureFilter.createForSignature(signature)
+                : HeatSignatureFilter.createForSignature(signature);
+            HeatSignatureFilter.cache.set(key, filter);
         }
         return filter;
     }
@@ -73,19 +76,47 @@ export class HeatSignatureFilter extends PulsingGlowOverlayFilter {
         return this.forSignature(signature);
     }
 
-    private static createForSignature(signature: HeatSignature) {
-        const { color, distance, innerStrength, outerStrength, bands, pulse } = HEAT_GLOWS[signature];
+    /** A new filter of a signature; forSignature shares them. */
+    static createForSignature(signature: HeatSignature): HeatSignatureFilter {
+        const { color, distance, innerStrength, outerStrength, pulse } = HEAT_GLOWS[signature];
         const filter = this.create({
             glowColor: color,
             distance,
             quality: this.qualityForPerformance(),
-            bands,
         }) as HeatSignatureFilter;
         filter.fitPadding(distance);
         filter.innerStrength = innerStrength;
         filter.outerStrength = outerStrength;
         filter.pulse = pulse;
         filter.animated = !!pulse;
+        return filter;
+    }
+}
+
+/**
+ * The heat look of photosensitive mode: a heat rim along the inside of the silhouette, in a faint halo crossed by
+ * one to three isotherm lines. It doesn't pulse.
+ */
+export class AccessibleHeatSignatureFilter extends HeatSignatureFilter {
+    static override get defaultUniforms() {
+        return {
+            ...super.defaultUniforms,
+            bands: 1,
+        };
+    }
+
+    static override createForSignature(signature: HeatSignature) {
+        const { color, distance, innerStrength, outerStrength, bands } = ACCESSIBLE_HEAT_GLOWS[signature];
+        const filter = this.create({
+            glowColor: color,
+            distance,
+            quality: this.qualityForPerformance(),
+            bands,
+        }) as AccessibleHeatSignatureFilter;
+        filter.fitPadding(distance);
+        filter.innerStrength = innerStrength;
+        filter.outerStrength = outerStrength;
+        filter.animated = false;
         return filter;
     }
 
@@ -112,12 +143,10 @@ export class HeatSignatureFilter extends PulsingGlowOverlayFilter {
       float dist = glow.y;
       vec4 tex = texture2D(uSampler, vTextureCoord);
 
-      // The body: dim at the edges, the heat color at the core.
-      float core = smoothstep(0.45, 1.0, coverage);
-      float fill = tex.a * clamp(0.35 + core * innerStrength * 0.5, 0.0, 1.0);
-      vec3 body = glowColor.rgb * mix(0.35, 1.0, core);
+      // Inside: a heat rim along the edge that fades inward, like Foundry's inner glow. The art is not drawn.
+      float rim = min(1.0, (1.0 - coverage) * innerStrength * smoothstep(0.6, 1.0, tex.a));
 
-      // A faint halo, crossed by one isotherm line per step of heat, 4 pixels apart.
+      // Outside: a faint halo, crossed by one isotherm line per step of heat, 4 pixels apart.
       float outside = 1.0 - smoothstep(0.35, 1.0, tex.a);
       float falloff = 1.0 - clamp((dist - 1.0) / DIST, 0.0, 1.0);
       float halo = falloff * clamp(outerStrength * 0.25, 0.0, 1.0) * 0.45;
@@ -125,9 +154,9 @@ export class HeatSignatureFilter extends PulsingGlowOverlayFilter {
                   + step(1.5, bands) * lineAt(dist, 7.0, 0.6)
                   + step(2.5, bands) * lineAt(dist, 11.0, 0.6);
       float lineAlpha = clamp(lines, 0.0, 1.0) * mix(0.6, 1.0, falloff);
-      float haloAlpha = min(1.0 - fill, clamp(max(halo, lineAlpha) * outside, 0.0, 1.0));
+      float glowAlpha = clamp(max(halo, lineAlpha) * outside + rim, 0.0, 1.0);
 
-      gl_FragColor = (vec4(body * fill, fill) + vec4(glowColor.rgb * haloAlpha, haloAlpha)) * alpha;
+      gl_FragColor = vec4(glowColor.rgb * glowAlpha, glowAlpha) * alpha;
     }`;
     }
 }
