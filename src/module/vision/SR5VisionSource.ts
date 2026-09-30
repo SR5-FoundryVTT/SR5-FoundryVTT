@@ -1,6 +1,10 @@
 import { isAstralVisionMode } from './astralPerception/astralVisionModes';
 import { ULTRASOUND_VISION_MODE } from './ultrasoundVision/ultrasoundDetectionMode';
 
+/** Whether a vision mode senses without light: astral sight or ultrasound. */
+export const isNonOpticalVisionMode = (mode: string | null | undefined) =>
+    isAstralVisionMode(mode) || mode === ULTRASOUND_VISION_MODE;
+
 /**
  * Vision source with the SR5 senses that don't rely on light.
  *
@@ -10,16 +14,13 @@ import { ULTRASOUND_VISION_MODE } from './ultrasoundVision/ultrasoundDetectionMo
  */
 export class SR5VisionSource extends foundry.canvas.sources.PointVisionSource {
     override get isBlinded() {
-        if (isAstralVisionMode(this.data.visionMode)) return false;
-        if (this.data.visionMode === ULTRASOUND_VISION_MODE) return false;
+        if (isNonOpticalVisionMode(this.data.visionMode)) return false;
         return super.isBlinded;
     }
 
     /** The drifting glow of astral sight and the sonar pings of ultrasound hold still in photosensitive mode. */
     override get isAnimated() {
-        const { visionMode } = this.data;
-        const animatedBySR5 = isAstralVisionMode(visionMode) || visionMode === ULTRASOUND_VISION_MODE;
-        if (canvas.photosensitiveMode && animatedBySR5) return false;
+        if (canvas.photosensitiveMode && isNonOpticalVisionMode(this.data.visionMode)) return false;
         return super.isAnimated;
     }
 

@@ -61,6 +61,14 @@ export const ACCESSIBLE_HEAT_GLOWS: Readonly<Record<HeatSignature, AccessibleHea
     hot: { color: [1.0, 0.95, 0.65, 1.0], distance: 16, innerStrength: 4, outerStrength: 4, bands: 3 },
 };
 
+type HeatTarget = Parameters<typeof getPhysicalTargetActor>[0];
+
+/** The target's heat signature, or null for a target that gives off none. */
+export const getHeatSignature = (target: HeatTarget): HeatSignature | null => {
+    const signature = getPhysicalTargetActor(target)?.system.visibilityChecks.targets.physical.thermographic;
+    return signature && signature !== 'none' ? signature : null;
+};
+
 /**
  * A heat glow in the manner of Foundry's glow outline, with a halo and pulse that follow the target's thermographic
  * signature. Warm and hot bodies give off heat haze that rises above them. The art is knocked out, since
@@ -94,27 +102,24 @@ export class HeatSignatureFilter extends PulsingGlowOverlayFilter {
     }
 
     /** The filter of the target's signature, or null for a target without one. */
-    static forTarget(target: Parameters<typeof getPhysicalTargetActor>[0]) {
-        const signature = getPhysicalTargetActor(target)?.system.visibilityChecks.targets.physical.thermographic;
-        if (!signature || signature === 'none') return null;
-        return this.forSignature(signature);
+    static forTarget(target: HeatTarget) {
+        const signature = getHeatSignature(target);
+        return signature ? this.forSignature(signature) : null;
     }
 
     /** A new filter of a signature; forSignature shares them. */
     static createForSignature(signature: HeatSignature): HeatSignatureFilter {
-        const { color, distance, innerStrength, outerStrength, pulse, vapor } = HEAT_GLOWS[signature];
+        const glow = HEAT_GLOWS[signature];
+        const { vapor } = glow;
         const filter = this.create({
-            glowColor: color,
-            distance,
+            glowColor: glow.color,
+            distance: glow.distance,
             quality: this.qualityForPerformance(),
             vaporHeight: vapor?.height ?? 0,
             vaporSpeed: vapor?.speed ?? 0,
         }) as HeatSignatureFilter;
-        filter.fitPadding(Math.max(distance, vapor?.height ?? 0));
-        filter.innerStrength = innerStrength;
-        filter.outerStrength = outerStrength;
-        filter.pulse = pulse;
-        filter.animated = !!pulse || !!vapor;
+        filter.configureGlow(glow, Math.max(glow.distance, vapor?.height ?? 0));
+        filter.animated ||= !!vapor;
         return filter;
     }
 
@@ -127,48 +132,16 @@ export class HeatSignatureFilter extends PulsingGlowOverlayFilter {
 
     static override _createFragmentShader(quality: number, distance: number) {
         return `
-    precision ${PIXI.Program.defaultFragmentPrecision} float;
-    varying vec2 vTextureCoord;
-
-    uniform sampler2D uSampler;
-    uniform float innerStrength;
-    uniform float outerStrength;
-    uniform float alpha;
-    uniform vec4 glowColor;
-    uniform vec4 inputSize;
-    uniform vec4 inputClamp;
+    ${this.GLOW_HEADER}
     uniform float vaporTime;
     uniform float vaporHeight;
     uniform float vaporSpeed;
 
     ${this.CONSTANTS}
     ${this.glowSample(quality, distance)}
-
-    // Value noise with an arithmetic hash; sin based hashes break down on some GPUs.
-    float hash(vec2 p) {
-      vec3 p3 = fract(vec3(p.xyx) * 0.1031);
-      p3 += dot(p3, p3.yzx + 33.33);
-      return fract((p3.x + p3.y) * p3.z);
-    }
-
-    float noise(vec2 p) {
-      vec2 i = floor(p);
-      vec2 f = fract(p);
-      vec2 u = f * f * (3.0 - 2.0 * f);
-      return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
-                 mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
-    }
-
-    float fbm(vec2 p) {
-      float value = 0.0;
-      float amplitude = 0.5;
-      for (int i = 0; i < 3; i++) {
-        value += amplitude * noise(p);
-        p *= 2.0;
-        amplitude *= 0.5;
-      }
-      return value;
-    }
+    ${this.PRNG}
+    ${this.NOISE}
+    ${this.FBM(3, 0.5)}
 
     void main(void) {
       vec4 tex = texture2D(uSampler, vTextureCoord);
@@ -215,32 +188,19 @@ export class AccessibleHeatSignatureFilter extends HeatSignatureFilter {
     }
 
     static override createForSignature(signature: HeatSignature) {
-        const { color, distance, innerStrength, outerStrength, bands } = ACCESSIBLE_HEAT_GLOWS[signature];
+        const glow = ACCESSIBLE_HEAT_GLOWS[signature];
         const filter = this.create({
-            glowColor: color,
-            distance,
+            glowColor: glow.color,
+            distance: glow.distance,
             quality: this.qualityForPerformance(),
-            bands,
+            bands: glow.bands,
         }) as AccessibleHeatSignatureFilter;
-        filter.fitPadding(distance);
-        filter.innerStrength = innerStrength;
-        filter.outerStrength = outerStrength;
-        filter.animated = false;
-        return filter;
+        return filter.configureGlow(glow);
     }
 
     static override _createFragmentShader(quality: number, distance: number) {
         return `
-    precision ${PIXI.Program.defaultFragmentPrecision} float;
-    varying vec2 vTextureCoord;
-
-    uniform sampler2D uSampler;
-    uniform float innerStrength;
-    uniform float outerStrength;
-    uniform float alpha;
-    uniform vec4 glowColor;
-    uniform vec4 inputSize;
-    uniform vec4 inputClamp;
+    ${this.GLOW_HEADER}
     uniform float bands;
 
     ${this.CONSTANTS}

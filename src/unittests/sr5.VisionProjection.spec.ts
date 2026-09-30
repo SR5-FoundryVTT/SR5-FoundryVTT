@@ -16,7 +16,6 @@ import ThermographicVisionDetectionMode from '@/module/vision/thermographicVisio
 import AstralPerceptionDetectionMode from '@/module/vision/astralPerception/astralPerceptionDetectionMode';
 import { ActorRollDataFlow } from '@/module/actor/flows/ActorRollDataFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
-import { PerceptionFlow } from '@/module/vision/PerceptionFlow';
 import {
     ASTRAL_PERCEPTION_VISION_MODE,
     ASTRAL_PROJECTION_VISION_MODE,
@@ -188,12 +187,6 @@ export const shadowrunVisionProjection = (context: QuenchBatchContext) => {
             assert.isTrue(form.detectionModes.astralPerception.enabled);
             assert.isFalse(form.detectionModes.basicSight.enabled, 'without physical sight');
 
-            // Forms projected while perception and projection shared a vision mode pick up the projection one.
-            if (PerceptionFlow.isRefreshEnabled(form)) {
-                form.updateSource({ sight: { visionMode: ASTRAL_PERCEPTION_VISION_MODE } });
-                PerceptionFlow.refreshTokenSource(form);
-                assert.strictEqual(form.sight.visionMode, ASTRAL_PROJECTION_VISION_MODE);
-            }
             assert.isFalse(hasPhysicalPresence({ document: form } as any));
             const astralDetection = new AstralPerceptionDetectionMode({
                 id: 'astralPerception',
@@ -303,7 +296,8 @@ export const shadowrunVisionProjection = (context: QuenchBatchContext) => {
             if (!form) return;
 
             await form.delete();
-            await waitFor(() => !AstralProjectionFlow.getState(body));
+            // The body's flag clears before its actor's initiative is restored.
+            await waitFor(() => !AstralProjectionFlow.getState(body) && actor.system.initiative.perception === 'meatspace');
 
             assert.isTrue(body.sight.enabled);
             assert.strictEqual(actor.system.initiative.perception, 'meatspace');

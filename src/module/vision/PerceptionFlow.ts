@@ -6,9 +6,11 @@ import { PerceptionResolver } from './PerceptionResolver';
 import { ULTRASOUND_RANGE_METERS } from './ultrasoundVision/ultrasoundDetectionMode';
 import { AUGMENTED_REALITY_RANGE_METERS } from './augmentedReality/arDetectionMode';
 import { isAstralForm } from './astralProjection/AstralProjectionState';
-import { ASTRAL_PROJECTION_VISION_MODE } from './astralPerception/astralVisionModes';
 
 type RefreshDocument = SR5Actor | SR5Item | ActiveEffect | TokenDocument;
+
+/** A token's detection modes by id. */
+export type DetectionModes = Record<string, { enabled: boolean; range: number | null }>;
 
 /** Range of senses without a rules limit, far enough to cover any scene. */
 const SENSE_RANGE = 10000;
@@ -49,7 +51,7 @@ export class PerceptionFlow {
     }
 
     static reconcileDetectionModes(
-        detectionModes: Record<string, { enabled: boolean; range: number | null }>,
+        detectionModes: DetectionModes,
         capabilities: PerceptionCapabilitiesType,
         range: number,
         sceneUnit = 'm',
@@ -74,7 +76,7 @@ export class PerceptionFlow {
     }
 
     static reconcileAstralDetectionModes(
-        detectionModes: Record<string, { enabled: boolean; range: number | null }>,
+        detectionModes: DetectionModes,
         range: number,
     ) {
         const next = foundry.utils.deepClone(detectionModes);
@@ -87,7 +89,7 @@ export class PerceptionFlow {
 
     /** A perceiving token keeps its physical senses and adds astral perception to them (SR5#312). */
     static reconcilePerceivingDetectionModes(
-        detectionModes: Record<string, { enabled: boolean; range: number | null }>,
+        detectionModes: DetectionModes,
         range: number,
     ) {
         const next = foundry.utils.deepClone(detectionModes);
@@ -96,8 +98,8 @@ export class PerceptionFlow {
     }
 
     static detectionModeUpdate(
-        current: Record<string, { enabled: boolean; range: number | null }>,
-        next: Record<string, { enabled: boolean; range: number | null }>,
+        current: DetectionModes,
+        next: DetectionModes,
     ) {
         const update = foundry.utils.deepClone(next) as Record<string, unknown>;
         for (const id of Object.keys(current)) {
@@ -124,14 +126,9 @@ export class PerceptionFlow {
         if (!this.isRefreshEnabled(token) || !token.actor) return false;
         const source = token.toObject();
         const range = this.senseRange(token);
-        const changes: Record<string, unknown> = {};
-        let detectionModes: Record<string, { enabled: boolean; range: number | null }>;
+        let detectionModes: DetectionModes;
         if (isAstralForm(token)) {
             detectionModes = this.reconcileAstralDetectionModes(source.detectionModes, range);
-            // Forms projected before perception and projection had their own vision modes still perceive.
-            if (source.sight.visionMode !== ASTRAL_PROJECTION_VISION_MODE) {
-                changes.sight = { visionMode: ASTRAL_PROJECTION_VISION_MODE };
-            }
         } else {
             detectionModes = this.reconcileDetectionModes(
                 source.detectionModes,
@@ -139,21 +136,11 @@ export class PerceptionFlow {
                 range,
                 token.parent?.grid.units,
             );
-            const previous = token.getFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision) as
-                { sight?: { range?: number | null } } | undefined;
-            if (previous) {
+            if (token.getFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision)) {
                 detectionModes = this.reconcilePerceivingDetectionModes(detectionModes, range);
-                // Bodies that started perceiving while perception still replaced physical sight get it back.
-                if (detectionModes.basicSight?.enabled === false) delete detectionModes.basicSight;
-                // Their sight also took the astral sense range, which would let them see in the dark.
-                const physicalRange = previous.sight?.range ?? 0;
-                if ((source.sight.range ?? 0) >= SENSE_RANGE && physicalRange < SENSE_RANGE) {
-                    changes.sight = { range: physicalRange };
-                }
             }
         }
         token.updateSource({
-            ...changes,
             detectionModes: this.detectionModeUpdate(source.detectionModes, detectionModes) as any,
         });
         if (token.parent !== canvas.scene) return false;

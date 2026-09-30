@@ -1,4 +1,6 @@
 import { FLAGS, SYSTEM_NAME } from './constants';
+import { ASTRAL_PERCEPTION_STATUS } from './vision/astralPerception/astralVisionModes';
+import { MANIFEST_STATUS, MATERIALIZE_STATUS } from './vision/astralProjection/ManifestationState';
 
 const DEFAULT_MOVEMENT_EXPIRY = 'firstActionPhase';
 
@@ -12,7 +14,7 @@ function getMovementExpiry() {
 
 const SRStatus = [
     {
-        id: 'sr5astralPerception',
+        id: ASTRAL_PERCEPTION_STATUS,
         name: 'SR5.StatusEffects.AstralPerception',
         img: 'icons/svg/eye.svg',
         hud: false,
@@ -51,14 +53,14 @@ const SRStatus = [
     },
     {
         // SR5#314 a manifesting astral being is seen as a ghostly image; see physicalDetectionMode.
-        id: 'sr5manifesting',
+        id: MANIFEST_STATUS,
         name: 'SR5.StatusEffects.Manifesting',
         img: 'icons/svg/aura.svg',
         hud: false,
     },
     {
         // SR5#303 a materialized spirit has a physical body and is dual-natured.
-        id: 'sr5materialized',
+        id: MATERIALIZE_STATUS,
         name: 'SR5.StatusEffects.Materialized',
         img: 'icons/svg/mystery-man.svg',
         hud: false,

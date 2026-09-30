@@ -4,12 +4,12 @@ import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { TestCreator } from '@/module/tests/TestCreator';
 import { AttributeOnlyTest } from '@/module/tests/AttributeOnlyTest';
 import { PerceptionFlow } from '@/module/vision/PerceptionFlow';
+import { AstralPerceptionFlow } from '@/module/vision/astralPerception/AstralPerceptionFlow';
 import {
     ASTRAL_PERCEPTION_STATUS,
     ASTRAL_PERCEPTION_VISION_MODE,
     ASTRAL_PROJECTION_VISION_MODE,
-    AstralPerceptionFlow,
-} from '@/module/vision/astralPerception/AstralPerceptionFlow';
+} from '@/module/vision/astralPerception/astralVisionModes';
 import AstralPerceptionDetectionMode from '@/module/vision/astralPerception/astralPerceptionDetectionMode';
 import {
     shouldSuppressPhysicalLightVision,

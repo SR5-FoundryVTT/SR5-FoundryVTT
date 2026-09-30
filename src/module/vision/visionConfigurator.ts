@@ -28,6 +28,16 @@ import {
 import { MANIFEST_STATUS, MATERIALIZE_STATUS } from './astralProjection/ManifestationState';
 import { AstralAwareCanvasVisibility } from './astralPerception/astralVisibility';
 import { SR5VisionSource } from './SR5VisionSource';
+import {
+    ASTRAL_BARRIER_REGION_BEHAVIOR,
+    ASTRAL_WARD_REGION_BEHAVIOR,
+    AstralBarrierRegionBehavior,
+    AstralWardRegionBehavior,
+} from '@/module/types/regionBehavior/AstralBoundary';
+import {
+    ENVIRONMENT_REGION_BEHAVIOR,
+    EnvironmentalRegionBehavior,
+} from '@/module/types/regionBehavior/Environmental';
 
 export default class VisionConfigurator {
     static configurePhysicalSight() {
@@ -165,5 +175,45 @@ export default class VisionConfigurator {
             walls: false,
             angle: false,
         });
+    }
+
+    /** Astral barriers and wards, and the SR5 environment, as Region behaviors. */
+    static configureRegionBehaviors() {
+        const behaviors = {
+            [ASTRAL_BARRIER_REGION_BEHAVIOR]: {
+                model: AstralBarrierRegionBehavior,
+                icon: 'fa-solid fa-shield-halved',
+                label: 'SR5.Vision.AstralRegions.Barrier.Label',
+            },
+            [ASTRAL_WARD_REGION_BEHAVIOR]: {
+                model: AstralWardRegionBehavior,
+                icon: 'fa-solid fa-shield',
+                label: 'SR5.Vision.AstralRegions.Ward.Label',
+            },
+            [ENVIRONMENT_REGION_BEHAVIOR]: {
+                model: EnvironmentalRegionBehavior,
+                icon: 'fa-solid fa-cloud-sun',
+                label: 'SR5.Vision.EnvironmentalRegions.Environment.Label',
+            },
+        };
+        const regionModel = game.model.RegionBehavior as Record<string, object>;
+        const documentTypes = game.documentTypes.RegionBehavior as string[];
+        for (const [type, { model, icon, label }] of Object.entries(behaviors)) {
+            Object.assign(CONFIG.RegionBehavior.dataModels, { [type]: model });
+            CONFIG.RegionBehavior.typeIcons[type] = icon;
+            CONFIG.RegionBehavior.typeLabels[type] = label;
+            // Keep document validation in sync when Foundry serves an older package model.
+            regionModel[type] ??= {};
+            if (!documentTypes.includes(type)) documentTypes.push(type);
+        }
+    }
+
+    /** Behaviors that failed validation before their data models were registered are read again. */
+    static revalidateRegionBehaviors() {
+        for (const scene of game.scenes) {
+            for (const region of scene.regions) {
+                if (region.behaviors.invalidDocumentIds.size) region.behaviors.initialize();
+            }
+        }
     }
 }

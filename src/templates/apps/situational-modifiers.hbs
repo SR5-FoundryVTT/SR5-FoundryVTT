@@ -40,30 +40,12 @@
         </div>
         {{/if}}
         <h2>{{localize "SR5.SituationalModifiersApplication.Category.Physical"}}</h2>
-        {{#if regionalModifiers.environmental.visibility}}
+        {{#each regionalModifiers.environmental}}
         <div class="form-group">
-            <label>{{localize "SR5.Vision.EnvironmentalRegions.Visibility.Contribution"}}</label>
-            <span>{{regionalModifiers.environmental.visibility}}</span>
+            <label>{{localize this.label}}</label>
+            <span>{{this.value}}</span>
         </div>
-        {{/if}}
-        {{#if regionalModifiers.environmental.light}}
-        <div class="form-group">
-            <label>{{localize "SR5.Vision.EnvironmentalRegions.Light.Contribution"}}</label>
-            <span>{{regionalModifiers.environmental.light}}</span>
-        </div>
-        {{/if}}
-        {{#if regionalModifiers.environmental.glare}}
-        <div class="form-group">
-            <label>{{localize "SR5.Vision.EnvironmentalRegions.Glare.Contribution"}}</label>
-            <span>{{regionalModifiers.environmental.glare}}</span>
-        </div>
-        {{/if}}
-        {{#if regionalModifiers.environmental.wind}}
-        <div class="form-group">
-            <label>{{localize "SR5.Vision.EnvironmentalRegions.Wind.Contribution"}}</label>
-            <span>{{regionalModifiers.environmental.wind}}</span>
-        </div>
-        {{/if}}
+        {{/each}}
         {{#if modifiers.documentIsActor}}
         <div class="form-group">
             <label for="modifiers-recoil-total">{{localize "SR5.ModifierTypes.Recoil"}}: {{modifiers.applied.recoil.total}}</label>

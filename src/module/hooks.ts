@@ -151,14 +151,7 @@ import { PerceptionFlow } from './vision/PerceptionFlow';
 import { VisionHUD } from './apps/VisionHUD';
 import { AstralProjectionFlow } from './vision/astralProjection/AstralProjectionFlow';
 import { AstralRegionFlow } from './vision/astralRegions/AstralRegionFlow';
-import {
-    ASTRAL_BARRIER_REGION_BEHAVIOR,
-    ASTRAL_WARD_REGION_BEHAVIOR,
-    AstralBarrierRegionBehavior,
-    AstralWardRegionBehavior,
-} from './types/regionBehavior/AstralBoundary';
 import { EnvironmentalRegionFlow } from './vision/environmentalRegions/EnvironmentalRegionFlow';
-import { ENVIRONMENT_REGION_BEHAVIOR, EnvironmentalRegionBehavior } from './types/regionBehavior/Environmental';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -455,24 +448,6 @@ ___________________
         CONFIG.Combat.dataModels["base"] = CombatDM;
         CONFIG.Combatant.dataModels["base"] = CombatantDM;
 
-        CONFIG.RegionBehavior.dataModels[ASTRAL_BARRIER_REGION_BEHAVIOR] = AstralBarrierRegionBehavior;
-        CONFIG.RegionBehavior.dataModels[ASTRAL_WARD_REGION_BEHAVIOR] = AstralWardRegionBehavior;
-        CONFIG.RegionBehavior.dataModels[ENVIRONMENT_REGION_BEHAVIOR] = EnvironmentalRegionBehavior;
-        // Keep document validation in sync when Foundry serves an older package model.
-        const regionTypes = [ASTRAL_BARRIER_REGION_BEHAVIOR, ASTRAL_WARD_REGION_BEHAVIOR, ENVIRONMENT_REGION_BEHAVIOR];
-        const regionModel = game.model.RegionBehavior as Record<string, object>;
-        const documentTypes = game.documentTypes.RegionBehavior as string[];
-        for (const type of regionTypes) {
-            regionModel[type] ??= {};
-            if (!documentTypes.includes(type)) documentTypes.push(type);
-        }
-        CONFIG.RegionBehavior.typeIcons[ASTRAL_BARRIER_REGION_BEHAVIOR] = 'fa-solid fa-shield-halved';
-        CONFIG.RegionBehavior.typeIcons[ASTRAL_WARD_REGION_BEHAVIOR] = 'fa-solid fa-shield';
-        CONFIG.RegionBehavior.typeIcons[ENVIRONMENT_REGION_BEHAVIOR] = 'fa-solid fa-cloud-sun';
-        CONFIG.RegionBehavior.typeLabels[ASTRAL_BARRIER_REGION_BEHAVIOR] = 'SR5.Vision.AstralRegions.Barrier.Label';
-        CONFIG.RegionBehavior.typeLabels[ASTRAL_WARD_REGION_BEHAVIOR] = 'SR5.Vision.AstralRegions.Ward.Label';
-        CONFIG.RegionBehavior.typeLabels[ENVIRONMENT_REGION_BEHAVIOR] = 'SR5.Vision.EnvironmentalRegions.Environment.Label';
-
         CONFIG.Item.dataModels["action"] = Action;
         CONFIG.Item.dataModels["ammo"] = Ammo;
         CONFIG.Item.dataModels["armor"] = Armor;
@@ -588,11 +563,7 @@ ___________________
     }
 
     static async ready() {
-        for (const scene of game.scenes) {
-            for (const region of scene.regions) {
-                if (region.behaviors.invalidDocumentIds.size) region.behaviors.initialize();
-            }
-        }
+        VisionConfigurator.revalidateRegionBehaviors();
         await IconAssign.refreshIconFiles();
 
         if (game.user?.isGM) {
@@ -797,6 +768,7 @@ ___________________
         VisionConfigurator.configureLowlight()
         VisionConfigurator.configureUltrasound()
         VisionConfigurator.configureAR()
+        VisionConfigurator.configureRegionBehaviors()
     }
 
     static configureTextEnrichers() {

@@ -7,9 +7,15 @@ import { getProjectionForm } from '@/module/vision/astralProjection/AstralProjec
 import { MANIFEST_STATUS, MATERIALIZE_STATUS } from '@/module/vision/astralProjection/ManifestationState';
 import { ManifestationFilter } from '@/module/vision/astralProjection/manifestationFilter';
 import { getPhysicalPresence } from '@/module/vision/physicalVision/physicalDetectionMode';
-import { isAstralVisionMode } from '@/module/vision/astralPerception/astralVisionModes';
+import { isNonOpticalVisionMode } from '@/module/vision/SR5VisionSource';
 
 export class SR5Token extends foundry.canvas.placeables.Token {
+    /** Filters drawn over this token after its detection filter, like an aura or a Matrix icon. */
+    private readonly senseOverlays: PIXI.Filter[] = [];
+
+    /** Filter showing this token as a manifesting astral being, while it is one. */
+    private manifestFilter: ManifestationFilter | null = null;
+
     /**
      * Let astral forms move through physical walls, and stop them before astral boundaries instead, so
      * drag previews and executed movement end in front of those the same way they end in front of walls.
@@ -23,16 +29,13 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         const [path, constrained] = AstralRegionFlow.isAstralOnly(this.document)
             ? super.constrainMovementPath(waypoints, { ...options, ignoreWalls: true })
             : super.constrainMovementPath(...args);
-        if (args[1]?.ignoreWalls) return [path, constrained];
+        if (options?.ignoreWalls) return [path, constrained];
         // Keep previews wall-like, but let the document pre-movement hook reject executed crossings
         // in full and notify the acting user.
-        if (!args[1]?.preview) return [path, constrained];
+        if (!options?.preview) return [path, constrained];
         const astralPath = AstralRegionFlow.constrainMovementPath(this.document, path as any);
         return astralPath ? [astralPath as typeof path, true] : [path, constrained];
     }
-
-    /** Filters drawn over this token after its detection filter, like an aura or a Matrix icon. */
-    private readonly senseOverlays: PIXI.Filter[] = [];
 
     /**
      * Swap the detection filter for the one matching this token and the current viewers' senses, and gather the
@@ -81,9 +84,6 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         if (hidden) mesh.visible = false;
     }
 
-    /** Filter showing this token as a manifesting astral being, while it is one. */
-    private manifestFilter: ManifestationFilter | null = null;
-
     /**
      * Manifesting and materializing change which senses detect this token and how it looks. The astral form of
      * an unlinked body isn't among the actor's dependent tokens, so it is refreshed along with its body.
@@ -121,7 +121,7 @@ export class SR5Token extends foundry.canvas.placeables.Token {
     override _getVisionBlindedStates() {
         const states = super._getVisionBlindedStates();
         const { visionMode } = this.document.sight;
-        if (isAstralVisionMode(visionMode) || visionMode === ULTRASOUND_VISION_MODE) states.blind = false;
+        if (isNonOpticalVisionMode(visionMode)) states.blind = false;
         if (visionMode === ULTRASOUND_VISION_MODE) states.darkness = false;
         return states;
     }

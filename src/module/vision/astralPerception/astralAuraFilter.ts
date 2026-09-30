@@ -183,6 +183,11 @@ export const ACCESSIBLE_AURA_LOOKS: Readonly<Record<AstralTier, AccessibleAuraLo
 const essenceFactor = (look: BaseAuraLook, bucket: number) =>
     look.followsEssence ? Math.max(MIN_ESSENCE_FACTOR, bucket / MAX_ESSENCE_BUCKET) : 1;
 
+/** How the sprite is drawn: recolored for its tier, or left out for an overlay on a token seen physically. */
+const spriteUniforms = (look: BaseAuraLook, overlay: boolean) => overlay
+    ? { spriteTint: WHITE, spriteSaturation: 0, spriteBrightness: 1, spriteAlpha: 0 }
+    : { spriteTint: look.tint, spriteSaturation: look.saturation, spriteBrightness: look.brightness, spriteAlpha: look.alpha };
+
 /**
  * How a token looks to astral sight: its sprite, recolored for its astral tier, inside an aura. As an overlay it
  * leaves the sprite alone and only adds the aura.
@@ -253,65 +258,62 @@ export class AstralAuraFilter extends PulsingGlowOverlayFilter {
             distance: look.distance,
             quality: this.qualityForPerformance(),
             glowColor: [...look.glow, 0.5 + 0.5 * essence],
-            spriteTint: overlay ? WHITE : look.tint,
-            spriteSaturation: overlay ? 0 : look.saturation,
-            spriteBrightness: overlay ? 1 : look.brightness,
-            spriteAlpha: overlay ? 0 : look.alpha,
+            ...spriteUniforms(look, overlay),
             rimStrength: look.rim * essence,
         }) as AstralAuraFilter;
         return filter.configure(tier, overlay, look, essence, look.distance);
     }
 
     protected configure(tier: AstralTier, overlay: boolean, look: BaseAuraLook, essence: number, distance: number) {
-        this.fitPadding(distance);
         this.tier = tier;
         this.overlay = overlay;
-        this.innerStrength = look.innerStrength * essence;
-        this.outerStrength = look.outerStrength * essence;
-        this.pulse = look.pulse;
-        this.animated = !!look.pulse;
-        return this;
+        return this.configureGlow({
+            distance,
+            innerStrength: look.innerStrength * essence,
+            outerStrength: look.outerStrength * essence,
+            pulse: look.pulse,
+        });
     }
 
-    static override _createFragmentShader(quality: number, distance: number) {
-        return `
-    precision ${PIXI.Program.defaultFragmentPrecision} float;
-    varying vec2 vTextureCoord;
-
-    uniform sampler2D uSampler;
-    uniform float innerStrength;
-    uniform float outerStrength;
-    uniform float alpha;
-    uniform vec4 glowColor;
-    uniform vec4 inputSize;
-    uniform vec4 inputClamp;
+    /**
+     * GLSL declaring the sprite uniforms and `vec4 auraSprite(vec4 tex, float coverage)`: the sprite, recolored for
+     * its tier, with the aura seeping into the silhouette's edges. Needs GLOW_HEADER and PERCEIVED_BRIGHTNESS first.
+     */
+    static AURA_SPRITE = `
     uniform vec3 spriteTint;
     uniform float spriteSaturation;
     uniform float spriteBrightness;
     uniform float spriteAlpha;
-    uniform float rimStrength;
 
-    ${this.CONSTANTS}
-    ${this.PERCEIVED_BRIGHTNESS}
-    ${this.glowSample(quality, distance)}
-
-    void main(void) {
-      float coverage = glowSample(vTextureCoord).x;
-
-      // The sprite, recolored for its tier. Textures are premultiplied, so unmultiply before recoloring.
-      vec4 tex = texture2D(uSampler, vTextureCoord);
+    vec4 auraSprite(vec4 tex, float coverage) {
+      // Textures are premultiplied, so unmultiply before recoloring.
       vec3 rgb = tex.a > 0.0 ? tex.rgb / tex.a : vec3(0.0);
       rgb = mix(vec3(perceivedBrightness(rgb)), rgb, 1.0 + spriteSaturation);
       rgb = clamp(rgb * spriteTint * spriteBrightness, 0.0, 1.0);
       float a = tex.a * spriteAlpha;
       vec4 sprite = vec4(rgb * a, a);
 
-      // The aura seeps into the silhouette's edges...
       float inner = min(1.0, (1.0 - coverage) * innerStrength * smoothstep(0.6, 1.0, tex.a)) * glowColor.a;
       float innerAlpha = tex.a * inner;
-      sprite = sprite * (1.0 - inner) + vec4(glowColor.rgb * innerAlpha, innerAlpha);
+      return sprite * (1.0 - inner) + vec4(glowColor.rgb * innerAlpha, innerAlpha);
+    }`;
 
-      // ...and shines around it, with a brighter band close to the silhouette for astrally active beings.
+    static override _createFragmentShader(quality: number, distance: number) {
+        return `
+    ${this.GLOW_HEADER}
+    uniform float rimStrength;
+
+    ${this.CONSTANTS}
+    ${this.PERCEIVED_BRIGHTNESS}
+    ${this.glowSample(quality, distance)}
+    ${this.AURA_SPRITE}
+
+    void main(void) {
+      float coverage = glowSample(vTextureCoord).x;
+      vec4 tex = texture2D(uSampler, vTextureCoord);
+      vec4 sprite = auraSprite(tex, coverage);
+
+      // The aura shines around the sprite, with a brighter band close to the silhouette for astrally active beings.
       float outside = 1.0 - smoothstep(0.35, 1.0, tex.a);
       float rim = rimStrength * smoothstep(0.25, 0.45, coverage);
       float glowAlpha = min(1.0 - sprite.a, clamp((coverage * outerStrength + rim) * outside, 0.0, 1.0));
@@ -346,10 +348,7 @@ export class AccessibleAstralAuraFilter extends AstralAuraFilter {
             distance,
             quality: this.qualityForPerformance(),
             glowColor: [...look.glow, 0.5 + 0.5 * essence],
-            spriteTint: overlay ? WHITE : look.tint,
-            spriteSaturation: overlay ? 0 : look.saturation,
-            spriteBrightness: overlay ? 1 : look.brightness,
-            spriteAlpha: overlay ? 0 : look.alpha,
+            ...spriteUniforms(look, overlay),
             rings: look.rings,
             ringColor: look.glow.map(channel => channel + (1 - channel) * RING_WHITENESS),
         }) as AccessibleAstralAuraFilter;
@@ -358,46 +357,23 @@ export class AccessibleAstralAuraFilter extends AstralAuraFilter {
 
     static override _createFragmentShader(quality: number, distance: number) {
         return `
-    precision ${PIXI.Program.defaultFragmentPrecision} float;
-    varying vec2 vTextureCoord;
-
-    uniform sampler2D uSampler;
-    uniform float innerStrength;
-    uniform float outerStrength;
-    uniform float alpha;
-    uniform vec4 glowColor;
-    uniform vec4 inputSize;
-    uniform vec4 inputClamp;
-    uniform vec3 spriteTint;
-    uniform float spriteSaturation;
-    uniform float spriteBrightness;
-    uniform float spriteAlpha;
+    ${this.GLOW_HEADER}
     uniform float rings;
     uniform vec3 ringColor;
 
     ${this.CONSTANTS}
     ${this.PERCEIVED_BRIGHTNESS}
     ${this.glowSample(quality, distance)}
+    ${this.AURA_SPRITE}
 
     void main(void) {
       vec2 glow = glowSample(vTextureCoord);
       float coverage = glow.x;
       float dist = glow.y;
-
-      // The sprite, recolored for its tier. Textures are premultiplied, so unmultiply before recoloring.
       vec4 tex = texture2D(uSampler, vTextureCoord);
-      vec3 rgb = tex.a > 0.0 ? tex.rgb / tex.a : vec3(0.0);
-      rgb = mix(vec3(perceivedBrightness(rgb)), rgb, 1.0 + spriteSaturation);
-      rgb = clamp(rgb * spriteTint * spriteBrightness, 0.0, 1.0);
-      float a = tex.a * spriteAlpha;
-      vec4 sprite = vec4(rgb * a, a);
+      vec4 sprite = auraSprite(tex, coverage);
 
-      // The aura seeps into the silhouette's edges...
-      float inner = min(1.0, (1.0 - coverage) * innerStrength * smoothstep(0.6, 1.0, tex.a)) * glowColor.a;
-      float innerAlpha = tex.a * inner;
-      sprite = sprite * (1.0 - inner) + vec4(glowColor.rgb * innerAlpha, innerAlpha);
-
-      // ...and shines around it as a halo that fades out across its whole width...
+      // The aura shines around the sprite as a halo that fades out across its whole width...
       float outside = 1.0 - smoothstep(0.35, 1.0, tex.a);
       float room = 1.0 - sprite.a;
       float falloff = 1.0 - clamp((dist - 1.0) / DIST, 0.0, 1.0);

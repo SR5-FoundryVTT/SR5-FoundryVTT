@@ -19,12 +19,24 @@ export class VisionHUD {
         const leftColumn = html.querySelector<HTMLElement>('.col.left');
         if (!leftColumn) return;
 
-        const projectionState = AstralProjectionFlow.getState(token.document);
-        if (AstralPerceptionFlow.canPerceive(actor) && !projectionState) {
-            leftColumn.append(this.astralPerceptionControl(token));
+        if (AstralPerceptionFlow.canPerceive(actor) && !AstralProjectionFlow.isProjected(token.document)) {
+            leftColumn.append(this.toggleControl({
+                className: 'sr5-astral-perception',
+                label: 'SR5.Vision.ToggleAstralPerception',
+                icon: 'fa-eye',
+                active: AstralPerceptionFlow.isActive(token.document),
+                toggle: () => AstralPerceptionFlow.toggle(token.document),
+            }));
         }
         if (AstralProjectionFlow.canProject(actor)) {
-            leftColumn.append(this.astralProjectionControl(token));
+            const projected = AstralProjectionFlow.isProjected(token.document);
+            leftColumn.append(this.toggleControl({
+                className: 'sr5-astral-projection',
+                label: projected ? 'SR5.Vision.ReturnFromAstralProjection' : 'SR5.Vision.BeginAstralProjection',
+                icon: 'fa-ghost',
+                active: projected,
+                toggle: () => AstralProjectionFlow.toggle(token.document),
+            }));
         }
         if (ManifestationFlow.canManifest(token.document)) {
             leftColumn.append(this.toggleControl({
@@ -51,27 +63,6 @@ export class VisionHUD {
         const active = await toggle;
         void app.render();
         return active;
-    }
-
-    private static astralPerceptionControl(token: Token) {
-        return this.toggleControl({
-            className: 'sr5-astral-perception',
-            label: 'SR5.Vision.ToggleAstralPerception',
-            icon: 'fa-eye',
-            active: AstralPerceptionFlow.isActive(token.document),
-            toggle: () => AstralPerceptionFlow.toggle(token.document),
-        });
-    }
-
-    private static astralProjectionControl(token: Token) {
-        const projected = AstralProjectionFlow.isProjected(token.document);
-        return this.toggleControl({
-            className: 'sr5-astral-projection',
-            label: projected ? 'SR5.Vision.ReturnFromAstralProjection' : 'SR5.Vision.BeginAstralProjection',
-            icon: 'fa-ghost',
-            active: projected,
-            toggle: () => AstralProjectionFlow.toggle(token.document),
-        });
     }
 
     /**

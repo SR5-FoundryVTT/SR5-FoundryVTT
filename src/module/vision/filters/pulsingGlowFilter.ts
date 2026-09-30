@@ -5,6 +5,14 @@ export interface GlowPulse {
     period: number;
 }
 
+export interface GlowSetup {
+    /** Halo width in pixels. */
+    distance: number;
+    innerStrength: number;
+    outerStrength: number;
+    pulse?: GlowPulse | null;
+}
+
 /** The current factor of a pulse, 1 when not animated or in photosensitive mode. */
 export const pulseFactor = (pulse: GlowPulse | null, animated = true) => {
     if (!animated || !pulse || canvas.photosensitiveMode) return 1;
@@ -32,10 +40,25 @@ export class PulsingGlowOverlayFilter extends foundry.canvas.rendering.filters.G
         }
     }
 
+    /** GLSL declaring the varying and the uniforms every glow shader reads. */
+    static get GLOW_HEADER() {
+        return `
+    precision ${PIXI.Program.defaultFragmentPrecision} float;
+    varying vec2 vTextureCoord;
+
+    uniform sampler2D uSampler;
+    uniform float innerStrength;
+    uniform float outerStrength;
+    uniform float alpha;
+    uniform vec4 glowColor;
+    uniform vec4 inputSize;
+    uniform vec4 inputClamp;`;
+    }
+
     /**
      * GLSL declaring `vec2 glowSample(vec2 uv)`, the sampling loop of Foundry's GlowOverlayFilter, itself based on
-     * https://github.com/pixijs/filters/tree/main/filters/glow (MIT). Needs `uSampler`, `inputSize`, `inputClamp`
-     * and `PI` to be declared first. It returns:
+     * https://github.com/pixijs/filters/tree/main/filters/glow (MIT). Needs GLOW_HEADER and CONSTANTS first.
+     * It returns:
      *
      * - x: how much of the silhouette surrounds the point, from 0 far away to 1 deep inside.
      * - y: roughly how many pixels away the silhouette is, up to `DIST + 1` when out of reach. Rings drawn at a
@@ -81,6 +104,20 @@ export class PulsingGlowOverlayFilter extends foundry.canvas.rendering.filters.G
     /** Give the filter room for its halo. Foundry keeps a 6 px padding, which would clip a wider one. */
     protected fitPadding(distance: number) {
         this.padding = Math.max(this.padding, distance);
+    }
+
+    /**
+     * Set up the glow's strengths and pulse, with room for its halo.
+     *
+     * @param padding Room around the token, when the filter draws past its halo.
+     */
+    protected configureGlow(glow: GlowSetup, padding = glow.distance) {
+        this.fitPadding(padding);
+        this.innerStrength = glow.innerStrength;
+        this.outerStrength = glow.outerStrength;
+        this.pulse = glow.pulse ?? null;
+        this.animated = !!this.pulse;
+        return this;
     }
 
     override apply(

@@ -21,7 +21,7 @@ interface SituationalModifiersTemplateData extends HandlebarsApplicationMixin.Re
     regionalModifiers: {
         noise: number
         background_count: number
-        environmental: RegionalPhysicalEnvironment
+        environmental: { label: string, value: number }[]
     }
 }
 
@@ -140,7 +140,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
  * - ...
  */
 export class SituationModifiersApplication extends HandlebarsApplicationMixin(ApplicationV2)<SituationalModifiersTemplateData> {
-    // Static Handlers contain the class references used for both static method calls and to setup the instance handlers.
+    // The handler classes, one instance of each is set up per application.
     static _staticHandlers: typeof ModifiersHandler[] = [
         MagicModifiersHandler,
         EnvironmentalModifiersHandler,
@@ -261,9 +261,22 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
             regionalModifiers: {
                 noise: this.modifiers.regionalModifierFor('noise'),
                 background_count: this.modifiers.regionalModifierFor('background_count'),
-                environmental: this.modifiers.regional.physical,
+                environmental: this._regionalEnvironment(this.modifiers.regional.physical),
             },
         };
+    }
+
+    /** The environmental conditions a Region imposes at the token, labeled for display. */
+    _regionalEnvironment(physical: RegionalPhysicalEnvironment) {
+        const labels: Record<keyof RegionalPhysicalEnvironment, string> = {
+            visibility: 'SR5.Vision.EnvironmentalRegions.Visibility.Contribution',
+            light: 'SR5.Vision.EnvironmentalRegions.Light.Contribution',
+            glare: 'SR5.Vision.EnvironmentalRegions.Glare.Contribution',
+            wind: 'SR5.Vision.EnvironmentalRegions.Wind.Contribution',
+        };
+        return Object.entries(labels)
+            .map(([category, label]) => ({ label, value: physical[category as keyof RegionalPhysicalEnvironment] }))
+            .filter(({ value }) => value);
     }
 
     override async _onRender(

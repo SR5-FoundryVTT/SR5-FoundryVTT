@@ -8,19 +8,9 @@ import { AstralRegionFlow } from '@/module/vision/astralRegions/AstralRegionFlow
 import { SR5Token } from '@/module/token/SR5Token';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
-import { SR5TestFactory } from './utils';
+import { rectangle, SR5TestFactory } from './utils';
 
 type AstralBoundaryType = typeof ASTRAL_BARRIER_REGION_BEHAVIOR | typeof ASTRAL_WARD_REGION_BEHAVIOR;
-
-const rectangle = (x: number, y: number, width: number, height: number, hole = false) => ({
-    type: 'rectangle' as const,
-    x,
-    y,
-    width,
-    height,
-    rotation: 0,
-    hole,
-});
 
 export const shadowrunVisionAstralRegions = (context: QuenchBatchContext) => {
     const { describe, it, after } = context;

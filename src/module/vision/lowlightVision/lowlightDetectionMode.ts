@@ -1,6 +1,3 @@
-
-//todo: v10 foundry-vtt-types 
-
 import LowLightVisionFilter from "./lowlightFilter";
 import { PhysicalSightDetectionMode } from '@/module/vision/physicalVision/physicalDetectionMode';
 

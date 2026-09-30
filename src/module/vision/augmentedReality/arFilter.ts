@@ -148,6 +148,13 @@ export default class AugmentedRealityFilter extends foundry.canvas.rendering.fil
       return max(vertical, horizontal);
     }
 
+    /** The four arms of a crosshair, of the given half width, from one distance to another off its center. */
+    float crossArms(vec2 fromCenter, float halfWidth, float from, float to) {
+      float vertical = step(fromCenter.x, halfWidth) * step(from, fromCenter.y) * step(fromCenter.y, to);
+      float horizontal = step(fromCenter.y, halfWidth) * step(from, fromCenter.x) * step(fromCenter.x, to);
+      return max(vertical, horizontal);
+    }
+
     float silhouetteAt(vec2 offset) {
       return step(0.5, texture2D(uSampler, vTextureCoord + offset * inputSize.zw).a);
     }
@@ -164,12 +171,8 @@ export default class AugmentedRealityFilter extends foundry.canvas.rendering.fil
       float mark = bracket(inset, thickness, arm);
       float edge = bracket(inset + 1.0, thickness + 2.0, arm + 2.0);
       vec2 fromCenter = abs(p - (lo + hi) * 0.5);
-      float cross = crosshair * max(
-        step(fromCenter.x, thickness * 0.5) * step(arm * 0.2, fromCenter.y) * step(fromCenter.y, arm * 0.7),
-        step(fromCenter.y, thickness * 0.5) * step(arm * 0.2, fromCenter.x) * step(fromCenter.x, arm * 0.7));
-      float crossEdge = crosshair * max(
-        step(fromCenter.x, thickness * 0.5 + 1.0) * step(arm * 0.2 - 1.0, fromCenter.y) * step(fromCenter.y, arm * 0.7 + 1.0),
-        step(fromCenter.y, thickness * 0.5 + 1.0) * step(arm * 0.2 - 1.0, fromCenter.x) * step(fromCenter.x, arm * 0.7 + 1.0));
+      float cross = crosshair * crossArms(fromCenter, thickness * 0.5, arm * 0.2, arm * 0.7);
+      float crossEdge = crosshair * crossArms(fromCenter, thickness * 0.5 + 1.0, arm * 0.2 - 1.0, arm * 0.7 + 1.0);
       mark = max(mark, cross);
       edge = max(edge, crossEdge);
 

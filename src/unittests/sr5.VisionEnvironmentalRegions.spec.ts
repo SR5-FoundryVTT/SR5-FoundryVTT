@@ -6,17 +6,7 @@ import {
 import { EnvironmentalRegionFlow } from '@/module/vision/environmentalRegions/EnvironmentalRegionFlow';
 import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 import { SuccessTest } from '@/module/tests/SuccessTest';
-import { SR5TestFactory } from './utils';
-
-const rectangle = (x: number, y: number, width: number, height: number, hole = false) => ({
-    type: 'rectangle' as const,
-    x,
-    y,
-    width,
-    height,
-    rotation: 0,
-    hole,
-});
+import { rectangle, SR5TestFactory } from './utils';
 
 const environment = (
     overrides: Partial<EnvironmentalRegionType> = {},

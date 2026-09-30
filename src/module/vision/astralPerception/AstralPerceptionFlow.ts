@@ -1,16 +1,16 @@
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { FLAGS, SYSTEM_NAME } from '@/module/constants';
-import { PerceptionFlow } from '@/module/vision/PerceptionFlow';
+import { type DetectionModes, PerceptionFlow } from '@/module/vision/PerceptionFlow';
 import { PerceptionResolver } from '@/module/vision/PerceptionResolver';
-
-export const ASTRAL_PERCEPTION_STATUS = 'sr5astralPerception';
-import { ASTRAL_PERCEPTION_VISION_MODE, ASTRAL_PROJECTION_VISION_MODE } from './astralVisionModes';
-
-export { ASTRAL_PERCEPTION_VISION_MODE, ASTRAL_PROJECTION_VISION_MODE };
+import {
+    ASTRAL_PERCEPTION_STATUS,
+    ASTRAL_PERCEPTION_VISION_MODE,
+    ASTRAL_PROJECTION_VISION_MODE,
+} from './astralVisionModes';
 
 export interface PreviousTokenVision {
     sight: Record<string, unknown>;
-    detectionModes: Record<string, { enabled: boolean; range: number | null }>;
+    detectionModes: DetectionModes;
 }
 
 export class AstralPerceptionFlow {
@@ -38,10 +38,10 @@ export class AstralPerceptionFlow {
         const { sight, detectionModes } = this.astralVision(token, source);
 
         await actor.toggleStatusEffect(ASTRAL_PERCEPTION_STATUS, { active: true });
-        await token.setFlag(SYSTEM_NAME, FLAGS.AstralPerceptionVision, this.captureVision(source));
         await token.update({
             sight,
             detectionModes: PerceptionFlow.detectionModeUpdate(source.detectionModes, detectionModes) as any,
+            [`flags.${SYSTEM_NAME}.${FLAGS.AstralPerceptionVision}`]: this.captureVision(source),
         });
         return true;
     }
