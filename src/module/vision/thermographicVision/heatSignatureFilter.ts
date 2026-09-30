@@ -65,7 +65,7 @@ type HeatTarget = Parameters<typeof getPhysicalTargetActor>[0];
 
 /** The target's heat signature, or null for a target that gives off none. */
 export const getHeatSignature = (target: HeatTarget): HeatSignature | null => {
-    const signature = getPhysicalTargetActor(target)?.system.visibilityChecks.targets.physical.thermographic;
+    const signature = getPhysicalTargetActor(target)?.system.visibilityChecks.targets.physical.heatSignature;
     return signature && signature !== 'none' ? signature : null;
 };
 

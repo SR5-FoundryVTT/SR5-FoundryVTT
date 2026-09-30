@@ -58,7 +58,9 @@ export class PerceptionResolver {
         const magic = actor.system.magic as Record<string, any> | undefined;
         if (!magic) return;
 
-        const type = magic.type as keyof typeof SR5.magicalTypes | undefined;
+        // The magical type is kept while an actor isn't awakened, but only applies while it is.
+        const awakened = actor.system.special === 'magic';
+        const type = awakened ? magic.type as keyof typeof SR5.magicalTypes | undefined : 'mundane';
         if (type === 'magician') {
             capabilities.astral.perception = true;
             capabilities.astral.projection = true;

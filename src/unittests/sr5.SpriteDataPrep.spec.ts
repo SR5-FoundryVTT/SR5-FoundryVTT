@@ -19,8 +19,8 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(sprite.system.visibilityChecks.targets.astral.hasAura, false);
             assert.strictEqual(sprite.system.visibilityChecks.targets.astral.astralActive, false);
             assert.strictEqual(sprite.system.visibilityChecks.targets.astral.affectedBySpell, false);
-            assert.strictEqual(sprite.system.visibilityChecks.targets.physical.active, false);
-            assert.strictEqual(sprite.system.visibilityChecks.targets.physical.thermographic, 'none');
+            assert.strictEqual(sprite.system.visibilityChecks.targets.physical.hasBody, false);
+            assert.strictEqual(sprite.system.visibilityChecks.targets.physical.heatSignature, 'none');
             assert.strictEqual(sprite.system.visibilityChecks.targets.matrix.hasIcon, true);
             assert.strictEqual(sprite.system.visibilityChecks.targets.matrix.runningSilent, false);
         });

@@ -44,7 +44,7 @@ const astralTarget = (options: {
                 attributes: { essence: { value: options.essence ?? 6 } },
                 visibilityChecks: {
                     targets: {
-                        physical: { active: options.physical ?? true, thermographic: 'warm' },
+                        physical: { hasBody: options.physical ?? true, heatSignature: 'warm' },
                         astral: {
                             hasAura: options.hasAura ?? true,
                             astralActive: options.astralActive ?? false,
@@ -70,7 +70,7 @@ export const shadowrunVisionAstralPerception = (context: QuenchBatchContext) => 
         it('uses resolved eligibility, including GM overrides', async () => {
             const magician = await factory.createActor({
                 type: 'character',
-                system: { magic: { type: 'magician' } },
+                system: { special: 'magic', magic: { type: 'magician' } },
             });
             const mundane = await factory.createActor({
                 type: 'character',
@@ -89,7 +89,7 @@ export const shadowrunVisionAstralPerception = (context: QuenchBatchContext) => 
         it('enables astral rendering and makes the actor dual-natured', async () => {
             const actor = await factory.createActor({
                 type: 'character',
-                system: { magic: { type: 'magician' } },
+                system: { special: 'magic', magic: { type: 'magician' } },
             });
             const scene = await factory.createScene({});
             const [token] = await scene.createEmbeddedDocuments('Token', [{
@@ -116,7 +116,7 @@ export const shadowrunVisionAstralPerception = (context: QuenchBatchContext) => 
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
-                    magic: { type: 'magician' },
+                    special: 'magic', magic: { type: 'magician' },
                     visibilityChecks: { capabilities: { physical: { lowLight: true } } },
                 },
             });
@@ -146,7 +146,7 @@ export const shadowrunVisionAstralPerception = (context: QuenchBatchContext) => 
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
-                    magic: { type: 'magician' },
+                    special: 'magic', magic: { type: 'magician' },
                     attributes: { body: { base: 5 } },
                 },
             });

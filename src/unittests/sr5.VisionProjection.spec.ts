@@ -42,7 +42,7 @@ export const shadowrunVisionProjection = (context: QuenchBatchContext) => {
         factory.createActor({
             type: 'character',
             system: {
-                magic: { type: 'magician' },
+                special: 'magic', magic: { type: 'magician' },
                 initiative: { perception: 'meatspace' },
                 ...system,
             },
@@ -141,7 +141,7 @@ export const shadowrunVisionProjection = (context: QuenchBatchContext) => {
             const magician = await createMagician();
             const aspected = await factory.createActor({
                 type: 'character',
-                system: { magic: { type: 'aspected_magician' } },
+                system: { special: 'magic', magic: { type: 'aspected_magician' } },
             });
             const overridden = await factory.createActor({
                 type: 'character',

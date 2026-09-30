@@ -68,7 +68,7 @@ const SRStatus = [
             targets: [{ id: 'actor', applyTo: 'actor' }],
             changes: [
                 {
-                    key: 'system.visibilityChecks.targets.physical.active',
+                    key: 'system.visibilityChecks.targets.physical.hasBody',
                     type: 'override',
                     value: true,
                     target: 'actor',

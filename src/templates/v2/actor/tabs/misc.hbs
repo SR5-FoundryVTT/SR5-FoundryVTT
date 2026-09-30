@@ -83,16 +83,16 @@
                             </div>
                         </div>
                     {{/if}}
-                    {{#if systemFields.visibilityChecks.fields.targets.fields.physical.fields.thermographic}}
+                    {{#if systemFields.visibilityChecks.fields.targets.fields.physical.fields.heatSignature}}
                         <div class="list-item">
                             <div class="list-item-start">
-                                <label data-tooltip="{{localize systemFields.visibilityChecks.fields.targets.fields.physical.fields.thermographic.hint}}">
-                                    {{localize systemFields.visibilityChecks.fields.targets.fields.physical.fields.thermographic.label}}
+                                <label data-tooltip="{{localize systemFields.visibilityChecks.fields.targets.fields.physical.fields.heatSignature.hint}}">
+                                    {{localize systemFields.visibilityChecks.fields.targets.fields.physical.fields.heatSignature.label}}
                                 </label>
                             </div>
                             <div class="list-item-col">
-                                {{formInput systemFields.visibilityChecks.fields.targets.fields.physical.fields.thermographic
-                                            value=source.system.visibilityChecks.targets.physical.thermographic
+                                {{formInput systemFields.visibilityChecks.fields.targets.fields.physical.fields.heatSignature
+                                            value=source.system.visibilityChecks.targets.physical.heatSignature
                                             classes="short" rootId=rootId localize=true }}
                             </div>
                         </div>

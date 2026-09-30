@@ -7,7 +7,7 @@ const actorData = (overrides: Record<string, unknown> = {}): any => ({
     system: {
         visibilityChecks: {
             targets: {
-                physical: { active: true, thermographic: 'warm' },
+                physical: { hasBody: true, heatSignature: 'warm' },
                 astral: { hasAura: true, astralActive: false, affectedBySpell: false },
                 matrix: { hasIcon: true, runningSilent: false },
             },
@@ -16,6 +16,7 @@ const actorData = (overrides: Record<string, unknown> = {}): any => ({
                 astral: { perception: false, projection: false },
             },
         },
+        special: 'magic',
         magic: { type: 'mundane', astralPerceptionOverride: 'default', astralProjectionOverride: 'default' },
         ...overrides,
     },
@@ -34,14 +35,14 @@ export const shadowrunVisionFoundation = (context: QuenchBatchContext) => {
         it('keeps the actor thermographic signature level', async () => {
             const actor = await factory.createActor({
                 type: 'character',
-                system: { visibilityChecks: { targets: { physical: { thermographic: 'cold' } } } },
+                system: { visibilityChecks: { targets: { physical: { heatSignature: 'cold' } } } },
             });
-            assert.strictEqual(actor.system.visibilityChecks.targets.physical.thermographic, 'cold');
+            assert.strictEqual(actor.system.visibilityChecks.targets.physical.heatSignature, 'cold');
 
             await actor.update({
-                system: { visibilityChecks: { targets: { physical: { thermographic: 'hot' } } } },
+                system: { visibilityChecks: { targets: { physical: { heatSignature: 'hot' } } } },
             });
-            assert.strictEqual(actor.system.visibilityChecks.targets.physical.thermographic, 'hot');
+            assert.strictEqual(actor.system.visibilityChecks.targets.physical.heatSignature, 'hot');
         });
 
         it('resolves magical subtype eligibility and applies explicit overrides last', () => {
@@ -62,6 +63,13 @@ export const shadowrunVisionFoundation = (context: QuenchBatchContext) => {
             });
             assert.isTrue(PerceptionResolver.resolve(mundaneOverride).astral.perception);
             assert.isTrue(PerceptionResolver.resolve(mundaneOverride).astral.projection);
+
+            const unawakened = actorData({
+                special: 'mundane',
+                magic: { type: 'magician', astralPerceptionOverride: 'default', astralProjectionOverride: 'default' },
+            });
+            assert.isFalse(PerceptionResolver.resolve(unawakened).astral.perception, 'a kept type needs the actor awakened');
+            assert.isFalse(PerceptionResolver.resolve(unawakened).astral.projection);
         });
 
         it('grants adepts astral perception through the Astral Perception power', () => {
@@ -90,8 +98,8 @@ export const shadowrunVisionFoundation = (context: QuenchBatchContext) => {
 
         it('gives new spirits a warm heat signature for when they materialize', async () => {
             const spirit = await factory.createActor({ type: 'spirit' });
-            assert.strictEqual(spirit.system.visibilityChecks.targets.physical.thermographic, 'warm');
-            assert.isFalse(spirit.system.visibilityChecks.targets.physical.active);
+            assert.strictEqual(spirit.system.visibilityChecks.targets.physical.heatSignature, 'warm');
+            assert.isFalse(spirit.system.visibilityChecks.targets.physical.hasBody);
         });
 
         it('uses active grants and removes them when the effect is disabled', async () => {

@@ -10,7 +10,7 @@ const PERCEPTION_TARGET_PATHS = {
     'system.visibilityChecks.astral.affectedBySpell': 'system.visibilityChecks.targets.astral.affectedBySpell',
     'system.visibilityChecks.matrix.hasIcon': 'system.visibilityChecks.targets.matrix.hasIcon',
     'system.visibilityChecks.matrix.runningSilent': 'system.visibilityChecks.targets.matrix.runningSilent',
-    'system.visibilityChecks.meat.hasHeat': 'system.visibilityChecks.targets.physical.thermographic',
+    'system.visibilityChecks.meat.hasHeat': 'system.visibilityChecks.targets.physical.heatSignature',
 } as const;
 
 /** Qualities naming a magical type, checked in order so that e.g. Mystic Adept wins over Adept. */
@@ -39,7 +39,7 @@ export class Version0_38_0 extends VersionMigration {
         this.migrateItemSheetRework(item);
     }
 
-    /** Vision: visibility checks moved under system.visibilityChecks.targets, heat became a thermographic level. */
+    /** Vision: visibility checks moved under system.visibilityChecks.targets, heat became a signature level. */
     private migrateVision(actor: any): void {
         const visibility = actor.system?.visibilityChecks;
         if (!visibility) return;
@@ -49,9 +49,9 @@ export class Version0_38_0 extends VersionMigration {
         visibility.targets.astral ??= {};
         visibility.targets.matrix ??= {};
 
-        visibility.targets.physical.active ??= ['character', 'critter', 'vehicle'].includes(actor.type);
+        visibility.targets.physical.hasBody ??= ['character', 'critter', 'vehicle'].includes(actor.type);
         // Spirits read warm once materialized, like a new spirit does.
-        visibility.targets.physical.thermographic ??= visibility.meat?.hasHeat || actor.type === 'spirit' ? 'warm' : 'none';
+        visibility.targets.physical.heatSignature ??= visibility.meat?.hasHeat || actor.type === 'spirit' ? 'warm' : 'none';
         visibility.targets.astral.hasAura ??= !!visibility.astral?.hasAura;
         visibility.targets.astral.astralActive ??= !!visibility.astral?.astralActive;
         visibility.targets.astral.affectedBySpell ??= !!visibility.astral?.affectedBySpell;

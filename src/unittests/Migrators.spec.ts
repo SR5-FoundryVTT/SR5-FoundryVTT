@@ -1101,7 +1101,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             migrator.migrateActor(actor);
 
             assert.deepEqual(actor.system.visibilityChecks.targets, {
-                physical: { active: true, thermographic: 'warm' },
+                physical: { hasBody: true, heatSignature: 'warm' },
                 astral: { hasAura: true, astralActive: false, affectedBySpell: true },
                 matrix: { hasIcon: true, runningSilent: true },
             });
@@ -1124,7 +1124,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             migrator.migrateActiveEffect(effect);
 
             assert.deepEqual(effect.system.changes, [
-                { key: 'system.visibilityChecks.targets.physical.thermographic', value: 'warm' },
+                { key: 'system.visibilityChecks.targets.physical.heatSignature', value: 'warm' },
                 { key: 'system.visibilityChecks.targets.matrix.runningSilent', value: false },
             ]);
         });

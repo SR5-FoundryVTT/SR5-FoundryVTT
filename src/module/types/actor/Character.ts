@@ -60,7 +60,7 @@ const CharacterData = () => ({
         matrix: { attributeA: 'intuition', attributeB: 'data_processing', constant: 0, dice: 3 },
     })),
 
-    visibilityChecks: new SchemaField(VisibilityChecks('astral', 'matrix', 'meatspace')),
+    visibilityChecks: new SchemaField(VisibilityChecks({ body: true, heat: 'warm', aura: true, icon: true })),
 
     // === Condition & Movement ===
     track: new SchemaField(Tracks('physical', 'stun')),

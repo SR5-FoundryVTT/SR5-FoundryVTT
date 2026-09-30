@@ -27,7 +27,7 @@ export const getPhysicalPresence = (target: DetectionTarget): PhysicalPresence =
     const actor = getPhysicalTargetActor(target);
     // A form shares its body's actor, so only the form turns ghostly when that actor manifests.
     if (token instanceof TokenDocument && isAstralForm(token)) return isManifesting(actor) ? 'manifest' : 'none';
-    if (!actor || actor.system.visibilityChecks.targets.physical.active !== false) return 'solid';
+    if (!actor || actor.system.visibilityChecks.targets.physical.hasBody !== false) return 'solid';
     return isManifesting(actor) ? 'manifest' : 'none';
 };
 

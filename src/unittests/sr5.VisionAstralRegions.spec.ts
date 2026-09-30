@@ -224,7 +224,7 @@ export const shadowrunVisionAstralRegions = (context: QuenchBatchContext) => {
             }]);
 
             assert.isTrue(spirit.actor!.system.visibilityChecks.targets.astral.astralActive);
-            assert.isFalse(spirit.actor!.system.visibilityChecks.targets.physical.active);
+            assert.isFalse(spirit.actor!.system.visibilityChecks.targets.physical.hasBody);
             assert.isFalse(await spirit.move({ x: 700, y: 100 }));
             assert.strictEqual(spirit.x, 100);
         });
@@ -237,7 +237,7 @@ export const shadowrunVisionAstralRegions = (context: QuenchBatchContext) => {
                 'system.visibilityChecks.targets.astral.astralActive': true,
             } as any);
 
-            assert.isTrue(dualNatured.actor!.system.visibilityChecks.targets.physical.active);
+            assert.isTrue(dualNatured.actor!.system.visibilityChecks.targets.physical.hasBody);
             assert.isTrue(dualNatured.actor!.system.visibilityChecks.targets.astral.astralActive);
             assert.isTrue(await dualNatured.move({ x: 700, y: 100 }));
             assert.strictEqual(dualNatured.x, 700);

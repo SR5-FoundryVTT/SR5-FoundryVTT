@@ -46,7 +46,7 @@ const actorData = (metatype: string, changes: Record<string, unknown> = {}): any
                 astral: { perception: false, projection: false },
             },
             targets: {
-                physical: { active: true, thermographic: 'warm' },
+                physical: { hasBody: true, heatSignature: 'warm' },
                 astral: { hasAura: true, astralActive: false, affectedBySpell: false },
                 matrix: { hasIcon: true, runningSilent: false },
             },
@@ -57,14 +57,14 @@ const actorData = (metatype: string, changes: Record<string, unknown> = {}): any
     items: [],
 });
 
-const target = (active = true, invisible = false, thermographic = 'warm', manifesting = false) =>
+const target = (hasBody = true, invisible = false, heatSignature = 'warm', manifesting = false) =>
     ({
         document: {
             actor: {
                 system: {
                     visibilityChecks: {
                         targets: {
-                            physical: { active, thermographic },
+                            physical: { hasBody, heatSignature },
                             matrix: { hasIcon: true, runningSilent: false },
                         },
                     },
@@ -107,7 +107,7 @@ const tracer = (traced: string[], marked: string[] = traced) => {
 };
 
 /** A detection target carrying its persona on a commlink. */
-const deviceTarget = (options: { invisible?: boolean; active?: boolean } = {}) => ({
+const deviceTarget = (options: { invisible?: boolean; hasBody?: boolean } = {}) => ({
     document: {
         actor: {
             uuid: 'Actor.runner',
@@ -116,7 +116,7 @@ const deviceTarget = (options: { invisible?: boolean; active?: boolean } = {}) =
             system: {
                 visibilityChecks: {
                     targets: {
-                        physical: { active: options.active ?? true, thermographic: 'warm' },
+                        physical: { hasBody: options.hasBody ?? true, heatSignature: 'warm' },
                         matrix: { hasIcon: true, runningSilent: false },
                     },
                 },
@@ -471,7 +471,7 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
                 (ar as any)._canDetect(perceivingTracingViewer, deviceTarget()),
                 'a perceiving viewer keeps its augmented reality',
             );
-            assert.isFalse((ar as any)._canDetect(tracingViewer, deviceTarget({ active: false })), 'nor off the plane');
+            assert.isFalse((ar as any)._canDetect(tracingViewer, deviceTarget({ hasBody: false })), 'nor off the plane');
             for (const mode of modes) {
                 assert.isFalse((mode as any)._canDetect(visionSource(), astralTarget), mode.id);
                 assert.isFalse((mode as any)._canDetect(astralViewer, physicalTarget), `${mode.id} astral viewer`);

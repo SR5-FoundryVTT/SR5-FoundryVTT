@@ -235,7 +235,7 @@ export class AstralRegionFlow {
     static isAstralOnly(token: TokenDocument) {
         if (isAstralForm(token)) return true;
         const targets = token.actor?.system.visibilityChecks.targets;
-        return targets?.astral.astralActive === true && targets.physical.active === false;
+        return targets?.astral.astralActive === true && targets.physical.hasBody === false;
     }
 
     private static crosses(region: RegionDocument, origin: ElevatedPoint, destination: ElevatedPoint) {
