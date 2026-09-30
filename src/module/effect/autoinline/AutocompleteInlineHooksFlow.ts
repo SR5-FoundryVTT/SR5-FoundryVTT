@@ -182,7 +182,9 @@ export const AutocompleteInlineHooksFlow =  {
             tracer_rounds: '',
             smartlink: '',
             ultrasound: '',
-            thermographic_vision: ''
+            thermographic_vision: '',
+            flare_compensation: '',
+            sunglasses: '',
         }}
     },
 

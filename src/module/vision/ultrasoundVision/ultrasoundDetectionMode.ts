@@ -1,0 +1,34 @@
+import {
+    hasPhysicalPresence,
+    isAstralProjectionSource,
+} from '@/module/vision/physicalVision/physicalDetectionMode';
+import { ULTRASOUND_COLOR } from './ultrasoundShaders';
+
+export const ULTRASOUND_RANGE_METERS = 50;
+export const ULTRASOUND_VISION_MODE = 'ultrasound';
+
+export default class UltrasoundDetectionMode extends foundry.canvas.perception.DetectionMode {
+    static override getDetectionFilter() {
+        return (this._detectionFilter ??= foundry.canvas.rendering.filters.OutlineOverlayFilter.create({
+            outlineColor: [...ULTRASOUND_COLOR, 1.0],
+            knockout: true,
+            wave: true,
+        }));
+    }
+
+    override _canDetect(
+        ...[visionSource, target]: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>
+    ) {
+        return !isAstralProjectionSource(visionSource) && hasPhysicalPresence(target);
+    }
+
+    override _testLOS(
+        ...[visionSource, , , test]: Parameters<foundry.canvas.perception.DetectionMode['_testLOS']>
+    ) {
+        return !UltrasoundDetectionMode._testCollision(visionSource, test, {
+            ...visionSource.los?.config,
+            type: 'move',
+            angle: 360,
+        });
+    }
+}

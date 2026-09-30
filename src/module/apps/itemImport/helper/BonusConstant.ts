@@ -1,4 +1,5 @@
 import { BonusSchema } from '../schema/BonusSchema';
+import type { PerceptionCapabilitiesType } from '@/module/types/template/Visibility';
 
 export type DocCreateData = (
     Actor.CreateData | Item.CreateData
@@ -30,7 +31,40 @@ export interface LimitConditionTranslation {
     disabled?: boolean;
 }
 
+export type PhysicalSense = keyof PerceptionCapabilitiesType['physical'];
+
 export class BonusConstant {
+    /**
+     * Chummer items granting a physical sense, by Chummer id. Chummer has no bonus for senses, so the
+     * items are recognized by id.
+     */
+    public static readonly senseGrants: Record<string, PhysicalSense> = {
+        // Cyberware
+        '97910ef7-dc30-4a87-8314-d1e0021dc39c': 'lowLight',        // Low-Light Vision
+        'e9c59df9-9009-4e4a-a257-45eaab5885a4': 'lowLight',        // Low-Light (2050)
+        'ba3204d8-3ec5-4da0-b980-44992a3a4a13': 'thermographic',   // Thermographic Vision
+        '4382ca25-5400-4640-8fcd-a60e0b7e6f81': 'thermographic',   // Thermographic (2050)
+        '92e9d8e5-b9aa-4786-add3-a1d1f82b8ec0': 'ultrasound',      // Ultrasound Sensor
+        // Bioware
+        'f038260b-f2de-4a9a-9507-5602d0e64a22': 'lowLight',        // Cat's Eyes
+        // Gear
+        '287c6d58-2217-48b2-9e14-6ba23584939a': 'lowLight',        // Low Light
+        '39c072cd-cb03-4145-a699-8f6c7e8fb20e': 'lowLight',        // Low Light (2050)
+        '9755ccab-8fe1-4310-b7f1-87b280b0ec6f': 'lowLight',        // Binoculars, Low Light (2050)
+        '52c535c6-1933-4bf3-9467-e94d40db7dfa': 'lowLight',        // Goggles, Low Light (2050)
+        'f7f74a85-bd3b-4a46-9c3b-80688c72ef51': 'thermographic',   // Thermographic Vision
+        '60ac70ec-8b62-464d-817d-1d2fd04a8102': 'thermographic',   // Thermographic Vision(2050)
+        '25571ea8-d1b1-4b73-a7d3-a2e1151c789c': 'thermographic',   // Binoculars, Thermographic Vision (2050)
+        'dee0e58f-5fcc-4af7-bc60-3d942b6457a3': 'thermographic',   // Goggles, Thermographic Vision (2050)
+        'e140b671-dc22-429d-b12a-dfbf46951049': 'ultrasound',      // Ultrasound (sensor function)
+        // Qualities
+        '8ec5c9bb-aeb9-42f2-a436-a60f764adfe4': 'lowLight',        // Low-Light Vision
+        '2f080d13-92d7-4b16-9ee6-93b5a89206e4': 'lowLight',        // Low-Light Vision (Changeling)
+        '210401d7-57fa-4260-9517-2725689a509e': 'lowLight',        // Low-Light Vision (Feline)
+        '02e76a38-304e-4a0e-93a3-ad2938306afc': 'thermographic',   // Thermographic Vision
+        'fd346177-3791-44c0-af8c-7cf176fc9aa3': 'thermographic',   // Thermographic Vision (SURGE)
+    };
+
     public static readonly skillGroupTable = {
         "Acting": ["con", "impersonation", "performance"],
         "Athletics": ["gymnastics", "running", "swimming", "flight"],

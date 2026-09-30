@@ -63,6 +63,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
         entity.img = IconAssign.iconAssign(entity);
 
         BH.addBonus(entity, this.getBonus(jsonData));
+        BH.addSense(entity, jsonData.id._TEXT);
 
         if (jsonData.page && jsonData.source) {
             const page = IH.getArray(jsonData.altpage)[0]?._TEXT ?? jsonData.page._TEXT;

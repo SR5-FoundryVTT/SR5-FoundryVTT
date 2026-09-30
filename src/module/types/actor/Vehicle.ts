@@ -80,7 +80,7 @@ const VehicleData = () => ({
         initial: "willpower",
         choices: SR5.attributes
     }),
-    visibilityChecks: new SchemaField(VisibilityChecks("matrix", "meatspace")),
+    visibilityChecks: new SchemaField(VisibilityChecks({ body: true, heat: "warm", icon: true })),
 
     // === Driver & Networking ===
     driver: new StringField({ required: true }),

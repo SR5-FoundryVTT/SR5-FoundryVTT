@@ -153,6 +153,15 @@ export const registerSystemSettings = () => {
         default: false,
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.AutomaticTokenSenses, {
+        name: 'SETTINGS.AutomaticTokenSenses',
+        hint: 'SETTINGS.AutomaticTokenSensesDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
+    });
+
     /**
      * Control if GM triggered chat messages should hide critical message parts.
      *

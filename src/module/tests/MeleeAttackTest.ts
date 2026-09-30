@@ -54,9 +54,9 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
     override prepareActorModifier(actor: SR5Actor, type: ModifierTypes): { name: string; value: number; } {
         if (type !== 'environmental') return super.prepareActorModifier(actor, type);
 
-        // Only light and visibility apply.
+        // Only light/glare and visibility apply.
         const modifiers = actor.getSituationModifiers();
-        modifiers.environmental.apply({ applicable: ['light', 'visibility'] });
+        modifiers.environmental.apply({ applicable: ['light', 'glare', 'visibility'] });
 
         const name = this._getModifierTypeLabel(type);
         const value = modifiers.environmental.total;

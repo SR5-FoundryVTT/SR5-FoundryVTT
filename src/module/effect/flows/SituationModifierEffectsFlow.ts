@@ -1,9 +1,21 @@
 import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5ActiveEffect } from "../SR5ActiveEffect";
 import { SituationModifier } from "../../rules/modifiers/SituationModifier";
-import { imageMagnification, lowLightVision, smartlink, thermographicVision, tracerRounds, ultrasound } from "./EnvironmentalChangeFlow";
+import {
+    applyBestVisionCompensation,
+    flareCompensation,
+    imageMagnification,
+    lowLightVision,
+    smartlink,
+    sunglasses,
+    thermographicVision,
+    tracerRounds,
+    ultrasound,
+    VISION_COMPENSATIONS,
+} from "./EnvironmentalChangeFlow";
 import { SuccessTest } from "../../tests/SuccessTest";
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from "../../effects";
+import { PerceptionResolver } from "../../vision/PerceptionResolver";
 
 /**
  * TODO: Documentation.
@@ -23,7 +35,9 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
             'tracer_rounds': tracerRounds,
             'smartlink': smartlink,
             'ultrasound': ultrasound,
-            'thermographic_vision': thermographicVision
+            'thermographic_vision': thermographicVision,
+            'flare_compensation': flareCompensation,
+            'sunglasses': sunglasses,
         }
     }
 
@@ -56,23 +70,45 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
         changes.sort((a, b) => a.priority - b.priority);
 
         console.debug('Shadowrun 5e | Applying Situation Modifier Effect changes', changes);
+        // A handler granted by several effects or senses only applies once.
+        const handlerNames = new Set<string>(this.senseHandlerNames());
         for (const change of changes) {
             if (!change.key) continue;
             
             // expect keys in format of <modifierType>.<modifierHandler>
             const changeKeySplit = change.key.split('.') as [string, string];
-            if (changeKeySplit.length !== 2) return false;
+            if (changeKeySplit.length !== 2) continue;
             const [modifierType, modifierHandler] = changeKeySplit;
 
             if (modifierType !== this.modifier.type) continue;
+            if (this.applyHandlers[modifierHandler]) handlerNames.add(modifierHandler);
+        }
 
-            const handler = this.applyHandlers[modifierHandler];
-            if (!handler) continue;
-
+        const visionHandlers: ((modifier: any, test?: SuccessTest) => void)[] = [];
+        for (const handlerName of handlerNames) {
+            const handler = this.applyHandlers[handlerName];
+            if (VISION_COMPENSATIONS.has(handlerName)) {
+                visionHandlers.push(handler);
+                continue;
+            }
             console.debug('Shadowrun 5e | ... applying modifier handler', this.modifier, handler, test);
             handler(this.modifier, test);
         }
+        if (visionHandlers.length) applyBestVisionCompensation(this.modifier as any, visionHandlers, test);
         return false;
+    }
+
+    /**
+     * Senses of the actor compensate environmental modifiers without needing an effect. See SR5#175
+     */
+    *senseHandlerNames(): Generator<string> {
+        if (this.modifier.type !== 'environmental') return;
+        if (!this.modifier.sourceDocumentIsActor || !this.modifier.modifiers?.document) return;
+
+        const senses = PerceptionResolver.resolve(this.modifier.modifiers.document as SR5Actor).physical;
+        if (senses.lowLight) yield 'low_light_vision';
+        if (senses.thermographic) yield 'thermographic_vision';
+        if (senses.ultrasound) yield 'ultrasound';
     }
 
     /**

@@ -91,3 +91,14 @@ export class SR5TestFactory {
         this.createdFolder.clear();
     }
 }
+
+/** A rectangular Region shape, or a hole cut out of one. */
+export const rectangle = (x: number, y: number, width: number, height: number, hole = false) => ({
+    type: 'rectangle' as const,
+    x,
+    y,
+    width,
+    height,
+    rotation: 0,
+    hole,
+});

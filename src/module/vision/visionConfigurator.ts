@@ -1,37 +1,118 @@
 import AstralPerceptionDetectionMode from './astralPerception/astralPerceptionDetectionMode';
-import AstralPerceptionBackgroundVisionShader  from './astralPerception/astralPerceptionBackgroundShader';
+import {
+    AstralBackgroundVisionShader,
+    AstralPerceptionBackgroundVisionShader,
+} from './astralPerception/astralShaders';
+import {
+    ASTRAL_PERCEPTION_VISION_MODE,
+    ASTRAL_PROJECTION_VISION_MODE,
+} from './astralPerception/astralVisionModes';
 import ThermographicVisionDetectionMode from './thermographicVision/thermographicDetectionMode';
 import LowlightVisionDetectionMode from './lowlightVision/lowlightDetectionMode';
 import AugmentedRealityVisionDetectionMode from './augmentedReality/arDetectionMode';
+import UltrasoundDetectionMode, { ULTRASOUND_VISION_MODE } from './ultrasoundVision/ultrasoundDetectionMode';
+import {
+    ULTRASOUND_COLOR,
+    UltrasoundBackgroundVisionShader,
+    UltrasoundColorationVisionShader,
+} from './ultrasoundVision/ultrasoundShaders';
+import {
+    PhysicalLightPerceptionDetectionMode,
+    PhysicalSightDetectionMode,
+} from './physicalVision/physicalDetectionMode';
+import {
+    PhysicalAllDetectionMode,
+    PhysicalInvisibilityDetectionMode,
+    PhysicalTremorDetectionMode,
+} from './physicalVision/coreDetectionModes';
+import { MANIFEST_STATUS, MATERIALIZE_STATUS } from './astralProjection/ManifestationState';
+import { AstralAwareCanvasVisibility } from './astralPerception/astralVisibility';
+import { SR5VisionSource } from './SR5VisionSource';
+import {
+    ASTRAL_BARRIER_REGION_BEHAVIOR,
+    ASTRAL_WARD_REGION_BEHAVIOR,
+    AstralBarrierRegionBehavior,
+    AstralWardRegionBehavior,
+} from '@/module/types/regionBehavior/AstralBoundary';
+import {
+    ENVIRONMENT_REGION_BEHAVIOR,
+    EnvironmentalRegionBehavior,
+} from '@/module/types/regionBehavior/Environmental';
 
 export default class VisionConfigurator {
+    static configurePhysicalSight() {
+        const modes = CONFIG.Canvas.detectionModes;
+        const replace = (id: string, Mode: typeof foundry.canvas.perception.DetectionMode) => {
+            const mode = modes[id];
+            if (mode) modes[id] = new Mode(mode.toObject()) as unknown as typeof mode;
+        };
+        replace('basicSight', PhysicalSightDetectionMode);
+        replace('lightPerception', PhysicalLightPerceptionDetectionMode);
+        // Foundry's other senses stay on the physical plane as well.
+        replace('seeInvisibility', PhysicalInvisibilityDetectionMode);
+        replace('senseInvisibility', PhysicalInvisibilityDetectionMode);
+        replace('feelTremor', PhysicalTremorDetectionMode);
+        replace('seeAll', PhysicalAllDetectionMode);
+        replace('senseAll', PhysicalAllDetectionMode);
+    }
+
+    /** Let tokens react when their actor manifests or materializes, see SR5Token._onApplyStatusEffect. */
+    static configureStatuses() {
+        const special = CONFIG.specialStatusEffects as Record<string, string>;
+        special.MANIFEST = MANIFEST_STATUS;
+        special.MATERIALIZE = MATERIALIZE_STATUS;
+    }
+
     static configureAstralPerception() {
+        CONFIG.Canvas.visionSourceClass = SR5VisionSource as unknown as typeof CONFIG.Canvas.visionSourceClass;
+        CONFIG.Canvas.groups.visibility.groupClass = AstralAwareCanvasVisibility as unknown as
+            typeof CONFIG.Canvas.groups.visibility.groupClass;
         CONFIG.Canvas.detectionModes.astralPerception = new AstralPerceptionDetectionMode({
             id: 'astralPerception',
             label: 'SR5.Vision.AstralPerception',
+            walls: true,
             type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
         });
-  
+
+        // SR5#312 a perceiving body sees the astral plane overlaid on the physical world, which keeps its light
+        // and colors, faded under the glow of life. Auras are drawn over the tokens, see SenseFilterResolver.
+        const { LIGHTING_VISIBILITY } = foundry.canvas.perception.VisionMode;
         CONFIG.Canvas.visionModes.astralPerception = new foundry.canvas.perception.VisionMode({
-            id: 'astralPerception',
+            id: ASTRAL_PERCEPTION_VISION_MODE,
             label: 'SR5.Vision.AstralPerception',
             canvas: {
                 shader: foundry.canvas.rendering.shaders.ColorAdjustmentsSamplerShader,
-                uniforms: {
-                    saturation: 5,
-                    tint: AstralPerceptionBackgroundVisionShader.COLOR_TINT,
-                },
+                uniforms: { contrast: -0.05, saturation: -0.65, exposure: -0.15 },
+            },
+            vision: {
+                // The fade marks perceiving in any light, instead of growing with the darkness level.
+                darkness: { adaptive: false },
+                defaults: { attenuation: 0, contrast: -0.05, saturation: -0.65, brightness: 0 },
+                background: { shader: AstralPerceptionBackgroundVisionShader },
+            },
+        }, { animated: true });
+
+        // SR5#312-313 a projected form sees only the astral plane, always lit by the glow of life, so no scene
+        // lighting or darkness applies.
+        CONFIG.Canvas.visionModes.astralProjection = new foundry.canvas.perception.VisionMode({
+            id: ASTRAL_PROJECTION_VISION_MODE,
+            label: 'SR5.Vision.AstralProjection',
+            canvas: {
+                shader: foundry.canvas.rendering.shaders.ColorAdjustmentsSamplerShader,
+                uniforms: { contrast: -0.15, saturation: -0.9, exposure: -0.45 },
             },
             lighting: {
-                background: { visibility: foundry.canvas.perception.VisionMode.LIGHTING_VISIBILITY.DISABLED },
-                illumination: { visibility: foundry.canvas.perception.VisionMode.LIGHTING_VISIBILITY.DISABLED },
-                coloration: { visibility: foundry.canvas.perception.VisionMode.LIGHTING_VISIBILITY.DISABLED },
+                background: { visibility: LIGHTING_VISIBILITY.DISABLED },
+                illumination: { visibility: LIGHTING_VISIBILITY.DISABLED },
+                coloration: { visibility: LIGHTING_VISIBILITY.DISABLED },
+                darkness: { visibility: LIGHTING_VISIBILITY.DISABLED },
             },
             vision: {
                 darkness: { adaptive: false },
-                background: { shader: AstralPerceptionBackgroundVisionShader },
+                defaults: { attenuation: 0, contrast: -0.1, saturation: -0.85, brightness: 1 },
+                background: { shader: AstralBackgroundVisionShader },
             },
-        });
+        }, { animated: true });
     }
 
     static configureThermographicVision() {
@@ -50,12 +131,89 @@ export default class VisionConfigurator {
         });
     }
 
+    static configureUltrasound() {
+        CONFIG.Canvas.detectionModes.ultrasound = new UltrasoundDetectionMode({
+            id: 'ultrasound',
+            label: 'SR5.Vision.Ultrasound',
+            walls: true,
+            angle: false,
+            type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SOUND,
+        });
+
+        // Ultrasound replaces normal vision with a colorless map of shapes and textures that ignores light.
+        // It is based on Foundry's tremorsense, tinted gray like the ultrasound detection outline.
+        const { LIGHTING_VISIBILITY } = foundry.canvas.perception.VisionMode;
+        const { shaders } = foundry.canvas.rendering;
+        CONFIG.Canvas.visionModes.ultrasound = new foundry.canvas.perception.VisionMode({
+            id: ULTRASOUND_VISION_MODE,
+            label: 'SR5.Vision.Ultrasound',
+            canvas: {
+                shader: shaders.ColorAdjustmentsSamplerShader,
+                uniforms: { contrast: 0, saturation: -1, exposure: -0.65, tint: ULTRASOUND_COLOR },
+            },
+            lighting: {
+                background: { visibility: LIGHTING_VISIBILITY.DISABLED },
+                illumination: { visibility: LIGHTING_VISIBILITY.DISABLED },
+                coloration: { visibility: LIGHTING_VISIBILITY.DISABLED },
+                darkness: { visibility: LIGHTING_VISIBILITY.DISABLED },
+            },
+            vision: {
+                darkness: { adaptive: false },
+                defaults: { attenuation: 0, contrast: 0.2, saturation: -1, brightness: 1 },
+                background: { shader: UltrasoundBackgroundVisionShader },
+                coloration: { shader: UltrasoundColorationVisionShader },
+            },
+        }, { animated: true });
+    }
+
     static configureAR() {
         CONFIG.Canvas.detectionModes.augmentedReality = new AugmentedRealityVisionDetectionMode({
             id: 'augmentedReality',
             label: 'SR5.Vision.AugmentedReality',
             type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
+            // Icons are spotted through the antenna, not line of sight (SR5#235).
+            walls: false,
+            angle: false,
         });
     }
+
+    /** Astral barriers and wards, and the SR5 environment, as Region behaviors. */
+    static configureRegionBehaviors() {
+        const behaviors = {
+            [ASTRAL_BARRIER_REGION_BEHAVIOR]: {
+                model: AstralBarrierRegionBehavior,
+                icon: 'fa-solid fa-shield-halved',
+                label: 'SR5.Vision.AstralRegions.Barrier.Label',
+            },
+            [ASTRAL_WARD_REGION_BEHAVIOR]: {
+                model: AstralWardRegionBehavior,
+                icon: 'fa-solid fa-shield',
+                label: 'SR5.Vision.AstralRegions.Ward.Label',
+            },
+            [ENVIRONMENT_REGION_BEHAVIOR]: {
+                model: EnvironmentalRegionBehavior,
+                icon: 'fa-solid fa-cloud-sun',
+                label: 'SR5.Vision.EnvironmentalRegions.Environment.Label',
+            },
+        };
+        const regionModel = game.model.RegionBehavior as Record<string, object>;
+        const documentTypes = game.documentTypes.RegionBehavior as string[];
+        for (const [type, { model, icon, label }] of Object.entries(behaviors)) {
+            Object.assign(CONFIG.RegionBehavior.dataModels, { [type]: model });
+            CONFIG.RegionBehavior.typeIcons[type] = icon;
+            CONFIG.RegionBehavior.typeLabels[type] = label;
+            // Keep document validation in sync when Foundry serves an older package model.
+            regionModel[type] ??= {};
+            if (!documentTypes.includes(type)) documentTypes.push(type);
+        }
+    }
+
+    /** Behaviors that failed validation before their data models were registered are read again. */
+    static revalidateRegionBehaviors() {
+        for (const scene of game.scenes) {
+            for (const region of scene.regions) {
+                if (region.behaviors.invalidDocumentIds.size) region.behaviors.initialize();
+            }
+        }
+    }
 }
-  

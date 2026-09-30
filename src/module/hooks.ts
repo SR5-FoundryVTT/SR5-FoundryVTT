@@ -68,6 +68,7 @@ import { MatrixHooks } from './tests/hooks/MatrixHooks';
 import { MatrixResistTest } from './tests/MatrixResistTest';
 import { OpposedBruteForceTest } from './tests/OpposedBruteForceTest';
 import { OpposedHackOnTheFlyTest } from './tests/OpposedHackOnTheFlyTest';
+import { OpposedTraceIconTest } from './tests/OpposedTraceIconTest';
 import { MatrixDefenseTest } from './tests/MatrixDefenseTest';
 import { MatrixTest } from './tests/MatrixTest';
 import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
@@ -146,6 +147,11 @@ import { SR5SkillSheet } from './item/sheets/SR5SkillSheet';
 import { SkillGroupFlow } from './actor/flows/SkillGroupFlow';
 import { OpposedMatrixTest } from './tests/OpposedMatrixTest';
 import { BlastScatterFlow } from './tests/flows/BlastScatterFlow';
+import { PerceptionFlow } from './vision/PerceptionFlow';
+import { VisionHUD } from './apps/VisionHUD';
+import { AstralProjectionFlow } from './vision/astralProjection/AstralProjectionFlow';
+import { AstralRegionFlow } from './vision/astralRegions/AstralRegionFlow';
+import { EnvironmentalRegionFlow } from './vision/environmentalRegions/EnvironmentalRegionFlow';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -171,7 +177,7 @@ export class HooksManager {
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
         Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory.bind(HooksManager));
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory.bind(HooksManager));
-        Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));
+        Hooks.on('renderTokenHUD', VisionHUD.onRenderTokenHUD.bind(VisionHUD));
         Hooks.on('moveToken', SR5TokenDocument.moveToken.bind(SR5Token));
         Hooks.on('createItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('updateItem', (item, data, options, userId) => { void HooksManager.updateIcConnectedToHostItem(item, data, options, userId); });
@@ -185,6 +191,11 @@ export class HooksManager {
         // Announce extended tests game time has made rollable again. Debounced, as holding a
         // time preset would otherwise scan every record per tick.
         Hooks.on('updateWorldTime', foundry.utils.debounce(() => { void ExtendedTestDueFlow.announceDue(); }, 250));
+
+        PerceptionFlow.registerHooks();
+        AstralProjectionFlow.registerHooks();
+        AstralRegionFlow.registerHooks();
+        EnvironmentalRegionFlow.registerHooks();
 
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();
@@ -286,6 +297,7 @@ ___________________
                 OpposedBruteForceTest,
                 HackOnTheFlyTest,
                 OpposedHackOnTheFlyTest,
+                OpposedTraceIconTest,
                 MatrixResistTest,
                 BiofeedbackResistTest,
                 CheckOverwatchScoreTest,
@@ -341,6 +353,7 @@ ___________________
                 OpposedRitualTest,
                 OpposedBruteForceTest,
                 OpposedHackOnTheFlyTest,
+                OpposedTraceIconTest,
                 OpposedCheckOverwatchScoreTest,
                 OpposedMatrixTest
             },
@@ -550,6 +563,7 @@ ___________________
     }
 
     static async ready() {
+        VisionConfigurator.revalidateRegionBehaviors();
         await IconAssign.refreshIconFiles();
 
         if (game.user?.isGM) {
@@ -709,6 +723,7 @@ ___________________
             [FLAGS.UnsetDataStorage]: [DataStorage._handleUnsetDataStorageSocketMessage.bind(DataStorage)],
             [FLAGS.UpdateDocumentsAsGM]: [SocketMessageFlow.handleUpdateDocumentsAsGMMessage.bind(SocketMessage)],
             [FLAGS.ApplyExtendedTestRoll]: [ExtendedTestFlow._handleApplyRollSocketMessage.bind(ExtendedTestFlow)],
+            [FLAGS.AstralProjectionOperation]: [AstralProjectionFlow.handleSocketMessage.bind(AstralProjectionFlow)],
         } as const;
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData, senderId?: string) => {
@@ -746,10 +761,14 @@ ___________________
 
     static configureVision() {
         //register detection modes
+        VisionConfigurator.configurePhysicalSight()
+        VisionConfigurator.configureStatuses()
         VisionConfigurator.configureAstralPerception()
         VisionConfigurator.configureThermographicVision()
         VisionConfigurator.configureLowlight()
+        VisionConfigurator.configureUltrasound()
         VisionConfigurator.configureAR()
+        VisionConfigurator.configureRegionBehaviors()
     }
 
     static configureTextEnrichers() {
