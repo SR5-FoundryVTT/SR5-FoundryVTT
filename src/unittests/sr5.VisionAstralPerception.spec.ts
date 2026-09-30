@@ -16,7 +16,7 @@ import {
 } from '@/module/vision/astralPerception/astralVisibility';
 import { SR5VisionSource } from '@/module/vision/SR5VisionSource';
 import { SenseFilterResolver } from '@/module/vision/SenseFilterResolver';
-import { AstralAuraFilter } from '@/module/vision/astralPerception/astralAuraFilter';
+import { AccessibleAstralAuraFilter, AstralAuraFilter } from '@/module/vision/astralPerception/astralAuraFilter';
 import {
     AstralBackgroundVisionShader,
     AstralPerceptionBackgroundVisionShader,
@@ -259,37 +259,61 @@ export const shadowrunVisionAstralPerception = (context: QuenchBatchContext) => 
         });
 
         it('draws each astral tier with its own shared aura, dimmed by Essence', () => {
-            const shadow = AstralAuraFilter.forSignature('shadow') as any;
-            const full = AstralAuraFilter.forSignature('aura', 6) as any;
-            const chromed = AstralAuraFilter.forSignature('aura', 1) as any;
-            const form = AstralAuraFilter.forSignature('form', 1) as any;
+            const classic = { accessible: false };
+            const shadow = AstralAuraFilter.forSignature('shadow', 6, classic) as any;
+            const full = AstralAuraFilter.forSignature('aura', 6, classic) as any;
+            const chromed = AstralAuraFilter.forSignature('aura', 1, classic) as any;
+            const awakened = AstralAuraFilter.forSignature('awakened', 6, classic) as any;
+            const form = AstralAuraFilter.forSignature('form', 1, classic) as any;
 
-            assert.strictEqual(AstralAuraFilter.forSignature('aura', 6), full, 'filters are shared');
-            assert.strictEqual(form, AstralAuraFilter.forSignature('form', 6), 'astral forms have no Essence to lose');
+            assert.notInstanceOf(full, AccessibleAstralAuraFilter);
+            assert.strictEqual(AstralAuraFilter.forSignature('aura', 6, classic), full, 'filters are shared');
+            assert.strictEqual(form, AstralAuraFilter.forSignature('form', 6, classic), 'astral forms have no Essence to lose');
             assert.strictEqual(shadow.outerStrength, 0, 'shadows have no aura');
             assert.isBelow(shadow.uniforms.spriteAlpha, 1, 'shadows are faded');
             assert.isBelow(chromed.outerStrength, full.outerStrength, 'cyberware thins an aura');
             assert.isAbove(chromed.outerStrength, 0, 'even a thin aura shows');
             assert.isAbove(form.outerStrength, full.outerStrength, 'astral forms outshine auras');
             assert.isAtLeast(form.padding, form.uniforms.distance, 'the halo fits its padding');
-            assert.isBelow(chromed.uniforms.distance, full.uniforms.distance, 'cyberware narrows the halo too');
+            assert.strictEqual(full.uniforms.rimStrength, 0, 'a living aura has no rim');
+            assert.isAbove(awakened.uniforms.rimStrength, 0, 'Awakened auras carry a rim');
+            assert.isAbove(form.uniforms.rimStrength, 0, 'astral forms carry a rim');
 
-            // Readable without color: each tier above a plain aura adds a ring.
-            const awakened = AstralAuraFilter.forSignature('awakened') as any;
-            assert.deepEqual([full, awakened, form].map(filter => filter.uniforms.rings), [0, 1, 2]);
-
-            const overlay = AstralAuraFilter.forSignature('aura', 6, { overlay: true }) as any;
+            const overlay = AstralAuraFilter.forSignature('aura', 6, { ...classic, overlay: true }) as any;
             assert.notStrictEqual(overlay, full, 'the overlay has its own filter');
             assert.isTrue(overlay.overlay);
             assert.strictEqual(overlay.uniforms.spriteAlpha, 0, 'the overlay leaves the physical sprite alone');
             assert.strictEqual(overlay.uniforms.distance, full.uniforms.distance, 'with the same aura');
 
             const marker = AstralPerceptionDetectionMode.getDetectionFilter()!;
-            assert.strictEqual(SenseFilterResolver.resolve(astralTarget({ essence: 1 }) as Token, marker), chromed);
+            assert.strictEqual(
+                SenseFilterResolver.resolve(astralTarget({ essence: 1 }) as Token, marker),
+                AstralAuraFilter.forSignature('aura', 1),
+            );
             assert.strictEqual(
                 SenseFilterResolver.resolve(astralTarget({ type: 'vehicle', hasAura: false }) as Token, marker),
-                shadow,
+                AstralAuraFilter.forSignature('shadow'),
             );
+        });
+
+        it('tells astral tiers apart without color in photosensitive mode', () => {
+            const accessible = { accessible: true };
+            const full = AstralAuraFilter.forSignature('aura', 6, accessible) as any;
+            const chromed = AstralAuraFilter.forSignature('aura', 1, accessible) as any;
+            const awakened = AstralAuraFilter.forSignature('awakened', 6, accessible) as any;
+            const form = AstralAuraFilter.forSignature('form', 6, accessible) as any;
+
+            assert.instanceOf(full, AccessibleAstralAuraFilter);
+            assert.notStrictEqual(full, AstralAuraFilter.forSignature('aura', 6, { accessible: false }), 'each look has its own filter');
+            // Each tier above a plain aura adds a ring.
+            assert.deepEqual([full, awakened, form].map(filter => filter.uniforms.rings), [0, 1, 2]);
+            assert.isBelow(chromed.uniforms.distance, full.uniforms.distance, 'cyberware narrows the halo too');
+            assert.isBelow(chromed.outerStrength, full.outerStrength, 'and dims it');
+            assert.isAtLeast(form.padding, form.uniforms.distance, 'the halo fits its padding');
+
+            const overlay = AstralAuraFilter.forSignature('aura', 6, { ...accessible, overlay: true }) as any;
+            assert.instanceOf(overlay, AccessibleAstralAuraFilter);
+            assert.strictEqual(overlay.uniforms.spriteAlpha, 0, 'the overlay leaves the physical sprite alone');
         });
 
         it('draws auras over tokens a perceiving viewer sees physically', function () {

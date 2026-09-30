@@ -8,26 +8,34 @@ import {
 
 type Color = [number, number, number];
 
-interface AuraLook {
+interface BaseAuraLook {
     /** Aura color. */
     glow: Color;
     /** Halo width in pixels of a full aura. */
     distance: number;
     innerStrength: number;
     outerStrength: number;
-    /**
-     * Bright rings around the silhouette, at fixed distances from it. Their count tells the tiers apart without
-     * relying on color: none for a living aura, one for an Awakened aura, two for an astral form.
-     */
-    rings: 0 | 1 | 2;
     /** Added to the sprite's saturation; -1 is fully grey. */
     saturation: number;
     brightness: number;
     tint: Color;
     alpha: number;
     pulse: GlowPulse | null;
-    /** Whether a lower Essence thins the aura. Astral forms have no Essence to lose. */
+    /** Whether a lower Essence dims the aura. Astral forms have no Essence to lose. */
     followsEssence: boolean;
+}
+
+interface AuraLook extends BaseAuraLook {
+    /** A brighter band hugging the silhouette, for beings active on the astral plane. */
+    rim: number;
+}
+
+interface AccessibleAuraLook extends BaseAuraLook {
+    /**
+     * Bright rings around the silhouette, at fixed distances from it. Their count tells the tiers apart without
+     * relying on color: none for a living aura, one for an Awakened aura, two for an astral form.
+     */
+    rings: 0 | 1 | 2;
 }
 
 export interface AuraOptions {
@@ -36,6 +44,8 @@ export interface AuraOptions {
      * the physical one while perceiving (SR5#312).
      */
     overlay?: boolean;
+    /** Use the look of photosensitive mode. Defaults to whether the canvas is in photosensitive mode. */
+    accessible?: boolean;
 }
 
 const WHITE: Color = [1, 1, 1];
@@ -51,12 +61,71 @@ const RING_WHITENESS = 0.45;
 
 /**
  * SR5#312: non-living things are grey shadows, living auras shine in color, and astral forms are brighter
- * still. Tiers also differ in ring count and brightness, so they read in any color vision and in greyscale.
+ * still. Awakened auras carry a rim, the look of beings active on the astral plane.
+ */
+export const AURA_LOOKS: Readonly<Record<AstralTier, AuraLook>> = {
+    shadow: {
+        glow: [0.8, 0.85, 0.95],
+        distance: 2,
+        innerStrength: 0,
+        outerStrength: 0,
+        rim: 0,
+        saturation: -1,
+        brightness: 0.6,
+        tint: [0.8, 0.85, 0.95],
+        alpha: 0.45,
+        pulse: null,
+        followsEssence: false,
+    },
+    aura: {
+        glow: [1.0, 0.8, 0.45],
+        distance: 8,
+        innerStrength: 1.5,
+        outerStrength: 2.5,
+        rim: 0,
+        saturation: 0.15,
+        brightness: 0.9,
+        tint: WHITE,
+        alpha: 1,
+        pulse: { min: 0.85, max: 1.15, period: 5000 },
+        followsEssence: true,
+    },
+    awakened: {
+        glow: [0.7, 0.45, 1.0],
+        distance: 12,
+        innerStrength: 2,
+        outerStrength: 4,
+        rim: 0.8,
+        saturation: 0.25,
+        brightness: 1,
+        tint: WHITE,
+        alpha: 1,
+        pulse: { min: 0.8, max: 1.25, period: 3500 },
+        followsEssence: true,
+    },
+    form: {
+        glow: [0.55, 0.95, 1.0],
+        distance: 14,
+        innerStrength: 3,
+        outerStrength: 6,
+        rim: 1,
+        saturation: 0.4,
+        brightness: 1.25,
+        tint: WHITE,
+        alpha: 1,
+        pulse: { min: 0.9, max: 1.3, period: 3000 },
+        followsEssence: false,
+    },
+};
+
+/**
+ * The auras of photosensitive mode. Tiers also differ in ring count and brightness, so they read in any color vision
+ * and in greyscale.
  *
  * Seen only astrally, a being's sprite takes on the color of its aura, so it doesn't pass for being seen
  * physically.
  */
-const AURA_LOOKS: Readonly<Record<AstralTier, AuraLook>> = {
+export const ACCESSIBLE_AURA_LOOKS: Readonly<Record<AstralTier, AccessibleAuraLook>> = {
     shadow: {
         glow: [0.8, 0.85, 0.95],
         distance: 2,
@@ -111,12 +180,17 @@ const AURA_LOOKS: Readonly<Record<AstralTier, AuraLook>> = {
     },
 };
 
+const essenceFactor = (look: BaseAuraLook, bucket: number) =>
+    look.followsEssence ? Math.max(MIN_ESSENCE_FACTOR, bucket / MAX_ESSENCE_BUCKET) : 1;
+
 /**
- * How a token looks to astral sight: its sprite, recolored for its astral tier, inside an aura with the tier's
- * rings. As an overlay it leaves the sprite alone and only adds the aura.
+ * How a token looks to astral sight: its sprite, recolored for its astral tier, inside an aura. As an overlay it
+ * leaves the sprite alone and only adds the aura.
  *
  * Detection filters render the token alone with this filter, so it draws the sprite itself rather than
  * knocking it out like Foundry's glow.
+ *
+ * In photosensitive mode, Foundry's accessibility option, auras show as an AccessibleAstralAuraFilter.
  */
 export class AstralAuraFilter extends PulsingGlowOverlayFilter {
     private static readonly cache = new Map<number, AstralAuraFilter>();
@@ -132,22 +206,27 @@ export class AstralAuraFilter extends PulsingGlowOverlayFilter {
             spriteSaturation: 0,
             spriteBrightness: 1,
             spriteAlpha: 1,
-            rings: 0,
-            ringColor: WHITE,
+            rimStrength: 0,
         };
     }
 
     /** The shared filter of a tier at an Essence bucket. */
-    static forSignature(tier: AstralTier, bucket = MAX_ESSENCE_BUCKET, { overlay = false }: AuraOptions = {}) {
-        const look = AURA_LOOKS[tier];
-        const effectiveBucket = look.followsEssence
+    static forSignature(
+        tier: AstralTier,
+        bucket = MAX_ESSENCE_BUCKET,
+        { overlay = false, accessible = !!canvas?.photosensitiveMode }: AuraOptions = {},
+    ) {
+        const effectiveBucket = AURA_LOOKS[tier].followsEssence
             ? Math.min(MAX_ESSENCE_BUCKET, Math.max(1, Math.round(bucket)))
             : MAX_ESSENCE_BUCKET;
-        const key = (ASTRAL_TIERS.indexOf(tier) * (MAX_ESSENCE_BUCKET + 1) + effectiveBucket) * 2 + Number(overlay);
-        let filter = this.cache.get(key);
+        const signatureKey = ASTRAL_TIERS.indexOf(tier) * (MAX_ESSENCE_BUCKET + 1) + effectiveBucket;
+        const key = signatureKey * 4 + Number(overlay) + 2 * Number(accessible);
+        let filter = AstralAuraFilter.cache.get(key);
         if (!filter) {
-            filter = this.createForSignature(tier, effectiveBucket, overlay);
-            this.cache.set(key, filter);
+            filter = accessible
+                ? AccessibleAstralAuraFilter.createForSignature(tier, effectiveBucket, overlay)
+                : AstralAuraFilter.createForSignature(tier, effectiveBucket, overlay);
+            AstralAuraFilter.cache.set(key, filter);
         }
         return filter;
     }
@@ -166,9 +245,99 @@ export class AstralAuraFilter extends PulsingGlowOverlayFilter {
         return signature ? this.forSignature(signature.tier, signature.bucket, options) : null;
     }
 
-    private static createForSignature(tier: AstralTier, bucket: number, overlay: boolean) {
+    /** A new filter of a tier; forSignature shares them. */
+    static createForSignature(tier: AstralTier, bucket: number, overlay: boolean): AstralAuraFilter {
         const look = AURA_LOOKS[tier];
-        const essence = look.followsEssence ? Math.max(MIN_ESSENCE_FACTOR, bucket / MAX_ESSENCE_BUCKET) : 1;
+        const essence = essenceFactor(look, bucket);
+        const filter = this.create({
+            distance: look.distance,
+            quality: this.qualityForPerformance(),
+            glowColor: [...look.glow, 0.5 + 0.5 * essence],
+            spriteTint: overlay ? WHITE : look.tint,
+            spriteSaturation: overlay ? 0 : look.saturation,
+            spriteBrightness: overlay ? 1 : look.brightness,
+            spriteAlpha: overlay ? 0 : look.alpha,
+            rimStrength: look.rim * essence,
+        }) as AstralAuraFilter;
+        return filter.configure(tier, overlay, look, essence, look.distance);
+    }
+
+    protected configure(tier: AstralTier, overlay: boolean, look: BaseAuraLook, essence: number, distance: number) {
+        this.fitPadding(distance);
+        this.tier = tier;
+        this.overlay = overlay;
+        this.innerStrength = look.innerStrength * essence;
+        this.outerStrength = look.outerStrength * essence;
+        this.pulse = look.pulse;
+        this.animated = !!look.pulse;
+        return this;
+    }
+
+    static override _createFragmentShader(quality: number, distance: number) {
+        return `
+    precision ${PIXI.Program.defaultFragmentPrecision} float;
+    varying vec2 vTextureCoord;
+
+    uniform sampler2D uSampler;
+    uniform float innerStrength;
+    uniform float outerStrength;
+    uniform float alpha;
+    uniform vec4 glowColor;
+    uniform vec4 inputSize;
+    uniform vec4 inputClamp;
+    uniform vec3 spriteTint;
+    uniform float spriteSaturation;
+    uniform float spriteBrightness;
+    uniform float spriteAlpha;
+    uniform float rimStrength;
+
+    ${this.CONSTANTS}
+    ${this.PERCEIVED_BRIGHTNESS}
+    ${this.glowSample(quality, distance)}
+
+    void main(void) {
+      float coverage = glowSample(vTextureCoord).x;
+
+      // The sprite, recolored for its tier. Textures are premultiplied, so unmultiply before recoloring.
+      vec4 tex = texture2D(uSampler, vTextureCoord);
+      vec3 rgb = tex.a > 0.0 ? tex.rgb / tex.a : vec3(0.0);
+      rgb = mix(vec3(perceivedBrightness(rgb)), rgb, 1.0 + spriteSaturation);
+      rgb = clamp(rgb * spriteTint * spriteBrightness, 0.0, 1.0);
+      float a = tex.a * spriteAlpha;
+      vec4 sprite = vec4(rgb * a, a);
+
+      // The aura seeps into the silhouette's edges...
+      float inner = min(1.0, (1.0 - coverage) * innerStrength * smoothstep(0.6, 1.0, tex.a)) * glowColor.a;
+      float innerAlpha = tex.a * inner;
+      sprite = sprite * (1.0 - inner) + vec4(glowColor.rgb * innerAlpha, innerAlpha);
+
+      // ...and shines around it, with a brighter band close to the silhouette for astrally active beings.
+      float outside = 1.0 - smoothstep(0.35, 1.0, tex.a);
+      float rim = rimStrength * smoothstep(0.25, 0.45, coverage);
+      float glowAlpha = min(1.0 - sprite.a, clamp((coverage * outerStrength + rim) * outside, 0.0, 1.0));
+      glowAlpha *= glowColor.a;
+
+      gl_FragColor = (sprite + vec4(glowColor.rgb * glowAlpha, glowAlpha)) * alpha;
+    }`;
+    }
+}
+
+/**
+ * The aura of photosensitive mode: a halo that fades out across its width, with the tier's rings, and an aura that
+ * narrows as well as dims with Essence loss.
+ */
+export class AccessibleAstralAuraFilter extends AstralAuraFilter {
+    static override get defaultUniforms() {
+        return {
+            ...super.defaultUniforms,
+            rings: 0,
+            ringColor: WHITE,
+        };
+    }
+
+    static override createForSignature(tier: AstralTier, bucket: number, overlay: boolean) {
+        const look = ACCESSIBLE_AURA_LOOKS[tier];
+        const essence = essenceFactor(look, bucket);
         // Cyberware narrows the halo as well as dimming it, so Essence doesn't rest on brightness alone.
         const distance = look.outerStrength
             ? Math.max(MIN_HALO_DISTANCE, Math.round(look.distance * (0.5 + 0.5 * essence)))
@@ -183,15 +352,8 @@ export class AstralAuraFilter extends PulsingGlowOverlayFilter {
             spriteAlpha: overlay ? 0 : look.alpha,
             rings: look.rings,
             ringColor: look.glow.map(channel => channel + (1 - channel) * RING_WHITENESS),
-        }) as AstralAuraFilter;
-        filter.fitPadding(distance);
-        filter.tier = tier;
-        filter.overlay = overlay;
-        filter.innerStrength = look.innerStrength * essence;
-        filter.outerStrength = look.outerStrength * essence;
-        filter.pulse = look.pulse;
-        filter.animated = !!look.pulse;
-        return filter;
+        }) as AccessibleAstralAuraFilter;
+        return filter.configure(tier, overlay, look, essence, distance);
     }
 
     static override _createFragmentShader(quality: number, distance: number) {
