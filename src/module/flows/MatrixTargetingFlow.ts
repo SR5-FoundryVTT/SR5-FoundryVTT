@@ -71,40 +71,18 @@ export const MatrixTargetingFlow = {
      * This is unrelated to the PAN -- this is based on whether the actor "owns" the item in terms of Shadowrun ownership
      * @param actor
      */
-    prepareOwnIcons(actor: SR5Actor): MatrixTargetDocument[] {
-        const targets: MatrixTargetDocument[] = [];
+    prepareOwnIcons(actor: SR5Actor): Shadowrun.MarkedDocument[] {
+        const targets: Shadowrun.MarkedDocument[] = [];
 
         if (!actor.uuid) return [];
 
-        // gather all actors and find the actors that we have ownership of (shadowrun character ownership, not Foundry Player ownership)
-        const actors = game.actors.filter((a) => {
-            // we don't want to include our own persona in this list
-            if (a === actor) return false;
-            return a instanceof SR5Actor && ActorOwnershipFlow._isOwnerOfActor(actor, a) && !a.getToken();
-        });
-
-        for (const slave of actors) {
-            // Filter out the actor itself.
-            if (slave.uuid === actor.uuid) continue;
-
-            const type = MatrixNetworkFlow.getDocumentType(slave);
-            const name = slave.getToken()?.name ?? slave.name;
-            targets.push({
-                name,
-                document: slave,
-                token: null,
-                runningSilent: slave.isRunningSilent(),
-                network: this._getNetworkName(slave.network),
-                type,
-                icons: []
-            })
-        }
         if (canvas.scene?.tokens) {
-            // go through the canvas tokens and see if we own any of them
+            // Only show owned drones/vehicles present on the current active scene
             for (const token of canvas.scene.tokens) {
                 if (!token.actor?.uuid) continue;
-                // again don't add ourselves, we do that later
-                if (token.actor.uuid === actor.uuid) continue;
+                if (token.getFlag('shadowrun5e', 'isSwarmCompanion')) continue;
+                if (token.actor.uuid === actor.uuid || token.actor.id === actor.id) continue;
+
                 if (token.actor instanceof SR5Actor && ActorOwnershipFlow._isOwnerOfActor(actor, token.actor)) {
                     const type = MatrixNetworkFlow.getDocumentType(token.actor);
                     targets.push({
@@ -114,24 +92,107 @@ export const MatrixTargetingFlow = {
                         runningSilent: token.actor.isRunningSilent(),
                         network: this._getNetworkName(token.actor.network),
                         type,
-                        icons: []
-                    })
+                        icons: [],
+                        marks: 0,
+                        markId: null,
+                    });
                 }
             }
+        } else {
+            // Fallback when no active scene is present: gather sidebar actors
+            const actors = game.actors.filter((a) => {
+                if (a === actor || a.id === actor.id) return false;
+                return a instanceof SR5Actor && ActorOwnershipFlow._isOwnerOfActor(actor, a);
+            });
+
+            for (const slave of actors) {
+                if (slave.uuid === actor.uuid) continue;
+
+                const type = MatrixNetworkFlow.getDocumentType(slave);
+                const name = slave.getToken()?.name ?? slave.name;
+                targets.push({
+                    name,
+                    document: slave,
+                    token: null,
+                    runningSilent: slave.isRunningSilent(),
+                    network: this._getNetworkName(slave.network),
+                    type,
+                    icons: [],
+                    marks: 0,
+                    markId: null,
+                });
+            }
         }
-        // add ourselves to the front so that our own Persona sits at the top
-        const type = MatrixNetworkFlow.getDocumentType(actor);
-        targets.unshift({
+        this._dedupeTargetsByDocumentUuid(targets);
+
+        if (actor.isType('vehicle')) {
+            const isControlled = actor.system.controlMode === 'remote' || actor.system.controlMode === 'rigger';
+            const driver = actor.getVehicleDriver();
+            const masterDevice = actor.master;
+            const masterActor = masterDevice?.actorOwner;
+            const riggerActor = driver || masterActor;
+
+            const droneTarget: Shadowrun.MarkedDocument = {
+                name: actor.getToken()?.name ?? actor.name,
+                document: actor as Actor.Stored,
+                token: actor.getToken(),
+                runningSilent: actor.isRunningSilent(),
+                network: this._getNetworkName(actor.network),
+                type: MatrixNetworkFlow.getDocumentType(actor),
+                icons: [],
+                marks: 0,
+                markId: null,
+            };
+
+            if (isControlled && riggerActor) {
+                const riggerTarget: Shadowrun.MarkedDocument = {
+                    name: riggerActor.getToken()?.name ?? riggerActor.name,
+                    document: riggerActor as Actor.Stored,
+                    token: riggerActor.getToken(),
+                    runningSilent: riggerActor.isRunningSilent(),
+                    network: this._getNetworkName(riggerActor.network),
+                    type: MatrixNetworkFlow.getDocumentType(riggerActor),
+                    icons: [droneTarget],
+                    marks: 0,
+                    markId: null,
+                };
+                return [riggerTarget];
+            }
+
+            return [droneTarget];
+        }
+
+        // For characters/other actors, separate controlled drones (indented) from autopilot ones (top-level)
+        const controlledTargets: Shadowrun.MarkedDocument[] = [];
+        const autonomousTargets: Shadowrun.MarkedDocument[] = [];
+
+        for (const target of targets) {
+            const doc = target.document;
+            if (doc instanceof SR5Actor && doc.type === 'vehicle') {
+                const mode = (doc.system as any)?.controlMode;
+                if (mode === 'remote' || mode === 'rigger') {
+                    controlledTargets.push(target);
+                } else {
+                    autonomousTargets.push(target);
+                }
+            } else {
+                controlledTargets.push(target);
+            }
+        }
+
+        const selfTarget: Shadowrun.MarkedDocument = {
             name: actor.getToken()?.name ?? actor.name,
             document: actor as Actor.Stored,
             token: actor.getToken(),
             runningSilent: actor.isRunningSilent(),
             network: this._getNetworkName(actor.network),
-            type,
-            icons: []
-        });
+            type: MatrixNetworkFlow.getDocumentType(actor),
+            icons: controlledTargets,
+            marks: 0,
+            markId: null,
+        };
 
-        return targets;
+        return [selfTarget, ...autonomousTargets];
     },
 
     /**

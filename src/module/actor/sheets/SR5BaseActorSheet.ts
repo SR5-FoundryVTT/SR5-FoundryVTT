@@ -1,5 +1,6 @@
 import { DeepPartial } from 'fvtt-types/utils';
 
+import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 import { SR5 } from '../../config';
 import { Helpers } from '../../helpers';
 import { SR5Actor } from '../SR5Actor';
@@ -38,6 +39,7 @@ import { CreateItemFlow } from '@/module/item/flows/CreateItemFlow';
 import { ActorSkillFlow } from '../flows/ActorSkillFlow';
 import { ModifiableValueType } from '@/module/types/template/Base';
 import { isElementInstance } from '@/module/utils/dom';
+import { MatrixRepairFlow } from '@/module/flows/MatrixRepairFlow';
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -102,6 +104,8 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
         uuid: string;
     } | null;
 
+    matrixAttributeIconsOnly?: boolean;
+
     // Sheet filters
     filters: SR5SheetFilters;
 
@@ -133,6 +137,7 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
     selectedInventory: string;
     spells: Record<string, SR5Item[]>;
     program_count: string;
+    hasHardwareSkill?: boolean;
 
     // UI
     tab: SR5Tab;
@@ -228,6 +233,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     selectedInventory: string;
 
     private readonly expandedSkills = new Set<string>();
+    expandedDroneStacks: Record<string, boolean> = {};
 
     constructor(...args: ConstructorParameters<typeof ActorSheetV2>) {
         super(...args);
@@ -327,6 +333,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
             addItem: SR5BaseActorSheet.#createItem,
             editItem: SR5BaseActorSheet.#editItem,
+            repairMatrixDevice: SR5BaseActorSheet.#repairMatrixDevice,
+            toggleDroneStack: SR5BaseActorSheet.#toggleDroneStack,
+            openVehicleSheet: SR5BaseActorSheet.#openVehicleSheet,
             moveItem: SR5BaseActorSheet.#moveItem,
             deleteItem: SR5BaseActorSheet.#deleteItem,
             favoriteItem: SR5BaseActorSheet.#favoriteItem,
@@ -435,6 +444,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
         data.program_count = this._prepareProgramCount(data.itemType);
+        data.hasHardwareSkill = (this.actor.findActiveSkill?.('hardware')?.value ?? 0) > 0;
+        data.matrixAttributeIconsOnly = game.settings.get(SYSTEM_NAME, FLAGS.MatrixAttributeDisplayMode) === 'icons';
 
         data.situationModifiers = this._prepareSituationModifiers();
 
@@ -858,6 +869,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         let dragData;
 
+        if (target?.dataset.actorUuid) {
+            const actor = fromUuidSync(target.dataset.actorUuid);
+            if (actor) {
+                // @ts-expect-error toDragData exists on Document
+                dragData = typeof actor.toDragData === 'function' ? actor.toDragData() : { type: 'Actor', uuid: target.dataset.actorUuid };
+            }
+        }
+
         if (target?.dataset.itemId) {
             const item = this.actor.items.get(target.dataset.itemId);
             if (item) {
@@ -1101,10 +1120,43 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (item) await item.sheet?.render(true, { mode: 'edit' } as any);
     }
 
+    static async #toggleDroneStack(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+        const target = event.currentTarget as HTMLElement | null;
+        const stackName = target?.dataset.stackName || target?.closest<HTMLElement>('[data-stack-name]')?.dataset.stackName;
+        if (!stackName) return;
+        this.expandedDroneStacks[stackName] = !this.expandedDroneStacks[stackName];
+        await this.render();
+    }
+
+    static async #openVehicleSheet(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        const target = event.currentTarget as HTMLElement | null;
+        const actorUuid = target?.dataset.actorUuid || target?.closest<HTMLElement>('[data-actor-uuid]')?.dataset.actorUuid;
+        if (!actorUuid) return;
+        const actor = fromUuidSync(actorUuid) as SR5Actor | null;
+        if (actor) {
+            await actor.sheet?.render(true);
+        }
+    }
+
     static async #moveItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
         if (!isElementInstance(event.target, HTMLElement)) return;
         await this._moveItemToInventory(event.target);
+    }
+
+    static async #repairMatrixDevice(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
+        const itemUuid = SheetFlow.closestUuid(event.target) || event.target.dataset.itemUuid;
+        if (!itemUuid) return;
+        const item = (await fromUuid(itemUuid)) as SR5Item | null;
+        if (!item || !(item instanceof SR5Item)) return;
+
+        await MatrixRepairFlow.runRepair(this.actor, item);
     }
 
     async _handleDeleteItem(item: SR5Item) {
@@ -1356,8 +1408,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         for (const item of this.actor.items) {
             if (!item.id) continue;
 
-            // Handled types are on the sheet outside the inventory.
-            if (handledTypes.includes(item.type)) continue;
+            // Handled types are on the sheet outside the inventory (except autosoft programs).
+            if (handledTypes.includes(item.type)) {
+                if (item.type === 'program' && item.system.type === 'autosoft') {
+                    // Autosofts are displayed in the inventory tab.
+                } else {
+                    continue;
+                }
+            }
 
             // Determine what inventory the item sits in.
             const inventory = itemIdInventory[item.id] || this.actor.defaultInventory;
@@ -1391,7 +1449,85 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             })
         });
 
+        this._prepareCarriedVehicles(inventoriesSheet);
+
         return inventoriesSheet;
+    }
+
+    _prepareCarriedVehicles(inventoriesSheet: InventoriesSheetData) {
+        if (!this.actor.isType('character')) return;
+
+        const ownedVehicles: SR5Actor<'vehicle'>[] = [];
+        for (const a of game.actors.contents) {
+            if (!a.isType('vehicle')) continue;
+            const isOwner = a.isOwner || a.system.driver === this.actor.uuid;
+            if (!isOwner) continue;
+            const isDrone = a.system.isDrone;
+            const category = a.system.category;
+            const body = a.system.attributes.body.value ?? 0;
+            if (isDrone || ['micro', 'mini', 'small', 'medium', 'anthro'].includes(category) || body <= 6) {
+                ownedVehicles.push(a);
+            }
+        }
+
+        if (ownedVehicles.length === 0) return;
+
+        const groupsByName = new Map<string, SR5Actor[]>();
+        for (const vehicle of ownedVehicles) {
+            const name = vehicle.name || 'Drone';
+            if (!groupsByName.has(name)) {
+                groupsByName.set(name, []);
+            }
+            groupsByName.get(name)!.push(vehicle);
+        }
+
+        const vehicleItems: any[] = [];
+
+        for (const [name, actors] of groupsByName.entries()) {
+            const firstActor = actors[0];
+            const quantity = actors.length;
+            const isExpanded = !!this.expandedDroneStacks[name];
+
+            const itemObj = {
+                id: firstActor.id,
+                uuid: firstActor.uuid,
+                actorUuid: firstActor.uuid,
+                name: name,
+                img: firstActor.img || 'icons/svg/vehicle.svg',
+                type: 'vehicle',
+                system: firstActor.system,
+                isVehicleActor: true,
+                quantity: quantity,
+                isStacked: quantity > 1,
+                isExpanded: isExpanded,
+                actors: actors.map(a => ({
+                    id: a.id,
+                    uuid: a.uuid,
+                    name: a.name,
+                    img: a.img || 'icons/svg/vehicle.svg',
+                    actor: a,
+                    system: a.system
+                }))
+            };
+            vehicleItems.push(itemObj);
+        }
+
+        const targetInventories = [
+            inventoriesSheet[this.actor.defaultInventory.name],
+            inventoriesSheet[this.actor.allInventories.name]
+        ].filter(Boolean);
+
+        for (const inventorySheet of targetInventories) {
+            if (!inventorySheet.types['vehicle']) {
+                inventorySheet.types['vehicle'] = {
+                    type: 'vehicle',
+                    label: SR5.itemTypes['vehicle'] || 'SR5.ItemTypes.Vehicle',
+                    isOpen: this._inventoryOpenClose['vehicle'] ?? true,
+                    items: []
+                };
+            }
+            inventorySheet.types['vehicle'].items.push(...vehicleItems);
+        }
     }
 
     /**

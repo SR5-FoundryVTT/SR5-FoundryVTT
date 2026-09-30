@@ -1,4 +1,12 @@
 {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/limits.hbs" }}
+
+{{#if autosoftInfo.isOverSlots}}
+    <div class="list-item warning-banner" style="background-color: rgba(255, 165, 0, 0.2); padding: 4px 8px; border: 1px solid orange; border-radius: 4px; margin-bottom: 4px;">
+        <i class="fas fa-triangle-exclamation" style="color: orange; margin-right: 6px;"></i>
+        <span>{{localize "SR5.Warnings.OverAutosoftSlots"}} ({{autosoftInfo.runningCount}} / {{autosoftInfo.maxSlots}})</span>
+    </div>
+{{/if}}
+
 <div class="attributes">
     {{#if @root.isEditMode}}
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/vehicle-paired-attribute.hbs"
@@ -82,3 +90,16 @@
         }}
     {{/unless}}
 </div>
+
+{{#if @root.isEditMode}}
+    <div class="list-item rigger-swarm-bar" style="margin-top: 4px; margin-bottom: 4px;">
+        <div class="list-item-start" style="display: flex; align-items: center; gap: 6px;">
+            <label style="text-wrap: nowrap;"><strong>{{localize "SR5.Swarm.Label"}}:</strong></label>
+            {{formInput systemFields.swarm.fields.active value=source.system.swarm.active rootId=@root.rootId}}
+            {{#if system.swarm.active}}
+                <label style="text-wrap: nowrap; margin-left: 12px;"><strong>{{localize "SR5.Swarm.Count"}}:</strong></label>
+                {{formInput systemFields.swarm.fields.count value=source.system.swarm.count classes="short" rootId=@root.rootId}}
+            {{/if}}
+        </div>
+    </div>
+{{/if}}

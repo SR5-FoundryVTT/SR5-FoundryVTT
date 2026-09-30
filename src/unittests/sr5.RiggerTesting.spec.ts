@@ -2,6 +2,7 @@ import { TestCreator } from "@/module/tests/TestCreator";
 import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { SR5 } from '@/module/config';
+import { RiggerFlow } from '@/module/flows/RiggerFlow';
 
 export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -189,6 +190,48 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
 
             // speed limit + control rig, unaffected by vehicle damaged handling penalty
             assert.equal(test!.limit.value, 6);
+        });
+
+        it('Toggles drone between autopilot and remote RCC mode and resets unjumped drones to autopilot on jump-in', async () => {
+            const driver = await createDriver();
+            const droneA = await factory.createActor({
+                type: 'vehicle',
+                system: {
+                    isDrone: true,
+                    controlMode: 'autopilot',
+                    vehicleType: 'ground'
+                }
+            });
+            const droneB = await factory.createActor({
+                type: 'vehicle',
+                system: {
+                    isDrone: true,
+                    controlMode: 'autopilot',
+                    vehicleType: 'air'
+                }
+            });
+
+            await droneA.addVehicleDriver(driver.uuid);
+            await droneB.addVehicleDriver(driver.uuid);
+
+            // Toggle Drone B to remote (RCC mode)
+            await droneB.update({ system: { controlMode: 'remote' } });
+            assert.equal(droneB.system.controlMode, 'remote');
+
+            // Jump driver into Drone A
+            await RiggerFlow.jumpIn(driver, droneA);
+
+            // Drone A should be rigger mode
+            assert.equal(droneA.system.controlMode, 'rigger');
+
+            // Drone B should have been automatically reset to autopilot mode
+            assert.equal(droneB.system.controlMode, 'autopilot');
+
+            // Jump out of Drone A
+            await RiggerFlow.jumpOut(driver, droneA);
+
+            // Drone A should revert to autopilot mode
+            assert.equal(droneA.system.controlMode, 'autopilot');
         });
     });
 };
