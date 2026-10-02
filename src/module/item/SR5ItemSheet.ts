@@ -389,7 +389,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             try {
                 const technology = itemData.technology as any;
                 if (technology.rating === 0) delete technology.rating;
-                if (technology.quantity === 0) delete technology.quantity;
                 if (technology.cost === 0) delete technology.cost;
             } catch (e) {
                 console.log(e);
@@ -829,7 +828,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const item = this.item.getOwnedItem(iid);
         const quantity = parseInt((event.currentTarget as HTMLInputElement).value);
 
-        if (!quantity || !item?.system?.technology) {
+        if (!Number.isFinite(quantity) || !item?.system?.technology) {
             console.error(`Shadowrun 5e | Tried altering technology quantity on an item without technology data: ${item?.id}`, item);
             return;
         }
