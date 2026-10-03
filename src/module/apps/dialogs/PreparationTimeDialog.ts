@@ -152,15 +152,6 @@ export class PreparationTimeDialog extends HandlebarsApplicationMixin(Applicatio
         this.#updatePreview();
     }
 
-    #formData(): Record<string, unknown> {
-        const data: Record<string, unknown> = {};
-        for (const name of ['year', 'month', 'dayOfMonth', 'hour', 'minute', 'second']) {
-            data[`components.${name}`] = this.element
-                .querySelector<HTMLInputElement>(`[name="components.${name}"]`)?.value;
-        }
-        return data;
-    }
-
     #writeComponents(components: PreparationTimeContext['components']) {
         for (const [name, value] of Object.entries(components)) {
             const input = this.element.querySelector<HTMLInputElement>(`[name="components.${name}"]`);
@@ -172,7 +163,8 @@ export class PreparationTimeDialog extends HandlebarsApplicationMixin(Applicatio
         const preview = this.element.querySelector<HTMLElement>('.time-absolute-preview');
         if (!preview) return;
 
-        const worldTime = PreparationTimeDialog.worldTimeFromForm(this.#formData());
+        const formData = new foundry.applications.ux.FormDataExtended(this.element as HTMLFormElement);
+        const worldTime = PreparationTimeDialog.worldTimeFromForm(formData.object as Record<string, unknown>);
         preview.textContent = worldTime === undefined ? '' : WorldTimeFlow.format(worldTime);
     }
 

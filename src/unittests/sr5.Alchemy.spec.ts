@@ -25,6 +25,25 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
 
     after(async () => { await factory.destroy(); });
 
+    /**
+     * A Force 4, Potency 3 indirect combat preparation created just now. Tests only override what
+     * they're about. Without a parent it's created as a world item.
+     */
+    const createPreparation = async (system: Record<string, unknown> = {}, parent?: SR5Actor) => {
+        const data = {
+            name: 'Prepared Fireball', type: 'preparation' as const,
+            system: foundry.utils.mergeObject({
+                category: 'combat', type: 'physical', combat: { type: 'indirect' }, range: 'los',
+                force: 4, trigger: 'command', potency: { base: 3 },
+                created: { worldTime: game.time.worldTime },
+            }, system, { inplace: false }),
+        };
+        if (!parent) return await factory.createItem(data as any) as SR5Item<'preparation'>;
+
+        const [item] = await parent.createEmbeddedDocuments('Item', [data as any]) as SR5Item[];
+        return item as SR5Item<'preparation'>;
+    };
+
     describe('Creating a preparation', () => {
         it('limits force to twice the magic rating', () => {
             assert.equal(AlchemyRules.maxForce(5), 10);
@@ -111,6 +130,18 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
 
         it('never rolls negative pool parts', () => {
             assert.deepEqual(AlchemyRules.activationPool(-1, -2), { force: 0, potency: 0 });
+        });
+
+        it('releases a timed preparation its trigger time after creation', () => {
+            assert.equal(AlchemyRules.triggerAt(10 * HOUR, 2 * HOUR), 12 * HOUR);
+            assert.equal(AlchemyRules.triggerAt(10 * HOUR, -1), 10 * HOUR);
+        });
+
+        it('cannot be dodged when an indirect spell is released by contact', () => {
+            // SG#210
+            assert.isFalse(AlchemyRules.canBeDodged('contact', 'indirect'));
+            assert.isTrue(AlchemyRules.canBeDodged('contact', 'direct'));
+            assert.isTrue(AlchemyRules.canBeDodged('command', 'indirect'));
         });
     });
 
@@ -309,7 +340,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.equal(preparation.system.action.opposed.test, 'PhysicalDefenseTest');
             assert.equal(preparation.system.action.opposed.attribute, '');
             assert.equal(preparation.system.action.opposed.attribute2, '');
-            assert.isTrue(PhysicalDefenseTest.isUnavoidableContactPreparation(preparation));
+            assert.isFalse(AlchemyRules.canBeDodged(preparation.system.trigger, preparation.system.combat.type));
         });
 
         it('creates nothing when the force wins, but still owes drain', async () => {
@@ -337,16 +368,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
 
         it('triggers on force plus potency and consumes the preparation', async () => {
             const alchemist = await createAlchemist();
-            const [created] = await alchemist.createEmbeddedDocuments('Item', [{
-                name: 'Prepared Fireball', type: 'preparation',
-                system: {
-                    category: 'combat', type: 'physical', combat: { type: 'indirect' },
-                    force: 4, trigger: 'contact', drain: -1,
-                    potency: { base: 3 },
-                    created: { worldTime: game.time.worldTime },
-                }
-            }]) as SR5Item[];
-            const preparation = created as SR5Item<'preparation'>;
+            const preparation = await createPreparation({ trigger: 'contact', drain: -1 }, alchemist);
 
             const trigger = await TestCreator.fromItem(
                 preparation, alchemist, { showDialog: false, showMessage: false }) as PreparationTriggerTest;
@@ -383,14 +405,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             });
             await alchemist.createEmbeddedDocuments('ActiveEffect', [spellcastingBoost('Actor Boost', 2)]);
 
-            const [created] = await alchemist.createEmbeddedDocuments('Item', [{
-                name: 'Prepared Fireball', type: 'preparation',
-                system: {
-                    category: 'combat', type: 'physical', combat: { type: 'indirect' },
-                    force: 4, trigger: 'command', potency: { base: 3 },
-                    created: { worldTime: game.time.worldTime },
-                }
-            }]) as SR5Item[];
+            const created = await createPreparation({}, alchemist);
             await created.createEmbeddedDocuments('ActiveEffect', [spellcastingBoost('Preparation Boost', 1)]);
 
             const trigger = await TestCreator.fromItem(
@@ -407,14 +422,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
         it('takes the ranged penalty against a running or sprinting target', async () => {
             const alchemist = await createAlchemist();
             const target = await factory.createActor({ type: 'character' });
-            const [created] = await alchemist.createEmbeddedDocuments('Item', [{
-                name: 'Prepared Fireball', type: 'preparation',
-                system: {
-                    category: 'combat', type: 'physical', combat: { type: 'indirect' }, range: 'los',
-                    force: 4, trigger: 'command', potency: { base: 3 },
-                    created: { worldTime: game.time.worldTime },
-                }
-            }]) as SR5Item[];
+            const created = await createPreparation({}, alchemist);
 
             const poolVsTarget = async () => {
                 const trigger = await TestCreator.fromItem(
@@ -437,16 +445,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
 
         it('does not allow a spent preparation to trigger again', async () => {
             const alchemist = await createAlchemist();
-            const [created] = await alchemist.createEmbeddedDocuments('Item', [{
-                name: 'Spent Preparation', type: 'preparation',
-                system: {
-                    category: 'combat', combat: { type: 'indirect' },
-                    force: 4, trigger: 'contact',
-                    potency: { base: 0, value: 0 },
-                    created: { worldTime: game.time.worldTime },
-                }
-            }]) as SR5Item[];
-            const preparation = created as SR5Item<'preparation'>;
+            const preparation = await createPreparation({ potency: { base: 0, value: 0 } }, alchemist);
             const trigger = await TestCreator.fromItem(
                 preparation, alchemist, { showDialog: false, showMessage: false }) as PreparationTriggerTest;
 
@@ -467,16 +466,10 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
                     }
                 }
             });
-            const [created] = await alchemist.createEmbeddedDocuments('Item', [{
-                name: 'Contact Fireball', type: 'preparation',
-                system: {
-                    category: 'combat', type: 'physical', combat: { type: 'indirect' },
-                    force: 4, trigger: 'contact', potency: { base: 3 },
-                    created: { worldTime: game.time.worldTime },
-                    action: { damage: { type: { base: 'physical', value: 'physical' } } },
-                }
-            }]) as SR5Item[];
-            const preparation = created as SR5Item<'preparation'>;
+            const preparation = await createPreparation({
+                trigger: 'contact',
+                action: { damage: { type: { base: 'physical', value: 'physical' } } },
+            }, alchemist);
             const trigger = await TestCreator.fromItem(
                 preparation, alchemist, { showDialog: false, showMessage: false }) as PreparationTriggerTest;
             await trigger._prepareExecution();
@@ -498,17 +491,12 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
 
         it('automatically resolves a due timed preparation at its scheduled potency', async () => {
             const alchemist = await createAlchemist();
-            const [created] = await alchemist.createEmbeddedDocuments('Item', [{
-                name: 'Timed Preparation', type: 'preparation',
-                system: {
-                    category: 'combat', combat: { type: 'indirect' },
-                    force: 4, trigger: 'time', triggerTime: HOUR,
-                    potency: { base: 2, value: 2 },
-                    // Simulate Foundry advancing past both the trigger and expiration in one jump.
-                    created: { worldTime: game.time.worldTime - 10 * HOUR },
-                }
-            }]) as SR5Item[];
-            const preparation = created as SR5Item<'preparation'>;
+            const preparation = await createPreparation({
+                trigger: 'time', triggerTime: HOUR,
+                potency: { base: 2 },
+                // Simulate Foundry advancing past both the trigger and expiration in one jump.
+                created: { worldTime: game.time.worldTime - 10 * HOUR },
+            }, alchemist);
 
             assert.isTrue(PreparationDecayFlow.isTimeTriggerDue(preparation.system, game.time.worldTime));
             const trigger = await PreparationDecayFlow.triggerTimedPreparation(
@@ -522,33 +510,14 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
     });
 
     describe('Area preparations', () => {
-        const preparationData = (range: string) => ({
-            name: 'Prepared Fireball', type: 'preparation' as const,
-            system: {
-                category: 'combat', type: 'physical', combat: { type: 'indirect' }, range,
-                force: 4, trigger: 'contact', potency: { base: 3 },
-                created: { worldTime: game.time.worldTime },
-            }
-        });
-
-        it('centers an area spell on the preparation with potency as radius', async () => {
-            const preparation = await factory.createItem(preparationData('los_a') as any);
-
-            assert.isTrue(preparation.isAreaOfEffect());
-            // Radius is Potency in meters, not the spell's Force. SR5#306.
-            assert.deepEqual(preparation.getBlastData(), { radius: 3, dropoff: 0 });
-        });
-
-        it('does not treat a line of sight preparation as an area', async () => {
-            const preparation = await factory.createItem(preparationData('los') as any);
-
-            assert.isFalse(preparation.isAreaOfEffect());
-            assert.isUndefined(preparation.getBlastData());
+        it('treats only an area spell as an area preparation', async () => {
+            assert.isTrue((await createPreparation({ range: 'los_a' })).isAreaOfEffect());
+            assert.isFalse((await createPreparation({ range: 'los' })).isAreaOfEffect());
         });
 
         it('places a template of potency radius that never scatters when triggered', async () => {
             const actor = await factory.createActor({ type: 'character' });
-            const [created] = await actor.createEmbeddedDocuments('Item', [preparationData('los_a')]) as SR5Item[];
+            const created = await createPreparation({ range: 'los_a' }, actor);
 
             const trigger = await TestCreator.fromItem(
                 created, actor, { showDialog: false, showMessage: false }) as PreparationTriggerTest;
@@ -556,6 +525,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             await trigger._prepareExecution();
 
             assert.isTrue(trigger.blastTemplateFlow.canPlace);
+            // Centered on the preparation, with Potency in meters as radius, not Force. SR5#306.
             assert.deepEqual(trigger.getBlastData(), { radius: 3, dropoff: 0 });
             // The area is centered on the preparation itself, so there is nothing to scatter.
             assert.isFalse(trigger.blastTemplateFlow.canScatter);
@@ -598,15 +568,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
         });
 
         it('updates creation time and recalculates potency', async () => {
-            const preparation = await factory.createItem({
-                type: 'preparation',
-                system: {
-                    category: 'combat',
-                    force: 4,
-                    potency: { base: 3 },
-                    created: { worldTime: game.time.worldTime },
-                }
-            }) as SR5Item<'preparation'>;
+            const preparation = await createPreparation();
 
             await PreparationTimeDialog.setCreationTime(preparation, game.time.worldTime - 8 * HOUR);
 
@@ -615,14 +577,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
         });
 
         it('revives a time-expired preparation when its creation time is corrected', async () => {
-            const preparation = await factory.createItem({
-                type: 'preparation',
-                system: {
-                    category: 'combat',
-                    potency: { base: 3 },
-                    created: { worldTime: game.time.worldTime - 10 * HOUR },
-                }
-            }) as SR5Item<'preparation'>;
+            const preparation = await createPreparation({ created: { worldTime: game.time.worldTime - 10 * HOUR } });
 
             assert.equal(preparation.system.potency.value, 0);
 
@@ -632,62 +587,30 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
         });
 
         it('derives the current potency during data preparation', async () => {
-            const preparation = await factory.createItem({
-                type: 'preparation',
-                system: {
-                    category: 'combat',
-                    force: 4,
-                    trigger: 'contact',
-                    potency: { base: 3 },
-                    created: { worldTime: game.time.worldTime - 100 * HOUR },
-                }
-            });
+            const preparation = await createPreparation({ created: { worldTime: game.time.worldTime - 100 * HOUR } });
 
             // Well past (potency x 3) hours, so nothing is left of it.
             assert.equal(preparation.system.potency.value, 0);
         });
 
         it('keeps full potency inside the full strength window', async () => {
-            const preparation = await factory.createItem({
-                type: 'preparation',
-                system: {
-                    category: 'combat',
-                    force: 4,
-                    potency: { base: 3 },
-                    created: { worldTime: game.time.worldTime },
-                }
-            });
+            const preparation = await createPreparation();
 
             assert.equal(preparation.system.potency.value, 3);
         });
 
-        it('re-prepares documents when preparation sheets refresh after time passes', () => {
-            let potency = 2;
-            let prepared = false;
-            let rendered = false;
-            const preparation = {
-                reset: () => { potency = 3; },
-                prepareData: () => { prepared = true; potency = 2; },
-                render: () => { rendered = true; },
-                actor: null,
-            } as unknown as SR5Item<'preparation'>;
+        it('re-derives potency when preparation sheets refresh after time passes', async () => {
+            const preparation = await createPreparation();
+            // Stand in for a potency derived at an earlier world time.
+            preparation.system.potency.value = 99;
 
             PreparationDecayFlow.refreshSheets([preparation]);
 
-            assert.isTrue(prepared);
-            assert.isTrue(rendered);
-            assert.equal(potency, 2);
+            assert.equal(preparation.system.potency.value, 3);
         });
 
         it('recognizes only due timed triggers with potency', async () => {
-            const preparation = await factory.createItem({
-                type: 'preparation',
-                system: {
-                    trigger: 'time', triggerTime: HOUR,
-                    potency: { base: 2 },
-                    created: { worldTime: game.time.worldTime },
-                }
-            });
+            const preparation = await createPreparation({ trigger: 'time', triggerTime: HOUR, potency: { base: 2 } });
 
             assert.isFalse(PreparationDecayFlow.isTimeTriggerDue(
                 preparation.system, game.time.worldTime + HOUR - 1));
@@ -699,42 +622,9 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
                 preparation.system, game.time.worldTime + HOUR));
         });
 
-        it('reports a preparation whose potency has expired', async () => {
-            const preparation = await factory.createItem({
-                type: 'preparation',
-                system: {
-                    category: 'combat',
-                    potency: { base: 2 },
-                    created: { worldTime: game.time.worldTime - 100 * HOUR },
-                }
-            });
-
-            assert.isTrue(PreparationDecayFlow.hasExpired(preparation.system, game.time.worldTime));
-        });
-
-        it('does not report a fresh or spent preparation as expired', async () => {
-            const fresh = await factory.createItem({
-                type: 'preparation',
-                system: { potency: { base: 2 }, created: { worldTime: game.time.worldTime } }
-            });
-            assert.isFalse(PreparationDecayFlow.hasExpired(fresh.system, game.time.worldTime));
-
-            const spent = await factory.createItem({
-                type: 'preparation',
-                system: {
-                    potency: { base: 0 },
-                    created: { worldTime: game.time.worldTime - 100 * HOUR }
-                }
-            });
-            assert.isFalse(PreparationDecayFlow.hasExpired(spent.system, game.time.worldTime));
-        });
-
         it('detects only forward crossings of the expiration boundary', async () => {
             const created = game.time.worldTime;
-            const preparation = await factory.createItem({
-                type: 'preparation',
-                system: { potency: { base: 2 }, created: { worldTime: created } }
-            });
+            const preparation = await createPreparation({ potency: { base: 2 }, created: { worldTime: created } });
             const expiresAt = AlchemyRules.expiresAt(2, created);
 
             assert.isTrue(PreparationDecayFlow.crossedExpiry(
@@ -747,10 +637,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
 
         it('prepares full, decaying, expired, and spent potency states', async () => {
             const created = game.time.worldTime;
-            const preparation = await factory.createItem({
-                type: 'preparation',
-                system: { potency: { base: 3 }, created: { worldTime: created } }
-            });
+            const preparation = await createPreparation({ created: { worldTime: created } });
 
             const full = preparePreparationPotencyStatus(preparation.system, created);
             const decaying = preparePreparationPotencyStatus(preparation.system, created + 7 * HOUR);
@@ -759,25 +646,13 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             await preparation.update({ system: { potency: { base: 0, value: 0 } } });
             const spent = preparePreparationPotencyStatus(preparation.system, created);
 
-            assert.include(full, {
-                state: 'full', currentPotency: 3, basePotency: 3,
-                progressValue: 9 * HOUR, progressMax: 9 * HOUR,
-            });
-            assert.include(decaying, {
-                state: 'decaying', currentPotency: 2, basePotency: 3,
-                progressValue: 2 * HOUR, progressMax: 9 * HOUR,
-            });
-            assert.include(expired, {
-                state: 'expired', currentPotency: 0, basePotency: 3,
-                progressValue: 0, remainingSeconds: 0,
-            });
-            assert.include(spent, {
-                state: 'spent', currentPotency: 0, basePotency: 0,
-                progressValue: 0, progressMax: 1,
-            });
-            assert.equal(full.remainingSeconds, 9 * HOUR);
+            // Progress counts down the remaining lifetime of potency x 3 hours.
+            assert.include(full, { state: 'full', progressValue: 9 * HOUR, progressMax: 9 * HOUR });
+            assert.include(decaying, { state: 'decaying', progressValue: 2 * HOUR, progressMax: 9 * HOUR });
+            assert.include(expired, { state: 'expired', progressValue: 0 });
+            assert.include(spent, { state: 'spent', progressValue: 0, progressMax: 1 });
             assert.closeTo(full.decayThresholdPercent, 100 / 3, 0.001);
-            assert.include(full.tooltip, WorldTimeFlow.format(full.expiresAt));
+            assert.include(full.tooltip, WorldTimeFlow.format(AlchemyRules.expiresAt(3, created)));
         });
 
         it('removes inert from the preparation schema', () => {
@@ -799,10 +674,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
         });
 
         it('carries the spell fields a spell item carries', async () => {
-            const preparation = await factory.createItem({
-                type: 'preparation',
-                system: { category: 'combat', type: 'mana', combat: { type: 'direct' } }
-            });
+            const preparation = await createPreparation({ type: 'mana', combat: { type: 'direct' } });
 
             // The defense chain resolves a triggered preparation through this accessor.
             assert.isDefined(preparation.spellPart);
@@ -811,10 +683,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
         });
 
         it('configures the trigger test on creation', async () => {
-            const preparation = await factory.createItem({
-                type: 'preparation',
-                system: { category: 'combat', combat: { type: 'indirect' } }
-            });
+            const preparation = await createPreparation();
 
             assert.equal(preparation.system.action.test, 'PreparationTriggerTest');
             assert.equal(preparation.system.action.opposed.test, 'PhysicalDefenseTest');

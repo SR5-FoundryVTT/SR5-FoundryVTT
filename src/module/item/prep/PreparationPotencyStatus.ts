@@ -5,14 +5,9 @@ export type PreparationPotencyState = 'full' | 'decaying' | 'expired' | 'spent';
 
 export interface PreparationPotencyStatus {
     state: PreparationPotencyState;
-    currentPotency: number;
-    basePotency: number;
     progressValue: number;
     progressMax: number;
     decayThresholdPercent: number;
-    decayStartsAt: number;
-    expiresAt: number;
-    remainingSeconds: number;
     tooltip: string;
 }
 
@@ -56,16 +51,5 @@ export function preparePreparationPotencyStatus(
         tooltip = `${remaining} — ${expiration}`;
     }
 
-    return {
-        state,
-        currentPotency,
-        basePotency,
-        progressValue,
-        progressMax,
-        decayThresholdPercent,
-        decayStartsAt,
-        expiresAt,
-        remainingSeconds,
-        tooltip,
-    };
+    return { state, progressValue, progressMax, decayThresholdPercent, tooltip };
 }

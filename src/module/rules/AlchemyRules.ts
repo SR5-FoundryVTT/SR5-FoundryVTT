@@ -1,5 +1,7 @@
 import { SR5 } from "../config";
 
+const HOUR = 3600;
+
 /**
  * Shadowrun 5 rules around Alchemy and alchemical preparations.
  *
@@ -19,7 +21,7 @@ export const AlchemyRules = {
      * As defined in SR5#305 'The Finished Preparation'.
      */
     get decayInterval(): number {
-        return 3600;
+        return HOUR;
     },
 
     /**
@@ -82,14 +84,21 @@ export const AlchemyRules = {
      * @param potency The potency the preparation ended up with.
      */
     validTriggerTime: (seconds: number, potency: number): boolean => {
-        return seconds >= 0 && seconds <= potency * 3600;
+        return seconds >= 0 && seconds <= potency * HOUR;
     },
 
     /**
      * Clamp a timer to the preparation's final legal activation window.
      */
     effectiveTriggerTime: (seconds: number, potency: number): number => {
-        return Math.min(Math.max(seconds, 0), Math.max(potency, 0) * 3600);
+        return Math.min(Math.max(seconds, 0), Math.max(potency, 0) * HOUR);
+    },
+
+    /**
+     * The world time at which a time trigger releases the preparation's spell.
+     */
+    triggerAt: (createdWorldTime: number, triggerTime: number): number => {
+        return createdWorldTime + Math.max(triggerTime, 0);
     },
 
     /**
@@ -142,5 +151,15 @@ export const AlchemyRules = {
      */
     activationPool: (force: number, potency: number): { force: number, potency: number } => {
         return { force: Math.max(0, force), potency: Math.max(0, potency) };
+    },
+
+    /**
+     * A contact trigger has already touched its subject, so an indirect spell released by it
+     * can't be dodged.
+     *
+     * As defined in SG#210.
+     */
+    canBeDodged: (trigger: string, combatType: string): boolean => {
+        return !(trigger === 'contact' && combatType === 'indirect');
     },
 };

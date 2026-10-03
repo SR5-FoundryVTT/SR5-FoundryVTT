@@ -392,13 +392,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
                 dropoff: 0,
             };
 
-        } else if (this.isType('preparation') && this.isAreaOfEffect()) {
-            // The preparation is the center of the area, with its Potency in meters as radius. SR5#306.
-            return {
-                radius: this.system.potency.value,
-                dropoff: 0,
-            };
-
         } else if (this.isGrenade()) {
             return {
                 radius: this.system.thrown.blast.radius,

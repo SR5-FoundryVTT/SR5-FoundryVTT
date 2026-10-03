@@ -925,13 +925,6 @@ export const SR5 = {
                 'direct': 'CombatSpellDefenseTest',
                 'indirect': 'PhysicalDefenseTest'
             }
-        },
-        // A triggered preparation releases its spell, so it defends like the spell it stores.
-        'preparation': {
-            'combat': {
-                'direct': 'CombatSpellDefenseTest',
-                'indirect': 'PhysicalDefenseTest'
-            }
         }
     },
 
@@ -943,12 +936,6 @@ export const SR5 = {
      */
     opposedResistTests: {
         'spell': {
-            'combat': {
-                'direct': '',
-                'indirect': 'PhysicalResistTest'
-            }
-        },
-        'preparation': {
             'combat': {
                 'direct': '',
                 'indirect': 'PhysicalResistTest'

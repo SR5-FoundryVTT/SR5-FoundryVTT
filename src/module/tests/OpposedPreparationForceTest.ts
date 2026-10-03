@@ -106,9 +106,7 @@ export class OpposedPreparationForceTest extends OpposedTest<OpposedPreparationF
      */
     override applyPoolModifiers() {
         // NOTE: We don't have an actor, therefore don't need to call document modifiers.
-        const pool = new ModifiableValue(this.data.pool);
-        pool.remove('SR5.Force');
-        pool.addBase('SR5.Force', this.against.data.force);
+        ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Force', this.against.data.force);
     }
 
     /**
@@ -166,12 +164,10 @@ export class OpposedPreparationForceTest extends OpposedTest<OpposedPreparationF
             opposed: foundry.utils.duplicate(spell.system.action.opposed),
         };
 
+        // Only the time trigger counts down.
         const triggerTime = this.against.data.trigger === 'time'
-            ? AlchemyRules.effectiveTriggerTime(
-                Number(this.against.data.triggerTime),
-                this.against.data.potency
-            )
-            : Math.max(Number(this.against.data.triggerTime), 0);
+            ? AlchemyRules.effectiveTriggerTime(Number(this.against.data.triggerTime), potency)
+            : 0;
 
         const itemData = {
             name: `${spell.name} (${game.i18n.localize('SR5.ItemTypes.Preparation')})`,

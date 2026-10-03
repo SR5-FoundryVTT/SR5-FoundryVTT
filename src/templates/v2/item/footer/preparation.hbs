@@ -1,14 +1,8 @@
 {{!--
     Kept as terse as the spell footer: the category plus what makes this a preparation.
-    The full property list lives in item-properties/preparation.hbs, used by the actor lists.
+    The actor lists add the full spell properties on top, see list-items/preparation/item.hbs.
 --}}
 {{#unless (empty item.system.category)}}
     <label>{{localizeOb item.system.category @root.config.spellCategories}}</label>
 {{/unless}}
-<label>{{localize "SR5.Force"}}&nbsp;{{item.system.force}}</label>
-<label data-tooltip="SR5.Tooltips.Preparation.Potency">
-    {{localize "SR5.Preparation.Potency"}}&nbsp;{{item.system.potency.value}}/{{item.system.potency.base}}
-</label>
-{{#unless (empty item.system.trigger)}}
-    <label>{{localizeOb item.system.trigger @root.config.preparationTriggers}}</label>
-{{/unless}}
+{{> "systems/shadowrun5e/dist/templates/v2/item-properties/preparation.hbs" item=item }}

@@ -12,7 +12,7 @@ import { TestOptions } from "./SuccessTest";
 import { MinimalActionType } from "../types/item/Action";
 import { CombatSpellRules } from "../rules/CombatSpellRules";
 import { SpellCastingTestData } from "./SpellCastingTest";
-import { SR5Item } from "../item/SR5Item";
+import { AlchemyRules } from "../rules/AlchemyRules";
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
     // Dialog input for cover modifier
@@ -46,17 +46,12 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
     }
 
     /**
-     * A contact trigger has already touched its subject, so an indirect spell released by it can't
-     * be dodged. SG#210.
+     * Defending against a preparation that can't be dodged. See AlchemyRules.canBeDodged.
      */
-    static isUnavoidableContactPreparation(item: SR5Item | undefined): boolean {
-        return !!item?.isType('preparation')
-            && item.system.trigger === 'contact'
-            && item.system.combat.type === 'indirect';
-    }
-
     get isUnavoidableContactPreparation(): boolean {
-        return PhysicalDefenseTest.isUnavoidableContactPreparation(this.against.item);
+        const item = this.against.item;
+        return !!item?.isType('preparation')
+            && !AlchemyRules.canBeDodged(item.system.trigger, item.system.combat.type);
     }
 
     override prepareBaseValues() {

@@ -65,16 +65,9 @@
     </div>
 </div>
 
-{{#with (preparationPotencyStatus item)}}
-    <div class="list-item preparation-potency-timeline-row">
-        <div class="preparation-potency-meter state-{{state}}"
-             style="--decay-threshold: {{decayThresholdPercent}}%;"
-             data-tooltip="{{tooltip}}">
-            <progress max="{{progressMax}}" value="{{progressValue}}" aria-label="{{tooltip}}"></progress>
-            <span class="preparation-potency-threshold" aria-hidden="true"></span>
-        </div>
-    </div>
-{{/with}}
+<div class="list-item preparation-potency-timeline-row">
+    {{> "systems/shadowrun5e/dist/templates/v2/common/preparation-potency-meter.hbs" item=item }}
+</div>
 
 <div class="list-item list-item-header">
     <div class="list-item-start skinny">

@@ -1,0 +1,9 @@
+{{!-- Lifetime of a preparation's potency, expects an SR5Item to be passed in as 'item' --}}
+{{#with (preparationPotencyStatus item)}}
+    <div class="preparation-potency-meter state-{{state}}"
+         style="--decay-threshold: {{decayThresholdPercent}}%;"
+         data-tooltip="{{tooltip}}">
+        <progress max="{{progressMax}}" value="{{progressValue}}" aria-label="{{tooltip}}"></progress>
+        <span class="preparation-potency-threshold" aria-hidden="true"></span>
+    </div>
+{{/with}}

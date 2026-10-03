@@ -42,17 +42,6 @@ export const PreparationDecayFlow = {
     },
 
     /**
-     * Has this preparation run out of potency?
-     *
-     * Pure over the item data and time, so the rule can be unit tested.
-     */
-    hasExpired(system: Item.SystemOfType<'preparation'>, worldTime: number): boolean {
-        if (system.potency.base <= 0) return false;
-
-        return AlchemyRules.currentPotency(system.potency.base, system.created.worldTime, worldTime) <= 0;
-    },
-
-    /**
      * Did advancing world time cross this preparation's expiration boundary?
      */
     crossedExpiry(
@@ -72,7 +61,7 @@ export const PreparationDecayFlow = {
     isTimeTriggerDue(system: Item.SystemOfType<'preparation'>, worldTime: number): boolean {
         if (system.trigger !== 'time' || system.potency.base <= 0) return false;
 
-        const triggerWorldTime = system.created.worldTime + Math.max(system.triggerTime, 0);
+        const triggerWorldTime = AlchemyRules.triggerAt(system.created.worldTime, system.triggerTime);
         if (triggerWorldTime > AlchemyRules.expiresAt(system.potency.base, system.created.worldTime)) return false;
 
         return worldTime >= triggerWorldTime;
@@ -99,8 +88,8 @@ export const PreparationDecayFlow = {
             });
             if (!(test instanceof PreparationTriggerTest)) return;
 
-            test.data.triggeredWorldTime = preparation.system.created.worldTime
-                + Math.max(preparation.system.triggerTime, 0);
+            test.data.triggeredWorldTime = AlchemyRules.triggerAt(
+                preparation.system.created.worldTime, preparation.system.triggerTime);
             test.data.targetUuids = [];
             await test.execute();
             return test;
@@ -164,10 +153,8 @@ export const PreparationDecayFlow = {
         const owners = new Set<SR5Actor>();
 
         for (const preparation of preparations) {
+            // Resetting re-runs data preparation, which derives potency for the new world time.
             preparation.reset();
-            // DataModel#reset only restores persisted source values. Run document preparation so
-            // PreparationPrep derives potency for the new world time before sheets or tests read it.
-            preparation.prepareData();
             preparation.render(false);
 
             const owner = preparation.actor;

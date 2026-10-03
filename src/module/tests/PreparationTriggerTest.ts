@@ -43,10 +43,6 @@ export class PreparationTriggerTest extends SpellCastingTest {
         const prepared = super._prepareData(data as DeepPartial<SpellCastingTestData>, options) as PreparationTriggerTestData;
 
         prepared.potency ||= 0;
-        // Drain was paid when the preparation was created. SR5#306.
-        prepared.drain = 0;
-        prepared.drainDamage = DataDefaults.createData('damage');
-        if (prepared.action?.followed) prepared.action.followed.test = '';
 
         return prepared;
     }
@@ -77,11 +73,6 @@ export class PreparationTriggerTest extends SpellCastingTest {
 
     override get canPushTheLimit(): boolean {
         return false;
-    }
-
-    override async prepareDocumentData() {
-        this.prepareInitialForceValue();
-        await super.prepareDocumentData();
     }
 
     /**
@@ -133,11 +124,8 @@ export class PreparationTriggerTest extends SpellCastingTest {
     applyPreparationPool() {
         const { force, potency } = AlchemyRules.activationPool(this.data.force, this.data.potency);
 
-        const pool = new ModifiableValue(this.data.pool);
-        pool.remove('SR5.Force');
-        pool.remove('SR5.Preparation.Potency');
-        pool.addBase('SR5.Force', force);
-        pool.addBase('SR5.Preparation.Potency', potency);
+        ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Force', force);
+        ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Preparation.Potency', potency);
     }
 
     /**

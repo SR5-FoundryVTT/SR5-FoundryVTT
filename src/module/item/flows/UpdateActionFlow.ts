@@ -149,24 +149,23 @@ export const UpdateActionFlow = {
 
         // An alchemical spell is a preparation formula, it's prepared rather than cast. SR5#304.
         if (alchemical) {
-            const alchemyTest = SR5.alchemicalSpellTests.test;
-
-            foundry.utils.setProperty(applyData, 'system.action.test', alchemyTest);
-            foundry.utils.setProperty(applyData, 'system.action.opposed.test', SR5.alchemicalSpellTests.opposed);
-            foundry.utils.setProperty(applyData, 'system.action.opposed.resist.test', '');
-            foundry.utils.setProperty(applyData, 'system.action.followed.test', SR5.followedTests[alchemyTest] ?? '');
+            const test = SR5.alchemicalSpellTests.test;
+            UpdateActionFlow.setActionTests(applyData, {
+                test,
+                opposed: SR5.alchemicalSpellTests.opposed,
+                resist: '',
+                followed: SR5.followedTests[test] ?? '',
+            });
             return;
         }
 
         // Based on category switch out active, opposed and resist test.
         const test = SR5.activeTests[type];
-        const drainTest = SR5.followedTests[test] ?? '';
-        const { opposedTest, resistTest } = UpdateActionFlow.spellOpposedTests(type, category, combatType);
-
-        foundry.utils.setProperty(applyData, 'system.action.test', test);
-        foundry.utils.setProperty(applyData, 'system.action.opposed.test', opposedTest);
-        foundry.utils.setProperty(applyData, 'system.action.opposed.resist.test', resistTest);
-        foundry.utils.setProperty(applyData, 'system.action.followed.test', drainTest);
+        UpdateActionFlow.setActionTests(applyData, {
+            test,
+            ...UpdateActionFlow.spellOpposedTests(category, combatType),
+            followed: SR5.followedTests[test] ?? '',
+        });
     },
 
     /**
@@ -176,13 +175,12 @@ export const UpdateActionFlow = {
      * the alchemist already resisted it during creation. See SR5#306.
      */
     injectPreparationTestIntoChangeData(type: string, changeData: DeepPartial<{system: Item.SystemOfType<'preparation'>}>, applyData, preparation?: SR5Item<'preparation'>) {
-        // Category, combat subtype and trigger can each alter the defense chain.
+        // Reconfigure on category or direct/indirect changes, including partial item updates.
         const changed = changeData?.system;
-        if (changed?.category === undefined && changed?.combat?.type === undefined && changed?.trigger === undefined) return;
+        if (changed?.category === undefined && changed?.combat?.type === undefined) return;
 
         const category = changed?.category ?? preparation?.system.category;
         const combatType = changed?.combat?.type ?? preparation?.system.combat.type;
-        const trigger = changed?.trigger ?? preparation?.system.trigger;
         if (category === undefined) return;
 
         // Remove test when the stored spell has no category.
@@ -191,13 +189,11 @@ export const UpdateActionFlow = {
             return;
         }
 
-        const test = SR5.activeTests[type];
-        const { opposedTest, resistTest } = UpdateActionFlow.spellOpposedTests(type, category, combatType);
-
-        foundry.utils.setProperty(applyData, 'system.action.test', test);
-        foundry.utils.setProperty(applyData, 'system.action.opposed.test', opposedTest);
-        foundry.utils.setProperty(applyData, 'system.action.opposed.resist.test', resistTest);
-        foundry.utils.setProperty(applyData, 'system.action.followed.test', '');
+        UpdateActionFlow.setActionTests(applyData, {
+            test: SR5.activeTests[type],
+            ...UpdateActionFlow.spellOpposedTests(category, combatType),
+            followed: '',
+        });
 
         // The defense test derives its attributes from the stored spell (direct) or its own
         // defaults (indirect). Clear copied casting-time selectors so they can't override either.
@@ -206,31 +202,36 @@ export const UpdateActionFlow = {
             foundry.utils.setProperty(applyData, 'system.action.opposed.attribute', '');
             foundry.utils.setProperty(applyData, 'system.action.opposed.attribute2', '');
             foundry.utils.setProperty(applyData, 'system.action.opposed.armor', false);
-
-            // Contact-triggered indirect spells cannot be dodged. Their zero-dice defense test
-            // exists only to carry damage and net hits into the normal resistance test. SG#210.
-            if (trigger === 'contact' && combatType === 'indirect')
-                foundry.utils.setProperty(applyData, 'system.action.opposed.mod', 0);
         }
     },
 
     /**
-     * Opposed and resist tests for a spell-like item, combat spells split by direct/indirect.
+     * Opposed and resist tests of a spell, combat spells split by direct/indirect.
      */
-    spellOpposedTests(type: string, category: string, combatType?: string) {
-        const opposedTest =
+    spellOpposedTests(category: string, combatType = '') {
+        const opposed =
             (category === 'combat'
-                ? SR5.opposedTests[type][category][combatType]
-                : SR5.opposedTests[type][category]
+                ? SR5.opposedTests.spell[category][combatType]
+                : SR5.opposedTests.spell[category]
             ) || 'OpposedTest';
 
-        const resistTest =
+        const resist =
             (category === 'combat'
-                ? SR5.opposedResistTests[type][category][combatType]
-                : SR5.opposedResistTests[type][category]
+                ? SR5.opposedResistTests.spell[category][combatType]
+                : SR5.opposedResistTests.spell[category]
             ) || '';
 
-        return { opposedTest, resistTest };
+        return { opposed, resist };
+    },
+
+    /**
+     * Write the active, opposed, resist and follow up test of an action in one go.
+     */
+    setActionTests(applyData, tests: { test: string, opposed: string, resist: string, followed: string }) {
+        foundry.utils.setProperty(applyData, 'system.action.test', tests.test);
+        foundry.utils.setProperty(applyData, 'system.action.opposed.test', tests.opposed);
+        foundry.utils.setProperty(applyData, 'system.action.opposed.resist.test', tests.resist);
+        foundry.utils.setProperty(applyData, 'system.action.followed.test', tests.followed);
     },
 
     /**

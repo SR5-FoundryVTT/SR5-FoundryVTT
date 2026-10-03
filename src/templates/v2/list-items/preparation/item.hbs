@@ -25,14 +25,7 @@
             <label data-tooltip="SR5.Tooltips.Preparation.Potency">
                 {{item.system.potency.value}}/{{item.system.potency.base}}
             </label>
-            {{#with (preparationPotencyStatus item)}}
-                <div class="preparation-potency-meter state-{{state}}"
-                     style="--decay-threshold: {{decayThresholdPercent}}%;"
-                     data-tooltip="{{tooltip}}">
-                    <progress max="{{progressMax}}" value="{{progressValue}}" aria-label="{{tooltip}}"></progress>
-                    <span class="preparation-potency-threshold" aria-hidden="true"></span>
-                </div>
-            {{/with}}
+            {{> "systems/shadowrun5e/dist/templates/v2/common/preparation-potency-meter.hbs" item=item }}
         </div>
 
         <div class="list-item-icons">
@@ -44,6 +37,7 @@
     <div class="list-item-desc">
         <div class="list-item-properties">
             {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/preparation.hbs' item=item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/spell.hbs' item=item }}
             {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/action.hbs' item=item }}
         </div>
         <div class="description-body">
