@@ -99,6 +99,7 @@
             "Addiction": "Addiction Actions",
             "AddictionMental": "Mental Addiction",
             "AddictionPhysical": "Physical Addiction",
+            "Alchemy": "Alchemy Actions",
             "Attack": "Attack Actions",
             "AttackMatrix": "Attack Matrix",
             "AttackMelee": "Attack Melee",
@@ -133,8 +134,7 @@
             "SpellIllusion": "Spellcasting Illusion",
             "SpellManipulation": "Spellcasting Manipulation",
             "SpellRitual": "Spellcasting Ritual",
-            "Summoning": "Summoning Actions",
-            "Alchemy": "Alchemy Actions"
+            "Summoning": "Summoning Actions"
         },
         "ActionType": {
             "Label": "Type",
@@ -1838,14 +1838,14 @@
             "Lifestyle": "Lifestyle",
             "Metamagic": "Metamagic",
             "Modification": "Modification",
+            "Preparation": "Preparation",
             "Program": "Program",
             "Quality": "Quality",
             "Ritual": "Ritual",
             "Sin": "SIN",
             "Spell": "Spell",
             "SpritePower": "Sprite Power",
-            "Weapon": "Weapon",
-            "Preparation": "Preparation"
+            "Weapon": "Weapon"
         },
         "Karma": "Karma",
         "KarmaManager": {
@@ -1945,6 +1945,7 @@
                 "Persona": "Persona",
                 "PersonalInventory": "On Person",
                 "PhysicalTrack": "Physical Track",
+                "Preparations": "Preparations",
                 "PublicAwarenessShort": "PA",
                 "RemoveOneMark": "Remove One Mark",
                 "ResetActorForNewRun": "New Run Reset",
@@ -1961,8 +1962,7 @@
                 "StreetCredShort": "SC",
                 "StunTrack": "Stun Track",
                 "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description.",
-                "VehicleConfiguration": "Vehicle Configuration",
-                "Preparations": "Preparations"
+                "VehicleConfiguration": "Vehicle Configuration"
             },
             "Inventory": {
                 "All": "All",
@@ -2355,6 +2355,72 @@
         "PowerPoints": "PP",
         "PowerType": "Type",
         "Powers": "Powers",
+        "Preparation": {
+            "Alchemical": "Alchemical",
+            "CraftingTime": "Crafting Time",
+            "CraftingTimeMinutes": "{minutes} minutes",
+            "Create": "Create Preparation",
+            "CreationTimeDialog": {
+                "Edit": "Edit creation time",
+                "Invalid": "Enter a valid creation date and time.",
+                "Title": "Preparation Creation Time",
+                "UseCurrent": "Use Current Time"
+            },
+            "Expired": "Expired",
+            "ExpiredAt": "Expired at {time}",
+            "ExpiredMessage": "{name} has lost its potency. The stored spell is gone.",
+            "Expires": "Expires",
+            "ExpiresAt": "Expires at {time}",
+            "ExpiresIn": "Expires in {duration}",
+            "FIELDS": {
+                "created": {
+                    "hint": "When the preparation was created.",
+                    "label": "Created",
+                    "worldTime": {
+                        "hint": "World time the preparation was created at.",
+                        "label": "Creation Time"
+                    }
+                },
+                "force": {
+                    "hint": "The force the preparation was created at.",
+                    "label": "Force"
+                },
+                "potency": {
+                    "base": {
+                        "hint": "Net hits scored when the preparation was created.",
+                        "label": "Created Potency"
+                    },
+                    "hint": "Strength of the stored spell.",
+                    "label": "Potency",
+                    "value": {
+                        "hint": "Potency remaining after decay.",
+                        "label": "Current Potency"
+                    }
+                },
+                "spellUuid": {
+                    "hint": "The spell this preparation was created from.",
+                    "label": "Source Spell"
+                },
+                "trigger": {
+                    "hint": "The condition that releases the stored spell.",
+                    "label": "Trigger"
+                },
+                "triggerTime": {
+                    "hint": "Seconds until a time trigger releases the spell.",
+                    "label": "Trigger Time"
+                }
+            },
+            "Formulae": "Alchemical Formulae",
+            "FullPotencyUntil": "Full potency until",
+            "Lynchpin": "Lynchpin",
+            "Potency": "Potency",
+            "Spent": "Spent",
+            "Trigger": {
+                "Command": "Command",
+                "Contact": "Contact",
+                "Time": "Time"
+            }
+        },
         "Program": {
             "FIELDS": {
                 "type": {
@@ -2732,6 +2798,10 @@
             "DetectionPsychic": "Psychic",
             "Elemental": "Elemental",
             "FIELDS": {
+                "alchemical": {
+                    "hint": "This spell was learned as an alchemical formula and can be made into a preparation.",
+                    "label": "Alchemical"
+                },
                 "category": {
                     "hint": "Category that the Spell belongs to",
                     "label": "Category"
@@ -2805,10 +2875,6 @@
                 "type": {
                     "hint": "If the Spell is Physical or Mana based",
                     "label": "Spell Type"
-                },
-                "alchemical": {
-                    "label": "Alchemical",
-                    "hint": "This spell was learned as an alchemical formula and can be made into a preparation."
                 }
             },
             "HealthEssence": "Essence",
@@ -3095,6 +3161,8 @@
             "Failure": "Failure!",
             "HackOnTheFlyFailure": "Hack on the Fly failed!",
             "HackOnTheFlySuccess": "Hack on the Fly successful!",
+            "PreparationFailure": "The spell slips out of the lynchpin",
+            "PreparationSuccess": "The preparation holds the spell",
             "ResistedAllDamage": "No Damage taken!",
             "ResistedSomeDamage": "Damage taken!",
             "Results": "Results",
@@ -3106,9 +3174,7 @@
             "SpiritSummonSuccess": "Spirit summoned!",
             "SpriteCompilationFailure": "Sprite fled!",
             "SpriteCompilationSuccess": "Sprite compiled!",
-            "Success": "Success!",
-            "PreparationSuccess": "The preparation holds the spell",
-            "PreparationFailure": "The spell slips out of the lynchpin"
+            "Success": "Success!"
         },
         "Tests": {
             "AttributeOnlyTest": "Attribute-Only Test",
@@ -3135,12 +3201,15 @@
             "OpposedCompileSpriteTest": "Oppose Compilation",
             "OpposedHackOnTheFlyTest": "Oppose Hack On The Fly",
             "OpposedMatrixTest": "Opposed Matrix Test",
+            "OpposedPreparationForceTest": "Resist with Force",
             "OpposedRitualTest": "Seal the Ritual",
             "OpposedSummonSpiritTest": "Oppose Summoning",
             "OpposedTest": "Opposed Test",
             "PhysicalDefenseTest": "Physical Defense",
             "PhysicalResistTest": "Physical Damage Resist",
             "PilotVehicleTest": "Pilot Vehicle Test",
+            "PreparationCreationTest": "Create Preparation",
+            "PreparationTriggerTest": "Trigger Preparation",
             "RangedAttackTest": "Ranged Weapon Attack",
             "RitualSpellcastingTest": "Ritual Spellcasting",
             "SkillTest": "Skill Test",
@@ -3148,10 +3217,7 @@
             "SuccessTest": "Success Test",
             "SummonSpiritTest": "Summon Spirit",
             "SuppressionDefenseTest": "Suppression Defense",
-            "ThrownAttackTest": "Thrown Weapon Attack",
-            "PreparationCreationTest": "Create Preparation",
-            "OpposedPreparationForceTest": "Resist with Force",
-            "PreparationTriggerTest": "Trigger Preparation"
+            "ThrownAttackTest": "Thrown Weapon Attack"
         },
         "Threshold": "Threshold",
         "TimeControl": {
@@ -3266,6 +3332,14 @@
             "MatrixTest": {
                 "SameGridDisabled": "As active and target icon both use grids, this is automatically determined"
             },
+            "Preparation": {
+                "Craft": "Uninterrupted crafting time needed before the test is rolled",
+                "Force": "Force of the preparation, up to twice your Magic rating",
+                "Potency": "Net hits of the creation test. Decays over time and stands in for Spellcasting when triggered",
+                "ReagentDrams": "Drams of reagents used, which replace force as the limit",
+                "Trigger": "The condition that releases the stored spell",
+                "TriggerTime": "Countdown until the spell releases, limited by the resulting potency in hours"
+            },
             "RangedAttack": {
                 "Recoil": "Progressive Recoil",
                 "RecoilAfterAttack": "Progressive Recoil including this attack",
@@ -3305,15 +3379,7 @@
                 "RollMode": "FoundryVTT chat message roll visibility",
                 "Threshold": "Calculated threshold value"
             },
-            "ToggleEditMode": "Toggle Edit Mode",
-            "Preparation": {
-                "Force": "Force of the preparation, up to twice your Magic rating",
-                "ReagentDrams": "Drams of reagents used, which replace force as the limit",
-                "Trigger": "The condition that releases the stored spell",
-                "TriggerTime": "Countdown until the spell releases, limited by the resulting potency in hours",
-                "Potency": "Net hits of the creation test. Decays over time and stands in for Spellcasting when triggered",
-                "Craft": "Uninterrupted crafting time needed before the test is rolled"
-            }
+            "ToggleEditMode": "Toggle Edit Mode"
         },
         "Top": "Top",
         "Total": "Total",
@@ -3445,6 +3511,10 @@
             "NoFireModeConfigured": "Ranged weapon has no firemode configured. Will use single shot.",
             "NoActorCreatePermission": "You do not have permission to create actors.",
             "OnlyGMCanDoThis": "Only a GM user can do this",
+            "PreparationDepleted": "This preparation has no potency remaining. Its spell has been lost.",
+            "PreparationForceTooHigh": "Preparation force is invalid or greater than twice your Magic rating.",
+            "PreparationNotConcluded": "The preparation is not finished yet. Let its force resist first.",
+            "PreparationTriggerTimeTooLong": "The time trigger is set further out than the preparation's potency in hours. It will activate prematurely.",
             "RitualInvalidForce": "Ritual force is invalid or greater then your lodges rating.",
             "RitualNotConcluded": "Ritual incomplete. Wait for ritual to oppose spellcasting to determine drain.",
             "RitualNotEnoughReagents": "Not enough reagents offered.",
@@ -3452,11 +3522,7 @@
             "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
             "SkillSetDefaultTypeOutsideCompendium": "Only skillsets in the configured skillset compendium will affect actor creation",
             "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
-            "TokenSelectionNeeded": "One or more tokens need to be selected",
-            "PreparationForceTooHigh": "Preparation force is invalid or greater than twice your Magic rating.",
-            "PreparationTriggerTimeTooLong": "The time trigger is set further out than the preparation's potency in hours. It will activate prematurely.",
-            "PreparationDepleted": "This preparation has no potency remaining. Its spell has been lost.",
-            "PreparationNotConcluded": "The preparation is not finished yet. Let its force resist first."
+            "TokenSelectionNeeded": "One or more tokens need to be selected"
         },
         "Weapon": {
             "AmmoCount": "Ammo Count",
@@ -3668,73 +3734,7 @@
         "Wireless": "Wireless",
         "WirelessOffline": "Offline",
         "WirelessOnline": "Online",
-        "WirelessUnavailable": "Unavailable",
-        "Preparation": {
-            "Potency": "Potency",
-            "Lynchpin": "Lynchpin",
-            "Expires": "Expires",
-            "ExpiresAt": "Expires at {time}",
-            "ExpiresIn": "Expires in {duration}",
-            "Expired": "Expired",
-            "ExpiredAt": "Expired at {time}",
-            "ExpiredMessage": "{name} has lost its potency. The stored spell is gone.",
-            "FullPotencyUntil": "Full potency until",
-            "Formulae": "Alchemical Formulae",
-            "Alchemical": "Alchemical",
-            "Create": "Create Preparation",
-            "CraftingTime": "Crafting Time",
-            "CraftingTimeMinutes": "{minutes} minutes",
-            "Spent": "Spent",
-            "CreationTimeDialog": {
-                "Edit": "Edit creation time",
-                "Invalid": "Enter a valid creation date and time.",
-                "Title": "Preparation Creation Time",
-                "UseCurrent": "Use Current Time"
-            },
-            "Trigger": {
-                "Command": "Command",
-                "Contact": "Contact",
-                "Time": "Time"
-            },
-            "FIELDS": {
-                "spellUuid": {
-                    "label": "Source Spell",
-                    "hint": "The spell this preparation was created from."
-                },
-                "force": {
-                    "label": "Force",
-                    "hint": "The force the preparation was created at."
-                },
-                "trigger": {
-                    "label": "Trigger",
-                    "hint": "The condition that releases the stored spell."
-                },
-                "triggerTime": {
-                    "label": "Trigger Time",
-                    "hint": "Seconds until a time trigger releases the spell."
-                },
-                "potency": {
-                    "label": "Potency",
-                    "hint": "Strength of the stored spell.",
-                    "base": {
-                        "label": "Created Potency",
-                        "hint": "Net hits scored when the preparation was created."
-                    },
-                    "value": {
-                        "label": "Current Potency",
-                        "hint": "Potency remaining after decay."
-                    }
-                },
-                "created": {
-                    "label": "Created",
-                    "hint": "When the preparation was created.",
-                    "worldTime": {
-                        "label": "Creation Time",
-                        "hint": "World time the preparation was created at."
-                    }
-                }
-            }
-        }
+        "WirelessUnavailable": "Unavailable"
     },
     "TYPES": {
         "Actor": {
@@ -3763,6 +3763,7 @@
             "lifestyle": "Lifestyle",
             "metamagic": "Metamagic",
             "modification": "Gear Modification",
+            "preparation": "Preparation",
             "program": "Program",
             "quality": "Quality",
             "ritual": "Ritual",
@@ -3771,8 +3772,7 @@
             "spell": "Spell",
             "sprite_power": "Sprite Power",
             "vehicle": "Vehicle",
-            "weapon": "Weapon",
-            "preparation": "Preparation"
+            "weapon": "Weapon"
         }
     }
 }
