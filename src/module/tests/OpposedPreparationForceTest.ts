@@ -64,6 +64,19 @@ export class OpposedPreparationForceTest extends OpposedTest<OpposedPreparationF
         await test.execute();
     }
 
+    /**
+     * The spell's opposed selectors describe how a target resists the spell once the preparation
+     * is triggered, so they don't apply to the force resisting its creation.
+     */
+    static override async _getOpposedActionTestData(
+        againstData: SuccessTestData,
+        document: SR5Actor | SR5Item,
+        previousMessageId: string
+    ): Promise<OpposedTestData | undefined> {
+        const opposed = { ...againstData.opposed, attribute: '' as const, attribute2: '' as const, skill: '' };
+        return super._getOpposedActionTestData({ ...againstData, opposed }, document, previousMessageId);
+    }
+
     constructor(data: DeepPartial<OpposedPreparationForceTestData>, documents?: TestDocuments, options?: Partial<TestOptions>) {
         // The opposition is an abstract force, not an actor. Drop whatever actor the selection
         // supplied so no actor modifiers end up in the pool.
@@ -108,6 +121,11 @@ export class OpposedPreparationForceTest extends OpposedTest<OpposedPreparationF
         // NOTE: We don't have an actor, therefore don't need to call document modifiers.
         ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Force', this.against.data.force);
     }
+
+    /**
+     * The spell's item modifiers, like the area of effect dodge penalty, apply to its targets.
+     */
+    override prepareItemModifiers() {}
 
     /**
      * A failure for the force is a success for the alchemist.

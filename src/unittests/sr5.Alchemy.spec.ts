@@ -366,6 +366,26 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.isAbove(opposed.against.data.drain, 0);
         });
 
+        it('opposes with the force alone', async () => {
+            const alchemist = await createAlchemist();
+            // An area spell with defense selectors, as imported from Chummer.
+            const spell = await createAlchemicalSpell(alchemist);
+
+            const creation = await TestCreator.fromItem(
+                spell, alchemist, { showDialog: false, showMessage: false }) as PreparationCreationTest;
+            await creation.execute();
+
+            const data = await OpposedPreparationForceTest._getOpposedActionTestData(creation.data, alchemist, '');
+            assert.isOk(data);
+            const opposed = new OpposedPreparationForceTest(
+                data!, { source: alchemist }, { showDialog: false, showMessage: false });
+            await opposed.execute();
+
+            // Neither the target's defense attributes nor the area dodge penalty apply.
+            assert.equal(opposed.pool.value, creation.data.force);
+            assert.deepEqual(opposed.pool.changes.map(change => change.name), ['SR5.Force']);
+        });
+
         it('triggers on force plus potency and consumes the preparation', async () => {
             const alchemist = await createAlchemist();
             const preparation = await createPreparation({ trigger: 'contact', drain: -1 }, alchemist);
