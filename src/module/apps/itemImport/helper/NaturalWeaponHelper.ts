@@ -2,7 +2,6 @@ import { DataDefaults } from 'src/module/data/DataDefaults';
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
 import { Constants, CompendiumKey } from '../importer/Constants';
 import { ImportHelper as IH } from './ImportHelper';
-import { SR5Item } from 'src/module/item/SR5Item';
 
 export interface NaturalWeaponEntry {
     _TEXT: string;
@@ -138,8 +137,7 @@ export class NaturalWeaponHelper {
         IH.setItem(compKey, weaponData.name, targetId);
 
         try {
-            await SR5Item.create(createData, { pack: `world.${compConfig.pack}`, keepId: true });
-            await compendium.getIndex();
+            await IH.createDocumentInCompendium(compKey, createData);
             return uuid;
         } catch (error) {
             console.error(`SR5 | Error creating natural weapon ${weaponData.name} in compendium:`, error);

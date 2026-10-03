@@ -616,7 +616,28 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             assert.isDefined(weaponFlag, 'metaTypesItems should contain flag entry for natural weapon');
             assert.strictEqual(weaponFlag?.category, 'weapon', 'Weapon flag should have category weapon');
         });
+
+        it('ImportHelper.withUnlockedCompendium safely restores locked state after operation', async () => {
+            const { ImportHelper } = await import('@/module/apps/itemImport/helper/ImportHelper');
+            const mockPack = {
+                collection: 'world.testpack',
+                locked: true,
+                configure: async function(options: { locked: boolean }) {
+                    this.locked = options.locked;
+                    return this;
+                },
+            };
+
+            let executedWhileUnlocked = false;
+            await ImportHelper.withUnlockedCompendium(mockPack as any, async (pack) => {
+                executedWhileUnlocked = !pack.locked;
+            });
+
+            assert.isTrue(executedWhileUnlocked, 'Compendium should be unlocked during callback execution');
+            assert.isTrue(mockPack.locked, 'Compendium locked state should be restored to true after execution');
+        });
     });
 };
 
 export const shadowrunRaceItemTesting = shadowrunMetatypeItemTesting;
+

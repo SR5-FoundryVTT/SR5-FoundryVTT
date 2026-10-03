@@ -2,6 +2,7 @@ import { Parser } from 'xml2js';
 import { ImportHelper as IH } from './ImportHelper';
 import { QualityParser } from '../parser/quality/QualityParser';
 import { CritterPowerParser } from '../parser/powers/CritterPowerParser';
+import { SystemType } from '../parser/Parser';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 import { SR5Item } from '../../../item/SR5Item';
 import { BulkImporter } from '../apps/BulkImporter';
@@ -132,13 +133,13 @@ export class MetatypeItemResolver {
                 createData.name = item.name;
             }
             if (item.category === 'optional_power' && createData.system) {
-                (createData.system as any).optional = 'optional';
+                const system = createData.system as SystemType<'critter_power'>;
+                system.optional = 'disabled_option';
             }
             UpdateActionFlow.injectActionTestsIntoChangeData(createData.type, createData, createData);
             IH.setItem('Critter_Power', powerData.name._TEXT, targetId);
 
-            await SR5Item.create(createData, { pack: `world.${compConfig.pack}`, keepId: true });
-            await compendium.getIndex();
+            await IH.createDocumentInCompendium(compKey, createData);
             console.log(`SR5 | Ingested metatype power "${item.name}" into compendium "world.${compConfig.pack}" with ID "${targetId}"`);
             return;
         }
@@ -161,8 +162,7 @@ export class MetatypeItemResolver {
             UpdateActionFlow.injectActionTestsIntoChangeData(createData.type, createData, createData);
             IH.setItem('Quality', qualityData.name._TEXT, targetId);
 
-            await SR5Item.create(createData, { pack: `world.${compConfig.pack}`, keepId: true });
-            await compendium.getIndex();
+            await IH.createDocumentInCompendium(compKey, createData);
             console.log(`SR5 | Ingested metatype trait "${item.name}" into compendium "world.${compConfig.pack}" with ID "${targetId}"`);
             return;
         }
