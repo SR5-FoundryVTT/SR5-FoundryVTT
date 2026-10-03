@@ -451,6 +451,47 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
         });
     });
 
+    describe('Area preparations', () => {
+        const preparationData = (range: string) => ({
+            name: 'Prepared Fireball', type: 'preparation' as const,
+            system: {
+                category: 'combat', type: 'physical', combat: { type: 'indirect' }, range,
+                force: 4, trigger: 'contact', potency: { base: 3 },
+                created: { worldTime: game.time.worldTime },
+            }
+        });
+
+        it('centers an area spell on the preparation with potency as radius', async () => {
+            const preparation = await factory.createItem(preparationData('los_a') as any);
+
+            assert.isTrue(preparation.isAreaOfEffect());
+            // Radius is Potency in meters, not the spell's Force. SR5#306.
+            assert.deepEqual(preparation.getBlastData(), { radius: 3, dropoff: 0 });
+        });
+
+        it('does not treat a line of sight preparation as an area', async () => {
+            const preparation = await factory.createItem(preparationData('los') as any);
+
+            assert.isFalse(preparation.isAreaOfEffect());
+            assert.isUndefined(preparation.getBlastData());
+        });
+
+        it('places a template of potency radius that never scatters when triggered', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [created] = await actor.createEmbeddedDocuments('Item', [preparationData('los_a')]) as SR5Item[];
+
+            const trigger = await TestCreator.fromItem(
+                created, actor, { showDialog: false, showMessage: false }) as PreparationTriggerTest;
+            assert.isOk(trigger);
+            await trigger._prepareExecution();
+
+            assert.isTrue(trigger.blastTemplateFlow.canPlace);
+            assert.deepEqual(trigger.getBlastData(), { radius: 3, dropoff: 0 });
+            // The area is centered on the preparation itself, so there is nothing to scatter.
+            assert.isFalse(trigger.blastTemplateFlow.canScatter);
+        });
+    });
+
     describe('Preparation items', () => {
         it('defaults its creation time to the current world time', async () => {
             const worldTime = game.time.worldTime;

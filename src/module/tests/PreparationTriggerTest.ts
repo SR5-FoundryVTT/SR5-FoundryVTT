@@ -92,6 +92,19 @@ export class PreparationTriggerTest extends SpellCastingTest {
         );
     }
 
+    /**
+     * An area preparation is centered on the preparation itself, with a radius of its Potency in
+     * meters instead of the spell's Force. SR5#306.
+     */
+    override getBlastData() {
+        if (!this.item?.isAreaOfEffect()) return undefined;
+
+        return {
+            radius: Number(this.data.potency),
+            dropoff: 0,
+        };
+    }
+
     /** A preparation without remaining potency cannot cast again. */
     override userCanExecute(): boolean {
         if (!super.userCanExecute()) return false;

@@ -392,6 +392,13 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
                 dropoff: 0,
             };
 
+        } else if (this.isType('preparation') && this.isAreaOfEffect()) {
+            // The preparation is the center of the area, with its Potency in meters as radius. SR5#306.
+            return {
+                radius: this.system.potency.value,
+                dropoff: 0,
+            };
+
         } else if (this.isGrenade()) {
             return {
                 radius: this.system.thrown.blast.radius,
@@ -1028,7 +1035,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     isAreaOfEffect(): boolean {
         return (this.isType('weapon') && this.system.category === 'thrown' && this.system.thrown.blast.radius > 0)
             || (this.isType('weapon') && (this.getEquippedAmmo()?.system.blast?.radius ?? 0) > 0)
-            || (this.isType('spell') && this.system.range === 'los_a')
+            || this.spellPart?.range === 'los_a'
             || (this.isType('ammo') && this.system.blast.radius > 0);
     }
 
