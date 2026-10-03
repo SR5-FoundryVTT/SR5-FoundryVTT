@@ -1,0 +1,81 @@
+<div class="sr5 chat-card roll-card sr5-roll-card-v2">
+    <div class="card-title card-header card-header--title">
+        <span class="test-name">{{title}}</span>
+    </div>
+    {{#if (or speaker.source item)}}
+    <div class="card-title card-header card-header--entities">
+        <div class="container container--fluid">
+            {{#if speaker.source}}
+            <div class="container__row">
+                <div class="container__col">
+                    <div class="document">
+                        <a class="chat-select-link" data-token-id="{{speaker.token.id}}">
+                            <img src="{{speakerImg speaker.source}}" class="entity-selectable" data-tooltip="{{speakerName speaker.source}}" />
+                        </a>
+                        <h3 class="header-name">
+                            <a class="chat-document-link" data-uuid="{{speaker.source.uuid}}">{{speakerName speaker.source}}</a>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+            {{#if item}}
+            <div class="container__row">
+                <div class="container__col">
+                    <div class="document">
+                        <img src="{{item.img}}" data-tooltip="{{item.name}}" />
+                        <h3 class="header-name">
+                            <a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">{{localizeContent item.name}}</a>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+    {{/if}}
+    <div class="card-main-content">
+        <div class="card-content card-content--code">
+            <div class="test-line">
+                <span class="test-name">{{test}}</span>
+            </div>
+        </div>
+        <div class="card-content card-content--metrics">
+            <div class="scatter-metrics-row">
+                <div class="test-value metric-row">
+                    <span class="value">{{localize "SR5.Hits"}}:</span>
+                    <span class="value-result">{{hits}}</span>
+                </div>
+            </div>
+            <div class="scatter-metrics-row">
+                <div class="left-side">
+                    <div class="test-value metric-row">
+                        <span class="value">{{localize "SR5.Scatter.Direction"}}:</span>
+                        <span class="value-result">{{direction}}</span>
+                    </div>
+                </div>
+                <div class="right-side">
+                    <div class="test-value metric-row">
+                        <span class="value">{{localize "SR5.Scatter.Distance"}}:</span>
+                        <span class="value-result">{{distance}} m</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-test-content card-test-content--status">
+            <div class="glitch-content clickable show-roll">
+                <div class="glitch">{{localize "SR5.Scatter.Rolls"}}</div>
+            </div>
+        </div>
+        <div class="card-rolls">
+            <div class="test-line">
+                <span class="test-name">{{localize "SR5.Scatter.Direction"}}</span>
+            </div>
+            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs' roll=directionRoll}}
+            <div class="test-line">
+                <span class="test-name">{{localize "SR5.Scatter.Distance"}}</span>
+            </div>
+            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs' roll=distanceRoll}}
+        </div>
+    </div>
+</div>

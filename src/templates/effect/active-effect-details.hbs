@@ -6,8 +6,10 @@
     {{#if isActorEffect}}
         {{formGroup fields.origin value=source.origin rootId=rootId disabled=true}}
     {{/if}}
-    {{#if isItemEffect}}
+    {{#if showOnlyForEquipped}}
         {{formGroup systemFields.onlyForEquipped value=source.system.onlyForEquipped rootId=rootId}}
+    {{/if}}
+    {{#if showOnlyForWireless}}
         {{formGroup systemFields.onlyForWireless value=source.system.onlyForWireless rootId=rootId}}
     {{/if}}
 

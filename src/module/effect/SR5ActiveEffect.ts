@@ -228,6 +228,16 @@ export class SR5ActiveEffect extends ActiveEffect {
         return ['base', 'changes', 'value'] satisfies (keyof ModifiableValueType)[];
     }
 
+    /** Whether the onlyForEquipped restriction has a parent item state to check against. */
+    get restrictsToEquipped(): boolean {
+        return this.system.onlyForEquipped && this.parent instanceof SR5Item && this.parent.canBeEquipped();
+    }
+
+    /** Whether the onlyForWireless restriction has a parent item state to check against. */
+    get restrictsToWireless(): boolean {
+        return this.system.onlyForWireless && this.parent instanceof SR5Item && this.parent.isMatrixDevice;
+    }
+
     override get isSuppressed(): boolean {
         // Native registry sets duration.expired when the span+boundary are reached. Mirror that suppression
         // here so expired effects are greyed out and not applied, regardless of parent type.
@@ -235,8 +245,8 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         if (!(this.parent instanceof SR5Item)) return false;
 
-        if (this.system.onlyForEquipped && !this.parent.isEquipped()) return true;
-        if (this.system.onlyForWireless && !this.parent.isWireless()) return true;
+        if (this.restrictsToEquipped && !this.parent.isEquipped()) return true;
+        if (this.restrictsToWireless && !this.parent.isWireless()) return true;
         if (this.parent.isType('critter_power') && !this.parent.system.enabled) return true;
         if (this.parent.isType('sprite_power') && !this.parent.system.enabled) return true;
 
