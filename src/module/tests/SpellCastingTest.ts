@@ -24,7 +24,9 @@ export interface SpellCastingTestData extends SuccessTestData {
  * Spellcasting tests as described on SR5#281 in the spellcasting chapter.
  */
 export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
-    public override item: SR5Item<'spell'> | undefined = undefined;
+    // A preparation carries the same spell fields a spell item does, and PreparationTriggerTest
+    // runs this flow with one. See SR5Item#spellPart.
+    public override item: SR5Item<'spell' | 'preparation'> | undefined = undefined;
     public blastTemplateFlow = new BlastTemplateFlow(this, {
         getBlastData: () => this.getBlastData(),
         canScatter: () => getItemScatterKind(this.item) !== undefined,
@@ -71,12 +73,12 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
      * Spellcasting test category directly depends on the spell cast.
      */
     override get testCategories(): Shadowrun.ActionCategories[] {
-        const spell = this.item?.asType('spell');
+        const spell = this.item?.spellPart;
         if (!spell) return [];
 
-        switch (spell.system.category) {
+        switch (spell.category) {
             case 'combat':
-                if (spell.system.combat.type === 'indirect' && spell.system.range === 'los')
+                if (spell.combat.type === 'indirect' && spell.range === 'los')
                     return ['spell_combat', 'attack', 'attack_ranged'];
 
                 return ['spell_combat'];

@@ -263,4 +263,29 @@
         justify-self: center;
     }
 
+    .preparation-created-time {
+        justify-content: flex-end;
+        gap: 0.35rem;
+
+        span {
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        button {
+            flex: 0 0 auto;
+            width: 1.75rem;
+            height: 1.75rem;
+            padding: 0;
+        }
+    }
+
+    .preparation-potency-timeline-row {
+        padding-block: 0.35rem;
+
+        .preparation-potency-meter {
+            flex: 1;
+        }
+    }
+
 }

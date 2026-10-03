@@ -1,0 +1,47 @@
+{{!-- list-item expects an SR5Item to be passed in as 'item' --}}
+<div class="list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
+    <div class="list-item {{#if (isOwner item owner=@root.actor)}} draggable {{/if}}"
+         data-source="{{item.system.description.source}}"
+         data-item-id="{{item.id}}"
+         data-context-menu="item"
+         data-uuid="{{item.uuid}}">
+        <div class="list-item-start">
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
+        </div>
+
+        <div class="list-item-col">
+            <label>
+                {{item.system.force}}
+            </label>
+        </div>
+        <div class="list-item-col">
+            <label>
+                {{localizeOb item.system.trigger @root.config.preparationTriggers}}
+            </label>
+        </div>
+        <div class="list-item-col preparation-potency-list">
+            <label data-tooltip="SR5.Tooltips.Preparation.Potency">
+                {{item.system.potency.value}}/{{item.system.potency.base}}
+            </label>
+            {{> "systems/shadowrun5e/dist/templates/v2/common/preparation-potency-meter.hbs" item=item }}
+        </div>
+
+        <div class="list-item-icons">
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
+        </div>
+    </div>
+    <div class="list-item-desc">
+        <div class="list-item-properties">
+            {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/preparation.hbs' item=item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/spell.hbs' item=item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/action.hbs' item=item }}
+        </div>
+        <div class="description-body">
+            {{{objValue (objValue @root.expandedUuids item.uuid) 'html'}}}
+        </div>
+    </div>
+</div>

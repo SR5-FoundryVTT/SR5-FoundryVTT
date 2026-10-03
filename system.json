@@ -106,6 +106,9 @@
             "quality": {
                 "htmlFields": ["description.value"]
             },
+            "preparation": {
+                "htmlFields": ["description.value"]
+            },
             "ritual": {
                 "htmlFields": ["description.value"]
             },

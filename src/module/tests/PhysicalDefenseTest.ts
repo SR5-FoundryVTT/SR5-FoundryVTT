@@ -12,6 +12,7 @@ import { TestOptions } from "./SuccessTest";
 import { MinimalActionType } from "../types/item/Action";
 import { CombatSpellRules } from "../rules/CombatSpellRules";
 import { SpellCastingTestData } from "./SpellCastingTest";
+import { AlchemyRules } from "../rules/AlchemyRules";
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
     // Dialog input for cover modifier
@@ -44,10 +45,29 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/physical-defense-test-dialog.hbs';
     }
 
+    /**
+     * Defending against a preparation that can't be dodged. See AlchemyRules.canBeDodged.
+     */
+    get isUnavoidableContactPreparation(): boolean {
+        const item = this.against.item;
+        return !!item?.isType('preparation')
+            && !AlchemyRules.canBeDodged(item.system.trigger, item.system.combat.type);
+    }
+
     override prepareBaseValues() {
         super.prepareBaseValues();
-        const spell = this.against.item?.asType('spell');
-        if (spell?.system.category === 'combat' && spell.system.combat.type === 'indirect') {
+
+        // Keep the defense link in the chain so damage can continue to its resistance test, but
+        // don't permit dodge dice.
+        if (this.isUnavoidableContactPreparation) {
+            this.data.pool.base = 0;
+            this.data.pool.changes = [];
+            ModifiableValue.calcTotal(this.data.pool, { min: 0 });
+        }
+
+        // Spells and the preparations storing them share their spell data.
+        const spell = this.against.item?.spellPart;
+        if (spell?.category === 'combat' && spell.combat.type === 'indirect') {
             const casting = this.data.against as SpellCastingTestData;
             this.data.incomingDamage = CombatSpellRules.calculateIndirectDamage(this.data.incomingDamage, casting.force);
         }
@@ -58,6 +78,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
     }
 
     override get testCategories(): Shadowrun.ActionCategories[] {
+        if (this.isUnavoidableContactPreparation) return [];
         return ['defense']
     }
 
@@ -80,6 +101,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
 
         const weapon = this.against.item;
         if (weapon === undefined) return;
+        if (this.isUnavoidableContactPreparation) return;
         
         this.data.activeDefenses = ActiveDefenseRules.availableActiveDefenses(weapon, actor);
 
@@ -166,10 +188,12 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
     }
 
     override get success() {
+        if (this.isUnavoidableContactPreparation) return false;
         return CombatRules.attackMisses(this.against.hits.value, this.hits.value);
     }
 
     override get failure() {
+        if (this.isUnavoidableContactPreparation) return true;
         return CombatRules.attackHits(this.against.hits.value, this.hits.value);
     }
 
@@ -240,6 +264,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
      */
     async applyActorEffectsForDefense() {
         if (!this.actor) return;
+        if (this.isUnavoidableContactPreparation) return;
 
         return this.actor.calculateNextDefenseMultiModifier();
     }

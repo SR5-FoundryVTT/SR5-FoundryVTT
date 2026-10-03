@@ -1,0 +1,7 @@
+<label>{{localize "SR5.Force"}}&nbsp;{{item.system.force}}</label>
+<label data-tooltip="SR5.Tooltips.Preparation.Potency">
+    {{localize "SR5.Preparation.Potency"}}&nbsp;{{item.system.potency.value}}/{{item.system.potency.base}}
+</label>
+{{#unless (empty item.system.trigger)}}
+    <label>{{localizeOb item.system.trigger @root.config.preparationTriggers}}</label>
+{{/unless}}
