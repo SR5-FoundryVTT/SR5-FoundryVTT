@@ -404,6 +404,37 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.equal(trigger.limit.value, 5);
         });
 
+        it('takes the ranged penalty against a running or sprinting target', async () => {
+            const alchemist = await createAlchemist();
+            const target = await factory.createActor({ type: 'character' });
+            const [created] = await alchemist.createEmbeddedDocuments('Item', [{
+                name: 'Prepared Fireball', type: 'preparation',
+                system: {
+                    category: 'combat', type: 'physical', combat: { type: 'indirect' }, range: 'los',
+                    force: 4, trigger: 'command', potency: { base: 3 },
+                    created: { worldTime: game.time.worldTime },
+                }
+            }]) as SR5Item[];
+
+            const poolVsTarget = async () => {
+                const trigger = await TestCreator.fromItem(
+                    created, alchemist, { showDialog: false, showMessage: false }) as PreparationTriggerTest;
+                trigger.targets = [target];
+                await trigger._prepareExecution();
+                return trigger.pool.value;
+            };
+
+            // Force 4 + Potency 3.
+            assert.equal(await poolVsTarget(), 7);
+
+            await target.toggleStatusEffect('sr5run', { active: true });
+            assert.equal(await poolVsTarget(), 5);
+
+            await target.toggleStatusEffect('sr5run', { active: false });
+            await target.toggleStatusEffect('sr5sprint', { active: true });
+            assert.equal(await poolVsTarget(), 3);
+        });
+
         it('does not allow a spent preparation to trigger again', async () => {
             const alchemist = await createAlchemist();
             const [created] = await alchemist.createEmbeddedDocuments('Item', [{
