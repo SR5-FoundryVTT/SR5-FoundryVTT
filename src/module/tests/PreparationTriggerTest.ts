@@ -6,6 +6,7 @@ import { DataDefaults } from "../data/DataDefaults";
 import { MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 import { SR5Item } from "../item/SR5Item";
+import { PreparationTriggerEffectsFlow } from "../effect/flows/PreparationTriggerEffectsFlow";
 import ModifierTypes = Shadowrun.ModifierTypes;
 
 
@@ -31,6 +32,12 @@ export class PreparationTriggerTest extends SpellCastingTest {
     declare data: PreparationTriggerTestData;
     // A preparation carries the same spell fields a spell item does. See SR5Item#spellPart.
     public declare item: SR5Item<'preparation'> | undefined;
+
+    constructor(...args: ConstructorParameters<typeof SpellCastingTest>) {
+        super(...args);
+        // The triggering actor's test effects must not reach the preparation's own pool.
+        this.effects = new PreparationTriggerEffectsFlow<this>(this);
+    }
 
     override _prepareData(data: DeepPartial<PreparationTriggerTestData>, options: Partial<TestOptions>): PreparationTriggerTestData {
         const prepared = super._prepareData(data as DeepPartial<SpellCastingTestData>, options) as PreparationTriggerTestData;
@@ -124,18 +131,20 @@ export class PreparationTriggerTest extends SpellCastingTest {
      * SR5#306, SG#210.
      */
     applyPreparationPool() {
+        const { force, potency } = AlchemyRules.activationPool(this.data.force, this.data.potency);
+
         const pool = new ModifiableValue(this.data.pool);
         pool.remove('SR5.Force');
         pool.remove('SR5.Preparation.Potency');
-        pool.addBase('SR5.Force', Number(this.data.force));
-        pool.addBase('SR5.Preparation.Potency', Number(this.data.potency));
+        pool.addBase('SR5.Force', force);
+        pool.addBase('SR5.Preparation.Potency', potency);
     }
 
     /**
      * Force is always the limit. Reagents spent during creation don't apply here. SG#210.
      */
     override prepareLimitValue() {
-        ModifiableValue.addUniqueBase(this.data.limit, 'SR5.Force', Number(this.data.force));
+        ModifiableValue.addUniqueBase(this.data.limit, 'SR5.Force', this.data.force);
     }
 
     /**

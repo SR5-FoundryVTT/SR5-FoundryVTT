@@ -8,6 +8,9 @@ import { SR5 } from "../config";
  * NOTE: Metamagics and qualities that alter these numbers (Fixation, Durable Preparations,
  * Advanced Alchemy triggers, Blood Alchemy) are not implemented. The seams for them are the
  * decayInterval and fullPotencyMultiplier getters below.
+ *
+ * NOTE: A sustained spell released from a preparation lasts Potency minutes (SR5#306). That isn't
+ * enforced, as the system doesn't track how long sustained spells last.
  */
 export const AlchemyRules = {
     /**
@@ -132,19 +135,12 @@ export const AlchemyRules = {
     },
 
     /**
-     * The dice pool used when a preparation is triggered: the preparation rolls for itself, using
-     * its force in place of Magic and its potency in place of the Spellcasting skill.
+     * The dice pool parts used when a preparation is triggered: the preparation rolls for itself,
+     * using its force in place of Magic and its potency in place of the Spellcasting skill.
      *
      * As defined in SR5#305-306 'Using a Preparation' and SG#210.
      */
-    activationPool: (force: number, potency: number): number => {
-        return Math.max(0, force) + Math.max(0, potency);
+    activationPool: (force: number, potency: number): { force: number, potency: number } => {
+        return { force: Math.max(0, force), potency: Math.max(0, potency) };
     },
-
-    /**
-     * Minutes a sustained spell released from a preparation lasts.
-     *
-     * As defined in SR5#306 'Using a Preparation'.
-     */
-    sustainedMinutes: (potency: number): number => potency,
 };

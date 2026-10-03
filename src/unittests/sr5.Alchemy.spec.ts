@@ -106,11 +106,11 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
     describe('Triggering a preparation', () => {
         it('rolls force plus potency', () => {
             // SG#210: the preparation rolls Force + Potency [Force]
-            assert.equal(AlchemyRules.activationPool(5, 6), 11);
+            assert.deepEqual(AlchemyRules.activationPool(5, 6), { force: 5, potency: 6 });
         });
 
-        it('sustains for potency minutes', () => {
-            assert.equal(AlchemyRules.sustainedMinutes(6), 6);
+        it('never rolls negative pool parts', () => {
+            assert.deepEqual(AlchemyRules.activationPool(-1, -2), { force: 0, potency: 0 });
         });
     });
 
@@ -145,7 +145,8 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
         });
 
         it('rolls eleven dice when triggered', () => {
-            assert.equal(AlchemyRules.activationPool(force, netHits), 11);
+            const pool = AlchemyRules.activationPool(force, netHits);
+            assert.equal(pool.force + pool.potency, 11);
         });
     });
 
@@ -363,6 +364,44 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             // Single use. SG#209.
             assert.equal(preparation.system.potency.base, 0);
             assert.equal(preparation.system.potency.value, 0);
+        });
+
+        it('ignores the triggering actor\'s test effects but keeps its own', async () => {
+            const alchemist = await createAlchemist();
+            const spellcastingBoost = (name: string, pool: number) => ({
+                name,
+                system: {
+                    targets: [{
+                        id: 't', applyTo: 'test_all' as const,
+                        conditions: [{ type: 'categories' as const, values: ['spell_combat'] }],
+                    }],
+                    changes: [
+                        { key: 'data.pool', value: `${pool}`, type: 'add' as const, target: 't' },
+                        { key: 'data.limit', value: `${pool}`, type: 'add' as const, target: 't' },
+                    ],
+                },
+            });
+            await alchemist.createEmbeddedDocuments('ActiveEffect', [spellcastingBoost('Actor Boost', 2)]);
+
+            const [created] = await alchemist.createEmbeddedDocuments('Item', [{
+                name: 'Prepared Fireball', type: 'preparation',
+                system: {
+                    category: 'combat', type: 'physical', combat: { type: 'indirect' },
+                    force: 4, trigger: 'command', potency: { base: 3 },
+                    created: { worldTime: game.time.worldTime },
+                }
+            }]) as SR5Item[];
+            await created.createEmbeddedDocuments('ActiveEffect', [spellcastingBoost('Preparation Boost', 1)]);
+
+            const trigger = await TestCreator.fromItem(
+                created, alchemist, { showDialog: false, showMessage: false }) as PreparationTriggerTest;
+            assert.isOk(trigger);
+            await trigger._prepareExecution();
+
+            assert.include(trigger.data.categories, 'spell_combat');
+            // Force 4 + Potency 3 + the preparation's own +1, without the actor's +2.
+            assert.equal(trigger.pool.value, 8);
+            assert.equal(trigger.limit.value, 5);
         });
 
         it('does not allow a spent preparation to trigger again', async () => {
