@@ -6,7 +6,7 @@ import { TestCreator } from '../TestCreator';
 
 interface ShotgunTemplateFlowHost {
     actor: {
-        getToken(): TokenDocument | null
+        getToken: () => TokenDocument | null
     } | undefined
     data: {
         ranges: RangesTemplateType
@@ -15,7 +15,7 @@ interface ShotgunTemplateFlowHost {
 }
 
 interface ShotgunTest extends ShotgunTemplateFlowHost {
-    populateDocuments(): Promise<void>
+    populateDocuments: () => Promise<void>
     shotgunTemplateFlow: ShotgunTemplateFlow
 }
 

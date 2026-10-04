@@ -4,7 +4,7 @@ import { TestCreator } from '../TestCreator';
 
 interface SuppressiveFireTemplateFlowHost {
     actor: {
-        getToken(): TokenDocument | null
+        getToken: () => TokenDocument | null
     } | undefined
     data: {
         fireMode: FireModeType
@@ -13,7 +13,7 @@ interface SuppressiveFireTemplateFlowHost {
 }
 
 interface SuppressiveFireTest extends SuppressiveFireTemplateFlowHost {
-    populateDocuments(): Promise<void>
+    populateDocuments: () => Promise<void>
     suppressiveFireTemplateFlow: SuppressiveFireTemplateFlow
 }
 
