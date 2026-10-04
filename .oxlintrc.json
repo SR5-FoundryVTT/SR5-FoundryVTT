@@ -13,7 +13,9 @@
         // standard pattern here; the caller ignores the returned promise either way. Only the void-return check is disabled.
         "typescript/no-misused-promises": ["warn", { "checksVoidReturn": false }],
         "typescript/prefer-promise-reject-errors": "warn",
-        "typescript/promise-function-async": "warn",
+        // Conflicts with require-await: a function that returns a promise without awaiting anything can't satisfy both rules.
+        // require-await is kept, so promise-returning functions are not forced to be async.
+        "typescript/promise-function-async": "off",
         "typescript/require-await": "warn",
         "typescript/return-await": "off",
         "typescript/consistent-type-assertions": "warn",
