@@ -1286,7 +1286,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const { modifiers } = sheetData.system;
 
         const modifierList = Object.keys(modifiers);
-        modifierList.sort();
+        modifierList.sort((a, b) => a < b ? -1 : a > b ? 1 : 0); // Same code unit order as the default sort.
         // shift global to the front of the list
         modifierList.splice(modifierList.indexOf("global"), 1);
         modifierList.unshift('global');
