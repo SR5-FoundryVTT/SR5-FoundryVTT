@@ -24,9 +24,9 @@ export default class Sr5Tour extends foundry.nue.Tour {
 
         await this.actor.sheet?.render(true, {editable: false} as any);
 
-        // @ts-expect-error
+        // @ts-expect-error The tour config type does not declare the custom tab property.
         if(this.config.tab) {
-            // @ts-expect-error
+            // @ts-expect-error The tour config type does not declare the custom tab property and sheet activateTab is not typed.
             this.actor?.sheet?.activateTab(this.config.tab)
         }
     }

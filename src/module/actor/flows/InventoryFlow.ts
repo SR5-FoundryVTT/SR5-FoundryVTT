@@ -102,7 +102,7 @@ export class InventoryFlow {
 
         // Default inventory is virtual, so only none default inventories need to have their items merged.
         if (this.actor.defaultInventory.name !== moveTo) {
-            // @ts-expect-error
+            // @ts-expect-error The update data type does not allow dotted-path keys with array values.
             updateData[`system.inventories.${moveTo}.itemIds`] = [
                 ...this.actor.system.inventories[name].itemIds,
                 ...this.actor.system.inventories[moveTo].itemIds

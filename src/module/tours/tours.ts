@@ -13,7 +13,7 @@ export default async function registerSR5Tours() {
     //      game.tours.register(
     //       'shadowrun5e',
     //       'CharacterImport',
-    //        // @ts-expect-error
+    //        // @ts-expect-error Commented-out tour registration, original type error was never documented.
     //       await Sr5Tour.fromJSON('/systems/shadowrun5e/dist/tours/character-import.json'),
     //     );
     //
