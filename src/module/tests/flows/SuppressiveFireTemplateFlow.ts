@@ -31,7 +31,7 @@ export class SuppressiveFireTemplateFlow {
     constructor(private readonly test: SuppressiveFireTemplateFlowHost) { }
 
     get canPlace(): boolean {
-        return this.test.data.fireMode.suppression === true;
+        return this.test.data.fireMode.suppression;
     }
 
     dialogListeners(getMeters: () => number): TestDialogListener[] {
