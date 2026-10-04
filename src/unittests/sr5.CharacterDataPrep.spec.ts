@@ -573,8 +573,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 type: 'cyberware',
                 name: 'Cybereyes',
                 system: {
-                    essence: 0.75,
-                    technology: { equipped: true }
+                    technology: { equipped: true, essence: { base: 0.75 } }
                 }
             }]);
 

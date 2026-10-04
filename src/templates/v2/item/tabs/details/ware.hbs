@@ -20,10 +20,10 @@
     </div>
     <div class="list-item-col">
         {{#if @root.isEditMode}}
-            {{formInput systemFields.essence value=source.system.essence classes="short"
-                        rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formInput systemFields.technology.fields.essence.fields.base value=source.system.technology.essence.base
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
         {{else}}
-            {{formInput systemFields.essence value=system.technology.essence.value classes="short"
+            {{formInput systemFields.technology.fields.essence.fields.base value=system.technology.essence.value classes="short"
                         rootId=@root.rootId disabled=true}}
         {{/if}}
     </div>

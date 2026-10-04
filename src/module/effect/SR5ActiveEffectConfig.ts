@@ -11,6 +11,7 @@ import { SR5ActiveEffectValueEditor } from './SR5ActiveEffectValueEditor';
 import { Translation } from '../utils/strings';
 import { EffectDurationStatus, prepareEffectDurationStatus } from './EffectDurationStatus';
 import { isElementInstance } from '@/module/utils/dom';
+import { SR5Item } from '../item/SR5Item';
 
 /**
  * Data Object that gets provided to the templates for ActiveEffects
@@ -34,6 +35,10 @@ type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
     expiryActionOptions: { label: string, value: 'default' | 'update' | 'delete', selected: boolean }[];
     system: ActiveEffectDM;
     systemFields: typeof ActiveEffectDM.schema.fields;
+
+    /** Whether the parent item has the state the matching restriction checks for. */
+    showOnlyForEquipped: boolean;
+    showOnlyForWireless: boolean;
 
     /** Prepared boundary choices for the expiry trigger select. */
     boundaryOptions: { value: string; label: string; selected: boolean }[];
@@ -220,6 +225,11 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         data.changeTypes = this.prepareChangeTypes();
         data.changePriorityPlaceholders = this.prepareChangePriorityPlaceholders();
         data.expiryActionOptions = this.prepareExpiryActionOptions(data.source);
+
+        // Only offer the item state restrictions the parent item actually has a state for.
+        const item = this.document.parent instanceof SR5Item ? this.document.parent : null;
+        data.showOnlyForEquipped = !!item?.canBeEquipped();
+        data.showOnlyForWireless = !!item?.isMatrixDevice;
 
         // Duration tab context
         data.boundaryOptions = this.prepareBoundaryOptions(data.source);
