@@ -193,7 +193,7 @@ export class DocumentSituationModifiers {
      * @param category A string matching a situation modifiers category.
      * @param options
      */
-    getTotalFor(category: keyof SituationModifiersSourceData|string, options:DocumentSituationModifiersTotalForOptions={}): number {
+    getTotalFor(category: keyof SituationModifiersSourceData | (string & {}), options:DocumentSituationModifiersTotalForOptions={}): number {
         const modifier = this._modifiers[category];
 
         if (options.reapply || options.applicable) {

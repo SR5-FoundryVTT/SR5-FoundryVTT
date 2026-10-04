@@ -17,9 +17,9 @@ export interface Accessory {
     ammoreplace?: { _TEXT: IntegerString | "100(belt)" | "24(d)" | "2500(belt)" | "32(d)" | "40(c)" | "External Source"; };
     ammoslots?: { _TEXT: IntegerString; };
     ap?: { _TEXT: IntegerString; };
-    avail: { _TEXT: IntegerString | string; };
+    avail: { _TEXT: string; };
     conceal?: { _TEXT: IntegerString | "Rating"; };
-    cost: { _TEXT: IntegerString | string; };
+    cost: { _TEXT: string; };
     damage?: { _TEXT: IntegerString; };
     damagetype?: { _TEXT: "P"; };
     extramount?: { _TEXT: "Barrel" | "Side" | "Under/Barrel"; };
@@ -69,23 +69,23 @@ export interface Weapon {
     accessorymounts?: {
         mount: OneOrMany<{ _TEXT: "Barrel" | "Side" | "Stock" | "Top" | "Under"; }>;
     };
-    accuracy: { _TEXT: IntegerString | string; };
+    accuracy: { _TEXT: string; };
     addweapon?: OneOrMany<{ _TEXT: string; }>;
     allowaccessory?: { _TEXT: "False" | "True"; };
     allowgear?: {
         gearcategory: Many<{ _TEXT: "Drugs" | "Toxins"; }>;
     };
     alternaterange?: { _TEXT: "Harpoon Gun (Underwater)" | "Shotguns (flechette)"; };
-    ammo: { _TEXT: IntegerString | string; };
+    ammo: { _TEXT: string; };
     ammocategory?: { _TEXT: string; };
     ammoslots?: { _TEXT: IntegerString; };
-    ap: { _TEXT: IntegerString | string; };
-    avail: { _TEXT: IntegerString | string; };
+    ap: { _TEXT: string; };
+    avail: { _TEXT: string; };
     category: { _TEXT: string; };
     conceal: { _TEXT: IntegerString; };
     cost: { _TEXT: IntegerString | "{Rating}*20" | "{Rating}*50"; };
     cyberware?: { _TEXT: "True"; };
-    damage: { _TEXT: IntegerString | string; };
+    damage: { _TEXT: string; };
     doubledcostaccessorymounts?: {
         mount: { _TEXT: "Barrel"; };
     };
@@ -93,7 +93,7 @@ export interface Weapon {
     hide?: Empty;
     id: { _TEXT: string; };
     maxrating?: { _TEXT: IntegerString; };
-    mode: { _TEXT: IntegerString | string; };
+    mode: { _TEXT: string; };
     mount?: { _TEXT: "Barrel" | "Under"; };
     name: { _TEXT: string; };
     page?: { _TEXT: IntegerString; };
@@ -105,7 +105,7 @@ export interface Weapon {
     shortburst?: { _TEXT: IntegerString; };
     singleshot?: { _TEXT: IntegerString; };
     sizecategory?: { _TEXT: string; };
-    source?: { _TEXT: IntegerString | string; };
+    source?: { _TEXT: string; };
     spec?: { _TEXT: string; };
     spec2?: { _TEXT: "Aerodynamic" | "Non-Aerodynamic" | "Revolvers" | "Semi-Automatics"; };
     type: { _TEXT: "Melee" | "Ranged"; };

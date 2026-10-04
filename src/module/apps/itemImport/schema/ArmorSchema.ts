@@ -10,10 +10,10 @@ export interface Armor {
     armor: { _TEXT: IntegerString | "Rating"; };
     armorcapacity: { _TEXT: IntegerString | "Rating"; };
     armoroverride?: { _TEXT: IntegerString; };
-    avail: { _TEXT: IntegerString | string; };
+    avail: { _TEXT: string; };
     bonus?: BonusSchema;
     category: { _TEXT: "Armor" | "Cloaks" | "Clothing" | "High-Fashion Armor Clothing" | "Specialty Armor"; };
-    cost: { _TEXT: IntegerString | string; };
+    cost: { _TEXT: string; };
     gears?: {
         usegear: OneOrMany<{
             $?: { rating: IntegerString; };
@@ -59,10 +59,10 @@ export interface Mod {
     addoncategory?: Many<{ _TEXT: "Commlinks" | "Cyberdecks" | "Drugs" | "Rigger Command Consoles" | "Toxins"; }>;
     armor: { _TEXT: IntegerString; };
     armorcapacity: { _TEXT: string; };
-    avail: { _TEXT: IntegerString | string; };
+    avail: { _TEXT: string; };
     bonus?: BonusSchema;
     category: { _TEXT: string; };
-    cost: { _TEXT: IntegerString | string; };
+    cost: { _TEXT: string; };
     gearcapacity?: { _TEXT: IntegerString; };
     hide?: Empty;
     id: { _TEXT: string; };

@@ -62,7 +62,7 @@ declare namespace Shadowrun {
         | 'drone_pilot_vehicle'
         | 'drone_perception'
         | 'drone_infiltration'
-        | string; // Allow document names to be given...
+        | (string & {}); // Allow document names to be given, while keeping the known names for autocompletion.
 
     /**
      * What kind of action is being performed.

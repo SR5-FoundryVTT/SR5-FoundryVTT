@@ -1928,7 +1928,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return [{ label: testCls.label }]
     }
 
-    get _resistTestClass(): any | undefined {
+    get _resistTestClass(): any {
         return undefined; // by default we don't want to show any resist test in a success test
     }
 
