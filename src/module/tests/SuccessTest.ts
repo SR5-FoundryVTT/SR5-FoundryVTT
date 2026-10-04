@@ -2416,7 +2416,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     static async executeMessageAction(againstData: SuccessTestData, messageId: string, options: Partial<TestOptions>) {
         // Determine actors to roll test with.
         // build documents based on the category, matrix can target individual icons
-        let documents = await Helpers.getOpposedTestTargets(againstData);
+        const documents = await Helpers.getOpposedTestTargets(againstData);
         // if the test had matrix data, push in the matrix test targets to the front
         if (againstData.categories.includes('matrix')) {
             documents.unshift(...await Helpers.getMatrixTestTargetDocuments(againstData as any));
