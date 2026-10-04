@@ -922,6 +922,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             ? game.i18n.localize('SR5.RCC.SimpleActionInCombat')
             : game.i18n.localize('SR5.RCC.SimpleAction');
 
+        const actorName = foundry.utils.escapeHTML(this.actor.name || '');
         const content = `
             <div class="shadowrun5e chat-card matrix-card">
                 <header class="card-header flexrow" style="align-items: center; gap: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px;">
@@ -929,7 +930,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
                     <h3 class="item-name" style="margin: 0; font-size: 1.1em;">${game.i18n.localize('SR5.RCC.ReconfigureTitle')}</h3>
                 </header>
                 <div class="card-content" style="padding: 6px 0;">
-                    <p style="margin: 4px 0;"><strong>${this.actor.name}</strong> ${game.i18n.localize('SR5.RCC.ReconfiguredMessage')} (<em>${actionLabel}</em>):</p>
+                    <p style="margin: 4px 0;"><strong>${actorName}</strong> ${game.i18n.localize('SR5.RCC.ReconfiguredMessage')} (<em>${actionLabel}</em>):</p>
                     <div style="display: flex; justify-content: space-around; margin-top: 6px; padding: 6px; background: rgba(0,0,0,0.25); border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">
                         <span><i class="fas fa-wifi" style="color: #4caf50;"></i> ${game.i18n.localize('SR5.RCC.NoiseReduction')}: <strong>${noiseReduction}</strong></span>
                         <span><i class="fas fa-share-nodes" style="color: #2196f3;"></i> ${game.i18n.localize('SR5.RCC.Sharing')}: <strong>${sharing}</strong></span>
@@ -949,6 +950,12 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         ...[context, options]: Parameters<SR5BaseActorSheet<T>["_onRender"]>
     ) {
         await super._onRender(context, options);
+
+        const rccSliders = this.element.querySelectorAll<HTMLInputElement>('input.rcc-allocation-input');
+        for (const slider of rccSliders) {
+            slider.addEventListener('input', (event) => void SR5MatrixActorSheet.#updateRccAllocation.call(this, event));
+            slider.addEventListener('change', (event) => void SR5MatrixActorSheet.#updateRccAllocation.call(this, event));
+        }
 
         const jumpedIndicators = this.element.querySelectorAll<HTMLElement>('[data-action="handleJumpedActorClick"]');
         for (const indicator of jumpedIndicators) {

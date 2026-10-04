@@ -69,17 +69,6 @@ export class Version0_38_0 extends VersionMigration {
                 system.subCategory = bestSubCategory;
             }
         }
-
-        // Migrate legacy swarm properties to system.swarm
-        if (typeof system.isSwarm === 'boolean' || typeof system.swarmCount === 'number') {
-            system.swarm = {
-                active: typeof system.swarm?.active === 'boolean' ? system.swarm.active : !!system.isSwarm,
-                count: typeof system.swarm?.count === 'number' ? system.swarm.count : (typeof system.swarmCount === 'number' ? system.swarmCount : 1),
-                tiles: system.swarm?.tiles ?? { uuids: [], image: "" },
-            };
-            delete system.isSwarm;
-            delete system.swarmCount;
-        }
     }
 
     // Each branch contributing to 0.38.0 keeps its whole flow in its own migrate<Branch> method, called here.

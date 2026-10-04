@@ -1,7 +1,5 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
 import { MovementPhaseMarker } from './SR5TokenDocument';
-import { SwarmTileHooks } from './SwarmTileHooks';
-import { SR5Token } from './SR5Token';
 
 const Color = foundry.utils.Color;
 type TokenRuler = foundry.canvas.placeables.tokens.TokenRuler;
@@ -62,14 +60,6 @@ export class SR5TokenRuler extends foundry.canvas.placeables.tokens.TokenRuler {
     ) {
         const highlightStyle = super._getGridHighlightStyle(waypoint, offset);
 
-        try {
-            SwarmTileHooks.clearSwarmRulerPreviews();
-            const token = this.token;
-            if (token instanceof SR5Token) {
-                token._updateSwarmDragPosition();
-            }
-        } catch (e) {}
-
         if (highlightStyle.alpha === 0) {
             return highlightStyle;
         }
@@ -107,14 +97,4 @@ export class SR5TokenRuler extends foundry.canvas.placeables.tokens.TokenRuler {
 
         return segmentStyle;
     }
-
-    override clear() {
-        try {
-            SwarmTileHooks.clearSwarmRulerPreviews();
-        } catch (e) {}
-        return super.clear();
-    }
 }
-
-
-

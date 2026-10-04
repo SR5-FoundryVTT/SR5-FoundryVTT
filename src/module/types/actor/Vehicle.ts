@@ -55,6 +55,11 @@ const VehicleData = () => ({
         initial: "",
         choices: SR5.vehicle.subCategories,
     }),
+    model: new StringField({
+        required: false,
+        blank: true,
+        initial: "",
+    }),
     availability: new StringField({ required: true }),
     cost: new NumberField({ required: true, nullable: false, initial: 0 }),
     isDrone: new BooleanField(),
@@ -92,16 +97,6 @@ const VehicleData = () => ({
     driver: new StringField({ required: true }),
     master: new StringField({ required: true }),
 
-    // === Swarm ===
-    swarm: new SchemaField({
-        active: new BooleanField({ initial: false }),
-        count: new NumberField({ required: true, initial: 1, integer: true, min: 1 }),
-        tiles: new SchemaField({
-            uuids: new ArrayField(new StringField({ required: true })),
-            image: new StringField({ required: false, initial: "" }),
-        }),
-    }),
-
     // === Condition & Movement ===
     track: new SchemaField(Tracks('physical', 'matrix')),
     movement: new SchemaField(Movement()),
@@ -135,7 +130,5 @@ export class Vehicle extends ActorBase<ReturnType<typeof VehicleData>> {
     }
     static override LOCALIZATION_PREFIXES = ["SR5.Vehicle", "SR5.Actor"];
 }
-
-console.log("VehicleData", VehicleData(), new Vehicle());
 
 export type VehicleStatsType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof VehicleStats>>;

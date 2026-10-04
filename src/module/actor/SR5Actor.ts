@@ -414,7 +414,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     getMatrixDevice(this: SR5Actor) {
-        if (this.isToken && this.token?.getFlag('shadowrun5e', 'isSwarmCompanion')) return undefined;
         return this.system.matrix?.device ? this.items.get(this.system.matrix.device) : undefined;
     }
 
@@ -638,7 +637,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Determine if this actor can be a matrix icon.
      */
     get canBeMatrixIcon(): boolean {
-        if (this.isToken && this.token?.getFlag('shadowrun5e', 'isSwarmCompanion')) return false;
         if (this.isType('vehicle')) return true;
         if (this.hasPersona) return true;
 
@@ -1885,7 +1883,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
   * Check if the current actor has a Matrix persona.
   */
     get hasPersona(): boolean {
-        if (this.isToken && this.token?.getFlag('shadowrun5e', 'isSwarmCompanion')) return false;
         return this.hasActorPersona() || this.hasDevicePersona();
     }
 
@@ -1895,7 +1892,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @returns true, when the actor lives in the matrix.
      */
     hasActorPersona(this: SR5Actor): boolean {
-        if (this.isToken && this.token?.getFlag('shadowrun5e', 'isSwarmCompanion')) return false;
         return this.isType('vehicle', 'ic') || this.isEmerged();
     }
 

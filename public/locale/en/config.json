@@ -829,14 +829,15 @@
         "Autosoft": "Autosoft",
         "AutosoftType": "Autosoft Type",
         "AutosoftConfigManager": {
-            "Title": "Configure & Transfer Autosoft",
+            "Title": "Configure Autosoft",
             "TargetActor": "Target Drone / Vehicle",
             "TargetWeapon": "Target Weapon (Gunnery)",
             "TargetModel": "Target Model",
             "NoWeapons": "No weapons mounted on target",
             "NoDrones": "No owned drones or vehicles found",
-            "Submit": "Configure & Transfer",
-            "Cancel": "Cancel"
+            "Submit": "Save Configuration",
+            "Cancel": "Cancel",
+            "Configured": "Autosoft {name} configuration saved."
         },
         "TargetModel": "Target Model",
         "TargetWeapon": "Target Weapon",
@@ -888,12 +889,6 @@
             "EmergencyExitFailure": "{actor} failed emergency exit and suffers {damage} impact damage!",
             "EWarNoiseReductionEffect": "E-War Noise Reduction",
             "JumpInTestFailed": "Failed test to jump into vehicle."
-        },
-        "Swarm": {
-            "Label": "Swarm",
-            "Toggle": "Toggle Swarm",
-            "Drones": "Drones",
-            "Count": "Drone Count"
         },
         "RCC": {
             "Sharing": "Sharing",
@@ -3386,22 +3381,6 @@
                 "Title": "Condition Monitor Tour",
                 "WoundModifierContent": "This cell denotes that filling it increases your wound modifier by the number written in the cell",
                 "WoundModifierTitle": "Wound Modifier"
-            },
-            "RiggerSwarm": {
-                "Title": "Drone Swarm Creation & Control Tour",
-                "Description": "Step-by-step interactive guide on creating a drone actor, enabling Swarm mode, configuring drone count, and observing companion tiles on the canvas.",
-                "DroneAttributesTitle": "1. Vehicle & Drone Attributes",
-                "DroneAttributesContent": "Creating a drone actor requires setting base vehicle attributes (Pilot, Body, Handling, Speed, Acceleration, Sensor). All stats start at minimum rating 1.",
-                "EnableSwarmTitle": "2. Enable Drone Swarm",
-                "EnableSwarmContent": "In Edit Mode on the Vehicle sheet, locate the Swarm section. Click the 'Swarm:' checkbox to activate swarm leader mode for this drone.",
-                "EnableSwarmActiveTitle": "3. Swarm Active Checkbox Ticked",
-                "EnableSwarmActiveContent": "With Swarm mode active, the checkbox is ticked and reveals the 'Count:' input field for configuring how many identical drones are linked into the swarm.",
-                "SwarmCountTitle": "4. Set Swarm Drone Count",
-                "SwarmCountContent": "Enter the number of drones in the swarm (e.g. 4). A higher drone count boosts effective Pilot rating and teamwork bonuses for autosoft tests.",
-                "CanvasSwarmDisplayTitle": "5. Swarm Companion Tiles on Canvas",
-                "CanvasSwarmDisplayContent": "Switching back to Play Mode displays the leader drone token on the canvas. The remaining 3 companion drones are automatically rendered as locked formation tiles around the leader!",
-                "TokenHUDControlTitle": "6. Token HUD & Real-Time Formation Movement",
-                "TokenHUDControlContent": "Right-click the leader token to access the native SR5 Token HUD for Jump In / Jump Out actions. Dragging the leader token smoothly slides all companion swarm tiles in lockstep across the grid."
             },
             "Autosofts": {
                 "Title": "Autosoft Management Guide",

@@ -140,7 +140,6 @@ import { SocketMessage } from './sockets';
 import { TagifyHooks } from '@/module/tagify/TagifyHooks';
 import { RiggingHooks } from '@/module/tests/hooks/RiggingHooks';
 import { TokenLockHooks } from '@/module/token/TokenLockHooks';
-import { SwarmTileHooks } from '@/module/token/SwarmTileHooks';
 import { SocketMessageFlow } from './flows/SocketMessageFlow';
 import { CompendiumBrowser } from './apps/compendiumBrowser/CompendiumBrowser';
 import { Skill } from './types/item/Skill';
@@ -190,7 +189,6 @@ export class HooksManager {
         RiggingHooks.registerHooks();
         TokenLockHooks.registerHooks();
         TagifyHooks.registerHooks();
-        SwarmTileHooks.registerHooks();
 
         RenderSettings.listen();
 

@@ -68,20 +68,21 @@ export class RiggingRules {
     static getLoadedRCCAutosofts(rccItem: SR5Item): SR5Item<'program'>[] {
         if (!rccItem.isType('device') || rccItem.system.category !== 'rcc') return [];
 
+        const sharing = Number(rccItem.system.sharing || 0);
+        if (sharing <= 0) return [];
+
         const owner = rccItem.actorOwner;
         if (!owner) return [];
 
         const programs = (owner.itemsForType.get('program') || []).filter(item => item.isType('program'));
-        const rccDevices = (owner.itemsForType.get('device') || []).filter(d => d.isType('device') && d.system.category === 'rcc');
 
-        return programs.filter(item => {
+        const loaded = programs.filter(item => {
             if (item.system.type !== 'autosoft' || !item.isEquipped()) return false;
             const itemMaster = item.system.technology?.master || (item.getFlag('shadowrun5e', 'rccUuid') as string | undefined);
-            if (itemMaster) {
-                return itemMaster === rccItem.uuid;
-            }
-            return rccDevices.length <= 1 || rccDevices[0].uuid === rccItem.uuid;
+            return itemMaster === rccItem.uuid;
         });
+
+        return loaded.slice(0, sharing);
     }
 
     /**
@@ -135,7 +136,7 @@ export class RiggingRules {
             case 'maneuvering':
                 return (drone?.isType('vehicle') ? drone.getVehicleTypeSkillName() : undefined) || 'pilot_ground_craft';
             case 'evasion':
-                return 'gymnastics';
+                return '';
             default:
                 return '';
         }
@@ -171,39 +172,63 @@ export class RiggingRules {
     static getEffectiveAutosoft(
         drone: SR5Actor,
         autosoftType: string,
-        options?: { model?: string; weapon?: string; skill?: string }
+        options?: { model?: string; weapon?: string; weaponUuid?: string; skill?: string }
     ): { rating: number; source: 'local' | 'rcc' | 'none'; name?: string } {
         if (!drone.isType('vehicle')) return { rating: 0, source: 'none' };
 
-        const droneModel = options?.model || drone.name || '';
         const requestedWeapon = options?.weapon || '';
+        const requestedWeaponUuid = options?.weaponUuid || '';
         const requestedSkill = options?.skill || '';
 
         const matchesAutosoft = (item: SR5Item<'program'>) => {
             const itemSkill = RiggingRules.getSkillForAutosoft(item, drone);
 
-            // If a specific skill is requested, check if item's skill matches
+            // 1. Skill / Autosoft Type match check
             if (requestedSkill) {
-                if (itemSkill && itemSkill === requestedSkill) return true;
-                if (item.system.autosoftType !== autosoftType) return false;
-            } else {
-                if (item.system.autosoftType !== autosoftType) return false;
+                if (itemSkill !== requestedSkill && item.system.autosoftType !== autosoftType) {
+                    return false;
+                }
+            } else if (autosoftType && item.system.autosoftType !== autosoftType) {
+                return false;
             }
 
-            // Targeting autosoft matches specific targetWeapon if specified
-            if (autosoftType === 'targeting' && item.system.targetWeapon && requestedWeapon) {
-                const tw = item.system.targetWeapon.toLowerCase();
-                const rw = requestedWeapon.toLowerCase();
-                if (tw !== rw && !rw.includes(tw) && !tw.includes(rw)) {
-                    return false;
+            // 2. Targeting autosoft matches specific targetWeapon if specified
+            if (item.system.autosoftType === 'targeting' && item.system.targetWeapon) {
+                const tw = item.system.targetWeapon.trim();
+                let twName = tw.toLowerCase();
+                if (tw.startsWith('Actor.') || tw.startsWith('Compendium.') || tw.startsWith('Item.')) {
+                    if (requestedWeaponUuid && tw === requestedWeaponUuid) {
+                        // Exact UUID match
+                    } else {
+                        const resolved = fromUuidSync(tw) as SR5Item | null;
+                        if (resolved?.name) {
+                            twName = resolved.name.toLowerCase();
+                        }
+                    }
+                }
+
+                if (requestedWeapon || requestedWeaponUuid) {
+                    const rw = requestedWeapon.trim().toLowerCase();
+                    const uuidMatch = requestedWeaponUuid && tw === requestedWeaponUuid;
+                    const nameMatch = rw && (twName === rw || rw.includes(twName) || twName.includes(rw));
+                    if (!uuidMatch && !nameMatch) {
+                        return false;
+                    }
                 }
             }
 
-            // Maneuvering / Stealth / Evasion autosofts match specific model if specified
-            if (['maneuvering', 'stealth', 'evasion'].includes(autosoftType) && item.system.targetModel && droneModel) {
-                const tm = item.system.targetModel.toLowerCase();
-                const dm = droneModel.toLowerCase();
-                if (tm !== dm && !dm.includes(tm) && !tm.includes(dm)) {
+            // 3. Maneuvering / Stealth / Evasion autosofts match specific model if specified
+            if (['maneuvering', 'stealth', 'evasion'].includes(item.system.autosoftType || '') && item.system.targetModel) {
+                const tm = item.system.targetModel.trim().toLowerCase();
+                const candidateModels = [
+                    options?.model,
+                    (drone.system as any)?.model,
+                    drone.prototypeToken?.name,
+                    drone.name
+                ].filter((m): m is string => Boolean(m)).map(m => m.trim().toLowerCase());
+
+                const modelMatches = candidateModels.some(cm => cm === tm || cm.includes(tm) || tm.includes(cm));
+                if (!modelMatches) {
                     return false;
                 }
             }
@@ -240,32 +265,5 @@ export class RiggingRules {
         }
 
         return { rating: 0, source: 'none' };
-    }
-
-    /**
-     * Calculate Drone Swarm Pilot info and pool bonus.
-     * Formula: Swarm Pilot = Base Pilot + (Count of Drones in Swarm - 1).
-     */
-    static getSwarmPilotInfo(drone: SR5Actor): { swarmPilot: number; highestPilot: number; memberCount: number; bonus: number } {
-        if (!drone.isType('vehicle')) {
-            return { swarmPilot: 0, highestPilot: 0, memberCount: 0, bonus: 0 };
-        }
-
-        const isSwarmActive = Boolean(drone.system.swarm.active);
-        if (!isSwarmActive) {
-            return { swarmPilot: 0, highestPilot: 0, memberCount: 0, bonus: 0 };
-        }
-
-        const count = Math.max(1, Number(drone.system.swarm.count) || 1);
-        const basePilot = drone.system.vehicle_stats?.pilot?.base || drone.system.vehicle_stats?.pilot?.value || 1;
-
-        if (count <= 1) {
-            return { swarmPilot: basePilot, highestPilot: basePilot, memberCount: 1, bonus: 0 };
-        }
-
-        const bonus = count - 1;
-        const swarmPilot = basePilot + bonus;
-
-        return { swarmPilot, highestPilot: basePilot, memberCount: count, bonus };
     }
 }

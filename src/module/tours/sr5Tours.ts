@@ -9,6 +9,24 @@ export default class Sr5Tour extends foundry.nue.Tour {
     tourTokenDoc?: any;
     tourItem?: SR5Item;
 
+    static async cleanupOrphanedTourDocuments() {
+        if (!game.user.isGM) return;
+        try {
+            for (const actor of (game.actors as unknown as SR5Actor[])) {
+                if (actor.getFlag('shadowrun5e', 'isTourDocument') || actor.name === 'Tour Drone') {
+                    await actor.delete();
+                }
+            }
+            for (const item of (game.items as unknown as SR5Item[])) {
+                if (item.getFlag('shadowrun5e', 'isTourDocument')) {
+                    await item.delete();
+                }
+            }
+        } catch (e) {
+            console.warn('SR5 | Failed cleaning orphaned tour documents:', e);
+        }
+    }
+
     override async _preStep() {
         await super._preStep();
 
@@ -20,9 +38,14 @@ export default class Sr5Tour extends foundry.nue.Tour {
             const actorType = (this.config as any)?.actorType || 'character';
             const droneImg = "systems/shadowrun5e/dist/icons/importer/drone/medium.svg";
             this.actor = (await SR5Actor.create({
-                name: "Tour Drone Swarm",
+                name: "Tour Drone",
                 type: actorType,
                 img: droneImg,
+                flags: {
+                    shadowrun5e: {
+                        isTourDocument: true
+                    }
+                },
                 prototypeToken: {
                     texture: {
                         src: droneImg
@@ -40,10 +63,6 @@ export default class Sr5Tour extends foundry.nue.Tour {
                         speed: { base: 4 },
                         acceleration: { base: 2 },
                         sensor: { base: 3 }
-                    },
-                    swarm: {
-                        active: false,
-                        count: 1
                     }
                 },
                 items: [
@@ -99,50 +118,8 @@ export default class Sr5Tour extends foundry.nue.Tour {
             })) as SR5Actor;
         }
 
-        // 2. Step-by-step modifications for RiggerSwarm and Autosofts tours
-        if (this.id === "RiggerSwarm" && this.actor?.isType('vehicle')) {
-            if (stepId === "DroneAttributes" || stepId === "EnableSwarm") {
-                await this.actor.update({ system: { swarm: { active: false, count: 1 } } });
-                if (this.actor.sheet) {
-                    (this.actor.sheet as any)._mode = 'edit';
-                    await (this.actor.sheet as any).render(true);
-                }
-            } else if (stepId === "EnableSwarmActive") {
-                await this.actor.update({ system: { swarm: { active: true, count: 1 } } });
-                if (this.actor.sheet) {
-                    (this.actor.sheet as any)._mode = 'edit';
-                    await (this.actor.sheet as any).render(true);
-                }
-            } else if (stepId === "SwarmCount") {
-                await this.actor.update({ system: { swarm: { active: true, count: 4 } } });
-                if (this.actor.sheet) {
-                    (this.actor.sheet as any)._mode = 'edit';
-                    await (this.actor.sheet as any).render(true);
-                }
-            } else if (stepId === "CanvasSwarmDisplay" || stepId === "TokenHUDControl") {
-                if (this.actor.sheet) {
-                    await this.actor.sheet.close();
-                }
-
-                if (canvas.scene && !this.tourTokenDoc) {
-                    const hitArea = canvas.stage?.hitArea as any;
-                    const center = hitArea?.width
-                        ? { x: Math.floor(hitArea.width / 2), y: Math.floor(hitArea.height / 2) }
-                        : { x: 1000, y: 1000 };
-
-                    const tokenData = await this.actor.getTokenDocument({
-                        x: center.x,
-                        y: center.y,
-                        texture: { src: this.actor.img || "systems/shadowrun5e/dist/icons/importer/drone/medium.svg" }
-                    });
-                    const [created] = await canvas.scene.createEmbeddedDocuments("Token", [tokenData.toObject()]);
-                    this.tourTokenDoc = created;
-                    if (created?.object) {
-                        canvas.animatePan({ x: created.x, y: created.y, scale: 1.2, duration: 500 });
-                    }
-                }
-            }
-        } else if (this.id === "Autosofts") {
+        // 2. Step-by-step modifications for Autosofts tours
+        if (this.id === "Autosofts") {
             if (stepId === "AutosoftItemCreation" || stepId === "AutosoftTypes" || stepId === "AutosoftPlayMode") {
                 if (this.actor?.sheet) {
                     await this.actor.sheet.close();

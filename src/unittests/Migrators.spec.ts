@@ -865,7 +865,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
     });
 
-    describe('Version0_38_0 vehicle subCategory and swarm migration', () => {
+    describe('Version0_38_0 vehicle subCategory migration', () => {
         it('migrates vehicle subCategory from Chummer importFlags category or image path', () => {
             const migrator = new Version0_38_0();
             const actor: any = {
@@ -942,21 +942,6 @@ export const Migrators = (context: QuenchBatchContext) => {
             };
             migrator.migrateActor(missileDroneActor);
             assert.strictEqual(missileDroneActor.system.subCategory, 'missile_drone');
-        });
-
-        it('migrates legacy isSwarm and swarmCount properties to system.swarm schema', () => {
-            const migrator = new Version0_38_0();
-            const actor: any = {
-                type: 'vehicle',
-                system: {
-                    subCategory: 'micro_drone',
-                    isSwarm: true,
-                    swarmCount: 5,
-                },
-            };
-            migrator.migrateActor(actor);
-            assert.isTrue(actor.system.swarm.active);
-            assert.notProperty(actor.system, 'swarmCount');
         });
 
         it('correctly classifies Chevy Suburban and Jet-ski without substring false positives', () => {

@@ -820,14 +820,15 @@
         "Autosoft": "Autosoft",
         "AutosoftType": "Autosoft-Typ",
         "AutosoftConfigManager": {
-            "Title": "Autosoft konfigurieren & übertragen",
+            "Title": "Autosoft konfigurieren",
             "TargetActor": "Ziel-Drohne / Fahrzeug",
             "TargetWeapon": "Ziel-Waffe (Geschütze)",
             "TargetModel": "Ziel-Modell",
             "NoWeapons": "Keine Waffen am Ziel montiert",
             "NoDrones": "Keine eigenen Drohnen oder Fahrzeuge gefunden",
-            "Submit": "Konfigurieren & Übertragen",
-            "Cancel": "Abbrechen"
+            "Submit": "Konfiguration speichern",
+            "Cancel": "Abbrechen",
+            "Configured": "Autosoft-Konfiguration für {name} gespeichert."
         },
         "TargetModel": "Ziel-Modell",
         "TargetWeapon": "Ziel-Waffe",
@@ -879,12 +880,6 @@
             "EmergencyExitFailure": "{actor} Notausstieg fehlgeschlagen und erleidet {damage} Aufprallschaden!",
             "EWarNoiseReductionEffect": "E-War Rauschunterdrückung",
             "JumpInTestFailed": "Probe zum Hineinspringen ins Fahrzeug fehlgeschlagen."
-        },
-        "Swarm": {
-            "Label": "Schwarm",
-            "Toggle": "Schwarm umschalten",
-            "Drones": "Drohnen",
-            "Count": "Drohnen-Anzahl"
         },
         "RCC": {
             "Sharing": "Zugriff",
@@ -3398,23 +3393,7 @@
                 "RecoveryTitle": "Regenerierungsprobe",
                 "Title": "Zustandsmonitor-Tour",
                 "WoundModifierContent": "Dieses Kästchen zeigt an, dass das Ausfüllen den Wundmodifikator um die im Kästchen angegebene Zahl erhöht.",
-                "WoundModifierTitle": "Wundmodifikator"
-            },
-            "RiggerSwarm": {
-                "Title": "Drohnenschwarm Erstellungs- & Steuerungs-Tour",
-                "Description": "Schritt-für-Schritt-Anleitung zum Erstellen einer Drohne, Aktivieren des Schwarm-Modus, Einstellen der Drohnen-Anzahl und Anzeigen der Begleit-Tiles auf der Karte.",
-                "DroneAttributesTitle": "1. Fahrzeug- & Drohnen-Attribute",
-                "DroneAttributesContent": "Beim Erstellen einer Drohne werden die Basis-Attribute (Pilot, Rumpf, Handling, Geschwindigkeit, Beschleunigung, Sensor) mit mindestens Stufe 1 festgelegt.",
-                "EnableSwarmTitle": "2. Drohnenschwarm Aktivieren",
-                "EnableSwarmContent": "Im Editiermodus des Fahrzeugbogens findest du unten den Schwarm-Bereich. Klicke auf das 'Schwarm:' Kontrollkästchen, um den Schwarm-Modus zu aktivieren.",
-                "EnableSwarmActiveTitle": "3. Schwarm-Kontrollkästchen Aktiviert",
-                "EnableSwarmActiveContent": "Sobald der Schwarm-Modus aktiv ist, wird das Häkchen gesetzt und das Eingabefeld 'Anzahl:' für die Drohnen-Anzahl freigeschaltet.",
-                "SwarmCountTitle": "4. Drohnen-Anzahl Einrichten",
-                "SwarmCountContent": "Trage die Anzahl der Drohnen im Schwarm ein (z.B. 4). Eine höhere Drohnen-Anzahl erhöht die effektive Pilot-Stufe und Teamwork-Boni.",
-                "CanvasSwarmDisplayTitle": "5. Schwarm-Begleit-Tiles auf der Karte",
-                "CanvasSwarmDisplayContent": "Beim Wechsel in den Spielmodus erscheint das Anführer-Token auf der Karte. Die restlichen 3 Drohnen werden automatisch als gesperrte Formations-Tiles um den Anführer platziert!",
-                "TokenHUDControlTitle": "6. Token HUD & Echtzeit-Formationsbewegung",
-                "TokenHUDControlContent": "Rechtsklicke auf das Anführer-Token für das native SR5 Token HUD (Hineinspringen / Herausspringen). Beim Ziehen des Tokens gleiten alle Begleit-Tiles synchron über das Raster."
+                "WoundModifierTitle": "Wound Modifier"
             },
             "Autosofts": {
                 "Title": "Autosoft Verwaltungs-Anleitung",

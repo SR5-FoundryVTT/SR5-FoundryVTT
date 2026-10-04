@@ -456,6 +456,39 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             }
         }
 
+        if (this.item.isType('program')) {
+            const owner = this.item.actorOwner;
+            const models: Array<{ value: string; label: string }> = [{ value: '', label: `-- ${game.i18n.localize('SR5.Default')} --` }];
+            const weapons: Array<{ value: string; label: string }> = [{ value: '', label: `-- ${game.i18n.localize('SR5.Default')} --` }];
+
+            if (owner) {
+                if (owner.isType('vehicle')) {
+                    if (owner.name) models.push({ value: owner.name, label: owner.name });
+                    if ((owner.system as any)?.model && (owner.system as any).model !== owner.name) {
+                        models.push({ value: (owner.system as any).model, label: (owner.system as any).model });
+                    }
+                    for (const w of (owner.itemsForType.get('weapon') || [])) {
+                        weapons.push({ value: w.name, label: w.name });
+                    }
+                } else {
+                    const vehicles = (game.actors as unknown as SR5Actor[]).filter(a => a.isType('vehicle') && (a.isOwner || (a.system as any)?.master === owner.uuid) && !a.compendium);
+                    for (const v of vehicles) {
+                        if (v.name && !models.some(m => m.value === v.name)) {
+                            models.push({ value: v.name, label: v.name });
+                        }
+                        for (const w of (v.itemsForType.get('weapon') || [])) {
+                            if (!weapons.some(wp => wp.value === w.name)) {
+                                weapons.push({ value: w.name, label: `${w.name} (${v.name})` });
+                            }
+                        }
+                    }
+                }
+            }
+
+            data['actorModels'] = models.length > 1 ? models : undefined;
+            data['actorWeapons'] = weapons.length > 1 ? weapons : undefined;
+        }
+
         data.rollModes = CONFIG.ChatMessage.modes;
 
         data.item = this.item;

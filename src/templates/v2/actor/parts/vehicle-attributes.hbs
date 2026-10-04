@@ -115,15 +115,3 @@
     {{/if}}
 </div>
 
-{{#if @root.isEditMode}}
-    <div class="list-item rigger-swarm-bar" style="margin-top: 4px; margin-bottom: 4px;">
-        <div class="list-item-start" style="display: flex; align-items: center; gap: 6px;">
-            <label style="text-wrap: nowrap;"><strong>{{localize "SR5.Swarm.Label"}}:</strong></label>
-            {{formInput systemFields.swarm.fields.active value=source.system.swarm.active rootId=@root.rootId}}
-            {{#if system.swarm.active}}
-                <label style="text-wrap: nowrap; margin-left: 12px;"><strong>{{localize "SR5.Swarm.Count"}}:</strong></label>
-                {{formInput systemFields.swarm.fields.count value=source.system.swarm.count classes="short" rootId=@root.rootId}}
-            {{/if}}
-        </div>
-    </div>
-{{/if}}

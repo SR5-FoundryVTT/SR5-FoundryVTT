@@ -106,8 +106,6 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
         uuid: string;
     } | null;
 
-    matrixAttributeIconsOnly?: boolean;
-
     // Sheet filters
     filters: SR5SheetFilters;
 
@@ -139,7 +137,6 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
     selectedInventory: string;
     spells: Record<string, SR5Item[]>;
     program_count: string;
-    hasHardwareSkill?: boolean;
 
     // UI
     tab: SR5Tab;
@@ -428,8 +425,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
         data.program_count = this._prepareProgramCount(data.itemType);
-        data.hasHardwareSkill = (this.actor.findActiveSkill?.('hardware')?.value ?? 0) > 0;
-        data.matrixAttributeIconsOnly = game.settings.get(SYSTEM_NAME, FLAGS.MatrixAttributeDisplayMode) === 'icons';
 
         data.situationModifiers = this._prepareSituationModifiers();
 
@@ -859,9 +854,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         if (target?.dataset.actorUuid) {
             const actor = fromUuidSync(target.dataset.actorUuid);
-            if (actor) {
-                // @ts-expect-error toDragData exists on Document
-                dragData = typeof actor.toDragData === 'function' ? actor.toDragData() : { type: 'Actor', uuid: target.dataset.actorUuid };
+            if (actor instanceof SR5Actor) {
+                dragData = actor.toDragData();
             }
         }
 
