@@ -51,28 +51,15 @@
                 <label data-tooltip="{{systemFields.targetWeapon.hint}}">{{localize "SR5.TargetWeapon"}}</label>
             </div>
             <div class="list-item-col">
-                {{#if (eq @root.autosoftTargetMode 'category')}}
-                    {{#if @root.weaponCategoryOptions}}
-                        <select name="system.targetWeapon" {{#if @root.isPlayMode}}disabled{{/if}}>
-                            {{#each @root.weaponCategoryOptions}}
-                                <option value="{{this.value}}" {{#if (eq this.value @root.source.system.targetWeapon)}}selected{{/if}}>{{this.label}}</option>
-                            {{/each}}
-                        </select>
-                    {{else}}
-                        {{formInput systemFields.targetWeapon value=source.system.targetWeapon
-                                    rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{/if}}
+                {{#if @root.actorWeapons}}
+                    <select name="system.targetWeapon" {{#if @root.isPlayMode}}disabled{{/if}}>
+                        {{#each @root.actorWeapons}}
+                            <option value="{{this.value}}" {{#if (eq this.value @root.source.system.targetWeapon)}}selected{{/if}}>{{this.label}}</option>
+                        {{/each}}
+                    </select>
                 {{else}}
-                    {{#if @root.actorWeapons}}
-                        <select name="system.targetWeapon" {{#if @root.isPlayMode}}disabled{{/if}}>
-                            {{#each @root.actorWeapons}}
-                                <option value="{{this.value}}" {{#if (eq this.value @root.source.system.targetWeapon)}}selected{{/if}}>{{this.label}}</option>
-                            {{/each}}
-                        </select>
-                    {{else}}
-                        {{formInput systemFields.targetWeapon value=source.system.targetWeapon
-                                    rootId=@root.rootId disabled=@root.isPlayMode}}
-                    {{/if}}
+                    {{formInput systemFields.targetWeapon value=source.system.targetWeapon
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
                 {{/if}}
             </div>
         </div>

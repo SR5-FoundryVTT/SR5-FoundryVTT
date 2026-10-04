@@ -4,13 +4,14 @@ import { SR5Item } from '@/module/item/SR5Item';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 import { SR5 } from '@/module/config';
+import { AutosoftType } from '@/module/types/item/Program';
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
 const { fromUuidSync } = foundry.utils;
 
 export interface AutosoftConfigManagerContext extends HandlebarsApplicationMixin.RenderContext {
-    autosoftType: string;
+    autosoftType: AutosoftType;
     autosoftTypes: Record<string, string>;
     activeSkills: Record<string, string>;
     selectedSkill: string;
@@ -26,7 +27,7 @@ export interface AutosoftConfigManagerContext extends HandlebarsApplicationMixin
 export class AutosoftConfigManager extends HandlebarsApplicationMixin(ApplicationV2)<AutosoftConfigManagerContext> {
     selectedTargetActorUuid: string = '';
     selectedTargetWeaponUuid: string = '';
-    selectedAutosoftType: string = '';
+    selectedAutosoftType: AutosoftType = '';
     selectedSkill: string = '';
     targetModel: string = '';
 
@@ -37,7 +38,7 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
     ) {
         super(options);
         const sys = autosoftItem.system;
-        this.selectedAutosoftType = sys.autosoftType || 'clearsight';
+        this.selectedAutosoftType = (sys.autosoftType as AutosoftType) || 'clearsight';
         this.selectedSkill = sys.skill || '';
         this.targetModel = sys.targetModel || '';
         this.selectedTargetWeaponUuid = sys.targetWeapon || '';
@@ -54,9 +55,14 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
     }
 
     private _getEligibleTargetActors(): SR5Actor[] {
-        // Drones/vehicles owned by player
+        if (this.sourceActor.isType('vehicle')) {
+            return [this.sourceActor];
+        }
+
         return (game.actors as unknown as SR5Actor[]).filter(actor => {
-            return actor.isType('vehicle') && actor.isOwner;
+            if (!actor.isType('vehicle') || actor.compendium) return false;
+            if (!game.user.isGM) return actor.isOwner;
+            return actor.isOwner || (actor.system as any)?.master === this.sourceActor.uuid;
         });
     }
 
@@ -100,33 +106,21 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
         return context;
     }
 
-    static async #submitTransfer(this: AutosoftConfigManager, event: Event) {
+    static async #saveConfig(this: AutosoftConfigManager, event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
-        const targetActor = fromUuidSync(this.selectedTargetActorUuid) as SR5Actor | null;
-        if (!targetActor) {
-            ui.notifications?.warn(game.i18n.localize("SR5.AutosoftConfigManager.NoDrones"));
-            return;
-        }
-
-        // Prepare item data for update & transfer
-        const itemData = this.autosoftItem.toObject();
-        itemData.system.autosoftType = this.selectedAutosoftType;
-        itemData.system.skill = this.selectedSkill;
-        itemData.system.targetModel = this.targetModel;
-        itemData.system.targetWeapon = this.selectedTargetWeaponUuid;
-
-        // Create on target actor
-        await targetActor.createEmbeddedDocuments('Item', [itemData]);
-
-        // Delete from source actor if sourceActor exists and owns the item
-        if (this.sourceActor && this.autosoftItem.actorOwner?.uuid === this.sourceActor.uuid) {
-            await this.autosoftItem.delete();
-        }
+        await this.autosoftItem.update({
+            system: {
+                autosoftType: this.selectedAutosoftType,
+                skill: this.selectedSkill,
+                targetModel: this.targetModel,
+                targetWeapon: this.selectedTargetWeaponUuid,
+            }
+        });
 
         ui.notifications?.info(
-            `${this.autosoftItem.name} transferred to ${targetActor.name}`
+            game.i18n.format("SR5.AutosoftConfigManager.Configured", { name: this.autosoftItem.name })
         );
 
         await this.close();
@@ -145,7 +139,7 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
 
         root.querySelector<HTMLSelectElement>('[name="autosoftType"]')?.addEventListener('change', (e: Event) => {
             if (e.target instanceof HTMLSelectElement) {
-                this.selectedAutosoftType = e.target.value;
+                this.selectedAutosoftType = e.target.value as AutosoftType;
                 void this.render();
             }
         });
@@ -200,7 +194,7 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
             resizable: true,
         },
         actions: {
-            submitTransfer: AutosoftConfigManager.#submitTransfer,
+            saveConfig: AutosoftConfigManager.#saveConfig,
             cancel: AutosoftConfigManager.#cancel,
         }
     }

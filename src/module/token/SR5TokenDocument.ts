@@ -43,9 +43,12 @@ export class SR5TokenDocument extends TokenDocument {
      * Handles system-specific cleanup before the token document is deleted.
      */
     protected override async _preDelete(...args: Parameters<TokenDocument["_preDelete"]>) {
-        // Disconnect from any networks before a token actor is deleted.
         if (this.actor?.isToken) {
-            await StorageFlow.deleteStorageReferences(this.actor);
+            try {
+                await StorageFlow.deleteStorageReferences(this.actor);
+            } catch (e) {
+                console.warn('SR5 | Failed to delete storage references for token actor', e);
+            }
         }
 
         return super._preDelete(...args);

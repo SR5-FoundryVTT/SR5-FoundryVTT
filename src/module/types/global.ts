@@ -194,6 +194,7 @@ declare module "fvtt-types/configuration" {
                 jumpedInEffectId?: string;
                 previousInitiativeMode?: string;
                 hasRiggerInterface?: boolean;
+                isTourDocument?: boolean;
             }
         };
         ActiveEffect: {
@@ -233,6 +234,7 @@ declare module "fvtt-types/configuration" {
                 jumpedInEffectId?: string;
                 isRiggerInterface?: boolean;
                 rccUuid?: string;
+                isTourDocument?: boolean;
             };
         };
         Macro: {
@@ -243,24 +245,11 @@ declare module "fvtt-types/configuration" {
         Token: {
             shadowrun5e: {
                 TokenMovementPhaseMarkers?: MovementPhaseMarker[];
-                isSwarmCompanion?: boolean;
-                swarmPrimaryTokenId?: string;
-                preSwarmTexture?: { scaleX?: number; scaleY?: number; tint?: string | null };
             };
         };
         TokenDocument: {
             shadowrun5e: {
                 TokenUseRoutingLib?: boolean;
-                isSwarmCompanion?: boolean;
-                swarmPrimaryTokenId?: string;
-                preSwarmTexture?: { scaleX?: number; scaleY?: number; tint?: string | null };
-            };
-        };
-        Tile: {
-            shadowrun5e: {
-                isSwarmTile?: boolean;
-                swarmPrimaryTokenId?: string;
-                swarmActorUuid?: string;
             };
         };
         User: {

@@ -1627,23 +1627,32 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         if (this.isType('device') && this.system.category === 'rcc') {
             const sys = changed.system as Record<string, any> | undefined;
-            const currentRating = sys?.technology?.rating !== undefined
-                ? Number(sys.technology.rating)
-                : this.getRating();
+            if (sys) {
+                const currentRating = sys.technology?.rating !== undefined
+                    ? Number(sys.technology.rating)
+                    : this.getRating();
 
-            if (sys?.sharing !== undefined) {
-                const requestedSharing = Math.max(0, Math.min(currentRating, Number(sys.sharing)));
-                sys.sharing = requestedSharing;
-                const currentNoiseRed = sys.noise_reduction !== undefined ? Number(sys.noise_reduction) : Number(this.system.noise_reduction || 0);
-                if (requestedSharing + currentNoiseRed > currentRating) {
-                    sys.noise_reduction = Math.max(0, currentRating - requestedSharing);
-                }
-            } else if (sys?.noise_reduction !== undefined) {
-                const requestedNoiseRed = Math.max(0, Math.min(currentRating, Number(sys.noise_reduction)));
-                sys.noise_reduction = requestedNoiseRed;
-                const currentSharing = Number(this.system.sharing || 0);
-                if (currentSharing + requestedNoiseRed > currentRating) {
-                    sys.sharing = Math.max(0, currentRating - requestedNoiseRed);
+                let sharing = sys.sharing !== undefined ? Number(sys.sharing) : Number(this.system.sharing || 0);
+                let noiseReduction = sys.noise_reduction !== undefined ? Number(sys.noise_reduction) : Number(this.system.noise_reduction || 0);
+
+                if (sys.sharing !== undefined) {
+                    sharing = Math.max(0, Math.min(currentRating, sharing));
+                    sys.sharing = sharing;
+                    if (sharing + noiseReduction > currentRating) {
+                        sys.noise_reduction = Math.max(0, currentRating - sharing);
+                    }
+                } else if (sys.noise_reduction !== undefined) {
+                    noiseReduction = Math.max(0, Math.min(currentRating, noiseReduction));
+                    sys.noise_reduction = noiseReduction;
+                    if (sharing + noiseReduction > currentRating) {
+                        sys.sharing = Math.max(0, currentRating - noiseReduction);
+                    }
+                } else if (sys.technology?.rating !== undefined) {
+                    if (sharing + noiseReduction > currentRating) {
+                        sharing = Math.min(sharing, currentRating);
+                        sys.sharing = sharing;
+                        sys.noise_reduction = Math.max(0, currentRating - sharing);
+                    }
                 }
             }
         }

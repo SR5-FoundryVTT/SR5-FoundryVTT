@@ -62,8 +62,6 @@ export const FLAGS = {
     TokenRulerColorSprinting: "TokenRulerColorSprinting",
     TokenRulerColorPhaseMarker: "TokenRulerColorPhaseMarker",
     TokenRulerOpacity: 'TokenRulerOpacity',
-    isSwarmCompanion: 'isSwarmCompanion',
-    swarmPrimaryTokenId: 'swarmPrimaryTokenId',
     TokenMovementHistoryReset: 'TokenMovementHistoryReset',
     TokenMovementPhaseMarkers: 'TokenMovementPhaseMarkers',
     GeneralActionsPack: 'GeneralActionsPack',

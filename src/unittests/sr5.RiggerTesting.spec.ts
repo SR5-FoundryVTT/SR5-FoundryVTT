@@ -301,38 +301,5 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
             assert.equal((rcc.system as any).sharing, 5);
             assert.equal((rcc.system as any).noise_reduction, 0);
         });
-
-        it('Calculates Drone Swarm Pilot rating and applies Swarm bonus to autonomous rolls', async () => {
-            const droneLeader = await factory.createActor({
-                type: 'vehicle',
-                system: {
-                    isDrone: true,
-                    swarm: {
-                        active: true,
-                        count: 3
-                    },
-                    controlMode: 'autopilot',
-                    vehicle_stats: {
-                        pilot: { base: 3 },
-                        sensor: { base: 3 }
-                    }
-                }
-            });
-
-            const swarmInfo = RiggingRules.getSwarmPilotInfo(droneLeader);
-            // Pilot in swarm (3) + (3 drones - 1) = 5.
-            assert.equal(swarmInfo.highestPilot, 3);
-            assert.equal(swarmInfo.memberCount, 3);
-            assert.equal(swarmInfo.swarmPilot, 5);
-            // Leader pilot is 3, so bonus = 5 - 3 = 2.
-            assert.equal(swarmInfo.bonus, 2);
-
-            const test = await TestCreator.fromPackAction(SR5.packNames.GeneralActionsPack, 'drone_perception', droneLeader, testOptions);
-            assert.notEqual(test, undefined);
-            await test!.execute();
-
-            // Dice pool should include Pilot (3) + Swarm Bonus (2) = 5
-            assert.equal(test!.pool.value, 5);
-        });
     });
 };

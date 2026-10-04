@@ -24,12 +24,6 @@ interface VehicleSheetDataFields extends MatrixActorSheetData {
         isOverSlots: boolean;
         runningAutosofts: SR5Item[];
     };
-    swarmInfo: {
-        swarmPilot: number;
-        highestPilot: number;
-        memberCount: number;
-        bonus: number;
-    };
     rccInfo?: {
         deviceRating: number;
         sharing: number;
@@ -113,8 +107,6 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             isOverSlots: runningCount > maxSlots,
             runningAutosofts
         };
-
-        data.swarmInfo = RiggingRules.getSwarmPilotInfo(this.actor);
 
         if (data.vehicle.master && data.vehicle.master.isType('device') && data.vehicle.master.system.category === 'rcc') {
             const info = RiggingRules.getRCCSharingInfo(data.vehicle.master);

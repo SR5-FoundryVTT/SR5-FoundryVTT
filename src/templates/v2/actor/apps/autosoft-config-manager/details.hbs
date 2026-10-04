@@ -14,6 +14,20 @@
 
     <div class="list-item">
         <div class="list-item-start">
+            <label>{{localize "SR5.Skill"}}</label>
+        </div>
+        <div class="list-item-col">
+            <select name="skill">
+                <option value="">-- {{localize "SR5.Default"}} --</option>
+                {{#each activeSkills as |label key|}}
+                    <option value="{{key}}" {{#if (eq key ../selectedSkill)}}selected{{/if}}>{{localize label}}</option>
+                {{/each}}
+            </select>
+        </div>
+    </div>
+
+    <div class="list-item">
+        <div class="list-item-start">
             <label>{{localize "SR5.AutosoftConfigManager.TargetActor"}}</label>
         </div>
         <div class="list-item-col">
