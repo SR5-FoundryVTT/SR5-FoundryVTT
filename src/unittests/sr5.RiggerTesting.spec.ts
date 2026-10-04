@@ -298,8 +298,8 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
 
             // Hardware device rating stays 5, noise_reduction clamped to 0
             assert.equal(rcc.getRating(), 5);
-            assert.equal((rcc.system as any).sharing, 5);
-            assert.equal((rcc.system as any).noise_reduction, 0);
+            assert.equal(rcc.system.sharing, 5);
+            assert.equal(rcc.system.noise_reduction, 0);
         });
     });
 };

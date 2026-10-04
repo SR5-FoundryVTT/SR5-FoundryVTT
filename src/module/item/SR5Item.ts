@@ -39,7 +39,7 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import GetEmbeddedDocumentOptions = foundry.abstract.Document.GetEmbeddedDocumentOptions;
 
 type OneOrMany<T> = T | T[];
-const { fromUuid, mergeObject, expandObject } = foundry.utils;
+const { fromUuid, fromUuidSync, mergeObject, expandObject } = foundry.utils;
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -1150,6 +1150,23 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     getConditionMonitor(this: SR5Item): ConditionType {
         return this.system.technology?.condition_monitor || DataDefaults.createData('condition_monitor');
+    }
+
+    get targetWeaponDocument(): SR5Item<'weapon'> | null {
+        if (!this.isType('program') || !this.system.targetWeapon) return null;
+        const tw = this.system.targetWeapon;
+        if (tw.startsWith('Actor.') || tw.startsWith('Compendium.') || tw.startsWith('Item.')) {
+            const doc = fromUuidSync(tw);
+            return (doc && (doc as SR5Item).isType?.('weapon')) ? (doc as SR5Item<'weapon'>) : null;
+        }
+        return null;
+    }
+
+    get targetWeaponLabel(): string {
+        if (!this.isType('program') || !this.system.targetWeapon) return '';
+        const doc = this.targetWeaponDocument;
+        if (doc?.name) return doc.name;
+        return this.system.targetWeapon;
     }
 
     getRating(this: SR5Item): number {

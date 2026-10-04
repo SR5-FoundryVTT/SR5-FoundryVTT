@@ -54,15 +54,15 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
         return game.i18n.localize("SR5.AutosoftConfigManager.Title");
     }
 
-    private _getEligibleTargetActors(): SR5Actor[] {
+    private _getEligibleTargetActors(): SR5Actor<'vehicle'>[] {
         if (this.sourceActor.isType('vehicle')) {
             return [this.sourceActor];
         }
 
-        return (game.actors as unknown as SR5Actor[]).filter(actor => {
+        return (game.actors as unknown as SR5Actor[]).filter((actor): actor is SR5Actor<'vehicle'> => {
             if (!actor.isType('vehicle') || actor.compendium) return false;
             if (!game.user.isGM) return actor.isOwner;
-            return actor.isOwner || (actor.system as any)?.master === this.sourceActor.uuid;
+            return actor.isOwner || actor.system.master === this.sourceActor.uuid;
         });
     }
 
@@ -85,15 +85,16 @@ export class AutosoftConfigManager extends HandlebarsApplicationMixin(Applicatio
         // Populate weapons from selected target actor
         const targetActorDoc = eligibleActors.find(a => a.uuid === this.selectedTargetActorUuid);
         if (targetActorDoc) {
-            const weapons = targetActorDoc.items.filter(i => i.isType('weapon'));
+            const weapons = targetActorDoc.itemsForType.get('weapon') ?? [];
             context.targetWeapons = weapons.map(w => ({
-                uuid: w.uuid,
+                uuid: w.uuid ?? '',
                 name: w.name || '',
                 img: w.img || ''
             }));
-            if (context.targetModel === '' && targetActorDoc.name) {
-                context.targetModel = targetActorDoc.name;
-                this.targetModel = targetActorDoc.name;
+            if (context.targetModel === '') {
+                const defaultModel = targetActorDoc.system.model || targetActorDoc.name || '';
+                context.targetModel = defaultModel;
+                this.targetModel = defaultModel;
             }
         } else {
             context.targetWeapons = [];
