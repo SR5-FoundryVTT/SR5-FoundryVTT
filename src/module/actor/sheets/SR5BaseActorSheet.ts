@@ -890,7 +890,20 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Avoid adding item types to the actor, that aren't handled on the sheet anywhere.
         if (this.getHandledItemTypes().includes(item.type) || this.getInventoryItemTypes().includes(item.type)) {
-            return super._onDropItem(event, item);
+            if (this.actor.uuid === item.parent?.uuid) {
+                // Linked items aren't listed on the actor sheet, so one dropped here was dragged out of
+                // its parent's sheet to take it out of that parent.
+                if (item.system.parentId) await item.update({ system: { parentId: null } });
+                return super._onDropItem(event, item);
+            }
+
+            const itemData = await SR5Item.createWithLinkedItems([item], {
+                transformAll: linked => linked.inCompendium
+                    ? game.items.fromCompendium(linked, { clearFolder: true, keepId: true })
+                    : linked.toObject(),
+            });
+            const created = await this.actor.createEmbeddedDocuments('Item', itemData, { keepId: true });
+            return created?.[0] ?? null;
         }
         return null;
     }
@@ -1358,6 +1371,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
             // Handled types are on the sheet outside the inventory.
             if (handledTypes.includes(item.type)) continue;
+
+            const parentId = foundry.utils.getProperty(item.system, 'parentId') as string | null | undefined;
+            if (parentId && this.actor.items.has(parentId)) continue;
 
             // Determine what inventory the item sits in.
             const inventory = itemIdInventory[item.id] || this.actor.defaultInventory;

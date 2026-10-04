@@ -5,8 +5,12 @@ import { ParseData, Schemas } from "../parser/Types";
 import { ImportHelper as IH } from '../helper/ImportHelper';
 import { ChummerFileXML, CompendiumKey, Constants } from './Constants';
 import CompendiumCollection = foundry.documents.collections.CompendiumCollection;
+import { derivedChildId } from '@/module/utils/ids';
 
 export type BulkImportMode = 'add' | 'update' | 'replace' | 'clean';
+
+type ImportCreateData = Actor.CreateData | Item.CreateData;
+type ImportCreateDataWithEmbeddedItems = ImportCreateData & { _embeddedItems?: Item.Source[] };
 
 /**
  * The most basic Chummer item data importer, designed to handle one or more Chummer5a data <type>.xml files.
@@ -83,13 +87,13 @@ export abstract class DataImporter {
         options: {
             documentType: string;
             compendiumKey: (data: TInput) => CompendiumKey;
-            parser: { Parse: (data: TInput, compendiumKey: CompendiumKey) => Promise<Actor.CreateData | Item.CreateData> };
+            parser: { Parse: (data: TInput, compendiumKey: CompendiumKey) => Promise<ImportCreateData> };
             filter?: (input: TInput) => boolean;
             injectActionTests?: (item: Item.CreateData) => void;
         }
     ): Promise<void> {
         const { compendiumKey, parser, filter, injectActionTests, documentType } = options;
-        const itemMap = new Map<CompendiumKey, (Actor.CreateData | Item.CreateData)[]>();
+        const itemMap = new Map<CompendiumKey, ImportCreateData[]>();
         const compendiums: Partial<Record<CompendiumKey, CompendiumCollection<'Actor' | 'Item'>>> = {};
         const descriptionIndexes = new Map<CompendiumKey, Awaited<ReturnType<CompendiumCollection<'Actor' | 'Item'>['getIndex']>>>();
         const dataInput = filter ? inputs.filter(x => {
@@ -119,7 +123,7 @@ export abstract class DataImporter {
                     continue;
                 }
 
-                const item = await parser.Parse(data, key);
+                const item = await parser.Parse(data, key) as ImportCreateDataWithEmbeddedItems;
                 injectActionTests?.(item as Item.CreateData);
 
                 if (this.importMode === 'update' && compendium.index.has(id)) {
@@ -141,6 +145,22 @@ export abstract class DataImporter {
 
                 if (!itemMap.has(key)) itemMap.set(key, []);
                 itemMap.get(key)!.push(item);
+                if ('type' in item && Array.isArray(item._embeddedItems)) {
+                    const usedIds = new Set<string>();
+                    for (const [index, embeddedItem] of item._embeddedItems.entries()) {
+                        const linked = foundry.utils.duplicate(embeddedItem) as Item.CreateData;
+                        // Derived from the parent rather than random, so importing again writes the
+                        // same children instead of adding another set of them.
+                        const sourceId = foundry.utils.getProperty(linked, 'system.importFlags.sourceid');
+                        const childKey = typeof sourceId === 'string' && sourceId ? sourceId : `${linked.name}#${index}`;
+                        linked._id = derivedChildId(id, childKey, usedIds);
+                        foundry.utils.setProperty(linked, 'system.parentId', id);
+                        if (item.folder) linked.folder = item.folder;
+                        itemMap.get(key)!.push(linked);
+                    }
+
+                    delete item._embeddedItems;
+                }
             } catch (error) {
                 console.error("Error:\n", error, "\nData:\n", data);
                 ui.notifications?.error(`Failed parsing ${documentType}: ${data?.name?._TEXT ?? "Unknown"}`);

@@ -27,8 +27,8 @@ export const ActorOwnershipFlow = {
     },
 
     _isOwnerOfItem(actor: SR5Actor, device: SR5Item) {
-        // check if we are the actorOwner of the item
-        return device.actorOwner === actor;
+        // check if we own the item
+        return device.actor === actor;
     },
 
     _isOwnerOfActor(actor: SR5Actor, device: SR5Actor) {

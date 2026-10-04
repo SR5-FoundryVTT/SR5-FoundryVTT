@@ -154,10 +154,18 @@ export class CompendiumBrowser extends BaseClass {
                 (!packs?.length || packs.includes(p.collection))
         ) as foundry.documents.collections.CompendiumCollection<DocType>[];
 
-        const indexes = await Promise.all(activePacks.map(async (pack) => pack.getIndex()));
+        // Packs created after world load only index parentId when asked for it.
+        const indexOptions = docType === 'Item' ? { fields: ['system.parentId'] } : undefined;
+        const indexes = await Promise.all(activePacks.map(async (pack) => pack.getIndex(indexOptions as any)));
         let entries = indexes.flatMap((index, idx) => {
             const packCollection = activePacks[idx].collection;
-            return [...index.values()].map((entry) => ({ ...entry, sourcePack: packCollection }));
+            return [...index.values()]
+                // Linked items belong to the parent listed beside them, as in the compendium window.
+                .filter((entry) => {
+                    const parentId = foundry.utils.getProperty(entry, 'system.parentId');
+                    return !(typeof parentId === 'string' && parentId && index.has(parentId));
+                })
+                .map((entry) => ({ ...entry, sourcePack: packCollection }));
         });
 
         if (types && types.length > 0)

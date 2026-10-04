@@ -168,6 +168,19 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
                 return !seededGroupNames.has(groupName);
             }).length;
 
+            // Weapon accessories, clips and ware children are imported as sibling items linked
+            // through system.parentId, so they count towards the actor's item total.
+            type ChummerChildren = { accessories?: { accessory?: unknown }, clips?: { clip?: unknown }, children?: { cyberware?: unknown } };
+            const countChildren = (parents: unknown[]) => parents.reduce<number>((count, parent) => {
+                const { accessories, clips, children } = parent as ChummerChildren;
+                return count + IH.getArray(accessories?.accessory).length
+                             + IH.getArray(clips?.clip).length
+                             + IH.getArray(children?.cyberware).length;
+            }, 0);
+
+            const linkedItemCount = countChildren(IH.getArray(character.weapons.weapon))
+                                  + countChildren(IH.getArray(character.cyberwares.cyberware));
+
             const itemCount = IH.getArray(character.qualities.quality).length
                             + IH.getArray(character.contacts.contact).length
                             + IH.getArray(character.weapons.weapon).length
@@ -181,7 +194,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
                             + seededGroupCount
                             + seededSkillCount
                             + extraImportedGroups
-                            + extraImportedSkills;
+                            + extraImportedSkills
+                            + linkedItemCount;
             
             assert.strictEqual(actor.items.size, itemCount, 'Item count');
         });
@@ -215,8 +229,13 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.range.ranges.short, 5);
             assert.strictEqual(weapon.system.range.modes.single_shot, true);
 
-            //embedded items
-            assert.strictEqual(IH.getArray(weapon.flags.shadowrun5e?.embeddedItems).length, 1);
+            // The weapon's accessory is imported as a sibling item linked back through system.parentId.
+            const linkedMod = actor.items.find(item =>
+                item.name === 'Concealable Holster' &&
+                foundry.utils.getProperty(item, 'system.parentId') === weapon.id) as SR5Item<'modification'> | undefined;
+            assert.exists(linkedMod);
+            assert.strictEqual(linkedMod?.type, 'modification');
+            assert.strictEqual(linkedMod?.system.type, 'weapon');
         });
 
         it('Should import strength-based weapon damage from raw Chummer damage', async () => {

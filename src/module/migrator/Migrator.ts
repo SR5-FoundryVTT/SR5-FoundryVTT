@@ -23,8 +23,12 @@ import { Version0_37_0 } from './versions/Version0_37_0';
 import { Version0_37_4 } from './versions/Version0_37_4';
 import { Version0_38_0 } from './versions/Version0_38_0';
 import { VersionMigration, MigratableDocument, MigratableDocumentName, MigratableDocumentType } from "./VersionMigration";
+import { MigrationStorage } from "./MigrationStorage";
 
 const { deepClone, setProperty } = foundry.utils;
+
+/** Version assigned to raw embedded data so it receives the complete migration chain. */
+export const UNMIGRATED_VERSION = '0.0.0';
 
 
 /**
@@ -99,6 +103,14 @@ export class Migrator {
         );
     }
 
+    private static getPendingWorldMigrators(): readonly VersionMigration[] {
+        const version = game.settings.get(game.system.id, FLAGS.KEY_DATA_VERSION);
+        return this.s_Versions.filter(migrator =>
+            migrator.handlesWorldMigration() &&
+            this.compareVersion(migrator.TargetVersion, version) > 0
+        );
+    }
+
     private static normalizeArray(data: any): any[] {
         if (data == null) return [];
         return Array.isArray(data) ? data : Object.values(data); 
@@ -146,7 +158,7 @@ export class Migrator {
         if (nested || (type === "ActiveEffect" && data.label)) {
             data.type ??= "base";
             data._stats ??= {};
-            data._stats.systemVersion ??= "0.0.0";
+            data._stats.systemVersion ??= UNMIGRATED_VERSION;
         }
 
         // If _stats is missing, or systemVersion is not present, or the document is already migrated, skip migration.
@@ -158,12 +170,15 @@ export class Migrator {
 
         let migrated = false;
         if (type === "Item") {
-            const items = this.normalizeArray(data.flags?.shadowrun5e?.embeddedItems);
-            for (const nestedItems of items) {
-                const nestedMigrated = this.migrate("Item", nestedItems, true, path);
-                migrated = migrated || nestedMigrated;
+            // Only normalize an existing flag; lifting nested items removes it and must not see it return.
+            if (data.flags?.shadowrun5e?.embeddedItems != null) {
+                const items = this.normalizeArray(data.flags.shadowrun5e.embeddedItems);
+                for (const nestedItems of items) {
+                    const nestedMigrated = this.migrate("Item", nestedItems, true, path);
+                    migrated = migrated || nestedMigrated;
+                }
+                setProperty(data, 'flags.shadowrun5e.embeddedItems', items);
             }
-            setProperty(data, 'flags.shadowrun5e.embeddedItems', items);
 
             if (nested) {
                 const effects = this.normalizeArray(data.effects);
@@ -225,6 +240,25 @@ export class Migrator {
     }
 
     /**
+     * Apply migrations to the source of a token's ActorDelta.
+     *
+     * Deltas carry no _stats of their own, so every migrator handling them runs on every load and
+     * must leave already migrated delta data untouched.
+     */
+    public static migrateActorDelta(data: any) {
+        if (!data || typeof data !== 'object') return;
+
+        for (const migrator of this.s_Versions) {
+            if (!migrator.handlesActorDelta(data)) continue;
+            try {
+                migrator.migrateActorDelta(data);
+            } catch (error) {
+                console.error(`Failed ActorDelta migration to ${migrator.TargetVersion}.\nID: ${data._id ?? 'unknown'};\n`, error);
+            }
+        }
+    }
+
+    /**
      * Apply migrated data to the document to persist and mark it as up-to-date.
      * 
      * This is connected to Migrator.migrate which will migrate document data on the fly
@@ -253,7 +287,8 @@ export class Migrator {
     }
 
     public static BeginMigration() {
-        if (this.pendingMigrationCount === 0) return;
+        const pendingForcedMigrations = this.getPendingWorldMigrators();
+        if (this.pendingMigrationCount === 0 && pendingForcedMigrations.length === 0) return;
         const migratedVersion = game.settings.get(game.system.id, FLAGS.KEY_DATA_VERSION);
         if (this.compareVersion(migratedVersion, this.migrationVersion) >= 0) return;
 
@@ -267,7 +302,7 @@ export class Migrator {
         const d = new foundry.appv1.api.Dialog({
             title: localizedWarningTitle,
             content:
-                `<h2 style="color: red; text-align: center">${localizedWarningHeader} (${this.pendingMigrationCount})</h2>` +
+                `<h2 style="color: red; text-align: center">${localizedWarningHeader} (${this.pendingMigrationCount + pendingForcedMigrations.length})</h2>` +
                 `<p style="text-align: center"><i>${localizedWarningRequired}</i></p>` +
                 `<p>${localizedWarningDescription}</p>` +
                 `<h3 style="color: red">${localizedWarningBackup}</h3>`,
@@ -297,44 +332,87 @@ export class Migrator {
         });
     }
 
-    /** Max serialized length per update request, well below Foundry's 100MB socket message limit. */
-    private static readonly MAX_BATCH_LENGTH = 10_000_000;
-
-    /** Split documents into batches of at most MAX_BATCH_LENGTH serialized length. */
-    private static *batchBySize<T>(docs: T[]): Generator<T[]> {
-        let batch: T[] = [], length = 0;
-        for (const doc of docs) {
-            const docLength = JSON.stringify(doc).length;
-            if (batch.length && length + docLength > this.MAX_BATCH_LENGTH) {
-                yield batch;
-                batch = []; length = 0;
-            }
-            batch.push(doc);
-            length += docLength;
-        }
-        if (batch.length) yield batch;
-    }
-
     /**
      * Update documents of a specific type.
      */
     private static async updateDocuments<Doc extends MigratableDocumentType>(
         cls: Doc,
         docs: NonNullable<Parameters<Doc['implementation']['updateDocuments']>[0]>,
-        parent: NonNullable<Parameters<Doc['implementation']['updateDocuments']>[1]>['parent'] = null
+        parent: NonNullable<Parameters<Doc['implementation']['updateDocuments']>[1]>['parent'] = null,
+        pack?: string
     ) {
         this.updateProgressbar();
         const migratedDocs = docs.filter(d => d._stats?.systemVersion === this._migrationMark);
 
-        for (const batch of this.batchBySize(migratedDocs)) {
+        for (const batch of MigrationStorage.batchBySize(migratedDocs)) {
             try {
                 await cls.implementation.updateDocuments(
                     batch as any,
                     // Save migrated data silently (no hooks/renders) to avoid intermediate state issues.
-                    { parent: parent as any, diff: false, recursive: false, noHook: true, render: false }
+                    { parent: parent as any, pack, diff: false, recursive: false, noHook: true, render: false }
                 );
             } catch (error) {
-                console.error(`Failed migration update for ${cls.documentName} documents (parent: ${parent?.uuid ?? 'none'}).`, error);
+                console.error(`Failed migration update for ${cls.documentName} documents (parent: ${parent?.uuid ?? pack ?? 'none'}).`, error);
+            }
+        }
+    }
+
+    /**
+     * Whether a document source, or any item source below it, still owes a migration update.
+     */
+    private static hasPendingItems(items: any[] = []): boolean {
+        return items.some(item =>
+            item?._stats?.systemVersion === this._migrationMark ||
+            (item?.effects ?? []).some((effect: any) => effect?._stats?.systemVersion === this._migrationMark)
+        );
+    }
+
+    /**
+     * Persist lazily migrated contents of world-owned Actor and Scene compendiums.
+     *
+     * Their documents migrate on load like any other, but nothing else ever writes them back, so
+     * data derived during migration, like lifted items, would be recreated on every load.
+     */
+    private static async updateWorldCompendiums(packs: foundry.documents.collections.CompendiumCollection<any>[]) {
+        for (const pack of packs) {
+            this.updateProgressbar();
+            try {
+                const documents = await pack.getDocuments();
+
+                if (pack.documentName === 'Actor') {
+                    const actors = documents as Actor.Implementation[];
+                    const pending = actors.filter(actor => {
+                        const source = actor.toObject() as any;
+                        return source._stats?.systemVersion === this._migrationMark ||
+                            this.hasPendingItems(source.items) ||
+                            (source.effects ?? []).some((effect: any) => effect?._stats?.systemVersion === this._migrationMark);
+                    });
+                    if (pending.length === 0) continue;
+
+                    await MigrationStorage.withUnlockedPack(pack, async () => {
+                        await this.updateDocuments(Actor, pending.map(actor => actor.toObject()) as any, null, pack.collection);
+                        for (const actor of pending) {
+                            await this.updateDocuments(Item, actor.toObject().items, actor);
+                            await this.updateDocuments(ActiveEffect, actor.toObject().effects, actor);
+                            for (const item of actor.items)
+                                await this.updateDocuments(ActiveEffect, item.toObject().effects, item);
+                        }
+                    });
+                }
+
+                if (pack.documentName === 'Scene') {
+                    const scenes = (documents as Scene.Implementation[]).filter(scene =>
+                        scene.tokens.some(token => !token.actorLink && this.hasPendingItems((token.toObject() as any).delta?.items))
+                    );
+                    if (scenes.length === 0) continue;
+
+                    await MigrationStorage.withUnlockedPack(pack, async () => {
+                        for (const scene of scenes)
+                            await MigrationStorage.updateTokens(scene, MigrationStorage.tokenSources(scene));
+                    });
+                }
+            } catch (error) {
+                console.error(`Failed migration update for compendium ${pack.collection}.`, error);
             }
         }
     }
@@ -344,6 +422,10 @@ export class Migrator {
      */
     private static async updateAllMigratableDocuments() {
         const start = performance.now();
+        const worldMigrators = this.getPendingWorldMigrators();
+        const worldPacks = game.packs.filter(pack =>
+            pack.metadata.packageType === 'world' && ['Actor', 'Scene'].includes(pack.documentName)
+        );
 
         // Estimate total migration steps
         this.totalMigrations =
@@ -351,7 +433,9 @@ export class Migrator {
             1 + game.actors.size * 2 +                    // Actor + their items + their effects
             [...game.actors].reduce((sum, actor) => sum + actor.items.size, 0) +  // Actor item effects
             1 + game.combats.size +                       // Combats + their combatants
-            game.scenes.size;                             // Non-actor tokens
+            game.scenes.size +                            // Non-actor tokens
+            worldPacks.length +                           // World Actor and Scene compendiums
+            worldMigrators.length;                       // Forced world migrations
 
         /* Items and its embedded Effects */
         await this.updateDocuments(Item, deepClone(game.items._source));
@@ -379,27 +463,18 @@ export class Migrator {
         /* Tokens */
         for (const scene of game.scenes) {
             this.updateProgressbar();
-            const tokens = scene.tokens.map(token => {
-                const data = token.toObject();
+            await MigrationStorage.updateTokens(scene, MigrationStorage.tokenSources(scene));
+        }
 
-                // Foundry uses the parent token ID as the ActorDelta ID.
-                // Provide it upfront to avoid ActorDeltaField._updateDiff assigning _id to the cleaned update value.
-                if (!token.actorLink && data.delta && !data.delta._id)
-                    data.delta._id = token.id;
+        /* World compendiums */
+        await this.updateWorldCompendiums(worldPacks as foundry.documents.collections.CompendiumCollection<any>[]);
 
-                return data;
-            });
-
-            for (const batch of this.batchBySize(tokens)) {
-                try {
-                    await TokenDocument.implementation.updateDocuments(
-                        batch,
-                        // Save migrated data silently (no hooks/renders) to avoid intermediate state issues.
-                        { parent: scene, diff: false, recursive: false, noHook: true, render: false }
-                    );
-                } catch (error) {
-                    console.error(`Failed migration update for Token documents in ${scene.uuid}.`, error);
-                }
+        for (const migrator of worldMigrators) {
+            this.updateProgressbar();
+            try {
+                await migrator.MigrateWorld();
+            } catch (error) {
+                console.error(`Failed forced migration to ${migrator.TargetVersion}.`, error);
             }
         }
 

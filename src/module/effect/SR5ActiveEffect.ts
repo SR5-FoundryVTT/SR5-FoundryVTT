@@ -144,15 +144,6 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * Always returns the parent actor of the effect, even if the effect is applied to an item.
-     */
-    override get actor(): SR5Actor | null {
-        if (this.parent instanceof SR5Actor) return this.parent;
-        if (this.parent instanceof SR5Item) return this.parent.actorOwner ?? null;
-        return null;
-    }
-
-    /**
      * Use to display this effect on sheet, including a possible parent item structure.
      */
     public get sheetName(): string | null {
@@ -246,6 +237,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (!(this.parent instanceof SR5Item)) return false;
 
         if (this.restrictsToEquipped && !this.parent.isEquipped()) return true;
+        if (this.restrictsToEquipped && this.parent.hasUnequippedAttachmentParent()) return true;
         if (this.restrictsToWireless && !this.parent.isWireless()) return true;
         if (this.parent.isType('critter_power') && !this.parent.system.enabled) return true;
         if (this.parent.isType('sprite_power') && !this.parent.system.enabled) return true;
@@ -506,14 +498,6 @@ export class SR5ActiveEffect extends ActiveEffect {
         data: ActiveEffect.UpdateInput,
         operation?: ActiveEffect.Database.UpdateOneDocumentOperation,
     ) {
-        if (this.parent instanceof SR5Item && this.parent._isNestedItem) {
-            if (!data || !this.id) return this;
-
-            await this.parent.updateNestedEffects({ ...data, _id: this.id } as ActiveEffect.UpdateInput);
-            this.render();
-            return this;
-        }
-
         await Migrator.updateMigratedDocument(this);
 
         return super.update(data, operation);

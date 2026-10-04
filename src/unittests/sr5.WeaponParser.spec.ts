@@ -5,6 +5,7 @@ import { WeaponParser as ActorWeaponParser } from '../module/apps/actorImport/it
 import { Constants } from '../module/apps/itemImport/importer/Constants';
 import { CritterParser } from '../module/apps/itemImport/parser/metatype/CritterParser';
 import { AmmoParser as ItemAmmoParser } from '../module/apps/itemImport/parser/gear/AmmoParser';
+import { derivedChildId } from '../module/utils/ids';
 
 function mockXmlData(data: Record<string, unknown>): Record<string, unknown> {
     return Object.fromEntries(Object.entries(data)
@@ -387,6 +388,42 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(output.damageType, 'physical');
             assert.strictEqual(output.element, 'acid');
             assert.strictEqual(output.ap, -5);
+        });
+    });
+    describe("Actor Import Embedded Item Links", () => {
+        const actorWeaponParser = new ActorWeaponParser();
+        const link = (parent: { _id: string; type: string }, items: any[]): any[] =>
+            (actorWeaponParser as any).linkEmbeddedItems(parent, items);
+
+        it("links direct attachments to the parent and keeps grandchildren below their own parent", () => {
+            const weapon = { _id: 'weapon0000000000', type: 'weapon' };
+            const mod = { _id: 'mod0000000000000', name: 'Smartgun', type: 'modification', system: {} };
+            const nested = { _id: 'nested0000000000', name: 'Nested', type: 'modification', system: { parentId: mod._id } };
+            const stray = { _id: 'stray00000000000', name: 'Stray', type: 'modification', system: { parentId: 'elsewhere0000000' } };
+            const spell = { _id: 'spell00000000000', name: 'Spell', type: 'spell', system: {} };
+
+            const linked = link(weapon, [mod, nested, stray, spell]);
+
+            assert.deepEqual(linked.map(item => item._id), [mod._id, nested._id]);
+            assert.strictEqual(linked[0].system.parentId, weapon._id);
+            assert.strictEqual(linked[0].system.type, 'weapon');
+            assert.strictEqual(linked[1].system.parentId, mod._id);
+        });
+    });
+
+    describe("Item Import Embedded Item Ids", () => {
+        it("derives the same child ids on every import, distinct per parent and per duplicate", () => {
+            const first = derivedChildId('parent0000000000', 'clip', new Set());
+            const again = derivedChildId('parent0000000000', 'clip', new Set());
+            const otherParent = derivedChildId('parent1111111111', 'clip', new Set());
+
+            const used = new Set<string>();
+            const duplicates = [derivedChildId('parent0000000000', 'clip', used), derivedChildId('parent0000000000', 'clip', used)];
+
+            assert.strictEqual(first, again);
+            assert.notStrictEqual(first, otherParent);
+            assert.notStrictEqual(duplicates[0], duplicates[1]);
+            assert.match(first, /^[A-Za-z0-9]{16}$/);
         });
     });
 }

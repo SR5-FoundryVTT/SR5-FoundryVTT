@@ -1,4 +1,5 @@
 import { ActorSchema } from "../ActorSchema";
+import { SR5Item } from "@/module/item/SR5Item";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { IconAssign } from "../../iconAssigner/IconAssign";
 import { DataDefaults, SystemEntityType } from "src/module/data/DataDefaults";
@@ -65,7 +66,9 @@ export abstract class Parser<T extends ItemSystems> {
         const guid = itemData.suid ?? IH.getArray(itemData.sourceid)[0] ?? null;
         const itemIdFromGuid = guid ? IH.guidToId(guid) : null;
 
-        for (const [packId, indexes] of Parser.compendiumCache.entries()) {
+        for (const [packId, index] of Parser.compendiumCache.entries()) {
+            // Linked items are part of the item listed as their parent, not templates of their own.
+            const indexes = index.filter(e => !foundry.utils.getProperty(e, 'system.parentId'));
             const itemIndex =  indexes.find(e => e._id === itemIdFromGuid && e.type === this.parseType)
                             ?? indexes.find(e => e.name === itemData.name && e.type === this.parseType)
                             ?? indexes.find(e => e.name === itemData.name_english && e.type === this.parseType);
@@ -131,10 +134,10 @@ export abstract class Parser<T extends ItemSystems> {
         };
     }
 
-    public async parseItems(itemsData: BaseType[] | BaseType | undefined) {
+    public async parseItems(itemsData: BaseType[] | BaseType | undefined): Promise<Item.CreateData[]> {
         if (!itemsData) return [];
 
-        const parsedItems: BlankItem<T>[] = [];
+        const parsedItems: Item.CreateData[] = [];
 
         for (const itemData of IH.getArray(itemsData)) {
             try {
@@ -147,8 +150,8 @@ export abstract class Parser<T extends ItemSystems> {
                 this.parseTechnology(item, itemData);
                 this.parseItem(item, itemData);
                 this.parseImportFlags(item, itemData);
-
-                item.flags.shadowrun5e.embeddedItems = await this.getEmbeddedItems(itemData);
+                const embeddedItems = await this.getEmbeddedItems(itemData);
+                const linkedItems = this.linkEmbeddedItems(item, embeddedItems);
 
                 if (!item.img)
                     item.img = IconAssign.iconAssign(item);
@@ -164,7 +167,7 @@ export abstract class Parser<T extends ItemSystems> {
                     console.table(correctionLogs);
                 }
 
-                parsedItems.push(item);
+                parsedItems.push(item, ...linkedItems);
             } catch (error) {
                 console.error(`Error parsing item ${itemData.name}:`, error);
             }
@@ -174,7 +177,43 @@ export abstract class Parser<T extends ItemSystems> {
     }
 
     protected abstract parseItem(item: BlankItem<T>, itemData: BaseType): void;
-    protected async getEmbeddedItems(itemData: BaseType): Promise<Item.Source[]> {
-        return [] as Item.Source[];
+    protected async getEmbeddedItems(itemData: BaseType): Promise<Item.CreateData[]> {
+        return [] as Item.CreateData[];
+    }
+
+    /**
+     * Link parsed embedded items below their parent.
+     *
+     * parseItems returns each embedded item followed by the items linked below it, which already
+     * point at it. Only items without a parent yet are direct children; the rest keep their own
+     * parent and are kept whenever that parent is.
+     */
+    protected linkEmbeddedItems(parent: { _id?: string; type: string }, items: Item.CreateData[]): Item.CreateData[] {
+        if (!parent._id) return [];
+
+        const modificationType = SR5Item.modificationTypeFor(parent.type);
+        const kept = new Set<string>();
+        const linkedItems: Item.CreateData[] = [];
+
+        for (const item of items) {
+            const linked = foundry.utils.duplicate(item) as Item.CreateData;
+            const ownParentId = foundry.utils.getProperty(linked, 'system.parentId');
+
+            if (typeof ownParentId === 'string' && ownParentId) {
+                if (!kept.has(ownParentId)) continue;
+            } else {
+                if (!SR5Item.isAttachment(parent.type, linked.type!)) continue;
+
+                foundry.utils.setProperty(linked, 'system.parentId', parent._id);
+                if (linked.type === 'modification' && modificationType) {
+                    foundry.utils.setProperty(linked, 'system.type', modificationType);
+                }
+            }
+
+            if (typeof linked._id === 'string') kept.add(linked._id);
+            linkedItems.push(linked);
+        }
+
+        return linkedItems;
     }
 }

@@ -24,9 +24,9 @@ export class WareParser extends Parser<'bioware' | 'cyberware'> {
         }
     }
 
-    protected override async getEmbeddedItems(itemData: ExtractItemType<'cyberwares', 'cyberware'>): Promise<Item.Source[]> {
+    protected override async getEmbeddedItems(itemData: ExtractItemType<'cyberwares', 'cyberware'>): Promise<Item.CreateData[]> {
         return [
             ...(await new WareModParser(this.parseType).parseItems(itemData.children?.cyberware))
-        ] as Item.Source[];
+        ] as Item.CreateData[];
     }
 }

@@ -29,15 +29,16 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 name: 'Explosive Ammo Weapon',
                 system: { category: 'range' },
             }]);
-            const ammo = await factory.createItem({
+            await actor.createEmbeddedDocuments('Item', [{
                 type: 'ammo',
+                name: 'Explosive Ammo',
                 system: {
+                    parentId: weapon.id,
                     technology: { equipped: true },
                     blast: { radius: 4, dropoff: 1 },
                 },
-            });
+            } as any]);
 
-            await (weapon as SR5Item<'weapon'>).createNestedItem(ammo.toObject());
             const test = await TestCreator.fromItem(weapon as SR5Item<'weapon'>, actor, {
                 showDialog: false,
                 showMessage: false,
