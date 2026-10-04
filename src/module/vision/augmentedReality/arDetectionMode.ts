@@ -6,7 +6,8 @@ import AugmentedRealityVisionFilter from "./arFilter";
 export default class AugmentedRealityVisionDetectionMode extends foundry.canvas.perception.DetectionMode {
 
     static override getDetectionFilter() {
-        return this._detectionFilter ??= AugmentedRealityVisionFilter.create();
+        this._detectionFilter ??= AugmentedRealityVisionFilter.create();
+        return this._detectionFilter;
     }
   
     override _canDetect(
