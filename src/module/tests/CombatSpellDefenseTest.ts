@@ -139,6 +139,6 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
         if (spell?.system.category !== 'combat' || spell.system.combat.type === 'direct')
             return;
 
-        this.actor.calculateNextDefenseMultiModifier();
+        void this.actor.calculateNextDefenseMultiModifier();
     }
 }

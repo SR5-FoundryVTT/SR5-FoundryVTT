@@ -541,12 +541,12 @@ ___________________
         HooksManager.configureTextEnrichers();
 
         // Preload might reduce loading time during play.
-        HandlebarManager.loadTemplates();
+        void HandlebarManager.loadTemplates();
 
         // Register Tours
-        registerSR5Tours();
+        void registerSR5Tours();
 
-        DataStorage.validate();
+        void DataStorage.validate();
     }
 
     static async ready() {
@@ -579,7 +579,7 @@ ___________________
     static hotbarDrop(bar, dropData, slot): boolean {
         switch (dropData.type) {
             case 'Item':
-                createItemMacro(dropData, slot);
+                void createItemMacro(dropData, slot);
                 return false;
         }
         return true;

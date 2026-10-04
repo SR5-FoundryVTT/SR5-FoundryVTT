@@ -40,7 +40,7 @@ export async function createItemMacro(dropData, slot) {
         );
     }
 
-    if (macro) game.user?.assignHotbarMacro(macro, slot);
+    if (macro) void game.user?.assignHotbarMacro(macro, slot);
 }
 
 /**

@@ -69,7 +69,7 @@ export const OverwatchStorage = {
                 delete ow[uuidStorage];
             });
             // Ignore promise, as this can be handled in background.
-            DataStorage.set(OverwatchStorage.key, ow);
+            void DataStorage.set(OverwatchStorage.key, ow);
         }
 
         return documents.filter(document => document !== null).map(({document}) => document) as SR5Actor[];

@@ -421,7 +421,7 @@ export class CompendiumBrowser extends BaseClass {
 
     /** Handles the cancel button in selection mode. */
     private _onCancelSelection() {
-        this.close();
+        void this.close();
     }
 
     /** Handles a change event on a pack or folder checkbox in the settings. */

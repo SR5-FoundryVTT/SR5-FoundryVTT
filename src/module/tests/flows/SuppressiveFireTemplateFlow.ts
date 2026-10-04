@@ -48,7 +48,7 @@ export class SuppressiveFireTemplateFlow {
 
         if (!this.canPlace) return;
         if (this.#placement) {
-            this.cancelPreview();
+            void this.cancelPreview();
             return;
         }
 
@@ -57,7 +57,7 @@ export class SuppressiveFireTemplateFlow {
 
     async drawChatPreview() {
         if (this.#placement) {
-            this.cancelPreview();
+            void this.cancelPreview();
             return;
         }
 

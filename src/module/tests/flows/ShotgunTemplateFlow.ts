@@ -69,7 +69,7 @@ export class ShotgunTemplateFlow {
         event.stopPropagation();
 
         if (this.#placement) {
-            this.cancelPreview();
+            void this.cancelPreview();
             return;
         }
 
@@ -78,7 +78,7 @@ export class ShotgunTemplateFlow {
 
     async drawChatPreview(ranges = this.test.data.ranges, choke = this.test.data.shotgunChoke) {
         if (this.#placement) {
-            this.cancelPreview();
+            void this.cancelPreview();
             return;
         }
 

@@ -54,11 +54,11 @@ export const GmOnlyMessageContentFlow = {
         // SuccessTest doesn't NEED an actor, if one is cast that way: show gm-only-content
         if (!actor || !game.user) {
             $(html).find('.gm-only-content').removeClass('gm-only-content');
-            ui.chat.scrollBottom();
+            void ui.chat.scrollBottom();
         }
         else if (game.user.isGM || game.user.isTrusted || actor.isOwner) {
             $(html).find('.gm-only-content').removeClass('gm-only-content');
-            ui.chat.scrollBottom();
+            void ui.chat.scrollBottom();
         }
     }
 };
