@@ -93,14 +93,14 @@ export class SituationModifier {
      * Determine if the source document used is an actor.
      */
     get sourceDocumentIsActor(): boolean {
-        return this.modifiers !== undefined && this.modifiers.documentIsActor;
+        return this.modifiers?.documentIsActor ?? false;
     }
 
     /**
      * Determine if the source document used is a scene.
      */
     get sourceDocumentIsScene(): boolean {
-        return this.modifiers !== undefined && this.modifiers.documentIsScene;
+        return this.modifiers?.documentIsScene ?? false;
     }    
 
     /**
