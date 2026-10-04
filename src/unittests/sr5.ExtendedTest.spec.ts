@@ -91,7 +91,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
          * without creating documents. Ancestors are ordered nearest first, as Foundry does.
          */
         const folder = (name: string, ...ancestors: { name: string }[]) =>
-            ({ id: name, name, ancestors }) as any;
+            ({ id: name, name, ancestors });
         const doc = (name: string, parent: any = null) => ({ uuid: `Actor.${name}`, name, folder: parent });
 
         it('lists documents under their folders, in tree order', () => {
@@ -137,7 +137,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
                 base: value - extendedModifier, value,
                 changes: [{ name: 'SR5.ExtendedTest', value: extendedModifier, enabled: true }],
             },
-        }) as any;
+        }) as unknown as ExtendedTestRecord['testData'];
 
         it('applies the cumulative dice pool modifier per roll', () => {
             const record = baseRecord();

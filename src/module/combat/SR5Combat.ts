@@ -92,7 +92,7 @@ export class SR5Combat extends Combat<"base"> {
         const method = combat?.[fnName] as unknown;
         if (typeof method !== 'function') return;
 
-        return await method.call(combat);
+        return await (method.call(combat) as Promise<unknown>);
     }
 
     // =========================================================

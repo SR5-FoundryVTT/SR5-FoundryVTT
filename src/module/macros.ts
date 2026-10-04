@@ -49,11 +49,11 @@ export async function createItemMacro(dropData, slot) {
  * @param {string} itemName
  * @return {Promise}
  */
-export function rollItemMacro(itemName) {
+export async function rollItemMacro(itemName) {
     if (!game?.actors) return;
 
     const speaker = ChatMessage.getSpeaker();
-    let actor;
+    let actor: SR5Actor | undefined;
     if (speaker.token) actor = game.actors.tokens[speaker.token];
     if (!speaker.actor) return;
     if (!actor) actor = game.actors.get(speaker.actor);

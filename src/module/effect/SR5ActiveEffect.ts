@@ -527,14 +527,14 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @returns {Array<*>}      The parsed delta cast as a typed array
      */
     private static __castArray(raw: string, type: foundry.utils.DataType) {
-        let delta: any[];
+        let delta: unknown[];
         try {
-            delta = this.__parseOrString(raw);
-            delta = delta instanceof Array ? delta : [delta];
+            const parsed = this.__parseOrString(raw);
+            delta = parsed instanceof Array ? parsed : [parsed];
         } catch (e) {
             delta = [raw];
         }
-        return delta.map(d => this.__castDelta(d, type));
+        return delta.map(d => this.__castDelta(d as string, type));
     }
 
     /**
@@ -544,8 +544,8 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param {string} type     The target data type that the raw value should be cast to match
      * @returns {*}             The parsed delta cast to the target data type
      */
-    private static __castDelta(raw: string, type: foundry.utils.DataType) {
-        let delta;
+    private static __castDelta(raw: string, type: foundry.utils.DataType): unknown {
+        let delta: unknown;
         switch (type) {
             case "boolean":
                 delta = Boolean(SR5ActiveEffect.__parseOrString(raw));
@@ -569,7 +569,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param {string} raw      A raw serialized string
      * @returns {*}             The parsed value, or the original value if parsing failed
      */
-    private static __parseOrString(raw: string) {
+    private static __parseOrString(raw: string): unknown {
         try {
             return JSON.parse(raw);
         } catch (err) {

@@ -74,42 +74,42 @@ export const registerBasicHelpers = () => {
         if (v2 === 0) return 0;
         return v1 / v2;
     });
-    Handlebars.registerHelper('hasprop', function (this: any, obj, prop, options) {
+    Handlebars.registerHelper('hasprop', function (this: unknown, obj: object, prop: string, options: Handlebars.HelperOptions) {
         if (Object.hasOwn(obj, prop)) {
             return options.fn(this);
         } else return options.inverse(this);
     });
-    Handlebars.registerHelper('ifin', function (this: any, val, arr, options) {
+    Handlebars.registerHelper('ifin', function (this: unknown, val: unknown, arr: unknown[], options: Handlebars.HelperOptions) {
         if (arr.includes(val)) return options.fn(this);
         else return options.inverse(this);
     });
     // if greater than
-    Handlebars.registerHelper('ifgt', function (this: any, v1, v2, options) {
+    Handlebars.registerHelper('ifgt', function (this: unknown, v1: number, v2: number, options: Handlebars.HelperOptions) {
         if (v1 > v2) return options.fn(this);
         else return options.inverse(this);
     });
     // if less than
-    Handlebars.registerHelper('iflt', function (this: any, v1, v2, options) {
+    Handlebars.registerHelper('iflt', function (this: unknown, v1: number, v2: number, options: Handlebars.HelperOptions) {
         if (v1 < v2) return options.fn(this);
         else return options.inverse(this);
     });
     // if less than or equal
-    Handlebars.registerHelper('iflte', function (this: any, v1, v2, options) {
+    Handlebars.registerHelper('iflte', function (this: unknown, v1: number, v2: number, options: Handlebars.HelperOptions) {
         if (v1 <= v2) return options.fn(this);
         else return options.inverse(this);
     });
     // if not equal
-    Handlebars.registerHelper('ifne', function (this: any, v1, v2, options) {
+    Handlebars.registerHelper('ifne', function (this: unknown, v1: unknown, v2: unknown, options: Handlebars.HelperOptions) {
         if (v1 !== v2) return options.fn(this);
         else return options.inverse(this);
     });
     // if equal
-    Handlebars.registerHelper('ife', function (this: any, v1, v2, options) {
+    Handlebars.registerHelper('ife', function (this: unknown, v1: unknown, v2: unknown, options: Handlebars.HelperOptions) {
         if (v1 === v2) return options.fn(this);
         else return options.inverse(this);
     });
     // if then
-    Handlebars.registerHelper('ift', function (v1, v2) {
+    Handlebars.registerHelper('ift', function (v1: unknown, v2: unknown) {
         if (v1) return v2;
     });
 
@@ -123,7 +123,7 @@ export const registerBasicHelpers = () => {
     Handlebars.registerHelper('not', function (v1) {
         return !v1;
     });
-    Handlebars.registerHelper('sum', function (v1, v2) {
+    Handlebars.registerHelper('sum', function (v1: number, v2: number) {
         return v1 + v2;
     });
 
@@ -142,7 +142,7 @@ export const registerBasicHelpers = () => {
         console.log(value);
     });
     Handlebars.registerHelper('buildName', function (options) {
-        const hash: string[] = Helpers.orderKeys(options.hash);
+        const hash = Helpers.orderKeys<Record<string, string>>(options.hash as Record<string, string>);
         const name = Object.values(hash).reduce((retVal, current, index) => {
             if (index > 0) retVal += '.';
             return retVal + current;
@@ -168,7 +168,7 @@ export const registerBasicHelpers = () => {
     /**
      * Creates an array from a spread set of objects ie. (toArray "foo" "bar") => ["foo", "bar"]
      */
-    Handlebars.registerHelper('toArray', function (...vals) {
+    Handlebars.registerHelper('toArray', function (...vals: unknown[]) {
         const copy = [...vals];
         copy.splice(-1); //Remove handlebars options object from last item in array
         return copy;
@@ -211,7 +211,7 @@ export const registerBasicHelpers = () => {
      * Allow using the first given value that's defined.
      * @params * A open list of parameters, from which the first defined value will be returned.
      */
-    Handlebars.registerHelper('firstDefined', function (...values) {
+    Handlebars.registerHelper('firstDefined', function (...values: unknown[]) {
         for (const value of values) {
             if (value !== undefined) return value;
         }

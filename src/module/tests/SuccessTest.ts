@@ -134,6 +134,14 @@ export interface SuccessTestData extends TestData {
     targetUuids: string[]
 }
 
+/** Entry of the chat message context menu, using the name based format Foundry hooks still provide. */
+interface ChatMessageContextOption {
+    name: string
+    callback: (li: unknown) => unknown
+    condition: boolean | ((li: unknown) => boolean)
+    icon: string
+}
+
 export interface TestOptions {
     showDialog: boolean
     showMessage: boolean
@@ -825,7 +833,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     _getModifierTypeLabel(type: ModifierTypes): string {
-        return SR5.modifierTypes[type];
+        return SR5.modifierTypes[type] as string;
     }
 
     /**
@@ -2243,7 +2251,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param app The ChatLog application. 
      * @param options The list of options to be shown in the context menu.
      */
-    static chatMessageContextOptions(app, options) {
+    static chatMessageContextOptions(app, options: ChatMessageContextOption[]) {
         const pushTheLimit = async (li) => {
             const messageId = $(li).data().messageId;
             const test = await TestCreator.fromMessage(messageId);
@@ -2282,7 +2290,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         };
 
         // Keep Foundry delete option at the context menus bottom.
-        const deleteOption = options.pop();
+        const deleteOption = options.pop() as ChatMessageContextOption;
 
         options.push({
             name: game.i18n.localize('SR5.PushTheLimit'),

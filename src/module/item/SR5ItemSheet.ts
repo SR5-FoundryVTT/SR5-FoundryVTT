@@ -1096,7 +1096,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     ) {
         if (this.item._isNestedItem) {
             await this.item.update(submitData, options);
-            return undefined as any;
+            return undefined as never;
         }
 
         return await super._processSubmitData(event, form, submitData, options);

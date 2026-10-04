@@ -226,7 +226,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                 );
                 return (/<input[^>]*name="test\.data\.limit"[^>]*>/.exec(html))?.[0] ?? '';
             };
-            const manualLimitOverride = (test) =>
+            const manualLimitOverride = (test: SuccessTest) =>
                 test.limit.changes.find(change => change.name === 'SR5.ManualOverride');
 
             it('renders an applied limit (>0) as a normal editable number', async () => {
@@ -349,7 +349,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                 );
                 return (/<input[^>]*name="test\.data\.threshold"[^>]*>/.exec(html))?.[0] ?? '';
             };
-            const manualThresholdOverride = (test) =>
+            const manualThresholdOverride = (test: SuccessTest) =>
                 test.threshold.changes.find(change => change.name === 'SR5.ManualOverride');
 
             it('renders an applied threshold (>0) as a normal editable number', async () => {

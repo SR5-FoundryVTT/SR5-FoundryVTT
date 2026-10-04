@@ -33,26 +33,26 @@ export class Helpers {
         return Math.round(value * multiplier) / multiplier;
     }
 
-    static listItemId(event): string {
-        return event.currentTarget.closest('.list-item').dataset.itemId;
+    static listItemId(event: { currentTarget: HTMLElement }): string {
+        return event.currentTarget.closest<HTMLElement>('.list-item')!.dataset.itemId as string;
     }
 
-    static listItemUuid(event): string {
-        return event.currentTarget.closest('.list-item').dataset.uuid;
+    static listItemUuid(event: { currentTarget: HTMLElement }): string {
+        return event.currentTarget.closest<HTMLElement>('.list-item')!.dataset.uuid as string;
     }
 
-    static listHeaderId(event): string {
-        return event.currentTarget.closest('.list-header').dataset.itemId;
+    static listHeaderId(event: { currentTarget: HTMLElement }): string {
+        return event.currentTarget.closest<HTMLElement>('.list-header')!.dataset.itemId as string;
     }
 
-    static eventUuid(event): string {
+    static eventUuid(event: { currentTarget?: HTMLElement | null }): string {
         return event.currentTarget?.dataset?.uuid ?? '';
     }
 
     // replace 'SR5.'s on keys with 'SR5_DOT_'
-    static onSetFlag(data) {
+    static onSetFlag(data: unknown): unknown {
         if (!data || typeof data !== 'object') return data;
-        const newData = {};
+        const newData: Record<string, unknown> = {};
         for (const [key, value] of Object.entries(data)) {
             const newKey = key.replace('SR5.', 'SR5_DOT_');
             newData[newKey] = this.onSetFlag(value);
@@ -61,9 +61,9 @@ export class Helpers {
     }
 
     // replace 'SR5_DOT_' with 'SR5.' on keys
-    static onGetFlag(data) {
+    static onGetFlag(data: unknown): unknown {
         if (!data || typeof data !== 'object') return data;
-        const newData = {};
+        const newData: Record<string, unknown> = {};
         for (const [key, value] of Object.entries(data)) {
             const newKey = key.replace('SR5_DOT_', 'SR5.');
             newData[newKey] = this.onGetFlag(value);
@@ -115,7 +115,7 @@ export class Helpers {
             setContent(this);
         });
         html.find('label.checkbox').click((event) => setContent(event.currentTarget));
-        html.find('.submit-checkbox').change((event) => app._onSubmit(event));
+        html.find('.submit-checkbox').change((event) => { app._onSubmit(event); });
     }
 
     static label(str: string) {
@@ -133,27 +133,28 @@ export class Helpers {
         return frags.join(' ');
     }
 
-    static orderKeys(obj) {
-        const keys = Object.keys(obj).sort(function keyOrder(k1, k2) {
+    static orderKeys<T extends object>(obj: T): T {
+        const record = obj as Record<string, unknown>;
+        const keys = Object.keys(record).sort(function keyOrder(k1, k2) {
             if (k1 < k2) return -1;
             if (k1 > k2) return +1;
             return 0;
         });
 
         let i;
-        const after = {};
+        const after: Record<string, unknown> = {};
         for (i = 0; i < keys.length; i++) {
-            after[keys[i]] = obj[keys[i]];
-            delete obj[keys[i]];
+            after[keys[i]] = record[keys[i]];
+            delete record[keys[i]];
         }
 
         for (i = 0; i < keys.length; i++) {
-            obj[keys[i]] = after[keys[i]];
+            record[keys[i]] = after[keys[i]];
         }
         return obj;
     }
 
-    static hasModifiers(event) {
+    static hasModifiers(event?: Pick<KeyboardEvent, 'shiftKey' | 'altKey' | 'ctrlKey' | 'metaKey'> | null) {
         return event && (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey);
     }
 
@@ -312,7 +313,7 @@ export class Helpers {
      * @returns
      */
     static getTokenLOSHeight(token: TokenDocument): number {
-        return token.flags['wall-height']?.tokenHeight ?? 0;
+        return (token.flags['wall-height'] as { tokenHeight?: number } | undefined)?.tokenHeight ?? 0;
     }
 
     static convertLengthUnit(length: number, fromUnit: string): number {

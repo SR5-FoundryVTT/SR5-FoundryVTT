@@ -844,7 +844,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * NOTE: The current drag&drop implementation is borked and needs cleanup across: SR5ApplicationMixin as base for actor and item sheets.
      */
     protected override async _onDrop(event: DragEvent) {
-        return await (ActorSheetV2.prototype as any)._onDrop.call(this, event);
+        return await ((ActorSheetV2.prototype as any)._onDrop.call(this, event) as Promise<void>);
     }
 
     /**

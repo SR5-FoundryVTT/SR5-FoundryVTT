@@ -17,9 +17,9 @@ export class ModifiableFieldPrep {
             if (field instanceof ModifiableField)
                 func(value as ModifiableValueType);
             else if (field instanceof SchemaField)
-                this.traverseFields(value, (subKey) => field.fields[subKey], func);
+                this.traverseFields(value, (subKey) => field.fields[subKey] as foundry.data.fields.DataField.Any, func);
             else if (field instanceof TypedObjectField || field instanceof ArrayField)
-                this.traverseFields(value, () => field.element, func);
+                this.traverseFields(value, () => field.element as foundry.data.fields.DataField.Any, func);
         }
     }
 

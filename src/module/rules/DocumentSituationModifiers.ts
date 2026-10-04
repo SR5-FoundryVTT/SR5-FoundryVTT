@@ -2,7 +2,7 @@ import { SuccessTest } from './../tests/SuccessTest';
 import { RecoilModifier } from './modifiers/RecoilModifier';
 import { BackgroundCountModifier } from './modifiers/BackgroundCountModifier';
 import { NoiseModifier } from './modifiers/NoiseModifier';
-import { SituationalModifierApplyOptions, } from './modifiers/SituationModifier';
+import { SituationalModifierApplyOptions, SituationModifier } from './modifiers/SituationModifier';
 import { EnvironmentalModifier } from './modifiers/EnvironmentalModifier';
 import { SR5Actor } from "../actor/SR5Actor";
 import {FLAGS, SYSTEM_NAME} from "../constants";
@@ -194,7 +194,7 @@ export class DocumentSituationModifiers {
      * @param options
      */
     getTotalFor(category: keyof SituationModifiersSourceData | (string & {}), options:DocumentSituationModifiersTotalForOptions={}): number {
-        const modifier = this._modifiers[category];
+        const modifier = this._modifiers[category] as SituationModifier;
 
         if (options.reapply || options.applicable) {
             modifier.apply({applicable: options.applicable, test: options.test})

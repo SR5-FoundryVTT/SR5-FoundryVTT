@@ -54,13 +54,13 @@ export class WeaponParserBase extends Parser<'weapon'> {
         if (weaponJson.useskill?._TEXT) {
             const jsonSkill = weaponJson.useskill._TEXT;
             if (Constants.MAP_CATEGORY_TO_SKILL[jsonSkill])
-                return Constants.MAP_CATEGORY_TO_SKILL[jsonSkill];
+                return Constants.MAP_CATEGORY_TO_SKILL[jsonSkill] as string;
 
             return jsonSkill.replace(/[\s-]/g, '_').toLowerCase();
         } else {
             const category = weaponJson.category._TEXT;
             if (Constants.MAP_CATEGORY_TO_SKILL[category])
-                return Constants.MAP_CATEGORY_TO_SKILL[category];
+                return Constants.MAP_CATEGORY_TO_SKILL[category] as string;
 
             const type = weaponJson.type._TEXT.toLowerCase();
             return type === 'range' ? 'exotic_ranged_weapon' : 'exotic_melee_weapon';

@@ -291,7 +291,7 @@ export class SituationModifier {
         // A placed token must apply it's scene modifiers first.
         const modifiers = DocumentSituationModifiers.getDocumentModifiers(document);
         // Select the modifier category only.
-        return modifiers.source[this.type];
+        return modifiers.source[this.type] as SourceModifierData | undefined;
     }
 
     /**

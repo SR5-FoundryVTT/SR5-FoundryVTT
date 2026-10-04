@@ -48,7 +48,7 @@ async function runWithPatches(
 
     cls.prototype.execute = async function () {
         executeCount += 1;
-        return this as any;
+        return this as never;
     };
 
     Helpers.getSelectedActorsOrCharacter = () => selectedActors;

@@ -91,7 +91,7 @@ export class SR5ChatMessage extends ChatMessage<'base'> {
     }
 
     get _testData(): any {
-        return this.getFlag(SYSTEM_NAME, FLAGS.Test);
+        return this.getFlag(SYSTEM_NAME, FLAGS.Test) as unknown;
     }
 
     /**

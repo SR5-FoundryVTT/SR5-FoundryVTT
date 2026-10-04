@@ -1548,10 +1548,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // Attributes for hosts work only within their own attributes.
         if (this.isType('host')) {
             const rollData = this.getRollData();
-            return rollData.attributes?.[name];
+            return rollData.attributes?.[name] as AttributeFieldType | undefined;
         }
 
-        return rollData.attributes?.[name];
+        return rollData.attributes?.[name] as AttributeFieldType | undefined;
     }
 
     /**
