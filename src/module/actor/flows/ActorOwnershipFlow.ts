@@ -33,10 +33,11 @@ export const ActorOwnershipFlow = {
 
     _isOwnerOfActor(actor: SR5Actor, device: SR5Actor) {
         if (device === actor) return true;
-        // if it's a vehicle, check if we are the driver of it (this isn't perfect but will do for now)
         const vehicle = device.asType('vehicle');
         if (vehicle) {
-            return vehicle.getVehicleDriver() === actor;
+            if (vehicle.getVehicleDriver() === actor) return true;
+            if (vehicle.master && vehicle.master.actorOwner === actor) return true;
+            return false;
         }
         const sprite = device.asType('sprite');
         if (sprite) {

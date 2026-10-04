@@ -158,6 +158,18 @@
     ],
     "packs": [
         {
+            "name": "sr5e-vehicle-actions",
+            "label": "SR5e Vehicle Actions",
+            "path": "packs/sr5e-vehicle-actions",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "TRUSTED": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "type": "Item",
+            "system": "shadowrun5e"
+        },
+        {
             "name": "sr5e-matrix-actions",
             "label": "SR5e Matrix Actions",
             "path": "packs/sr5e-matrix-actions",
@@ -254,7 +266,8 @@
                 "sr5e-matrix-actions",
                 "sr5e-skills",
                 "sr5e-skill-groups",
-                "sr5e-skill-sets"
+                "sr5e-skill-sets",
+                "sr5e-vehicle-actions"
             ]
         }
     ],

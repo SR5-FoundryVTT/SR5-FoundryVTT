@@ -189,7 +189,24 @@ declare module "fvtt-types/configuration" {
         Actor: {
             shadowrun5e: {
                 overwatchScore?: number;
+                jumpedInVehicleUuid?: string;
+                jumpedInVehicle?: string;
+                jumpedInEffectId?: string;
+                previousInitiativeMode?: string;
+                hasRiggerInterface?: boolean;
+                isTourDocument?: boolean;
             }
+        };
+        ActiveEffect: {
+            shadowrun5e: {
+                isJumpedInEffect?: boolean;
+                driverUuid?: string;
+                riggerInterfaceItemId?: string | null;
+                isSensorLock?: boolean;
+                isControlRigHandlingBonus?: boolean;
+                attackerUuid?: string | null;
+                netHits?: number;
+            };
         };
         ChatMessage: {
             shadowrun5e: {
@@ -214,6 +231,10 @@ declare module "fvtt-types/configuration" {
                 lastComplexFormLevel?: ComplexFormLevelType;
                 lastFireRange?: FireRangeType;
                 embeddedItems: Item.Source[];
+                jumpedInEffectId?: string;
+                isRiggerInterface?: boolean;
+                rccUuid?: string;
+                isTourDocument?: boolean;
             };
         };
         Macro: {
@@ -225,7 +246,12 @@ declare module "fvtt-types/configuration" {
             shadowrun5e: {
                 TokenMovementPhaseMarkers?: MovementPhaseMarker[];
             };
-        }
+        };
+        TokenDocument: {
+            shadowrun5e: {
+                TokenUseRoutingLib?: boolean;
+            };
+        };
         User: {
             shadowrun5e: {
                 showApplication?: boolean;
@@ -296,6 +322,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.CompendiaSettingsMenu": typeof SR5CompendiaSettings;
         "shadowrun5e.GeneralActionsPack": string;
         "shadowrun5e.MatrixActionsPack": string;
+        "shadowrun5e.VehicleActionsPack": string;
         "shadowrun5e.ICActionsPack": string;
         "shadowrun5e.SkillsPack": string;
         "shadowrun5e.SkillGroupsPack": string;
@@ -307,6 +334,9 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.ExtendedTestDueMessage": boolean;
         "shadowrun5e.WorldTimeInitialized": boolean;
         "shadowrun5e.TokenMovementHistoryReset": 'firstActionPhase' | 'turnStart';
+        "shadowrun5e.autosoftTargetMode": string;
+        "shadowrun5e.requireRiggerInterface": boolean;
+        "shadowrun5e.matrixAttributeDisplayMode": string;
     }
 }
 

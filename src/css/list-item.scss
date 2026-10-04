@@ -190,7 +190,8 @@
             align-items: center;
             gap: 0.1rem;
 
-            &.select-col {
+            &.select-col,
+            &.rigger-interface-col {
                 justify-content: start;
                 flex: 2;
             }

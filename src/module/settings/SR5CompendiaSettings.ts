@@ -14,6 +14,7 @@ export default class SR5CompendiaSettings extends AbstractCompendiaSettings {
             { separator: true as const, label: 'SR5.CompendiaSettings.ActionsPacksSection' as const },
             CompendiaSettingFlow.getPackSettingConfiguration(FLAGS.GeneralActionsPack),
             CompendiaSettingFlow.getPackSettingConfiguration(FLAGS.MatrixActionsPack),
+            CompendiaSettingFlow.getPackSettingConfiguration(FLAGS.VehicleActionsPack),
             CompendiaSettingFlow.getPackSettingConfiguration(FLAGS.ICActionsPack),
             { separator: true as const, label: 'SR5.CompendiaSettings.SkillsPacksSection' as const },
             CompendiaSettingFlow.getPackSettingConfiguration(FLAGS.SkillsPack),

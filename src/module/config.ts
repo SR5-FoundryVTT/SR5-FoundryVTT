@@ -860,6 +860,7 @@ export const SR5 = {
         soak: 'SR5.ModifierTypes.Soak',
         wounds: 'SR5.ModifierTypes.Wounds',
         recoil: 'SR5.ModifierTypes.Recoil',
+        damage: 'SR5.ModifierTypes.Damage',
     },
 
     /**
@@ -928,6 +929,7 @@ export const SR5 = {
         // packNames keys should match the name of the FLAG
         'GeneralActionsPack': 'sr5e-general-actions',
         'MatrixActionsPack': 'sr5e-matrix-actions',
+        'VehicleActionsPack': 'sr5e-vehicle-actions',
         'ICActionsPack': 'sr5e-ic-actions',
         'SkillsPack': 'sr5e-skills',
         'SkillGroupsPack': 'sr5e-skill-groups',
@@ -938,6 +940,23 @@ export const SR5 = {
         common_program: 'SR5.CommonProgram',
         hacking_program: 'SR5.HackingProgram',
         agent: 'SR5.Agent',
+        autosoft: 'SR5.Autosoft',
+    },
+
+    autosoftTypes: {
+        clearsight: 'SR5.AutosoftTypes.Clearsight',
+        evasion: 'SR5.AutosoftTypes.Evasion',
+        maneuvering: 'SR5.AutosoftTypes.Maneuvering',
+        stealth: 'SR5.AutosoftTypes.Stealth',
+        targeting: 'SR5.AutosoftTypes.Targeting',
+        electronic_warfare: 'SR5.AutosoftTypes.ElectronicWarfare',
+    },
+
+    controlModes: {
+        autopilot: 'SR5.ControlModes.Autopilot',
+        remote: 'SR5.ControlModes.Remote',
+        rigger: 'SR5.ControlModes.Rigger',
+        manual: 'SR5.ControlModes.Manual',
     },
 
     icTypes: {
@@ -1167,6 +1186,32 @@ export const SR5 = {
         environments: {
             speed: 'SR5.Vehicle.Environments.Speed',
             handling: 'SR5.Vehicle.Environments.Handling',
+        },
+        subCategories: {
+            bike: 'SR5.Vehicle.SubCategories.Bike',
+            motorcycle: 'SR5.Vehicle.SubCategories.Motorcycle',
+            car: 'SR5.Vehicle.SubCategories.Car',
+            truck: 'SR5.Vehicle.SubCategories.Truck',
+            boat: 'SR5.Vehicle.SubCategories.Boat',
+            submarine: 'SR5.Vehicle.SubCategories.Submarine',
+            aircraft: 'SR5.Vehicle.SubCategories.Aircraft',
+            rotorcraft: 'SR5.Vehicle.SubCategories.Rotorcraft',
+            vtol: 'SR5.Vehicle.SubCategories.Vtol',
+            hovercraft: 'SR5.Vehicle.SubCategories.Hovercraft',
+            ltav: 'SR5.Vehicle.SubCategories.Ltav',
+            glider: 'SR5.Vehicle.SubCategories.Glider',
+            walker: 'SR5.Vehicle.SubCategories.Walker',
+            heavy_equipment: 'SR5.Vehicle.SubCategories.HeavyEquipment',
+            military: 'SR5.Vehicle.SubCategories.Military',
+            commercial: 'SR5.Vehicle.SubCategories.Commercial',
+            micro_drone: 'SR5.Vehicle.SubCategories.MicroDrone',
+            mini_drone: 'SR5.Vehicle.SubCategories.MiniDrone',
+            small_drone: 'SR5.Vehicle.SubCategories.SmallDrone',
+            medium_drone: 'SR5.Vehicle.SubCategories.MediumDrone',
+            large_drone: 'SR5.Vehicle.SubCategories.LargeDrone',
+            huge_drone: 'SR5.Vehicle.SubCategories.HugeDrone',
+            anthro_drone: 'SR5.Vehicle.SubCategories.AnthroDrone',
+            missile_drone: 'SR5.Vehicle.SubCategories.MissileDrone',
         },
     },
 

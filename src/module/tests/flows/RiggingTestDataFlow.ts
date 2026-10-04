@@ -67,15 +67,13 @@ export const RiggingTestDataFlow = {
     },
 
     /**
-     * Replace the attributes used in an action to use the Mental attribute equivalent
-     * - this test verifies the actor in the roll is a vehicle being controlled remote or rigger
-     * @param action
-     * @param document
+     * Replace physical attributes with mental attributes for rigger/remote driver
      */
     replacePhysicalAttributesForMentalDriver: (action: ActionRollType, document?: SR5Actor|SR5Item) => {
         if (!document) return;
         const actor = document instanceof SR5Actor ? document : document.actorOwner;
         if (!actor?.isControlledByDriver('rigger', 'remote')) return;
         AttributeRules.replacePhysicalAttributesWithMentalAttributes(action);
-    },
+    }
 }
+

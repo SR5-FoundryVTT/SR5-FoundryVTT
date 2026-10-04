@@ -43,6 +43,7 @@ import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { MatrixICFlow } from './flows/MatrixICFlow';
 import { ActorArmorFlow } from './flows/ActorArmorFlow';
 import { RollDataOptions } from '../item/Types';
+import { RiggerFlow } from '../flows/RiggerFlow';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
 import { PackItemFlow } from '../item/flows/PackItemFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
@@ -308,7 +309,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         else if (this.isType('sprite'))
             SpritePrep.prepareDerivedData(this.system, items);
         else if (this.isType('vehicle'))
-            VehiclePrep.prepareDerivedData(this.system, items);
+            VehiclePrep.prepareDerivedData(this.system, items, this);
         else if (this.isType('ic'))
             ICPrep.prepareDerivedData(this.system, items);
     }
@@ -983,6 +984,16 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
+     * Create an action test for an action defined within the systems vehicle action pack.
+     *
+     * @param actionName The action within the vehicle pack.
+     * @param options Success Test options
+     */
+    async vehicleActionTest(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
+        return this.packActionTest(SR5.packNames.VehicleActionsPack as Shadowrun.PackName, actionName, options);
+    }
+
+    /**
      * Roll an action as defined within the systems general action pack.
      *
      * @param actionName The action with in the general pack.
@@ -1001,6 +1012,16 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async rollMatrixAction(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
         return this.rollPackAction(SR5.packNames.MatrixActionsPack as Shadowrun.PackName, actionName, options);
+    }
+
+    /**
+     * Roll an action as defined within the systems vehicle action pack.
+     *
+     * @param actionName The action within the vehicle pack.
+     * @param options Success Test options
+     */
+    async rollVehicleAction(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
+        return this.rollPackAction(SR5.packNames.VehicleActionsPack as Shadowrun.PackName, actionName, options);
     }
 
     /**
@@ -1689,10 +1710,55 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     getVehicleDriver(): SR5Actor | undefined {
         if (!this.isType('vehicle') || !this.hasDriver()) return;
 
-        const driver = fromUuidSync(this.system.driver);
+        let driver: any = fromUuidSync(this.system.driver);
+        if (!driver && this.system.driver) {
+            driver = game.actors?.get(this.system.driver) || game.actors?.getName(this.system.driver);
+        }
         // If no driver id is set, we won't get an actor and should explicitly return undefined.
         if (!driver || !(driver instanceof SR5Actor)) return undefined;
         return driver;
+    }
+
+    /**
+     * Jump a rigger/character actor into a vehicle actor, or jump into a specified vehicle.
+     */
+    async jumpIn(targetVehicle?: SR5Actor) {
+        const vehicle = targetVehicle || (this.isType('vehicle') ? this : null);
+        const driver = this.isType('vehicle') ? (this.getVehicleDriver() || null) : this;
+        if (vehicle && driver) {
+            await RiggerFlow.jumpIn(driver, vehicle);
+        }
+    }
+
+    /**
+     * Jump out of a vehicle actor.
+     */
+    async jumpOut(targetVehicle?: SR5Actor) {
+        const vehicle = targetVehicle || (this.isType('vehicle') ? this : null);
+        const driver = this.isType('vehicle') ? (this.getVehicleDriver() || null) : this;
+        if (vehicle) {
+            await RiggerFlow.jumpOut(driver, vehicle);
+        }
+    }
+
+    /**
+     * Trigger forced ejection & dump shock for a jumped-in vehicle.
+     */
+    async ejectDriver(isDeviceDestroyed = false) {
+        if (this.isType('vehicle')) {
+            await RiggerFlow.ejectDriver(this, isDeviceDestroyed);
+        }
+    }
+
+    /**
+     * Toggle jump-in / jump-out state between driver and vehicle.
+     */
+    async toggleJumpIn(targetVehicle?: SR5Actor) {
+        const vehicle = targetVehicle || (this.isType('vehicle') ? this : null);
+        const driver = this.isType('vehicle') ? (this.getVehicleDriver() || null) : this;
+        if (vehicle) {
+            await RiggerFlow.toggleJumpIn(driver, vehicle);
+        }
     }
 
     /**
@@ -2171,7 +2237,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param args
      */
     override async _preDelete(...args: Parameters<Actor["_preDelete"]>) {
-        await StorageFlow.deleteStorageReferences(this);
+        try {
+            await StorageFlow.deleteStorageReferences(this);
+        } catch (err) {
+            console.warn('SR5 | Failed to delete storage references for actor', err);
+        }
         return super._preDelete(...args);
     }
 

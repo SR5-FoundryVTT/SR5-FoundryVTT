@@ -471,22 +471,42 @@ body.theme-light,
             flex-shrink: 0;
             vertical-align: bottom;
 
-            /* Make the inner list-item distribute its children across the footer
-               so the footer content fills the full width and the armor badge
-               stays pinned to the far right. */
             .list-item {
                 width: 100%;
                 display: flex;
                 flex-flow: row nowrap;
                 align-items: center;
-                gap: .5rem;
-                /* Allow children to grow to fill space so items span the full width */
-            }
+                gap: .4rem;
 
-            /* By default each immediate child should flex to take available space */
-            .list-item > * {
-                flex: 1 1 auto;
-                min-width: 0; /* prevent overflow from long labels */
+                > * {
+                    flex: 0 0 auto;
+                    min-width: 0;
+                }
+
+                .basic-row {
+                    flex: 0 0 auto;
+
+                    select {
+                        max-width: 8.5rem;
+                        text-overflow: ellipsis;
+                    }
+                }
+
+                .basic-row.sheet-footer-drone,
+                .sheet-footer-movement,
+                .sheet-footer-armor {
+                    margin-left: auto;
+                }
+
+                .basic-row.sheet-footer-drone ~ *,
+                .sheet-footer-movement ~ * {
+                    margin-left: 0;
+                }
+
+                .sheet-footer-armor {
+                    flex: 0 0 auto;
+                    white-space: nowrap;
+                }
             }
         }
 

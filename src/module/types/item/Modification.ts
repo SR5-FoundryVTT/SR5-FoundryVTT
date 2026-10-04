@@ -18,6 +18,16 @@ const ModificationData = () => ({
         required: true,
         choices: SR5.modificationCategories,
     }),
+    subCategory: new StringField({
+        blank: true,
+        required: false,
+        initial: '',
+    }),
+    isRiggerInterface: new BooleanField({
+        required: false,
+        nullable: false,
+        initial: false,
+    }),
     mod_weapon: new SchemaField({
         mount_point: new StringField({
             blank: true,

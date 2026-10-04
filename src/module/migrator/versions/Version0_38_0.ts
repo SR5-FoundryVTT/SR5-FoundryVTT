@@ -1,16 +1,115 @@
+import { SR5 } from '@/module/config';
+import { parseVehicleSubCategory } from '@/module/apps/actorImport/itemImporter/vehicleImport/VehicleParser';
 import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { VersionMigration } from '../VersionMigration';
 
 const { randomID } = foundry.utils;
 
+/**
+ * Helper to check how IconAssign evaluates a vehicle category to an icon path override.
+ */
+function evaluateVehicleIconCategory(category: string): string {
+    if (!category || typeof category !== 'string') return '';
+    const slug = category
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    return (SR5.itemCategoryIconOverrides?.vehicle as Record<string, string> | undefined)?.[slug] ?? '';
+}
+
 /** Migrate data changes from every branch that ships in 0.38.0. */
 export class Version0_38_0 extends VersionMigration {
     readonly TargetVersion = '0.38.0';
 
+    override migrateActor(actor: any): void {
+        if (actor.type !== 'vehicle') return;
+
+        const system = actor.system;
+        if (!system) return;
+
+        // Populate subCategory if empty or if generic/default value needs refinement
+        const isGenericSubCategory = !system.subCategory || (system.subCategory === 'medium_drone' && !system.isDrone);
+        if (isGenericSubCategory) {
+            const importFlags = system.importFlags ?? actor.flags?.shadowrun5e?.importFlags;
+            const importCategory = typeof importFlags?.category === 'string' ? importFlags.category : '';
+            const evaluatedImportIcon = evaluateVehicleIconCategory(importCategory);
+
+            const fallbackDroneCategory = system.isDrone && typeof system.category === 'string'
+                ? `drones-${system.category.trim()}`
+                : '';
+            const evaluatedDroneIcon = evaluateVehicleIconCategory(fallbackDroneCategory);
+
+            const candidates = [
+                evaluatedImportIcon,
+                evaluatedDroneIcon,
+                importCategory,
+                actor.img,
+                actor.prototypeToken?.texture?.src,
+                importFlags?.name,
+                actor.name,
+                system.isDrone && system.category ? `${system.category}_drone` : '',
+                system.vehicleType,
+            ];
+
+            let bestSubCategory = '';
+            for (const candidate of candidates) {
+                if (typeof candidate === 'string' && candidate) {
+                    const parsed = parseVehicleSubCategory(candidate);
+                    if (parsed) {
+                        bestSubCategory = parsed;
+                        break;
+                    }
+                }
+            }
+
+            if (bestSubCategory) {
+                system.subCategory = bestSubCategory;
+            }
+        }
+    }
+
     // Each branch contributing to 0.38.0 keeps its whole flow in its own migrate<Branch> method, called here.
     override migrateItem(item: any): void {
         this.migrateItemSheetRework(item);
+
+        const system = item.system;
+        if (!system) return;
+
+        // Migrate biofeedback 'none' to '' in action damage or item damage
+        if (system.action?.damage?.biofeedback === 'none') {
+            system.action.damage.biofeedback = '';
+        }
+        if (system.damage?.biofeedback === 'none') {
+            system.damage.biofeedback = '';
+        }
+
+        // Migrate Rigger Interface modification items to system.isRiggerInterface = true
+        if (item.type === 'modification') {
+            const isCosmeticOrPowertrain = system.modification_category === 'cosmetic'
+                || system.category === 'cosmetic'
+                || system.modification_category === 'powertrain'
+                || system.category === 'powertrain'
+                || system.importFlags?.category?.toLowerCase() === 'cosmetic';
+            const name = (item.name || '').toLowerCase();
+            const sourceId = (item.flags?.core?.sourceId || item._stats?.compendiumSource || '').toLowerCase();
+            const isRiggerInterface = (isCosmeticOrPowertrain || !system.modification_category) && (
+                name.includes('rigger interface')
+                || name.includes('riggeranpassung')
+                || name.includes('interface rigger')
+                || name.includes('리거 인터페이스')
+                || sourceId.includes('rigger-interface')
+                || sourceId.includes('rigger_interface')
+            );
+            if (isRiggerInterface) {
+                system.isRiggerInterface = true;
+                if (!system.modification_category) {
+                    system.modification_category = 'cosmetic';
+                }
+            }
+        }
     }
 
     /**
