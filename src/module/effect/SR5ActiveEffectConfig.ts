@@ -556,10 +556,10 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     }
 
     prepareChangePriorityPlaceholders() {
-        return Object.entries(SR5ActiveEffect.CHANGE_TYPES).reduce((placeholders, [type, data]) => {
+        return Object.entries(SR5ActiveEffect.CHANGE_TYPES).reduce<Record<string, string>>((placeholders, [type, data]) => {
             placeholders[type] = String(data?.defaultPriority ?? '');
             return placeholders;
-        }, {} as Record<string, string>);
+        }, {});
     }
 
     prepareSelectionModeOptions() {
