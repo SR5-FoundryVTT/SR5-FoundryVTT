@@ -48,7 +48,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.lengthOf(vehicles, 1, 'Vehicle not created');
         });
 
-        it('Should have the correct attributes and limits', async () => {
+        it('Should have the correct attributes and limits', () => {
             if (!actor) throw new Error('No actor created');
 
             assert.strictEqual(actor.name, character.name, 'Name');
@@ -68,7 +68,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             }
         });
 
-        it('Should have the correct skills', async () => {
+        it('Should have the correct skills', () => {
             if (!actor) throw new Error('No actor created');
 
             const skills = IH.getArray(character.skills.skill);
@@ -186,7 +186,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.items.size, itemCount, 'Item count');
         });
 
-        it('Should have the correct weapon', async () => {
+        it('Should have the correct weapon', () => {
             if (!actor) throw new Error('No actor created');
             const weapon = actor.items.find(i => i.name === 'Ruger Super Warhawk') as SR5Item<'weapon'>;
             if (!weapon) throw new Error('Weapon not found');
@@ -219,7 +219,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(IH.getArray(weapon.flags.shadowrun5e?.embeddedItems).length, 1);
         });
 
-        it('Should import strength-based weapon damage from raw Chummer damage', async () => {
+        it('Should import strength-based weapon damage from raw Chummer damage', () => {
             if (!actor) throw new Error('No actor created');
             const weapon = actor.items.find(i => i.name === 'Unarmed Attack') as SR5Item<'weapon'>;
             if (!weapon) throw new Error('Weapon not found');
@@ -229,7 +229,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.action.damage.type.base, 'stun');
         });
 
-        it('Should have the correct vehicles', async () => {
+        it('Should have the correct vehicles', () => {
             const vehicle = vehicles[0];
             if (!vehicle) throw new Error('No vehicle created');
 

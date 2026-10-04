@@ -429,7 +429,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.effects = prepareSortedEffects(this.actor.effects.contents);
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
 
-        data.inventories = await this._prepareItemsInventory();
+        data.inventories = this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
         data.hasInventory = this._prepareHasInventory(data.inventories);
@@ -1305,7 +1305,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * Each item can  be in one custom inventory or the default inventory.
      */
-    async _prepareItemsInventory() {
+    _prepareItemsInventory() {
         // All custom and default actor inventories.
         const inventoriesSheet: InventoriesSheetData = {};
         // Simple item to inventory mapping.
@@ -1615,7 +1615,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /** Setup untrained skill filter within getData */
-    static async #filterUntrainedSkills(this: SR5BaseActorSheet, event: PointerEvent) {
+    static #filterUntrainedSkills(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
         if (!isElementInstance(event.target, HTMLElement)) return;
         this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
@@ -1625,7 +1625,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         this.#filterActiveSkillsElements();
     }
 
-    static async #handleFilterActiveSkills(
+    static #handleFilterActiveSkills(
         this: SR5BaseActorSheet, event: KeyboardEvent | null, query: string, rgx: RegExp, content: HTMLElement | null
     ) {
         this._filters.skills = query;

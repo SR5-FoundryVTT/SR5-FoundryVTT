@@ -40,15 +40,15 @@ async function runWithPatches(
     let executeCount = 0;
     let getOpposedCount = 0;
 
-    clsAny._getOpposedActionTestData = async (_againstData, document) => {
+    clsAny._getOpposedActionTestData = (_againstData, document) => {
         capturedDocument = document;
         getOpposedCount += 1;
-        return createOpposedTestData(cls.name, againstType);
+        return Promise.resolve(createOpposedTestData(cls.name, againstType));
     };
 
-    cls.prototype.execute = async function () {
+    cls.prototype.execute = function () {
         executeCount += 1;
-        return this as never;
+        return Promise.resolve(this as never);
     };
 
     Helpers.getSelectedActorsOrCharacter = () => selectedActors;

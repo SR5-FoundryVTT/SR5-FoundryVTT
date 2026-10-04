@@ -92,7 +92,7 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(fallbackSpirit!.system.attributes.essence.value, 3);
         });
 
-        it('Should have the correct attributes and limits', async () => {
+        it('Should have the correct attributes and limits', () => {
             if (!spirit) throw new Error('No spirit created');
 
             assert.strictEqual(spirit.name, character.name, 'Name');

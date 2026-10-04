@@ -233,7 +233,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         } else if (partId === 'networkIcons') {
             this._prepareMatrixTargets(partContext);
         } else if (partId === 'markedIcons') {
-            await this._prepareMarkedDocuments(partContext);
+            this._prepareMarkedDocuments(partContext);
         }
 
         if (partContext?.matrixLeftTabs) {
@@ -296,7 +296,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         }
     }
 
-    async _prepareMarkedDocuments(data: MatrixActorSheetData) {
+    _prepareMarkedDocuments(data: MatrixActorSheetData) {
         // When marked documents overview is shown, collect all marked documents.
         const markedDocuments = this.actor.getAllMarkedDocuments();
         data.markedDocuments = this._prepareMarkedDocumentTargets(markedDocuments);
@@ -337,7 +337,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * - switching out sheet display
      * - provide a display of additional matrix icons underneath uuid
      */
-    static async #toggleConnectedMatrixIcons(this: SR5MatrixActorSheet, event: PointerEvent) {
+    static #toggleConnectedMatrixIcons(this: SR5MatrixActorSheet, event: PointerEvent) {
         event.stopPropagation();
         if (!isElementInstance(event.target, HTMLElement)) return;
 
@@ -506,7 +506,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      *
      * @param event Any interaction event
      */
-    static async #selectMatrixTarget(this: SR5MatrixActorSheet, event: PointerEvent) {
+    static #selectMatrixTarget(this: SR5MatrixActorSheet, event: PointerEvent) {
         event.stopPropagation();
         if (!isElementInstance(event.target, HTMLElement)) return;
 

@@ -737,10 +737,10 @@ ___________________
         SuppressiveFireTemplateFlow.chatMessageListeners(html);
         ShotgunTemplateFlow.chatMessageListeners(html);
         await OpposedTest.chatMessageListeners(message, html, data);
-        await ActionFollowupFlow.chatMessageListeners(message, html, data);
-        await TeamworkTest.chatMessageListeners(message, html);
-        await JournalEnrichers.messageRequestHooks(html);
-        await MatrixNetworkFlow.chatMessageListeners(message, html, data);
+        ActionFollowupFlow.chatMessageListeners(message, html, data);
+        TeamworkTest.chatMessageListeners(message, html);
+        JournalEnrichers.messageRequestHooks(html);
+        MatrixNetworkFlow.chatMessageListeners(message, html, data);
         ExtendedTestDueFlow.chatMessageListeners(message, html);
     }
 

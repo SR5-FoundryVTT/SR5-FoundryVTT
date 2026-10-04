@@ -466,7 +466,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(test.netHits.value, 1);
         });
 
-        it('buy hits allows push the limit but blocks second chance', async () => {
+        it('buy hits allows push the limit but blocks second chance', () => {
             const test = TestCreator.fromPool({ pool: 8 }, { showMessage: false, showDialog: false });
             test.data.buyHits = true;
 

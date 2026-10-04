@@ -2350,7 +2350,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         await LinksHelpers.openSource(source);
     }
 
-    static async _chatToggleCardRolls(event: Event) {
+    static _chatToggleCardRolls(event: Event) {
         event.preventDefault();
         event.stopPropagation();
 

@@ -124,7 +124,7 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
         void this.close();
     }
 
-    static async #cancel(this: ReputationManager) {
+    static #cancel(this: ReputationManager) {
         void this.close();
     }
 

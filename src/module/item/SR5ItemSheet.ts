@@ -1348,7 +1348,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     /**
      * Handle interaction with a damage track title.
      */
-    static async #rollConditionMonitor(this: SR5ItemSheet, event: Event) {
+    static #rollConditionMonitor(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
     }
 }
