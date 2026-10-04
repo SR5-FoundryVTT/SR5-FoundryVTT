@@ -222,12 +222,12 @@ export class RiggingRules {
                 const tm = item.system.targetModel.trim().toLowerCase();
                 const candidateModels = [
                     options?.model,
-                    (drone.system as any)?.model,
+                    drone.system.model,
                     drone.prototypeToken?.name,
                     drone.name
                 ].filter((m): m is string => Boolean(m)).map(m => m.trim().toLowerCase());
 
-                const modelMatches = candidateModels.some(cm => cm === tm || cm.includes(tm) || tm.includes(cm));
+                const modelMatches = candidateModels.some(cm => cm === tm || cm.includes(tm) || tm.includes(cm) || item.system.targetModel === drone.uuid);
                 if (!modelMatches) {
                     return false;
                 }

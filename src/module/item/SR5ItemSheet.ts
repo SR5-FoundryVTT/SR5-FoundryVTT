@@ -463,22 +463,33 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
             if (owner) {
                 if (owner.isType('vehicle')) {
-                    if (owner.name) models.push({ value: owner.name, label: owner.name });
-                    if ((owner.system as any)?.model && (owner.system as any).model !== owner.name) {
-                        models.push({ value: (owner.system as any).model, label: (owner.system as any).model });
+                    const modelVal = owner.system.model || owner.name;
+                    if (modelVal) {
+                        const modelLabel = owner.system.model
+                            ? (owner.name && owner.name !== owner.system.model ? `${owner.name} (${owner.system.model})` : owner.system.model)
+                            : (owner.name || modelVal);
+                        models.push({ value: modelVal, label: modelLabel });
                     }
                     for (const w of (owner.itemsForType.get('weapon') || [])) {
-                        weapons.push({ value: w.name, label: w.name });
+                        if (w.uuid) {
+                            weapons.push({ value: w.uuid, label: w.name || w.uuid });
+                        }
                     }
                 } else {
-                    const vehicles = (game.actors as unknown as SR5Actor[]).filter(a => a.isType('vehicle') && (a.isOwner || (a.system as any)?.master === owner.uuid) && !a.compendium);
+                    const vehicles = (game.actors as unknown as SR5Actor[]).filter(
+                        (a): a is SR5Actor<'vehicle'> => a.isType('vehicle') && !a.compendium && (a.isOwner || a.system.master === owner.uuid)
+                    );
                     for (const v of vehicles) {
-                        if (v.name && !models.some(m => m.value === v.name)) {
-                            models.push({ value: v.name, label: v.name });
+                        const modelVal = v.system.model || v.name;
+                        if (modelVal && !models.some(m => m.value === modelVal)) {
+                            const modelLabel = v.system.model
+                                ? (v.name && v.name !== v.system.model ? `${v.name} (${v.system.model})` : v.system.model)
+                                : (v.name || modelVal);
+                            models.push({ value: modelVal, label: modelLabel });
                         }
                         for (const w of (v.itemsForType.get('weapon') || [])) {
-                            if (!weapons.some(wp => wp.value === w.name)) {
-                                weapons.push({ value: w.name, label: `${w.name} (${v.name})` });
+                            if (w.uuid && !weapons.some(wp => wp.value === w.uuid)) {
+                                weapons.push({ value: w.uuid, label: `${w.name} (${v.name})` });
                             }
                         }
                     }
