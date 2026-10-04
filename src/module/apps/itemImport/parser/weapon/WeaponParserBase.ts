@@ -56,7 +56,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
             if (Constants.MAP_CATEGORY_TO_SKILL[jsonSkill])
                 return Constants.MAP_CATEGORY_TO_SKILL[jsonSkill];
 
-            return jsonSkill.replace(/[\s\-]/g, '_').toLowerCase();
+            return jsonSkill.replace(/[\s-]/g, '_').toLowerCase();
         } else {
             const category = weaponJson.category._TEXT;
             if (Constants.MAP_CATEGORY_TO_SKILL[category])
