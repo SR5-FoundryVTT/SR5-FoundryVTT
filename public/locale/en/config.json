@@ -915,6 +915,10 @@
                 "hint": "This compendium will be used for all matrix actions.",
                 "label": "Matrix Actions"
             },
+            "VehicleActionsPack": {
+                "hint": "This compendium will be used for all vehicle actions.",
+                "label": "Vehicle Actions"
+            },
             "SkillsPacksSection": "Skills Compendiums",
             "ActionsPacksSection": "Actions Compendiums",
             "SkillsPack": {
@@ -1919,6 +1923,7 @@
             "Sin": "SIN",
             "Spell": "Spell",
             "SpritePower": "Sprite Power",
+            "Vehicle": "Vehicle",
             "Weapon": "Weapon"
         },
         "Karma": "Karma",
@@ -2290,6 +2295,7 @@
             "BackgroundCount": "Background Count",
             "Composure": "Composure",
             "ControlRigRating": "Control Rig Rating",
+            "Damage": "Damage",
             "Defense": "Defense",
             "DefenseBlock": "Defense (Block)",
             "DefenseDodge": "Defense (Dodge)",
@@ -3415,6 +3421,7 @@
                 "SoftWarningBadgesContent": "If total active shared autosoft ratings exceed RCC Sharing capacity, soft warning badges notify you on the Matrix tab to adjust your allocation."
             }
         },
+        "ToggleExpand": "Toggle Expand",
         "UnderBarrel": "Under Barrel",
         "UseEdgeForInitiativeRoll": "Use edge rule blitz for initiative",
         "Value": "Value",

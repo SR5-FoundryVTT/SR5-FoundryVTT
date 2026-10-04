@@ -9,7 +9,7 @@
     "description": {
       "value": "",
       "chat": "",
-      "source": "R5 183"
+      "source": "R5 177"
     },
     "action": {
       "type": "complex",
@@ -66,19 +66,18 @@
         "mod": []
       },
       "opposed": {
-        "type": "",
-        "test": "",
+        "type": "opposed",
+        "test": "PilotVehicleTest",
         "attribute": "",
         "attribute2": "",
         "skill": "",
         "armor": false,
         "mod": 0,
-        "description": "",
+        "description": "Opposed Sneaking vs Perception",
         "resist": {
-          "test": "",
-          "skill": "",
-          "attribute": "",
-          "attribute2": "",
+          "test": "SuccessTest",
+          "attribute": "intuition",
+          "skill": "perception",
           "armor": false,
           "mod": 0
         }

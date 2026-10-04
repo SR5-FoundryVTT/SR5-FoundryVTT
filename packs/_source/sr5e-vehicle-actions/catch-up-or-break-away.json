@@ -9,7 +9,7 @@
     "description": {
       "value": "",
       "chat": "",
-      "source": "R5 180"
+      "source": "R5 174"
     },
     "action": {
       "type": "complex",
@@ -28,7 +28,7 @@
       "limit": {
         "value": 0,
         "base": 0,
-        "attribute": "handling",
+        "attribute": "speed",
         "mod": []
       },
       "threshold": {
@@ -66,19 +66,16 @@
         "mod": []
       },
       "opposed": {
-        "type": "",
-        "test": "",
+        "type": "opposed",
+        "test": "PilotVehicleTest",
         "attribute": "",
         "attribute2": "",
         "skill": "",
         "armor": false,
         "mod": 0,
-        "description": "",
+        "description": "Opposed Vehicle Test (Reaction + Pilot [Speed])",
         "resist": {
-          "test": "",
-          "skill": "",
-          "attribute": "",
-          "attribute2": "",
+          "test": "PilotVehicleTest",
           "armor": false,
           "mod": 0
         }

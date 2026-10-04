@@ -9,7 +9,7 @@
     "description": {
       "value": "",
       "chat": "",
-      "source": "SR5 203 / R5 182"
+      "source": "R5 177"
     },
     "action": {
       "type": "complex",
@@ -66,20 +66,18 @@
         "mod": []
       },
       "opposed": {
-        "type": "",
-        "test": "",
-        "attribute": "",
-        "attribute2": "",
+        "type": "opposed",
+        "test": "PhysicalDefenseTest",
+        "attribute": "reaction",
+        "attribute2": "intuition",
         "skill": "",
         "armor": false,
         "mod": 0,
-        "description": "",
+        "description": "Defense vs Ramming (Reaction + Intuition [Handling])",
         "resist": {
-          "test": "",
-          "skill": "",
-          "attribute": "",
-          "attribute2": "",
-          "armor": false,
+          "test": "PhysicalResistTest",
+          "attribute": "body",
+          "armor": true,
           "mod": 0
         }
       },

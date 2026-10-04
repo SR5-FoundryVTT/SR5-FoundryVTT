@@ -9,10 +9,10 @@
     "description": {
       "value": "",
       "chat": "",
-      "source": "R5 186"
+      "source": "R5 176"
     },
     "action": {
-      "type": "simple",
+      "type": "complex",
       "test": "SuccessTest",
       "categories": [
         "rigging"
@@ -32,8 +32,8 @@
         "mod": []
       },
       "threshold": {
-        "value": 0,
-        "base": 0
+        "base": 2,
+        "value": 2
       },
       "extended": {
         "value": 0,

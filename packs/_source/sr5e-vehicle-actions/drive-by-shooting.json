@@ -9,10 +9,10 @@
     "description": {
       "value": "",
       "chat": "",
-      "source": "R5 183"
+      "source": "R5 176"
     },
     "action": {
-      "type": "complex",
+      "type": "simple",
       "test": "SuccessTest",
       "categories": [
         "rigging"

@@ -9,10 +9,10 @@
     "description": {
       "value": "",
       "chat": "",
-      "source": "R5 183"
+      "source": "R5 177"
     },
     "action": {
-      "type": "simple",
+      "type": "free",
       "test": "PilotVehicleTest",
       "categories": [
         "rigging"

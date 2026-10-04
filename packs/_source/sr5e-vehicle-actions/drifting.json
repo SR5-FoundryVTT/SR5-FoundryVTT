@@ -9,7 +9,7 @@
     "description": {
       "value": "",
       "chat": "",
-      "source": "R5 183"
+      "source": "R5 175"
     },
     "action": {
       "type": "complex",
@@ -32,8 +32,8 @@
         "mod": []
       },
       "threshold": {
-        "value": 0,
-        "base": 0
+        "base": 2,
+        "value": 2
       },
       "extended": {
         "value": 0,
