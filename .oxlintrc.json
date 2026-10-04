@@ -9,7 +9,9 @@
         "typescript/no-deprecated": "warn",
         "typescript/await-thenable": "warn",
         "typescript/no-floating-promises": "warn",
-        "typescript/no-misused-promises": "warn",
+        // Async handlers passed to jQuery `.on(...)`, `Hooks.on(...)` and Foundry option callbacks are the
+        // standard pattern here; the caller ignores the returned promise either way. Only the void-return check is disabled.
+        "typescript/no-misused-promises": ["warn", { "checksVoidReturn": false }],
         "typescript/prefer-promise-reject-errors": "warn",
         "typescript/promise-function-async": "warn",
         "typescript/require-await": "warn",
