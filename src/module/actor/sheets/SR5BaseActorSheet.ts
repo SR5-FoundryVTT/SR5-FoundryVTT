@@ -851,6 +851,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Guard against non-HTMLElement drag sources and keep actor item/effect drag payload creation stable.
      * NOTE: The current drag&drop implementation is borked and needs cleanup across: SR5ApplicationMixin as base for actor and item sheets.
      */
+    // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
     protected override async _onDragStart(event: DragEvent) {
         const target = event.currentTarget as HTMLElement | null;
         const targetElement = event.target as HTMLElement | null;

@@ -849,6 +849,7 @@ export class Helpers {
                     }
                 },
                 default: 'confirm',
+                // oxlint-disable-next-line typescript/require-await -- Dialog callback contract expects a Promise.
                 onAfterClose: async html => {
                     const selected = html.find('select[name="actor"]').val();
                     return { actorId: selected };

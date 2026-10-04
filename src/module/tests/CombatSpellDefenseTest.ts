@@ -131,6 +131,7 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
     /**
      * Increase the actors multi defense modifier for indirect combat spells.
      */
+    // oxlint-disable-next-line typescript/require-await -- Awaited by the test flow and overridden by sibling tests.
     async applyActorEffectsForDefense() {
         if (!this.actor) return;
 

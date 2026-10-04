@@ -174,6 +174,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     /**
      * Prepare start details from the working clone so staged restarts are reflected before submit.
      */
+    // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
     protected override async _prepareStartContext(): Promise<ActiveEffectConfig.StartContext | null> {
         const start = this.clone.toObject().start;
         if (!start) return null;

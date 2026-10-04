@@ -393,11 +393,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param actor The actor for this opposing test.
      * @param previousMessageId The id this message action is sourced from.
      */
+    // oxlint-disable-next-line typescript/require-await -- Async hook that subclasses override with awaiting implementations.
     static async _getOpposedActionTestData(testData: DeepPartial<SuccessTestData>, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
         return undefined;
     }
 
+    // oxlint-disable-next-line typescript/require-await -- Async hook that subclasses override with awaiting implementations.
     static async _getResistActionTestData(testData: DeepPartial<SuccessTestData>, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support resist message actions`);
         return undefined;
@@ -567,6 +569,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Override this method if there needs to be some cleanup after a user has canceled a dialog 
      * but before the tests actual execution.
      */
+    // oxlint-disable-next-line typescript/require-await -- Async hook that subclasses override with awaiting implementations.
     async _cleanUpAfterDialogCancel() {
         this.dialog = null;
     }
@@ -737,6 +740,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Prepare missing data based on tests Documents before anything else is done.
      */
+    // oxlint-disable-next-line typescript/require-await -- Async hook that subclasses override with awaiting implementations.
     async prepareDocumentData() {
         // Calculate damage here to have access to actor AND item used.
         this.data.damage = ActionFlow.calcDamageData(this.data.damage, this.actor, this.item);

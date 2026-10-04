@@ -1273,6 +1273,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      *                                           value to indicate failure or no action being taken
      * @protected
      */
+    // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
     async _onDropFolder(event, folder) {
         return null;
     }
@@ -1283,6 +1284,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @returns {Promise<void>}
      * @protected
      */
+    // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
     override async _onDragStart(event: DragEvent) {
         const target = event.currentTarget as HTMLElement;
         const targetElement = event.target as HTMLElement;

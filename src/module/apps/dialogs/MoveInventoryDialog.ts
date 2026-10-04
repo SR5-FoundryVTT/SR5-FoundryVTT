@@ -47,6 +47,7 @@ export class MoveInventoryDialog extends PromptDialog {
             default: 'cancel',
             templateData: { inventories },
             templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/move-inventory-dialog.hbs',
+            // oxlint-disable-next-line typescript/require-await -- Dialog callback contract expects a Promise.
             onAfterClose: async html => {
                 return html.find('input[name="inventories"]:checked').val();
             }

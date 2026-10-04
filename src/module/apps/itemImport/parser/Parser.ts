@@ -20,6 +20,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
 
     protected getBonus(jsonData: ParseData) { return 'bonus' in jsonData ? jsonData.bonus : undefined; }
     protected abstract getFolder(jsonData: ParseData, compendiumKey: CompendiumKey): Promise<Folder>;
+    // oxlint-disable-next-line typescript/require-await -- Default for an async hook that subclasses override with awaiting implementations.
     protected async getItems(jsonData: ParseData): Promise<Item.Source[]> { return []; }
     protected getSystem(jsonData: ParseData) { return this.getBaseSystem(); }
 
