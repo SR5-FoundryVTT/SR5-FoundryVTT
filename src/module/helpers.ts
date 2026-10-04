@@ -768,7 +768,7 @@ export class Helpers {
      */
     static objectHasKeys(obj: object, keys: string[]): boolean {
         for (const key of keys) {
-            if (!obj.hasOwnProperty(key)) return false;
+            if (!Object.hasOwn(obj, key)) return false;
         }
 
         return true;
