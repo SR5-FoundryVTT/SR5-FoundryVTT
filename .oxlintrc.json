@@ -71,7 +71,7 @@
         "typescript/explicit-function-return-type": "off",
         "typescript/no-confusing-non-null-assertion": "off",
         "typescript/no-confusing-void-expression": "off",
-        "typescript/no-dynamic-delete": "warn",
+        "typescript/no-dynamic-delete": "off",
         "typescript/no-empty-function": "off",
         "typescript/no-extraneous-class": "off",
         "typescript/no-namespace": "off",
