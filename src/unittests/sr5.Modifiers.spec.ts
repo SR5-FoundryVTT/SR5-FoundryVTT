@@ -181,14 +181,14 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
             })
 
             it('use default modifiers for faulty constructor params', () => {
-                //@ts-expect-error Intentionally pass an incomplete source data object.
+                //@ts-expect-error TODO: fvtt-types v14 - Intentionally pass an incomplete source data object.
                 assert.deepEqual(new DocumentSituationModifiers({}).source, defaultSourceModifiers);
                 assert.deepEqual(new DocumentSituationModifiers(undefined).source, defaultSourceModifiers);
-                //@ts-expect-error Intentionally pass null.
+                //@ts-expect-error TODO: fvtt-types v14 - Intentionally pass null.
                 assert.deepEqual(new DocumentSituationModifiers(null).source, defaultSourceModifiers);
-                //@ts-expect-error Intentionally pass a number.
+                //@ts-expect-error TODO: fvtt-types v14 - Intentionally pass a number.
                 assert.deepEqual(new DocumentSituationModifiers(0).source, defaultSourceModifiers);
-                //@ts-expect-error Intentionally pass a number.
+                //@ts-expect-error TODO: fvtt-types v14 - Intentionally pass a number.
                 assert.deepEqual(new DocumentSituationModifiers(1).source, defaultSourceModifiers);
                 assert.deepEqual(new DocumentSituationModifiers().source, defaultSourceModifiers);
             })
