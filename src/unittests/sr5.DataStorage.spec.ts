@@ -107,9 +107,9 @@ export const shadowrunDataStorage = (context: QuenchBatchContext) => {
         };
 
         it('reports added, modified and removed top level keys', async () => {
-            assert.include(await changesFrom(() => DataStorage.set(key('value'), 1)), ROOT);
-            assert.include(await changesFrom(() => DataStorage.set(key('value'), 2)), ROOT);
-            assert.include(await changesFrom(() => DataStorage.unset(ROOT)), ROOT);
+            assert.include(await changesFrom(async () => DataStorage.set(key('value'), 1)), ROOT);
+            assert.include(await changesFrom(async () => DataStorage.set(key('value'), 2)), ROOT);
+            assert.include(await changesFrom(async () => DataStorage.unset(ROOT)), ROOT);
         });
 
         it('reports a change below the top level key as that key', async () => {
@@ -117,7 +117,7 @@ export const shadowrunDataStorage = (context: QuenchBatchContext) => {
 
             // A second key under the same root is still one changed top level key, as that
             // is the granularity applications re-render on.
-            const reported = await changesFrom(() => DataStorage.set(key('second'), 2));
+            const reported = await changesFrom(async () => DataStorage.set(key('second'), 2));
 
             assert.include(reported, ROOT);
         });

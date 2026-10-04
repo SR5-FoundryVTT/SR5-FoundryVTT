@@ -733,7 +733,7 @@ ___________________
 
     static async chatMessageListeners(message: ChatMessage, html, data) {
         await SuccessTest.chatMessageListeners(message, html, data);
-        BlastTemplateFlow.chatMessageListeners(html, test => BlastScatterFlow.handle(test));
+        BlastTemplateFlow.chatMessageListeners(html, async test => BlastScatterFlow.handle(test));
         SuppressiveFireTemplateFlow.chatMessageListeners(html);
         ShotgunTemplateFlow.chatMessageListeners(html);
         await OpposedTest.chatMessageListeners(message, html, data);
