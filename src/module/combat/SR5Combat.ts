@@ -103,6 +103,9 @@ export class SR5Combat extends Combat<"base"> {
         return this.system.pass;
     }
 
+    // Foundry's Combat interface defines nextCombatant as a getter, but SR5's initiative flow
+    // doesn't have a single "next" combatant due to initiative passes.
+    // @ts-ignore nextCombatant return type differs across fvtt-types versions
     override get nextCombatant(): undefined { return undefined; }
 
 
