@@ -117,9 +117,7 @@ export class SituationModifier {
      * 
      * @returns false, when a handler doesn't use any document source data.
      */
-    static get hasSourceData(): boolean {
-        return true;
-    }
+    static readonly hasSourceData: boolean = true;
 
     /**
      * Determine if the source data has an active modifier set for this situational modifier.
