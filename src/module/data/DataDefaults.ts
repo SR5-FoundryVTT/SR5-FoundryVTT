@@ -158,7 +158,7 @@ export class DataDefaults {
      */
     static baseSystemData<EntityType extends SystemEntityType>(
         entity: EntityType,
-        createData: SystemConstructorArgs<EntityType> = undefined
+        createData?: SystemConstructorArgs<EntityType>
     ): ReturnType<SystemByType<EntityType>['toObject']> {
         if (createData) {
             let correctionLogs: CorrectionLog | null;
