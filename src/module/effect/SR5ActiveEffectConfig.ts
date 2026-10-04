@@ -692,7 +692,6 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         if (isElementInstance(target, HTMLSelectElement) && name === 'duration.expiry') {
             this._syncFormIntoClone();
             void this.render();
-            return;
         }
     }
 
