@@ -288,13 +288,22 @@ export const TestCreator = {
      * @param test Any test implementation with an action providing a follow up test.
      * @param options See TestOptions documentation.
      */
-    fromFollowupTest: async function(test: SuccessTest, options: Partial<TestOptions> = {}): Promise<SuccessTest | void> {
+    fromFollowupTest: async function(test: SuccessTest, options: Partial<TestOptions> = {}): Promise<SuccessTest | undefined> {
         if (!test?.data?.action?.followed?.test) return;
-        if (!test.item) return console.error(`Shadowrun 5e | Test doesn't have a populated item document`);
-        if (!test.actor) return console.error(`Shadowrun 5e | Test doesn't have a populated actor document`);
+        if (!test.item) {
+            console.error(`Shadowrun 5e | Test doesn't have a populated item document`);
+            return;
+        }
+        if (!test.actor) {
+            console.error(`Shadowrun 5e | Test doesn't have a populated actor document`);
+            return;
+        }
 
         const testCls = TestCreator._getTestClass(test.data.action.followed.test);
-        if (!testCls) return console.error(`Shadowrun 5e | A ${test.constructor.name} has a unregistered follow up test configured`, this);
+        if (!testCls) {
+            console.error(`Shadowrun 5e | A ${test.constructor.name} has a unregistered follow up test configured`, this);
+            return;
+        }
 
         const data = Object.assign(TestCreator._minimalTestData(), {
             title: testCls.label,

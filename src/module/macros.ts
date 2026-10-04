@@ -99,7 +99,7 @@ export async function createSkillMacro(data: { skillId: string, skill: SkillFiel
  *
  * @param skillLabel Custom skill names must be supported and legacy skill names might be translated.
  */
-export async function rollSkillMacro(skillLabel): Promise<SuccessTest<SuccessTestData> | void> {
+export async function rollSkillMacro(skillLabel): Promise<SuccessTest<SuccessTestData> | undefined> {
     if (!game?.actors) return;
     if (!skillLabel) return;
 

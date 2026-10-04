@@ -119,7 +119,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * target and changes have a concrete destination. Effects created with explicit targets (tests,
      * imports, migration) keep theirs.
      */
-    protected override async _preCreate(...args: Parameters<ActiveEffect['_preCreate']>): Promise<boolean | void> {
+    protected override async _preCreate(...args: Parameters<ActiveEffect['_preCreate']>): Promise<boolean | undefined> {
         const allowed = await super._preCreate(...args);
         if (allowed === false) return false;
 
@@ -293,7 +293,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Re-enable an expired effect, reset its anchor, and re-register it with the expiry registry.
      * Use this to restart a duration that was consumed (e.g. buff renewed for another combat).
      */
-    async restart(): Promise<this | void> {
+    async restart(): Promise<this | undefined> {
         const combat = this.actor?.inCombat ? (game.combat ?? undefined) : undefined;
         return this.update({
             disabled: false,
