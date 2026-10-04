@@ -741,7 +741,7 @@ ___________________
         await TeamworkTest.chatMessageListeners(message, html);
         await JournalEnrichers.messageRequestHooks(html);
         await MatrixNetworkFlow.chatMessageListeners(message, html, data);
-        await ExtendedTestDueFlow.chatMessageListeners(message, html);
+        ExtendedTestDueFlow.chatMessageListeners(message, html);
     }
 
     static configureVision() {
