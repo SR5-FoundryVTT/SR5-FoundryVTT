@@ -74,7 +74,7 @@ export class SR5TokenRuler extends foundry.canvas.placeables.tokens.TokenRuler {
             highlightStyle.color = Color.from(game.settings.get(SYSTEM_NAME, FLAGS.TokenRulerColorSprinting));
         }
 
-        highlightStyle.alpha = game.settings.get(SYSTEM_NAME, FLAGS.TokenRulerOpacity) ?? undefined;
+        highlightStyle.alpha = (game.settings.get(SYSTEM_NAME, FLAGS.TokenRulerOpacity) as number | undefined) ?? undefined;
 
         return highlightStyle;
     }

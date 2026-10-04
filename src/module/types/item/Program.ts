@@ -12,6 +12,27 @@ const ProgramData = () => ({
         initial: 'common_program',
         choices: SR5.programTypes,
     }),
+    autosoftType: new StringField({
+        required: false,
+        blank: true,
+        initial: '',
+        choices: SR5.autosoftTypes,
+    }),
+    skill: new StringField({
+        required: false,
+        blank: true,
+        initial: '',
+    }),
+    targetModel: new StringField({
+        required: false,
+        blank: true,
+        initial: '',
+    }),
+    targetWeapon: new StringField({
+        required: false,
+        blank: true,
+        initial: '',
+    }),
 });
 
 export class Program extends ItemBase<ReturnType<typeof ProgramData>> {
@@ -22,4 +43,6 @@ export class Program extends ItemBase<ReturnType<typeof ProgramData>> {
     static override LOCALIZATION_PREFIXES = ["SR5.Program", "SR5.Item"];
 }
 
-console.log("ProgramData", ProgramData(), new Program());
+export type AutosoftType = "" | keyof typeof SR5.autosoftTypes;
+
+

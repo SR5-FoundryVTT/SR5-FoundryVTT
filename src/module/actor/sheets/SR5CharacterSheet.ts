@@ -94,6 +94,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         },
         inventory: {
             template: SheetFlow.templateBase('actor/tabs/inventory'),
+            templates: SheetFlow.templateListItem('vehicle'),
             scrollable: ['.scrollable']
         },
         social: {
@@ -125,7 +126,8 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             'cyberware',
             'device',
             'equipment',
-            'modification'
+            'modification',
+            'program',
         ];
     }
 

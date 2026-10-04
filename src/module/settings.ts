@@ -86,6 +86,55 @@ export const registerSystemSettings = () => {
         default: '',
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.AutosoftTargetMode, {
+        name: 'SETTINGS.AutosoftTargetModeName',
+        hint: 'SETTINGS.AutosoftTargetModeDescription',
+        scope: 'world',
+        config: true,
+        type: String,
+        default: 'weapon',
+        choices: {
+            'weapon': 'SETTINGS.AutosoftTargetModeWeapon',
+            'category': 'SETTINGS.AutosoftTargetModeCategory'
+        }
+    });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.RequireRiggerInterface, {
+        name: 'SETTINGS.RequireRiggerInterfaceName',
+        hint: 'SETTINGS.RequireRiggerInterfaceDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+    });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.MatrixAttributeDisplayMode, {
+        name: 'SETTINGS.MatrixAttributeDisplayModeName',
+        hint: 'SETTINGS.MatrixAttributeDisplayModeDescription',
+        scope: 'client',
+        config: true,
+        type: String,
+        default: 'icons',
+        choices: {
+            'full': 'SETTINGS.MatrixAttributeDisplayModeFull',
+            'icons': 'SETTINGS.MatrixAttributeDisplayModeIcons',
+        },
+        onChange: () => {
+            for (const window of Object.values(ui.windows)) {
+                if (window) {
+                    void window.render();
+                }
+            }
+            if (foundry?.applications?.instances) {
+                for (const app of foundry.applications.instances.values()) {
+                    if (app) {
+                        void app.render();
+                    }
+                }
+            }
+        }
+    });
+
     game.settings.register(SYSTEM_NAME, FLAGS.ShowGlitchAnimation, {
         name: 'SETTINGS.ShowGlitchAnimationName',
         hint: 'SETTINGS.ShowGlitchAnimationDescription',
@@ -406,6 +455,17 @@ export const registerSystemSettings = () => {
     game.settings.register(SYSTEM_NAME, FLAGS.MatrixActionsPack, {
         name: 'SR5.CompendiaSettings.MatrixActionsPack.label',
         hint: 'SR5.CompendiaSettings.MatrixActionsPack.hint',
+        scope: 'world',
+        config: false,
+        type: String
+    });
+
+    /**
+     * Override the default vehicle actions pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.VehicleActionsPack, {
+        name: 'SR5.CompendiaSettings.VehicleActionsPack.label',
+        hint: 'SR5.CompendiaSettings.VehicleActionsPack.hint',
         scope: 'world',
         config: false,
         type: String

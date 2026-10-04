@@ -66,6 +66,7 @@ export const FLAGS = {
     TokenMovementPhaseMarkers: 'TokenMovementPhaseMarkers',
     GeneralActionsPack: 'GeneralActionsPack',
     MatrixActionsPack: 'MatrixActionsPack',
+    VehicleActionsPack: 'VehicleActionsPack',
     ICActionsPack: 'ICActionsPack',
     SkillsPack: 'SkillsPack',
     SkillGroupsPack: 'SkillGroupsPack',
@@ -79,7 +80,10 @@ export const FLAGS = {
     ApplyExtendedTestRoll: 'ApplyExtendedTestRoll',
     EnforceExtendedTestInterval: 'EnforceExtendedTestInterval',
     ExtendedTestDueMessage: 'ExtendedTestDueMessage',
-    WorldTimeInitialized: 'WorldTimeInitialized'
+    WorldTimeInitialized: 'WorldTimeInitialized',
+    AutosoftTargetMode: 'autosoftTargetMode',
+    RequireRiggerInterface: 'requireRiggerInterface',
+    MatrixAttributeDisplayMode: 'matrixAttributeDisplayMode'
 } as const;
 export const CORE_NAME = 'core';
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';
