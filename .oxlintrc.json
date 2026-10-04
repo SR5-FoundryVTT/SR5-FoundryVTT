@@ -31,7 +31,9 @@
         "typescript/no-unsafe-assignment": "warn",
         "typescript/no-unsafe-call": "warn",
 
-        "eqeqeq": "warn",
+        // `== null` / `!= null` deliberately cover both null and undefined, which Foundry and legacy data mix constantly.
+        // Strict `=== null` alone would change behavior; the explicit form is longer without being clearer.
+        "eqeqeq": ["warn", "always", { "null": "ignore" }],
         "no-case-declarations": "off",
         "no-empty": "warn",
         "no-fallthrough": "warn",

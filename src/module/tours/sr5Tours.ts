@@ -12,7 +12,7 @@ export default class Sr5Tour extends foundry.nue.Tour {
         await super._preStep();
 
         //create actor if needed
-        if(this.actor == undefined) {
+        if(this.actor == null) {
             this.actor = new SR5Actor({
                 name: "Tour " + this.id,
                 type: 'character',
