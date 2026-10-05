@@ -152,8 +152,9 @@
     margin: 0.3rem 0;
   }
 
-  .dialog-content-common > div > .form-group:not(.modifiable-value):not(.toggle-checkbox-row) {
+  .dialog-content-common .form-group:not(.modifiable-value):not(.toggle-checkbox-row) {
     display: flex;
+    flex-wrap: nowrap;
     align-items: center;
     justify-content: space-between;
     gap: 0.35rem;
@@ -161,33 +162,34 @@
     min-width: 0;
 
     > label {
-      flex: 0 1 35%;
+      flex: 1 1 auto;
       min-width: 0;
       margin: 0;
     }
 
     > input[type='text'],
     > input[type='number'] {
-      flex: 1 1 0;
+      flex: 0 1 8rem;
       min-width: 0;
-      max-width: none;
-      width: auto;
+      max-width: 50%;
+      width: 8rem;
       height: 24px;
       text-align: center;
     }
 
-    > select {
-      flex: 1 1 0;
-      min-width: 0;
-      width: auto;
-      height: 24px;
+    // Match the compact numeric controls used for pool, limit, and threshold.
+    > input[type='number'] {
+      flex: 0 0 50px;
+      max-width: 50px;
+      width: 50px;
     }
 
-    > input[type='text'].text-value {
-      flex: 0 1 56%;
-      min-width: 6rem;
-      max-width: none;
-      width: auto;
+    > select {
+      flex: 0 1 8rem;
+      min-width: 0;
+      max-width: 50%;
+      width: 8rem;
+      height: 24px;
     }
 
     > input[type='checkbox'] {
@@ -217,14 +219,22 @@
     }
   }
 
-  .dialog-content-common > div > .form-group.fire-mode-select-row:not(.modifiable-value):not(.toggle-checkbox-row) > select,
-  .dialog-content-common > div > .form-group.range-select-row:not(.modifiable-value):not(.toggle-checkbox-row) > select {
-    flex: 1 1 0;
+  // Attack and device choices need room for their longer option labels.
+  .dialog-content-common .form-group.fire-mode-select-row:not(.modifiable-value):not(.toggle-checkbox-row) > select,
+  .dialog-content-common .form-group.range-select-row:not(.modifiable-value):not(.toggle-checkbox-row) > select,
+  .dialog-content-common .form-group.target-select-row:not(.modifiable-value):not(.toggle-checkbox-row) > select {
+    flex: 0 1 65%;
     min-width: 0;
+    max-width: 65%;
+    width: auto;
   }
 
   .modifiable-value {
     border-radius: 0;
+
+    > label {
+      min-width: 0;
+    }
 
     .form-fields {
       padding-top: 1px;
@@ -297,6 +307,7 @@
     }
 
     .breakdown-list {
+      min-width: 0;
       padding: 2px 6px;
       gap: 2px;
       border-radius: 0;
@@ -467,10 +478,10 @@
       // The fields sit in a wrapper, so the sizing the section gives its direct child
       // controls misses them. Repeated here to keep the row as tall as its neighbours.
       input[type='number'] {
-        flex: 0 0 3.4rem;
-        min-width: 3.4rem;
-        max-width: 3.4rem;
-        width: 3.4rem;
+        flex: 0 0 50px;
+        min-width: 50px;
+        max-width: 50px;
+        width: 50px;
         height: 24px;
         text-align: center;
       }
@@ -507,8 +518,12 @@
 
     .matrix-marks-icon-input {
       position: absolute;
+      top: 0;
+      left: 0;
       width: 1px;
       height: 1px;
+      margin: 0;
+      overflow: hidden;
       opacity: 0;
       pointer-events: none;
     }
