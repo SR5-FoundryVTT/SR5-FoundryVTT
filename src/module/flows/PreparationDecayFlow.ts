@@ -5,17 +5,19 @@ import { TestCreator } from "../tests/TestCreator";
 import { PreparationTriggerTest } from "../tests/PreparationTriggerTest";
 import { intervalToSeconds } from "../utils/timeUnits";
 
+const TRIGGER_DUE_TEMPLATE = 'systems/shadowrun5e/dist/templates/chat/preparation-trigger-due-message.hbs';
+
 /**
  * React to world time passing for alchemical preparations.
  *
  * The current potency itself is derived during item data preparation (see PreparationPrep), so
  * this flow never has to write it. What it does is handle the side effects of time passing:
- * refreshing sheets that show stale potency and announcing when preparations run out.
+ * refreshing sheets that show stale potency and announcing when preparations come due or run out.
  *
  * See SR5#305 'The Finished Preparation'.
  */
 export const PreparationDecayFlow = {
-    // A burst of world-time updates must not start the same timed preparation twice while its
+    // Repeated clicks on a due card must not start the same timed preparation twice while its
     // asynchronous roll is still resolving.
     triggering: new Set<string>(),
 
@@ -69,12 +71,23 @@ export const PreparationDecayFlow = {
     },
 
     /**
-     * Release a timed preparation at its scheduled instant without borrowing the GM's selected
-     * targets. The resulting chat card can then be opposed by the actual affected actor(s).
+     * Did advancing world time make this timed preparation due?
+     */
+    crossedTrigger(
+        system: Item.SystemOfType<'preparation'>,
+        previousWorldTime: number,
+        worldTime: number
+    ): boolean {
+        return PreparationDecayFlow.isTimeTriggerDue(system, worldTime)
+            && !PreparationDecayFlow.isTimeTriggerDue(system, previousWorldTime);
+    },
+
+    /**
+     * Release a timed preparation at its scheduled potency, however late it is rolled.
      */
     async triggerTimedPreparation(
         preparation: SR5Item<'preparation'>,
-        options: { showMessage?: boolean } = {}
+        options: { showDialog?: boolean, showMessage?: boolean } = {}
     ): Promise<PreparationTriggerTest | undefined> {
         const owner = preparation.actor;
         const uuid = preparation.uuid;
@@ -84,14 +97,13 @@ export const PreparationDecayFlow = {
         PreparationDecayFlow.triggering.add(uuid);
         try {
             const test = await TestCreator.fromItem(preparation, owner, {
-                showDialog: false,
+                showDialog: options.showDialog ?? true,
                 showMessage: options.showMessage ?? true,
             });
             if (!(test instanceof PreparationTriggerTest)) return;
 
             test.data.triggeredWorldTime = AlchemyRules.triggerAt(
                 preparation.system.created.worldTime, intervalToSeconds(preparation.system.triggerTime));
-            test.data.targetUuids = [];
             await test.execute();
             return test;
         } finally {
@@ -100,8 +112,8 @@ export const PreparationDecayFlow = {
     },
 
     /**
-     * Resolve timed triggers, announce newly expired preparations, and refresh their displays.
-     * Only the active GM creates rolls and chat messages.
+     * Announce newly due timed triggers and newly expired preparations, and refresh their displays.
+     * Only the active GM creates chat messages.
      */
     async onWorldTimeChange() {
         const worldTime = game.time.worldTime;
@@ -113,8 +125,12 @@ export const PreparationDecayFlow = {
 
         if (game.users?.activeGM?.isSelf) {
             for (const preparation of preparations) {
-                if (PreparationDecayFlow.isTimeTriggerDue(preparation.system, worldTime)) {
-                    await PreparationDecayFlow.triggerTimedPreparation(preparation);
+                // A due trigger still rolls at its scheduled potency, so it isn't also announced
+                // as expired when one time jump crosses both.
+                if (PreparationDecayFlow.crossedTrigger(
+                    preparation.system, previousWorldTime, worldTime
+                )) {
+                    await PreparationDecayFlow.announceTrigger(preparation);
                     continue;
                 }
                 if (PreparationDecayFlow.crossedExpiry(
@@ -127,21 +143,62 @@ export const PreparationDecayFlow = {
     },
 
     /**
+     * The players owning this actor, or the GM alone when there are none.
+     */
+    ownerWhisper(owner: SR5Actor): string[] {
+        const whisper = game.users
+            ?.filter(user => !user.isGM && owner.testUserPermission(user, 'OWNER'))
+            .map(user => user.id as string) ?? [];
+
+        // Without an audience a message would go out publicly, so keep it to the GM instead.
+        return whisper.length ? whisper : [game.user.id as string];
+    },
+
+    /**
+     * Whisper the owners a card to roll a timed preparation that just came due.
+     */
+    async announceTrigger(preparation: SR5Item<'preparation'>) {
+        const owner = preparation.actor;
+        if (!owner) return;
+
+        const content = await foundry.applications.handlebars.renderTemplate(TRIGGER_DUE_TEMPLATE, {
+            preparation,
+            actor: owner,
+        });
+
+        await ChatMessage.create({
+            content,
+            whisper: PreparationDecayFlow.ownerWhisper(owner),
+            speaker: { alias: owner.name ?? undefined },
+        });
+    },
+
+    /**
      * Whisper the owners that a preparation lost its spell.
      */
     async announceExpiry(preparation: SR5Item<'preparation'>) {
         const owner = preparation.actor;
         if (!owner) return;
 
-        const whisper = game.users
-            ?.filter(user => !user.isGM && owner.testUserPermission(user, 'OWNER'))
-            .map(user => user.id as string) ?? [];
-
-        // Without an audience this would go out publicly, so keep it to the GM instead.
         await ChatMessage.create({
             content: `<p>${game.i18n.format('SR5.Preparation.ExpiredMessage', { name: preparation.name })}</p>`,
-            whisper: whisper.length ? whisper : [game.user.id as string],
+            whisper: PreparationDecayFlow.ownerWhisper(owner),
             speaker: { alias: owner.name ?? undefined },
+        });
+    },
+
+    /**
+     * Register listeners for the due card's roll button.
+     *
+     * Needs to be registered to the 'renderChatMessage' FoundryVTT hook.
+     */
+    chatMessageListeners(_message: ChatMessage, html) {
+        $(html).find('[data-action="preparation-trigger-roll"]').on('click', async event => {
+            event.preventDefault();
+            const preparation = await fromUuid(event.currentTarget.dataset.uuid) as SR5Item<'preparation'> | null;
+            if (!preparation?.isOwner) return;
+
+            await PreparationDecayFlow.triggerTimedPreparation(preparation);
         });
     },
 

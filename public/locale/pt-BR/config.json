@@ -1557,6 +1557,10 @@
                 "Command": "Comando",
                 "Contact": "Contato",
                 "Time": "Tempo"
+            },
+            "TriggerDueMessage": {
+                "Header": "Gatilho de tempo alcançado",
+                "Roll": "Rolar Preparado"
             }
         },
         "Program": "Programa",

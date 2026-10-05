@@ -2419,6 +2419,10 @@
                 "Command": "Command",
                 "Contact": "Contact",
                 "Time": "Time"
+            },
+            "TriggerDueMessage": {
+                "Header": "Time trigger reached",
+                "Roll": "Roll Preparation"
             }
         },
         "Program": {

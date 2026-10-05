@@ -560,7 +560,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.isFalse(defense.pool.changes.some(change => change.name === 'SR5.MultiDefense'));
         });
 
-        it('automatically resolves a due timed preparation at its scheduled potency', async () => {
+        it('rolls a late timed preparation at its scheduled potency', async () => {
             const alchemist = await createAlchemist();
             const preparation = await createPreparation({
                 trigger: 'time', triggerTime: { value: 1, unit: 'hours' },
@@ -571,7 +571,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
 
             assert.isTrue(PreparationDecayFlow.isTimeTriggerDue(preparation.system, game.time.worldTime));
             const trigger = await PreparationDecayFlow.triggerTimedPreparation(
-                preparation, { showMessage: false });
+                preparation, { showDialog: false, showMessage: false });
 
             assert.instanceOf(trigger, PreparationTriggerTest);
             assert.isTrue(trigger?.evaluated);
@@ -700,6 +700,15 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             await preparation.update({ system: { potency: { base: 0, value: 0 } } });
             assert.isFalse(PreparationDecayFlow.isTimeTriggerDue(
                 preparation.system, game.time.worldTime + HOUR));
+        });
+
+        it('detects only forward crossings of the trigger time', async () => {
+            const preparation = await createPreparation({ trigger: 'time', triggerTime: { value: 1, unit: 'hours' } });
+            const due = preparation.system.created.worldTime + HOUR;
+
+            assert.isTrue(PreparationDecayFlow.crossedTrigger(preparation.system, due - 1, due));
+            assert.isFalse(PreparationDecayFlow.crossedTrigger(preparation.system, due, due + 1));
+            assert.isFalse(PreparationDecayFlow.crossedTrigger(preparation.system, due + 1, due - 1));
         });
 
         it('detects only forward crossings of the expiration boundary', async () => {

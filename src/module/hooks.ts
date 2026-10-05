@@ -569,7 +569,8 @@ ___________________
             Migrator.BeginMigration();
 
             await WorldTimeFlow.initialize();
-            // Resolve preparations that became due while no GM was connected.
+            // Record the starting world time, so the first advance can see 
+            // which preparation triggers and expirations it crosses.
             await PreparationDecayFlow.onWorldTimeChange();
 
             if (ChangelogApplication.showApplication)
@@ -757,6 +758,7 @@ ___________________
         await JournalEnrichers.messageRequestHooks(html);
         await MatrixNetworkFlow.chatMessageListeners(message, html, data);
         await ExtendedTestDueFlow.chatMessageListeners(message, html);
+        PreparationDecayFlow.chatMessageListeners(message, html);
     }
 
     static configureVision() {
