@@ -263,6 +263,21 @@
         justify-self: center;
     }
 
+    // The time trigger's amount and unit, sharing one row.
+    .list-item .preparation-trigger-time-fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.25rem;
+        min-width: 0;
+
+        input,
+        select {
+            width: 100%;
+            min-width: 0;
+            height: 24px;
+        }
+    }
+
     .preparation-created-time {
         justify-content: flex-end;
         gap: 0.35rem;

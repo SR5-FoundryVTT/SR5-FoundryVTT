@@ -3,6 +3,7 @@ import { SR5Item } from "../item/SR5Item";
 import { AlchemyRules } from "../rules/AlchemyRules";
 import { TestCreator } from "../tests/TestCreator";
 import { PreparationTriggerTest } from "../tests/PreparationTriggerTest";
+import { intervalToSeconds } from "../utils/timeUnits";
 
 /**
  * React to world time passing for alchemical preparations.
@@ -61,7 +62,7 @@ export const PreparationDecayFlow = {
     isTimeTriggerDue(system: Item.SystemOfType<'preparation'>, worldTime: number): boolean {
         if (system.trigger !== 'time' || system.potency.base <= 0) return false;
 
-        const triggerWorldTime = AlchemyRules.triggerAt(system.created.worldTime, system.triggerTime);
+        const triggerWorldTime = AlchemyRules.triggerAt(system.created.worldTime, intervalToSeconds(system.triggerTime));
         if (triggerWorldTime > AlchemyRules.expiresAt(system.potency.base, system.created.worldTime)) return false;
 
         return worldTime >= triggerWorldTime;
@@ -89,7 +90,7 @@ export const PreparationDecayFlow = {
             if (!(test instanceof PreparationTriggerTest)) return;
 
             test.data.triggeredWorldTime = AlchemyRules.triggerAt(
-                preparation.system.created.worldTime, preparation.system.triggerTime);
+                preparation.system.created.worldTime, intervalToSeconds(preparation.system.triggerTime));
             test.data.targetUuids = [];
             await test.execute();
             return test;

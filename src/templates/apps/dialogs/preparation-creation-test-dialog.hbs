@@ -18,9 +18,17 @@
                 </select>
             </div>
             {{#if (eq test.data.trigger 'time')}}
-                <div class="form-group">
+                <div class="form-group trigger-time-row">
                     <label data-tooltip="SR5.Tooltips.Preparation.TriggerTime">{{localize "SR5.Preparation.FIELDS.triggerTime.label"}}</label>
-                    <input name="test.data.triggerTime" type="number" class="disabled-for-display" value="{{test.data.triggerTime}}" />
+                    <div class="trigger-time-fields">
+                        <input name="test.data.triggerTime.value" type="number" min="0" step="any"
+                               class="disabled-for-display" value="{{test.data.triggerTime.value}}"
+                               aria-label="{{localize 'SR5.Preparation.FIELDS.triggerTime.label'}}" />
+                        <select name="test.data.triggerTime.unit" data-dtype="String"
+                                aria-label="{{localize 'SR5.ActiveEffect.Duration.Units'}}">
+                            {{selectOptions test.triggerTimeUnits selected=test.data.triggerTime.unit localize=true}}
+                        </select>
+                    </div>
                 </div>
             {{/if}}
             <div class="form-group">

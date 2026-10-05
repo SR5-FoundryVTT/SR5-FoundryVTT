@@ -2,6 +2,7 @@ import { SR5 } from "@/module/config";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { SpellPartData } from "../template/SpellPart";
+import { TRIGGER_TIME_UNITS } from "@/module/utils/timeUnits";
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 /**
@@ -28,8 +29,11 @@ const PreparationData = () => ({
         required: true,
         choices: SR5.preparationTriggers
     }),
-    // Countdown in seconds for the time trigger, counted from creation. Unused by other triggers.
-    triggerTime: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    // Countdown from creation, using the same amount/unit format as extended-test intervals.
+    triggerTime: new SchemaField({
+        value: new NumberField({ required: true, nullable: false, initial: 0, min: 0 }),
+        unit: new StringField({ required: true, initial: 'seconds', choices: TRIGGER_TIME_UNITS }),
+    }),
 
     potency: new SchemaField({
         // Net hits of the creation test. SR5#305 'Step 5: Create the Preparation'.

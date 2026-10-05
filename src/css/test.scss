@@ -457,8 +457,9 @@
     }
   }
 
-  // Extended test interval control, styled like the active effect duration fields.
-  .extended-interval-row {
+  // Amount and unit controls share the compact test field sizing.
+  .extended-interval-row,
+  .trigger-time-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -469,10 +470,12 @@
       min-width: 0;
     }
 
-    .extended-interval-fields {
+    .extended-interval-fields,
+    .trigger-time-fields {
       display: flex;
       flex-flow: row nowrap;
       align-items: center;
+      justify-content: flex-end;
       gap: 0.25rem;
 
       // The fields sit in a wrapper, so the sizing the section gives its direct child

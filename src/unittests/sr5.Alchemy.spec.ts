@@ -12,6 +12,8 @@ import { SR5Actor } from "../module/actor/SR5Actor";
 import { SR5Item } from "../module/item/SR5Item";
 import { PreparationTimeDialog } from "../module/apps/dialogs/PreparationTimeDialog";
 import { preparePreparationPotencyStatus } from "../module/item/prep/PreparationPotencyStatus";
+import { TestDialog } from "../module/apps/dialogs/TestDialog";
+import { intervalToSeconds } from "../module/utils/timeUnits";
 
 const HOUR = 3600;
 
@@ -81,6 +83,35 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.isFalse(AlchemyRules.validTriggerTime(-1, 6));
             assert.equal(AlchemyRules.effectiveTriggerTime(7 * HOUR, 6), 6 * HOUR);
             assert.equal(AlchemyRules.effectiveTriggerTime(-1, 6), 0);
+        });
+
+        it('keeps the trigger time amount and unit through dialog edits', () => {
+            const creation = new PreparationCreationTest({ trigger: 'time' });
+            const dialog = new TestDialog(creation);
+
+            for (const [unit, seconds] of [['seconds', 5], ['minutes', 300], ['hours', 18000]] as const) {
+                dialog._updateData({
+                    'test.data.triggerTime.value': 5,
+                    'test.data.triggerTime.unit': unit,
+                });
+                assert.equal(intervalToSeconds(creation.data.triggerTime), seconds);
+                assert.deepEqual(creation.data.triggerTime, { value: 5, unit });
+
+                // Unrelated edits leave the amount and unit alone.
+                dialog._updateData({ 'test.data.reagents': 3 });
+                assert.equal(intervalToSeconds(creation.data.triggerTime), seconds);
+                assert.deepEqual(creation.data.triggerTime, { value: 5, unit });
+            }
+
+            dialog._updateData({
+                'test.data.triggerTime.value': 0.5,
+                'test.data.triggerTime.unit': 'hours',
+            });
+            assert.equal(intervalToSeconds(creation.data.triggerTime), 1800);
+            assert.isTrue(AlchemyRules.validTriggerTime(intervalToSeconds(creation.data.triggerTime), 1));
+
+            dialog._updateData({ 'test.data.triggerTime.value': 0 });
+            assert.equal(intervalToSeconds(creation.data.triggerTime), 0);
         });
     });
 
@@ -343,6 +374,26 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.isFalse(AlchemyRules.canBeDodged(preparation.system.trigger, preparation.system.combat.type));
         });
 
+        it('preserves the chosen timer unit while limiting creation to potency hours', async () => {
+            const alchemist = await createAlchemist();
+            const spell = await createAlchemicalSpell(alchemist);
+            const creation = await TestCreator.fromItem(
+                spell, alchemist, { showDialog: false, showMessage: false }) as PreparationCreationTest;
+            creation.data.trigger = 'time';
+            creation.data.triggerTime = { value: 5, unit: 'hours' };
+            creation.data.potency = 3;
+
+            const opposed = new OpposedPreparationForceTest(
+                { against: creation.data }, { source: alchemist }, { showDialog: false, showMessage: false });
+            opposed.against.actor = alchemist;
+            opposed.against.item = spell;
+            await opposed.createPreparationItem();
+            const preparation = await fromUuid<SR5Item>(opposed.data.preparationUuid) as SR5Item<'preparation'>;
+            assert.deepEqual(preparation.system.triggerTime, { value: 3, unit: 'hours' });
+            assert.isFalse(PreparationDecayFlow.isTimeTriggerDue(preparation.system, preparation.system.created.worldTime + 3 * HOUR - 1));
+            assert.isTrue(PreparationDecayFlow.isTimeTriggerDue(preparation.system, preparation.system.created.worldTime + 3 * HOUR));
+        });
+
         it('creates nothing when the force wins, but still owes drain', async () => {
             const alchemist = await createAlchemist();
             const spell = await createAlchemicalSpell(alchemist);
@@ -512,7 +563,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
         it('automatically resolves a due timed preparation at its scheduled potency', async () => {
             const alchemist = await createAlchemist();
             const preparation = await createPreparation({
-                trigger: 'time', triggerTime: HOUR,
+                trigger: 'time', triggerTime: { value: 1, unit: 'hours' },
                 potency: { base: 2 },
                 // Simulate Foundry advancing past both the trigger and expiration in one jump.
                 created: { worldTime: game.time.worldTime - 10 * HOUR },
@@ -553,6 +604,15 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
     });
 
     describe('Preparation items', () => {
+        it('schedules time triggers in seconds, minutes and hours', async () => {
+            for (const [value, unit, seconds] of [[5, 'seconds', 5], [5, 'minutes', 300], [0.5, 'hours', 1800]] as const) {
+                const preparation = await createPreparation({ trigger: 'time', triggerTime: { value, unit } });
+                const due = preparation.system.created.worldTime + seconds;
+                assert.isFalse(PreparationDecayFlow.isTimeTriggerDue(preparation.system, due - 1));
+                assert.isTrue(PreparationDecayFlow.isTimeTriggerDue(preparation.system, due));
+            }
+        });
+
         it('defaults its creation time to the current world time', async () => {
             const worldTime = game.time.worldTime;
             const preparation = await factory.createItem({ type: 'preparation' });
@@ -630,7 +690,7 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
         });
 
         it('recognizes only due timed triggers with potency', async () => {
-            const preparation = await createPreparation({ trigger: 'time', triggerTime: HOUR, potency: { base: 2 } });
+            const preparation = await createPreparation({ trigger: 'time', triggerTime: { value: 1, unit: 'hours' }, potency: { base: 2 } });
 
             assert.isFalse(PreparationDecayFlow.isTimeTriggerDue(
                 preparation.system, game.time.worldTime + HOUR - 1));

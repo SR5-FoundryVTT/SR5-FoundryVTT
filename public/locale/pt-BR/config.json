@@ -1544,7 +1544,7 @@
                     "label": "Gatilho"
                 },
                 "triggerTime": {
-                    "hint": "Segundos até um gatilho de tempo liberar o feitiço.",
+                    "hint": "Contagem regressiva até um gatilho de tempo liberar o feitiço, na unidade selecionada.",
                     "label": "Tempo do Gatilho"
                 }
             },

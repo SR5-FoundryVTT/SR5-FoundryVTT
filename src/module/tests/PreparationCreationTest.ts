@@ -7,8 +7,8 @@ import { DrainRules } from '../rules/DrainRules';
 import { DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 import { SR5Item } from "../item/SR5Item";
+import { TRIGGER_TIME_UNITS, intervalToSeconds } from '../utils/timeUnits';
 import ModifierTypes = Shadowrun.ModifierTypes;
-
 
 export interface PreparationCreationTestData extends SuccessTestData {
     // Force the preparation is created at, as described on SR5#304.
@@ -17,8 +17,8 @@ export interface PreparationCreationTestData extends SuccessTestData {
     reagents: number
     // Trigger releasing the spell later on, as described on SR5#305.
     trigger: string
-    // Countdown in seconds for the time trigger only.
-    triggerTime: number
+    // Countdown amount and unit for the time trigger only.
+    triggerTime: Item.SystemOfType<'preparation'>['triggerTime']
 
     // Net hits over the opposing force roll, as described on SR5#305.
     potency: number
@@ -43,13 +43,21 @@ export interface PreparationCreationTestData extends SuccessTestData {
 export class PreparationCreationTest extends SuccessTest<PreparationCreationTestData> {
     public override item: SR5Item<'spell'> | undefined = undefined;
 
+    /**
+     * Units the dialog offers for the time trigger.
+     */
+    get triggerTimeUnits() {
+        return TRIGGER_TIME_UNITS;
+    }
+
     override _prepareData(data: DeepPartial<PreparationCreationTestData>, options: Partial<TestOptions>): PreparationCreationTestData {
         const prepared = super._prepareData(data, options);
 
         prepared.force = Math.max(prepared.force || 1, 1);
         prepared.reagents ||= 0;
         prepared.trigger ||= 'command';
-        prepared.triggerTime ||= 0;
+        prepared.triggerTime = foundry.utils.mergeObject(
+            { value: 0, unit: 'seconds' }, prepared.triggerTime ?? {}, { inplace: false });
         prepared.potency ||= 0;
         prepared.drain ||= 0;
         prepared.drainDamage ||= DataDefaults.createData('damage');
@@ -195,7 +203,7 @@ export class PreparationCreationTest extends SuccessTest<PreparationCreationTest
      */
     warnAboutInvalidTriggerTime() {
         if (this.data.trigger !== 'time') return;
-        if (AlchemyRules.validTriggerTime(Number(this.data.triggerTime), this.data.potency)) return;
+        if (AlchemyRules.validTriggerTime(intervalToSeconds(this.data.triggerTime), this.data.potency)) return;
 
         ui.notifications?.warn('SR5.Warnings.PreparationTriggerTimeTooLong', { localize: true });
     }

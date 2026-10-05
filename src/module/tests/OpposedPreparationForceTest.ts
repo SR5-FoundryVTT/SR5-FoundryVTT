@@ -8,6 +8,7 @@ import { PreparationCreationTest } from './PreparationCreationTest';
 import { Translation } from '../utils/strings';
 import { spellPartKeys } from '../types/template/SpellPart';
 import { AlchemyRules } from '../rules/AlchemyRules';
+import { intervalToSeconds, unitToSeconds } from '../utils/timeUnits';
 
 const { fromUuid } = foundry.utils;
 
@@ -183,8 +184,8 @@ export class OpposedPreparationForceTest extends OpposedTest<OpposedPreparationF
         };
 
         // Only the time trigger counts down.
-        const triggerTime = this.against.data.trigger === 'time'
-            ? AlchemyRules.effectiveTriggerTime(Number(this.against.data.triggerTime), potency)
+        const triggerSeconds = this.against.data.trigger === 'time'
+            ? AlchemyRules.effectiveTriggerTime(intervalToSeconds(this.against.data.triggerTime), potency)
             : 0;
 
         const itemData = {
@@ -200,7 +201,10 @@ export class OpposedPreparationForceTest extends OpposedTest<OpposedPreparationF
                 trigger: this.against.data.trigger,
                 // An overlong timer activates at the latest legal instant instead of silently
                 // remaining armed past the chosen trigger's rules limit. SR5#305.
-                triggerTime,
+                triggerTime: {
+                    value: triggerSeconds / unitToSeconds(this.against.data.triggerTime.unit),
+                    unit: this.against.data.triggerTime.unit,
+                },
                 potency: { base: potency, value: potency },
                 created: { worldTime: game.time.worldTime },
             }

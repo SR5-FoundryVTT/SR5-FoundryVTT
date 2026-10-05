@@ -2406,7 +2406,7 @@
                     "label": "Trigger"
                 },
                 "triggerTime": {
-                    "hint": "Seconds until a time trigger releases the spell.",
+                    "hint": "Countdown until a time trigger releases the spell, in the selected unit.",
                     "label": "Trigger Time"
                 }
             },

@@ -46,8 +46,10 @@
         <div class="list-item-start skinny">
             <label data-tooltip="SR5.Tooltips.Preparation.TriggerTime">{{systemFields.triggerTime.label}}</label>
         </div>
-        <div class="list-item-col">
-            {{formInput systemFields.triggerTime value=source.system.triggerTime
+        <div class="list-item-col preparation-trigger-time-fields">
+            {{formInput systemFields.triggerTime.fields.value value=source.system.triggerTime.value
+                        classes="short" step="any" rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formInput systemFields.triggerTime.fields.unit value=source.system.triggerTime.unit localize=true
                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
         </div>
     </div>
