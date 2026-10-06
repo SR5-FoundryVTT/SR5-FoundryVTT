@@ -26,18 +26,32 @@ export const PreparationDecayFlow = {
     previousWorldTime: undefined as number | undefined,
 
     /**
-     * Every preparation item carried by an actor.
+     * Every preparation in the world: in the Items directory, carried by an actor, or carried by
+     * an unlinked token.
      *
-     * Unowned preparations in the Items directory are left alone on purpose. Those are templates
-     * rather than live preparations, and retiring them behind the GM's back would be surprising.
+     * Actor items are read through itemTypes, which FoundryVTT caches until the items change, so
+     * this doesn't scale with the number of items actors carry.
      */
     preparations(): SR5Item<'preparation'>[] {
         const preparations: SR5Item<'preparation'>[] = [];
 
+        for (const item of game.items ?? []) {
+            if (item.type === 'preparation') preparations.push(item as SR5Item<'preparation'>);
+        }
+
         for (const actor of game.actors ?? []) {
-            for (const item of (actor as SR5Actor).items) {
-                if (item.type !== 'preparation') continue;
-                preparations.push(item as SR5Item<'preparation'>);
+            preparations.push(...actor.itemTypes.preparation as SR5Item<'preparation'>[]);
+        }
+
+        // An unlinked token inherits its base actor's items, which are already listed above. Only
+        // the preparations the token holds itself are its own.
+        for (const scene of game.scenes ?? []) {
+            for (const token of scene.tokens) {
+                if (token.actorLink || !token.actor || !token.delta) continue;
+
+                for (const item of token.actor.itemTypes.preparation) {
+                    if (token.delta.items.manages(item.id)) preparations.push(item as SR5Item<'preparation'>);
+                }
             }
         }
 
@@ -96,14 +110,14 @@ export const PreparationDecayFlow = {
         preparation: SR5Item<'preparation'>,
         options: { showDialog?: boolean, showMessage?: boolean } = {}
     ): Promise<PreparationTriggerTest | undefined> {
-        const owner = preparation.actor;
         const uuid = preparation.uuid;
-        if (!owner || !uuid || preparation.system.potency.base <= 0
+        if (!uuid || preparation.system.potency.base <= 0
             || PreparationDecayFlow.triggering.has(uuid)) return;
 
         PreparationDecayFlow.triggering.add(uuid);
         try {
-            const test = await TestCreator.fromItem(preparation, owner, {
+            // A preparation in the Items directory rolls without an actor.
+            const test = await TestCreator.fromItem(preparation, preparation.actor, {
                 showDialog: options.showDialog ?? true,
                 showMessage: options.showMessage ?? true,
             });
@@ -149,11 +163,11 @@ export const PreparationDecayFlow = {
     },
 
     /**
-     * The players owning this actor, or the GM alone when there are none.
+     * The players owning this actor, or the GM alone when there are none or there is no actor.
      */
-    ownerWhisper(owner: SR5Actor): string[] {
+    ownerWhisper(owner: SR5Actor | null): string[] {
         const whisper = game.users
-            ?.filter(user => !user.isGM && owner.testUserPermission(user, 'OWNER'))
+            ?.filter(user => !user.isGM && !!owner?.testUserPermission(user, 'OWNER'))
             .map(user => user.id as string) ?? [];
 
         // Without an audience a message would go out publicly, so keep it to the GM instead.
@@ -161,13 +175,13 @@ export const PreparationDecayFlow = {
     },
 
     /**
-     * Whisper a message to the owners of this actor, speaking as the actor.
+     * Whisper a message to the owners of this actor, speaking as the actor if there is one.
      */
-    async whisperToOwners(owner: SR5Actor, content: string) {
+    async whisperToOwners(owner: SR5Actor | null, content: string) {
         await ChatMessage.create({
             content,
             whisper: PreparationDecayFlow.ownerWhisper(owner),
-            speaker: { alias: owner.name ?? undefined },
+            speaker: owner ? { alias: owner.name ?? undefined } : undefined,
         });
     },
 
@@ -176,7 +190,6 @@ export const PreparationDecayFlow = {
      */
     async announceTrigger(preparation: SR5Item<'preparation'>) {
         const owner = preparation.actor;
-        if (!owner) return;
 
         const content = await foundry.applications.handlebars.renderTemplate(TRIGGER_DUE_TEMPLATE, {
             preparation,
@@ -189,11 +202,8 @@ export const PreparationDecayFlow = {
      * Whisper the owners that a preparation lost its spell.
      */
     async announceExpiry(preparation: SR5Item<'preparation'>) {
-        const owner = preparation.actor;
-        if (!owner) return;
-
         const content = `<p>${game.i18n.format('SR5.Preparation.ExpiredMessage', { name: preparation.name })}</p>`;
-        await PreparationDecayFlow.whisperToOwners(owner, content);
+        await PreparationDecayFlow.whisperToOwners(preparation.actor, content);
     },
 
     /**

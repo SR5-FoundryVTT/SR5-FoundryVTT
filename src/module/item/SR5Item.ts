@@ -334,7 +334,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             actor = this.actor ?? undefined;
         }
 
-        if (!actor) return;
+        // A preparation rolls on its own Force and Potency, it doesn't need an actor. SR5#306.
+        if (!actor && !this.isType('preparation')) return;
 
         const showDialog = !TestCreator.shouldHideDialog(event);
         const test = await TestCreator.fromItem(this, actor, { showDialog });

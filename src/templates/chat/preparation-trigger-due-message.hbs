@@ -7,14 +7,17 @@
     <div class="card-title card-header card-header--entities">
         <div class="container container--fluid">
             <div class="container__row">
-                <div class="container__col">
-                    <div class="document">
-                        <img src="{{actor.img}}" data-tooltip="{{actor.name}}" />
-                        <h3 class="header-name">
-                            <a class="chat-document-link" data-uuid="{{actor.uuid}}">{{actor.name}}</a>
-                        </h3>
+                {{! A preparation in the Items directory has no actor. }}
+                {{#if actor}}
+                    <div class="container__col">
+                        <div class="document">
+                            <img src="{{actor.img}}" data-tooltip="{{actor.name}}" />
+                            <h3 class="header-name">
+                                <a class="chat-document-link" data-uuid="{{actor.uuid}}">{{actor.name}}</a>
+                            </h3>
+                        </div>
                     </div>
-                </div>
+                {{/if}}
                 {{! The name is already the card title, see rolls/success-test-message.hbs. }}
                 <div class="container__col container__col--item">
                     <div class="document">

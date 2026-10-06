@@ -578,6 +578,39 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.equal(trigger?.data.potency, 2);
             assert.equal(preparation.system.potency.base, 0);
         });
+
+        it('rolls an Items directory preparation without an actor through to the defense', async () => {
+            const defender = await factory.createActor({ type: 'character' });
+            const preparation = await createPreparation({
+                trigger: 'time', triggerTime: { value: 1, unit: 'hours' },
+                created: { worldTime: game.time.worldTime - 2 * HOUR },
+                action: { damage: { base: 6, type: { base: 'physical', value: 'physical' } } },
+            });
+
+            const trigger = await PreparationDecayFlow.triggerTimedPreparation(
+                preparation, { showDialog: false, showMessage: false });
+
+            assert.instanceOf(trigger, PreparationTriggerTest);
+            assert.isUndefined(trigger?.actor);
+            assert.isTrue(trigger?.evaluated);
+            // Force 4 + Potency 3.
+            assert.equal(trigger?.pool.value, 7);
+            assert.equal(preparation.system.potency.base, 0);
+
+            // An indirect spell from a preparation lying around is dodged like any other.
+            const defenseData = await PhysicalDefenseTest._getOpposedActionTestData(
+                trigger!.data, defender, '');
+            if (!defenseData) return assert.fail('Failed to create preparation defense test data');
+            const defense = new PhysicalDefenseTest(
+                defenseData,
+                { actor: defender, source: defender },
+                { showDialog: false, showMessage: false }
+            );
+            await defense.execute();
+
+            assert.isTrue(defense.evaluated);
+            assert.include(defense.data.categories, 'defense');
+        });
     });
 
     describe('Area preparations', () => {
@@ -722,6 +755,48 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
                 preparation.system, expiresAt, expiresAt + 1));
             assert.isFalse(PreparationDecayFlow.crossedExpiry(
                 preparation.system, expiresAt + 1, expiresAt - 1));
+        });
+
+        it('finds preparations in the Items directory, on actors and on unlinked tokens once each', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const carried = await createPreparation({}, actor);
+            const sidebar = await createPreparation();
+
+            const scene = await factory.createScene({});
+            const [token] = await scene.createEmbeddedDocuments('Token', [
+                { name: 'First', actorId: actor.id, actorLink: false },
+                { name: 'Second', actorId: actor.id, actorLink: false },
+            ]) as TokenDocument[];
+            const tokenOwned = await createPreparation({}, token.actor as SR5Actor);
+
+            const uuids = PreparationDecayFlow.preparations().map(preparation => preparation.uuid);
+            const count = (uuid: string | null) => uuids.filter(other => other === uuid).length;
+
+            assert.equal(count(sidebar.uuid), 1);
+            assert.equal(count(carried.uuid), 1);
+            assert.equal(count(tokenOwned.uuid), 1);
+            // Both tokens inherit the carried preparation, which only the base actor lists.
+            assert.isFalse(uuids.some(uuid => uuid?.startsWith(`Scene.${scene.id}`) && uuid.endsWith(`Item.${carried.id}`)));
+        });
+
+        it('whispers a due card for an Items directory preparation to the GM', async () => {
+            const preparation = await createPreparation({ trigger: 'time' });
+
+            const created = new Promise<ChatMessage>(resolve => {
+                Hooks.once('createChatMessage', message => resolve(message as ChatMessage));
+            });
+            await PreparationDecayFlow.announceTrigger(preparation);
+            const message = await created;
+
+            try {
+                assert.deepEqual(message.whisper, [game.user.id]);
+                assert.include(message.content, 'preparation-trigger-roll');
+                assert.include(message.content, preparation.uuid!);
+                // No actor to show next to the preparation.
+                assert.notInclude(message.content, 'header-name');
+            } finally {
+                await message.delete();
+            }
         });
 
         it('prepares full, decaying, expired, and spent potency states', async () => {
