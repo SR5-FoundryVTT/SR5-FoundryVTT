@@ -14,6 +14,7 @@ import { ActionPrep } from './prep/functions/ActionPrep';
 import { RangePrep } from './prep/functions/RangePrep';
 import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
 import { PreparationPrep } from './prep/PreparationPrep';
+import { PreparationDecayFlow } from '../flows/PreparationDecayFlow';
 import { ArmorPrep } from './prep/functions/ArmorPrep';
 
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
@@ -245,8 +246,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             SinPrep.prepareBaseData(this.system);
         else if (this.isType('bioware', 'cyberware'))
             WarePrep.prepareBaseData(this.system, equippedMods);
-        else if (this.isType('preparation'))
+        else if (this.isType('preparation')) {
             PreparationPrep.prepareBaseData(this.system);
+            PreparationDecayFlow.track(this);
+        }
     }
 
     override prepareDerivedData(this: SR5Item): void {

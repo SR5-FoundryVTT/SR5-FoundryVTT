@@ -776,7 +776,43 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
             assert.equal(count(carried.uuid), 1);
             assert.equal(count(tokenOwned.uuid), 1);
             // Both tokens inherit the carried preparation, which only the base actor lists.
-            assert.isFalse(uuids.some(uuid => uuid?.startsWith(`Scene.${scene.id}`) && uuid.endsWith(`Item.${carried.id}`)));
+            const inherited = (uuid: string | null) => !!uuid?.startsWith(`Scene.${scene.id}`) && uuid.endsWith(`Item.${carried.id}`);
+            assert.isFalse(uuids.some(inherited));
+            assert.isFalse([...PreparationDecayFlow.known].some(inherited));
+        });
+
+        it('forgets a deleted preparation', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const preparation = await createPreparation({}, actor);
+            const uuid = preparation.uuid!;
+            assert.include(PreparationDecayFlow.preparations().map(item => item.uuid), uuid);
+
+            await actor.deleteEmbeddedDocuments('Item', [preparation.id!]);
+
+            assert.notInclude(PreparationDecayFlow.preparations().map(item => item.uuid), uuid);
+            assert.isFalse(PreparationDecayFlow.known.has(uuid));
+        });
+
+        it('tracks every preparation a full search of the world finds', async () => {
+            // The preparations a search through every item, actor and unlinked token finds.
+            const found = new Set<string>();
+            for (const item of game.items) {
+                if (item.type === 'preparation') found.add(item.uuid!);
+            }
+            for (const actor of game.actors) {
+                for (const item of actor.itemTypes.preparation) found.add(item.uuid!);
+            }
+            for (const scene of game.scenes) {
+                for (const token of scene.tokens) {
+                    if (token.actorLink || !token.actor || !token.delta) continue;
+                    for (const item of token.actor.itemTypes.preparation) {
+                        if (token.delta.items.manages(item.id!)) found.add(item.uuid!);
+                    }
+                }
+            }
+
+            const tracked = PreparationDecayFlow.preparations().map(item => item.uuid!);
+            assert.sameMembers(tracked, [...found]);
         });
 
         it('whispers a due card for an Items directory preparation to the GM', async () => {
