@@ -47,8 +47,7 @@ export function preparePreparationPotencyStatus(
             { style: 'short', maxTerms: 2 }
         );
         const remaining = game.i18n.format('SR5.Preparation.ExpiresIn', { duration });
-        const expiration = game.i18n.format('SR5.Preparation.ExpiresAt', { time: WorldTimeFlow.format(expiresAt) });
-        tooltip = `${remaining} — ${expiration}`;
+        tooltip = `${remaining} — ${WorldTimeFlow.format(expiresAt)}`;
     }
 
     return { state, progressValue, progressMax, decayThresholdPercent, tooltip };

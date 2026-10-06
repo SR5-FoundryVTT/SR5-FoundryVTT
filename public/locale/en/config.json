@@ -2370,7 +2370,6 @@
             "ExpiredAt": "Expired at {time}",
             "ExpiredMessage": "{name} has lost its potency. The stored spell is gone.",
             "Expires": "Expires",
-            "ExpiresAt": "Expires at {time}",
             "ExpiresIn": "Expires in {duration}",
             "FIELDS": {
                 "created": {

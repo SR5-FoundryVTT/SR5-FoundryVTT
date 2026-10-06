@@ -1508,7 +1508,6 @@
             "ExpiredAt": "Expirou em {time}",
             "ExpiredMessage": "{name} perdeu sua potência. O feitiço armazenado se perdeu.",
             "Expires": "Expira",
-            "ExpiresAt": "Expira em {time}",
             "ExpiresIn": "Expira daqui a {duration}",
             "FIELDS": {
                 "created": {
