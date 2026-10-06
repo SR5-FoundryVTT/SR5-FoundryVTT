@@ -21,8 +21,8 @@ export const PreparationDecayFlow = {
     // asynchronous roll is still resolving.
     triggering: new Set<string>(),
 
-    // Last world time processed by this client. This detects expiry boundary crossings without
-    // persisting lifecycle state on every preparation.
+    // Last world time processed by this client. This detects trigger and expiry boundary crossings
+    // without persisting lifecycle state on every preparation.
     previousWorldTime: undefined as number | undefined,
 
     /**
@@ -59,12 +59,19 @@ export const PreparationDecayFlow = {
     },
 
     /**
+     * The world time at which this preparation's time trigger releases its spell.
+     */
+    triggerWorldTime(system: Item.SystemOfType<'preparation'>): number {
+        return AlchemyRules.triggerAt(system.created.worldTime, intervalToSeconds(system.triggerTime));
+    },
+
+    /**
      * Whether a valid timed preparation has reached its scheduled activation instant.
      */
     isTimeTriggerDue(system: Item.SystemOfType<'preparation'>, worldTime: number): boolean {
         if (system.trigger !== 'time' || system.potency.base <= 0) return false;
 
-        const triggerWorldTime = AlchemyRules.triggerAt(system.created.worldTime, intervalToSeconds(system.triggerTime));
+        const triggerWorldTime = PreparationDecayFlow.triggerWorldTime(system);
         if (triggerWorldTime > AlchemyRules.expiresAt(system.potency.base, system.created.worldTime)) return false;
 
         return worldTime >= triggerWorldTime;
@@ -102,8 +109,7 @@ export const PreparationDecayFlow = {
             });
             if (!(test instanceof PreparationTriggerTest)) return;
 
-            test.data.triggeredWorldTime = AlchemyRules.triggerAt(
-                preparation.system.created.worldTime, intervalToSeconds(preparation.system.triggerTime));
+            test.data.triggeredWorldTime = PreparationDecayFlow.triggerWorldTime(preparation.system);
             await test.execute();
             return test;
         } finally {
@@ -155,6 +161,17 @@ export const PreparationDecayFlow = {
     },
 
     /**
+     * Whisper a message to the owners of this actor, speaking as the actor.
+     */
+    async whisperToOwners(owner: SR5Actor, content: string) {
+        await ChatMessage.create({
+            content,
+            whisper: PreparationDecayFlow.ownerWhisper(owner),
+            speaker: { alias: owner.name ?? undefined },
+        });
+    },
+
+    /**
      * Whisper the owners a card to roll a timed preparation that just came due.
      */
     async announceTrigger(preparation: SR5Item<'preparation'>) {
@@ -165,12 +182,7 @@ export const PreparationDecayFlow = {
             preparation,
             actor: owner,
         });
-
-        await ChatMessage.create({
-            content,
-            whisper: PreparationDecayFlow.ownerWhisper(owner),
-            speaker: { alias: owner.name ?? undefined },
-        });
+        await PreparationDecayFlow.whisperToOwners(owner, content);
     },
 
     /**
@@ -180,11 +192,8 @@ export const PreparationDecayFlow = {
         const owner = preparation.actor;
         if (!owner) return;
 
-        await ChatMessage.create({
-            content: `<p>${game.i18n.format('SR5.Preparation.ExpiredMessage', { name: preparation.name })}</p>`,
-            whisper: PreparationDecayFlow.ownerWhisper(owner),
-            speaker: { alias: owner.name ?? undefined },
-        });
+        const content = `<p>${game.i18n.format('SR5.Preparation.ExpiredMessage', { name: preparation.name })}</p>`;
+        await PreparationDecayFlow.whisperToOwners(owner, content);
     },
 
     /**

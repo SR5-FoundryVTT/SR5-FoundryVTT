@@ -18,7 +18,7 @@ export function preparePreparationPotencyStatus(
     system: Item.SystemOfType<'preparation'>,
     worldTime: number = game.time.worldTime
 ): PreparationPotencyStatus {
-    const basePotency = Math.max(Number(system.potency.base) || 0, 0);
+    const basePotency = system.potency.base;
     const createdAt = system.created.worldTime;
     const decayStartsAt = createdAt + AlchemyRules.fullPotencyDuration(basePotency);
     const expiresAt = AlchemyRules.expiresAt(basePotency, createdAt);

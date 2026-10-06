@@ -1,7 +1,6 @@
 import { DeepPartial } from 'fvtt-types/utils';
 
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
-import { PreparationDecayFlow } from '@/module/flows/PreparationDecayFlow';
 import { WorldTimeFlow } from '@/module/flows/WorldTimeFlow';
 import type { SR5Item } from '@/module/item/SR5Item';
 
@@ -123,11 +122,10 @@ export class PreparationTimeDialog extends HandlebarsApplicationMixin(Applicatio
     }
 
     /**
-     * Persist only the creation anchor, then immediately derive the new potency for open sheets.
+     * Persist only the creation anchor. The update re-derives potency and re-renders open sheets.
      */
     static async setCreationTime(preparation: SR5Item<'preparation'>, worldTime: number): Promise<void> {
         await preparation.update({ system: { created: { worldTime } } });
-        PreparationDecayFlow.refreshSheets([preparation]);
     }
 
     override async _prepareContext(options: Parameters<ApplicationV2['_prepareContext']>[0]) {

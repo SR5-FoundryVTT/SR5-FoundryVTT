@@ -569,7 +569,7 @@ ___________________
             Migrator.BeginMigration();
 
             await WorldTimeFlow.initialize();
-            // Record the starting world time, so the first advance can see 
+            // Record the starting world time, so the first advance can see
             // which preparation triggers and expirations it crosses.
             await PreparationDecayFlow.onWorldTimeChange();
 
