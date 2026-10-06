@@ -2783,6 +2783,7 @@
         "Specialization": "Specialization",
         "Specializations": "Specializations",
         "Spell": {
+            "AlchemicalFormula": "Alchemical Formula",
             "Attack": "Spell Attack",
             "Cast": "Spell Cast",
             "CatCombat": "Combat",

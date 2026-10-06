@@ -5,14 +5,3 @@
 </div>
 
 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/spell-fields.hbs"}}
-
-{{!-- Alchemical spells are learned separately and are the only ones that can be prepared. SR5#304 --}}
-<div class="list-item">
-    <div class="list-item-start skinny">
-        <label data-tooltip="{{systemFields.alchemical.hint}}">{{systemFields.alchemical.label}}</label>
-    </div>
-    <div class="list-item-col">
-        {{formInput systemFields.alchemical value=source.system.alchemical
-                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-    </div>
-</div>

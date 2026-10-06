@@ -1744,6 +1744,7 @@
         "Specialization": "Especialização",
         "Specializations": "Especializações",
         "Spell": {
+            "AlchemicalFormula": "Fórmula Alquímica",
             "Attack": "Ataque Mágico",
             "Cast": "Lançar Magia",
             "CatCombat": "Combate",

@@ -27,7 +27,16 @@
                                 placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
                 </span>
                 <div class="item-type-container">
-                    <label>{{localize (concat 'TYPES.Item.' item.type)}}</label>
+                    {{!-- Alchemical spells are learned separately and are the only ones that can be prepared. SR5#304 --}}
+                    {{#if (isType item 'spell')}}
+                        <select name="system.alchemical" class="short" data-dtype="Boolean"
+                                data-tooltip="{{systemFields.alchemical.hint}}" {{disabled @root.isPlayMode}}>
+                            <option value="false" {{#unless source.system.alchemical}}selected{{/unless}}>{{localize 'TYPES.Item.spell'}}</option>
+                            <option value="true" {{#if source.system.alchemical}}selected{{/if}}>{{localize 'SR5.Spell.AlchemicalFormula'}}</option>
+                        </select>
+                    {{else}}
+                        <label>{{localize (concat 'TYPES.Item.' item.type)}}</label>
+                    {{/if}}
                 </div>
             </div>
             {{#if @root.isEditMode}}
