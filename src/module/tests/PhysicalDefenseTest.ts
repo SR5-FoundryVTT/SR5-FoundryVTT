@@ -66,7 +66,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         }
 
         // Spells and the preparations storing them share their spell data.
-        const spell = this.against.item?.spellPart;
+        const spell = this.against.item?.asType('spell', 'preparation')?.system;
         if (spell?.category === 'combat' && spell.combat.type === 'indirect') {
             const casting = this.data.against as SpellCastingTestData;
             this.data.incomingDamage = CombatSpellRules.calculateIndirectDamage(this.data.incomingDamage, casting.force);

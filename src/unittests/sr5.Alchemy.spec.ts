@@ -876,10 +876,9 @@ export const shadowrunAlchemy = (context: QuenchBatchContext) => {
         it('carries the spell fields a spell item carries', async () => {
             const preparation = await createPreparation({ type: 'mana', combat: { type: 'direct' } });
 
-            // The defense chain resolves a triggered preparation through this accessor.
-            assert.isDefined(preparation.spellPart);
-            assert.equal(preparation.spellPart?.category, 'combat');
-            assert.equal(preparation.spellPart?.combat.type, 'direct');
+            // The defense chain reads these from a triggered preparation as it does from a spell.
+            assert.equal(preparation.system.category, 'combat');
+            assert.equal(preparation.system.combat.type, 'direct');
         });
 
         it('configures the trigger test on creation', async () => {

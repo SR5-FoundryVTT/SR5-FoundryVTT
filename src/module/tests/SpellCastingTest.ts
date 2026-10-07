@@ -25,7 +25,7 @@ export interface SpellCastingTestData extends SuccessTestData {
  */
 export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
     // A preparation carries the same spell fields a spell item does, and PreparationTriggerTest
-    // runs this flow with one. See SR5Item#spellPart.
+    // runs this flow with one.
     public override item: SR5Item<'spell' | 'preparation'> | undefined = undefined;
     public blastTemplateFlow = new BlastTemplateFlow(this, {
         getBlastData: () => this.getBlastData(),
@@ -73,7 +73,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
      * Spellcasting test category directly depends on the spell cast.
      */
     override get testCategories(): Shadowrun.ActionCategories[] {
-        const spell = this.item?.spellPart;
+        const spell = this.item?.asType('spell', 'preparation')?.system;
         if (!spell) return [];
 
         switch (spell.category) {
@@ -89,8 +89,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
             case 'manipulation': return ['spell_manipulation'];
         }
 
-        return []
-
+        return [];
     }
 
     override get testModifiers(): ModifierTypes[] {

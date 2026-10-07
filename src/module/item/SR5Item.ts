@@ -35,7 +35,6 @@ import { SetMarksOptions } from '../storage/MarksStorage';
 import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ModifiableValueType } from '../types/template/Base';
-import { SpellPartType } from '../types/template/SpellPart';
 import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
 import { allApplicableDocumentEffects } from '../effects';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
@@ -155,18 +154,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     async clearNestedItems() {
         return this.unsetFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
-    }
-
-    /**
-     * The spell defining system data of this item, if it has any.
-     *
-     * Both spell items and preparation items carry the same spell fields, a preparation as a
-     * snapshot of the spell it was made from. Anything resolving a spell's behaviour should go
-     * through here, so a triggered preparation runs through the same flow as a cast spell.
-     */
-    get spellPart(): SpellPartType | undefined {
-        if (this.type !== 'spell' && this.type !== 'preparation') return undefined;
-        return this.system as SpellPartType;
     }
 
     get hasOpposedRoll(): boolean {
@@ -1032,7 +1019,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     isAreaOfEffect(): boolean {
         return (this.isType('weapon') && this.system.category === 'thrown' && this.system.thrown.blast.radius > 0)
             || (this.isType('weapon') && (this.getEquippedAmmo()?.system.blast?.radius ?? 0) > 0)
-            || this.spellPart?.range === 'los_a'
+            || this.asType('spell', 'preparation')?.system.range === 'los_a'
             || (this.isType('ammo') && this.system.blast.radius > 0);
     }
 

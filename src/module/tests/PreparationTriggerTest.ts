@@ -30,7 +30,7 @@ export interface PreparationTriggerTestData extends SpellCastingTestData {
  */
 export class PreparationTriggerTest extends SpellCastingTest {
     declare data: PreparationTriggerTestData;
-    // A preparation carries the same spell fields a spell item does. See SR5Item#spellPart.
+    // A preparation carries the same spell fields a spell item does.
     public declare item: SR5Item<'preparation'> | undefined;
 
     constructor(...args: ConstructorParameters<typeof SpellCastingTest>) {
