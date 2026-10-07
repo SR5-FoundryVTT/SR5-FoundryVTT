@@ -5,8 +5,8 @@
     {{#if (or speaker.source item)}}
     <div class="card-title card-header card-header--entities">
         <div class="container container--fluid">
-            {{#if speaker.source}}
             <div class="container__row">
+                {{#if speaker.source}}
                 <div class="container__col">
                     <div class="document">
                         <a class="chat-select-link" data-token-id="{{speaker.token.id}}">
@@ -17,20 +17,20 @@
                         </h3>
                     </div>
                 </div>
-            </div>
-            {{/if}}
-            {{#if item}}
-            <div class="container__row">
-                <div class="container__col">
+                {{/if}}
+                {{#if item}}
+                <div class="container__col container__col--item">
                     <div class="document">
-                        <img src="{{item.img}}" data-tooltip="{{item.name}}" />
+                        <a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">
+                            <img src="{{item.img}}" data-tooltip="{{localizeContent item.name}}" />
+                        </a>
                         <h3 class="header-name">
                             <a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">{{localizeContent item.name}}</a>
                         </h3>
                     </div>
                 </div>
+                {{/if}}
             </div>
-            {{/if}}
         </div>
     </div>
     {{/if}}

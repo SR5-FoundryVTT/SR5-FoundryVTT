@@ -5,6 +5,7 @@ import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { prepareEffectDurationStatus } from '../effect/EffectDurationStatus';
+import { preparePreparationPotencyStatus } from '../item/prep/PreparationPotencyStatus';
 
 export const registerItemLineHelpers = () => {
 
@@ -103,6 +104,11 @@ export const registerItemLineHelpers = () => {
     // State-aware duration presentation for the actor/item effect list (state/summary/icon).
     Handlebars.registerHelper('effectDurationStatus', function (effect: SR5ActiveEffect) {
         return prepareEffectDurationStatus(effect);
+    })
+
+    Handlebars.registerHelper('preparationPotencyStatus', function (item: SR5Item) {
+        if (!item?.isType('preparation')) return;
+        return preparePreparationPotencyStatus(item.system);
     })
 
     Handlebars.registerHelper('isFreshImport', function (document, options) {

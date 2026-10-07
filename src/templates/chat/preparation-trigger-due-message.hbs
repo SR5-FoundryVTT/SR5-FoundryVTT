@@ -1,0 +1,46 @@
+{{! Mirrors the extended test due card layout, see chat/extended-test-due-message.hbs. }}
+<div class="sr5 chat-card roll-card preparation-trigger-due-card">
+    <div class="card-title card-header card-header--title">
+        <span class="test-name">{{preparation.name}}</span>
+    </div>
+
+    <div class="card-title card-header card-header--entities">
+        <div class="container container--fluid">
+            <div class="container__row">
+                {{! A preparation in the Items directory has no actor. }}
+                {{#if actor}}
+                    <div class="container__col">
+                        <div class="document">
+                            <img src="{{actor.img}}" data-tooltip="{{actor.name}}" />
+                            <h3 class="header-name">
+                                <a class="chat-document-link" data-uuid="{{actor.uuid}}">{{actor.name}}</a>
+                            </h3>
+                        </div>
+                    </div>
+                {{/if}}
+                {{! The name is already the card title, see rolls/success-test-message.hbs. }}
+                <div class="container__col container__col--item">
+                    <div class="document">
+                        <a class="chat-document-link" data-entity="Item" data-id="{{preparation.id}}" data-uuid="{{preparation.uuid}}">
+                            <img src="{{preparation.img}}" data-tooltip="{{preparation.name}}" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-main-content">
+        <div class="card-test-content card-test-content--status">
+            <div class="glitch-content">
+                <div class="glitch">{{localize "SR5.Preparation.TriggerDueMessage.Header"}}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-buttons card-buttons--actions">
+        <div class="button" data-action="preparation-trigger-roll" data-uuid="{{preparation.uuid}}">
+            {{localize "SR5.Preparation.TriggerDueMessage.Roll"}}
+        </div>
+    </div>
+</div>

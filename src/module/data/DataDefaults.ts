@@ -36,6 +36,7 @@ import { Metamagic } from "../types/item/Metamagic";
 import { Modification } from "../types/item/Modification";
 import { Program } from "../types/item/Program";
 import { Quality } from "../types/item/Quality";
+import { Preparation } from "../types/item/Preparation";
 import { Ritual } from "../types/item/Ritual";
 import { LicenseData, Sin } from "../types/item/Sin";
 import { Spell } from "../types/item/Spell";
@@ -75,6 +76,7 @@ const systemMap = {
     modification: Modification,
     program: Program,
     quality: Quality,
+    preparation: Preparation,
     ritual: Ritual,
     sin: Sin,
     skill: Skill,

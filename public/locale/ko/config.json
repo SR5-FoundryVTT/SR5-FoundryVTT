@@ -2702,6 +2702,10 @@
             "DetectionDirectional": "지향형",
             "DetectionPsychic": "초자연",
             "FIELDS": {
+                "alchemical": {
+                    "hint": "This spell was learned as an alchemical formula and can be made into a preparation.",
+                    "label": "Alchemical"
+                },
                 "category": {
                     "hint": "주문이 속한 범주",
                     "label": "범주"

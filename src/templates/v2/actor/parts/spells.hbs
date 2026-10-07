@@ -1,5 +1,12 @@
+{{!--
+    Renders one categorized spell list. Expects:
+      spells     - the sorted category map from _prepareSortedCategorizedSpells
+      label      - localization key for the section header
+      alchemical - whether this section holds alchemical formulae
+--}}
 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/spell/header.hbs'
-        label='SR5.Spell.Spells'
+        label=label
+        alchemical=alchemical
         type='spell' }}
 {{#each spells.notfound}}
     {{> 'systems/shadowrun5e/dist/templates/v2/list-items/spell/item.hbs' item=this }}

@@ -50,7 +50,7 @@ const SRStatus = [
                     id: 'targetRanged',
                     applyTo: 'test_target',
                     conditions: [
-                        { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest', 'SpellCastingTest'] },
+                        { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest', 'SpellCastingTest', 'PreparationTriggerTest'] },
                         { type: 'categories', mode: 'include', values: ['attack_ranged', 'attack_thrown'] },
                     ],
                 },
@@ -100,7 +100,7 @@ const SRStatus = [
                     id: 'targetRanged',
                     applyTo: 'test_target',
                     conditions: [
-                        { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest', 'SpellCastingTest'] },
+                        { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest', 'SpellCastingTest', 'PreparationTriggerTest'] },
                         { type: 'categories', mode: 'include', values: ['attack_ranged', 'attack_thrown'] },
                     ],
                 },

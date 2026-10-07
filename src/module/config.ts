@@ -47,6 +47,7 @@ export const SR5 = {
         modification: 'SR5.ItemTypes.Modification',
         program: 'SR5.ItemTypes.Program',
         quality: 'SR5.ItemTypes.Quality',
+        preparation: 'SR5.ItemTypes.Preparation',
         ritual: 'SR5.ItemTypes.Ritual',
         sin: 'SR5.ItemTypes.Sin',
         spell: 'SR5.ItemTypes.Spell',
@@ -492,6 +493,24 @@ export const SR5 = {
         spotter: 'SR5.Ritual.Spotter',
     },
 
+    /**
+     * The condition that releases a preparation's spell, as defined on SR5#305.
+     */
+    preparationTriggers: {
+        command: 'SR5.Preparation.Trigger.Command',
+        contact: 'SR5.Preparation.Trigger.Contact',
+        time: 'SR5.Preparation.Trigger.Time',
+    },
+
+    /**
+     * Drain each preparation trigger adds to the creation of a preparation, as defined on SR5#305.
+     */
+    preparationTriggerDrain: {
+        command: 2,
+        contact: 1,
+        time: 2,
+    },
+
     attributeRolls: {
         composure: 'SR5.RollComposure',
         lift_carry: 'SR5.RollLiftCarry',
@@ -743,6 +762,7 @@ export const SR5 = {
         'addiction_mental': "SR5.ActionCategory.AddictionMental",
         'addiction_physical': "SR5.ActionCategory.AddictionPhysical",
         'addiction': "SR5.ActionCategory.Addiction",
+        'alchemy': "SR5.ActionCategory.Alchemy",
         'attack_matrix': "SR5.ActionCategory.AttackMatrix",
         'attack_melee': "SR5.ActionCategory.AttackMelee",
         'attack_ranged': "SR5.ActionCategory.AttackRanged",
@@ -877,7 +897,19 @@ export const SR5 = {
     activeTests: {
         'spell': 'SpellCastingTest',
         'ritual': 'RitualSpellcastingTest',
+        'preparation': 'PreparationTriggerTest',
         'complex_form': 'ComplexFormTest'
+    },
+
+    /**
+     * An alchemical spell is a preparation formula rather than a castable spell, so it rolls a
+     * different chain than its sorcery counterpart. See SR5#304 'Step 1: Choose a Spell'.
+     *
+     * The drain follow up is taken from followedTests, keyed by the active test.
+     */
+    alchemicalSpellTests: {
+        test: 'PreparationCreationTest',
+        opposed: 'OpposedPreparationForceTest',
     },
 
     /**
@@ -915,7 +947,8 @@ export const SR5 = {
      * When a test is cast an active test this defines what tests should follow that tests completion
      */
     followedTests: {
-        'SpellCastingTest': 'DrainTest'
+        'SpellCastingTest': 'DrainTest',
+        'PreparationCreationTest': 'DrainTest'
     },
 
     // When a firemode with suppression is used, this test should defend against it.
@@ -1539,6 +1572,7 @@ export const SR5 = {
             'negative': '',
             'positive': ''
         },
+        preparation: {},
         ritual: {},
         sin: {},
         spell: {
