@@ -531,6 +531,11 @@ export const SR5 = {
         thrown: 'SR5.Weapon.Category.Thrown',
     },
 
+    thrownTypes: {
+        grenade_standard: 'SR5.Weapon.Range.Category.StandardThrownGrenade',
+        grenade_aerodynamic: 'SR5.Weapon.Range.Category.AerodynamicThrownGrenade',
+    },
+
     weaponCliptypes: {
         removable_clip: 'SR5.Weapon.Cliptype.RemovableClip',
         break_action: 'SR5.Weapon.Cliptype.BreakAction',
@@ -1162,32 +1167,6 @@ export const SR5 = {
         environments: {
             speed: 'SR5.Vehicle.Environments.Speed',
             handling: 'SR5.Vehicle.Environments.Handling',
-        },
-        subCategories: {
-            bike: 'SR5.Vehicle.SubCategories.Bike',
-            motorcycle: 'SR5.Vehicle.SubCategories.Motorcycle',
-            car: 'SR5.Vehicle.SubCategories.Car',
-            truck: 'SR5.Vehicle.SubCategories.Truck',
-            boat: 'SR5.Vehicle.SubCategories.Boat',
-            submarine: 'SR5.Vehicle.SubCategories.Submarine',
-            aircraft: 'SR5.Vehicle.SubCategories.Aircraft',
-            rotorcraft: 'SR5.Vehicle.SubCategories.Rotorcraft',
-            vtol: 'SR5.Vehicle.SubCategories.Vtol',
-            hovercraft: 'SR5.Vehicle.SubCategories.Hovercraft',
-            ltav: 'SR5.Vehicle.SubCategories.Ltav',
-            glider: 'SR5.Vehicle.SubCategories.Glider',
-            walker: 'SR5.Vehicle.SubCategories.Walker',
-            heavy_equipment: 'SR5.Vehicle.SubCategories.HeavyEquipment',
-            military: 'SR5.Vehicle.SubCategories.Military',
-            commercial: 'SR5.Vehicle.SubCategories.Commercial',
-            micro_drone: 'SR5.Vehicle.SubCategories.MicroDrone',
-            mini_drone: 'SR5.Vehicle.SubCategories.MiniDrone',
-            small_drone: 'SR5.Vehicle.SubCategories.SmallDrone',
-            medium_drone: 'SR5.Vehicle.SubCategories.MediumDrone',
-            large_drone: 'SR5.Vehicle.SubCategories.LargeDrone',
-            huge_drone: 'SR5.Vehicle.SubCategories.HugeDrone',
-            anthro_drone: 'SR5.Vehicle.SubCategories.AnthroDrone',
-            missile_drone: 'SR5.Vehicle.SubCategories.MissileDrone',
         },
     },
 

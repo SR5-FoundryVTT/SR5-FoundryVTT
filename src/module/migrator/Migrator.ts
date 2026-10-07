@@ -340,9 +340,9 @@ export class Migrator {
     }
 
     /**
-     * Migrate all documents in the game.
+     * Migrate all actors in the game.
      */
-    public static async updateAllMigratableDocuments() {
+    private static async updateAllMigratableDocuments() {
         const start = performance.now();
 
         // Estimate total migration steps
