@@ -90,7 +90,7 @@ export const UpdateActionFlow = {
             'call_in_action': UpdateActionFlow.injectCallInActionTestIntoChangeData.bind(UpdateActionFlow)
         };
 
-        const handler = typeHandler[type];
+        const handler = typeHandler[type] as ((type: string, changeData: Item.UpdateData, applyData: object, item?: SR5Item) => void) | undefined;
         if (!handler) return;
 
         handler(type, changeData, applyData, item);

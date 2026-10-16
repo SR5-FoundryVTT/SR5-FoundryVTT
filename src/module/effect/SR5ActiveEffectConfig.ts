@@ -10,6 +10,13 @@ import { SR5ActiveEffect } from './SR5ActiveEffect';
 import { SR5ActiveEffectValueEditor } from './SR5ActiveEffectValueEditor';
 import { Translation } from '../utils/strings';
 import { EffectDurationStatus, prepareEffectDurationStatus } from './EffectDurationStatus';
+
+interface EffectTargetSource {
+    id?: string;
+    applyTo?: string;
+    name?: string;
+    conditions?: { type?: string; values?: string[] }[];
+}
 import { isElementInstance } from '@/module/utils/dom';
 import { SR5Item } from '../item/SR5Item';
 
@@ -120,7 +127,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     /**
      * Do any final preparations when rendering the sheet
      */
-    protected override async _renderHTML(context, options) {
+    protected override async _renderHTML(context, options: { parts?: string[] }) {
         this._closeValueEditor();
 
         // push footer to the end of parts so it is rendered at the bottom
@@ -128,7 +135,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             const index = options.parts.indexOf("footer");
             options.parts.push(options.parts.splice(index, 1)[0]);
         }
-        return super._renderHTML(context, options);
+        return super._renderHTML(context, options) as Promise<Record<string, HTMLElement>>;
     }
 
     /**
@@ -334,11 +341,11 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         const { targets } = this._syncFormIntoClone();
         if (!targets[targetIndex]) return;
 
-        const usedTypes = new Set<string>((targets[targetIndex].conditions ?? []).map((c: any) => c.type as string));
+        const usedTypes = new Set<string>((targets[targetIndex].conditions ?? []).map(c => c.type as string));
         const availableType = Object.keys(SR5.effectFilterTypes).find(t => !usedTypes.has(t));
         if (!availableType) return;
 
-        targets[targetIndex].conditions.push({ type: availableType });
+        targets[targetIndex].conditions!.push({ type: availableType });
         this.clone.updateSource({ system: { targets } });
         await this.render();
     }
@@ -469,7 +476,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         // Return detached data so callers can safely perform structural edits before updateSource.
         const { targets, changes } = this.clone.system.toObject();
         return {
-            targets: targets as any[],
+            targets: targets as EffectTargetSource[],
             changes: changes as any[],
         };
     }

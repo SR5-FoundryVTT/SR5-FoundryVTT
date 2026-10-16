@@ -58,7 +58,7 @@ export const registerAppv2Helpers = () => {
         }
         // remove options from the captured string
         types.splice(types.length - 1, 1);
-        return (document as any).isType(...types);
+        return (document as { isType: (...types: string[]) => boolean }).isType(...types);
     })
 
 }

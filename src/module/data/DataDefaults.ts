@@ -174,6 +174,6 @@ export class DataDefaults {
                 console.table(correctionLogs);
             }
         }
-        return new (systemMap[entity] as any)(createData).toObject() as ReturnType<SystemByType<EntityType>['toObject']>;
+        return new (systemMap[entity] as unknown as new (data?: SystemConstructorArgs<EntityType>) => SystemByType<EntityType>)(createData).toObject() as ReturnType<SystemByType<EntityType>['toObject']>;
     }
 }

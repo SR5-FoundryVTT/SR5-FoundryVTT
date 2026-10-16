@@ -1,3 +1,4 @@
+import type { TestCreator } from './tests/TestCreator';
 import {SituationModifiersApplication} from './apps/SituationModifiersApplication';
 import {OverwatchScoreTracker} from './apps/gmtools/OverwatchScoreTracker';
 
@@ -18,7 +19,7 @@ export const registerSystemKeybindings = () => {
         name: "SR5.Keybinding.SuccessTestPrompt.Label",
         hint: "SR5.Keybinding.SuccessTestPrompt.Hint",
         editable: [{ key: "KeyZ", modifiers: [] }],
-        onDown: () => { game.shadowrun5e.test.promptSuccessTest(); }
+        onDown: () => { void (game.shadowrun5e.test as typeof TestCreator).promptSuccessTest(); }
     });
 
     game.keybindings.register("shadowrun5e", "show-overwatch-tracker-app", {

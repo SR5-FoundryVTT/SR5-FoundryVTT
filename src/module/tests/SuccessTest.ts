@@ -2409,11 +2409,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * @param event A PointerEvent by user-interaction
      */
-    static async _castResultAction(event) {
+    static async _castResultAction(event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
-        const element = $(event.currentTarget)
+        const element = $(event.currentTarget as HTMLElement)
         const messageId = element.closest('.chat-message').data('messageId');
         const resultAction = element.data('action');
 

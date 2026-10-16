@@ -74,7 +74,7 @@ export class DamageApplicationFlow {
      * @param event 
      * @returns 
      */
-    static async chatMessageActionApplyDamage(html, event) {
+    static async chatMessageActionApplyDamage(html, event: JQuery.TriggeredEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
         event.stopPropagation();
         event.preventDefault();
         const applyDamage = $(event.currentTarget);

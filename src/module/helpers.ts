@@ -99,7 +99,7 @@ export class Helpers {
         return false;
     }
 
-    static setupCustomCheckbox(app, html) {
+    static setupCustomCheckbox(app: unknown, html: JQuery) {
         const setContent = (el) => {
             const checkbox = $(el).children('input[type=checkbox]');
             const checkmark = $(el).children('.checkmark');
@@ -111,11 +111,10 @@ export class Helpers {
                 $(checkmark).removeClass('fa-check-circle');
             }
         };
-        html.find('label.checkbox').each(function (this: any) {
+        html.find('label.checkbox').each(function (this: HTMLElement) {
             setContent(this);
         });
         html.find('label.checkbox').click((event) => setContent(event.currentTarget));
-        html.find('.submit-checkbox').change((event) => { app._onSubmit(event); });
     }
 
     static label(str: string) {
@@ -158,7 +157,7 @@ export class Helpers {
         return event && (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey);
     }
 
-    static filter(obj, comp) {
+    static filter(obj, comp: (entry: [string, unknown]) => boolean) {
         const retObj = {};
         if (typeof obj === 'object' && obj !== null) {
             Object.entries(obj).forEach(([key, value]) => {

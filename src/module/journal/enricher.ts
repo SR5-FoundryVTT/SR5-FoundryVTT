@@ -38,7 +38,7 @@ export class JournalEnrichers {
      * @param html the triggering html
      * @param data 
      */
-    static setEnricherHooks(journal, html, data) {
+    static setEnricherHooks(journal, html: JQuery, data) {
         const rolls = { 
             "Teamwork": "startTeamworkTest",
             "RollSkill": "rollSkill", 
@@ -96,7 +96,7 @@ export class JournalEnrichers {
 
             if (actor) {
                 //in a normal running game this should not happen
-                actor[rollType](rollEntity, {threshold: {base: threshold, value: threshold} })
+                (actor[rollType] as (entity: string | undefined, options: { threshold: { base: number, value: number } }) => unknown)(rollEntity, {threshold: {base: threshold, value: threshold} })
             } else {
                 ui.notifications?.error('SR5.Errors.NoAvailableActorFound', {localize: true});
             }

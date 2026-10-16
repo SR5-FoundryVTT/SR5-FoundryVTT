@@ -165,7 +165,7 @@ export const shadowrunChatMessageLayoutTesting = (context: QuenchBatchContext) =
         });
 
         describe('parameter modifier panels', () => {
-            const renderCard = async (test): Promise<HTMLElement> => {
+            const renderCard = async (test: SuccessTest): Promise<HTMLElement> => {
                 const wrapper = document.createElement('div');
                 wrapper.innerHTML = await foundry.applications.handlebars.renderTemplate(
                     'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',

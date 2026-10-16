@@ -1,3 +1,6 @@
+import type { SR5Actor } from './actor/SR5Actor';
+import type { SR5Item } from './item/SR5Item';
+
 /**
  * The legacy chat message approach of the system uses a generic chat message to display roll and item information.
  *
@@ -41,7 +44,7 @@ export async function createItemChatMessage(options) {
     return createChatMessage('systems/shadowrun5e/dist/templates/rolls/item-card.hbs', templateData);
 }
 
-function createChatTemplateData(options) {
+function createChatTemplateData(options: { actor?: SR5Actor; item?: SR5Item; description?: unknown; tests?: unknown }) {
     // field extraction is explicit to enforce visible data flow to ensure clean data.
     // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
     const {actor, item, description, tests} = options;

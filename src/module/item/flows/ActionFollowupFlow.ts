@@ -10,10 +10,10 @@ export const ActionFollowupFlow = {
         $(html).find('.followup-action').on('click', ActionFollowupFlow.castFollowupAction.bind(this));
     },
 
-    castFollowupAction: async (event) => {
+    castFollowupAction: async (event: Event) => {
         event.preventDefault();
 
-        const button = $(event.currentTarget);
+        const button = $(event.currentTarget as HTMLElement);
         const card = button.closest('.chat-message');
         const messageId = card.data('messageId');
 

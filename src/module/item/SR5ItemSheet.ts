@@ -839,12 +839,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this._onMarksQuantityChangeBy(event, -1);
     }
 
-    async _onMarksQuantityChangeBy(event, by: number) {
+    async _onMarksQuantityChangeBy(event: Event, by: number) {
         event.stopPropagation();
 
         if (!this.item.isType('host')) return;
 
-        const markId = event.currentTarget.dataset.markId;
+        const markId = (event.currentTarget as HTMLElement).dataset.markId;
         if (!markId) return;
 
         const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
@@ -1137,7 +1137,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @protected
      */
     override async _onDrop(event: DragEvent) {
-        const data = TextEditor.getDragEventData(event) as any;
+        const data = TextEditor.getDragEventData(event) as { type: Parameters<typeof foundry.utils.getDocumentClass>[0]; uuid?: string };
         if (!data) return;
 
         const targetElement = event.target as HTMLElement | null;
@@ -1153,7 +1153,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         // Dropped Documents
         const documentClass = foundry.utils.getDocumentClass(data.type);
         if (documentClass) {
-            const document = await documentClass.fromDropData(data);
+            // fvtt-types declares ClientDocument.fromDropData(data: never) and getDocumentClass returns a union of classes.
+            const document = await documentClass.fromDropData(data as never);
             await this._onDropDocument(event, document);
         }
     }
@@ -1195,9 +1196,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      *                                                 created, or otherwise a nullish value
      * @protected
      */
-    override async _onDropActiveEffect(event, effect): Promise<any> {
+    override async _onDropActiveEffect(event, effect: ActiveEffect.Implementation): Promise<any> {
         if (!this.item.isOwner) return null;
-        const keepId = !this.item.effects.has(effect.id);
+        const keepId = !this.item.effects.has(effect.id as string);
         const result = await SR5ActiveEffect.create(effect.toObject(), { parent: this.item, keepId });
         return result ?? null;
     }

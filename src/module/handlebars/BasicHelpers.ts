@@ -59,7 +59,7 @@ export const registerBasicHelpers = () => {
         return args.filter(a => typeof a === 'string').join('');
     });
 
-    Handlebars.registerHelper('for', function (from: number, to: number, options) {
+    Handlebars.registerHelper('for', function (from: number, to: number, options: Handlebars.HelperOptions) {
         let accum = '';
         for (let i = from; i < to; i += 1) {
             accum += options.fn(i);

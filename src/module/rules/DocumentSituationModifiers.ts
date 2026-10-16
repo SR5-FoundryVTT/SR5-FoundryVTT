@@ -225,7 +225,7 @@ export class DocumentSituationModifiers {
             if (Object.getPrototypeOf(handler).constructor.hasSourceData) {
                 // Befor application, remove invalid selections. 
                 // This happens when a selection has been set with an empty input DOM element.
-                Object.entries(this.source[category].active).forEach(([modifier, value]) => {
+                Object.entries(this.source[category].active as Record<string, unknown>).forEach(([modifier, value]) => {
                     switch (value) {
                         case null:
                         case undefined:

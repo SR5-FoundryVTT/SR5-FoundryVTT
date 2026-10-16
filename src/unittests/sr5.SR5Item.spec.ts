@@ -1,17 +1,19 @@
 import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
+import type { SR5ItemSheet } from "@/module/item/SR5ItemSheet";
 
 export const shadowrunSR5Item = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
     const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
+    type ItemSheetFixture = Pick<SR5ItemSheet, 'render' | 'element' | 'submit' | 'close'> & { _mode: 'play' | 'edit' };
 
     after(async () => { await factory.destroy(); });
 
     describe('SR5Items', () => {
         it('edits and saves Matrix action marks and owner from Details', async () => {
             const item = await factory.createItem({ type: 'action', system: { action: { categories: ['matrix'] } } });
-            const sheet = item.sheet as any;
+            const sheet = item.sheet as unknown as ItemSheetFixture;
             sheet._mode = 'edit';
             await sheet.render(true);
 
@@ -27,11 +29,11 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             await sheet.render(true);
             assert.strictEqual(item.system.action.category.matrix.marks, 2);
             assert.isTrue(item.system.action.category.matrix.owner);
-            assert.strictEqual((sheet.element.querySelector('[name="system.action.category.matrix.marks"]') as HTMLInputElement | null)?.value, '2');
+            assert.strictEqual(sheet.element.querySelector<HTMLInputElement>('[name="system.action.category.matrix.marks"]')?.value, '2');
             await sheet.close();
 
             const ordinary = await factory.createItem({ type: 'action' });
-            const ordinarySheet = ordinary.sheet as any;
+            const ordinarySheet = ordinary.sheet as unknown as ItemSheetFixture;
             ordinarySheet._mode = 'edit';
             await ordinarySheet.render(true);
             assert.isNull(ordinarySheet.element.querySelector('[name="system.action.category.matrix.marks"]'));

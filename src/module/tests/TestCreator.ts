@@ -612,7 +612,7 @@ export const TestCreator = {
                 if (segments.length > 2) console.error('Shadowrun 5e | Action contained a partial modifier with more than two segments', modifier, data.action);
 
                 // Record the modifier category with it's single applicable.
-                const [category, applicable] = segments;
+                const [category, applicable] = segments as [Shadowrun.ModifierTypes, string];
                 modifiers[category] = modifiers[category] ?? [];
                 modifiers[category].push(applicable);
 
