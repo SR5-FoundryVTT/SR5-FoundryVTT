@@ -191,7 +191,6 @@ export class OpposedPreparationForceTest extends OpposedTest<OpposedPreparationF
         const itemData = {
             name: `${spell.name} (${game.i18n.localize('SR5.ItemTypes.Preparation')})`,
             type: 'preparation' as const,
-            img: spell.img,
             system: {
                 ...spellSnapshot,
                 description: foundry.utils.duplicate(spell.system.description),
