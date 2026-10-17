@@ -1,4 +1,3 @@
-import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
 
 export class ArmorParser extends Parser<'armor'> {

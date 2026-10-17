@@ -63,7 +63,7 @@ export class NuyenManager extends HandlebarsApplicationMixin(ApplicationV2)<Nuye
         void this.close();
     }
 
-    static #cancel(this: NuyenManager, event: Event) {
+    static #cancel(this: NuyenManager) {
         void this.close();
     }
 

@@ -250,19 +250,19 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
             return this._mode === 'play';
         }
 
-        protected _canDragStart(selector?: string | null): boolean {
+        protected _canDragStart(_selector?: string | null): boolean {
             return !!this.isEditable;
         }
 
-        protected _canDragDrop(selector?: string | null): boolean {
+        protected _canDragDrop(_selector?: string | null): boolean {
             return !!this.isEditable;
         }
 
-        protected _onDragStart(event: DragEvent) { }
+        protected _onDragStart(_event: DragEvent) { }
 
-        protected _onDragOver(event: DragEvent) { }
+        protected _onDragOver(_event: DragEvent) { }
 
-        protected async _onDrop(event: DragEvent) { }
+        protected async _onDrop(_event: DragEvent) { }
 
         protected override async _prepareContext(
             options: Parameters<BaseType["_prepareContext"]>[0]

@@ -64,7 +64,7 @@ export class DamageApplicationFlow {
         return updatedDamage;
     }
 
-    static handleRenderChatMessage(app: ChatMessage, html, data) {
+    static handleRenderChatMessage(app: ChatMessage, html) {
         $(html).on('click', '.apply-damage', async event => await DamageApplicationFlow.chatMessageActionApplyDamage(html, event));
     }
 

@@ -20,7 +20,7 @@ export class JournalEnrichers {
         CONFIG.TextEditor.enrichers.push(
             {
                 pattern: new RegExp(`\\@(${JournalEnrichers.actorKeywords.join("|")})${opening}([a-z]+)${threshold}${closing}`, "g"),
-                enricher: (match, options) => {
+                enricher: (match) => {
                     const type = match[1]
                     const rollEntity = match[3]
                     const threshold = match[4]
@@ -38,7 +38,7 @@ export class JournalEnrichers {
      * @param html the triggering html
      * @param data 
      */
-    static setEnricherHooks(journal, html: JQuery, data) {
+    static setEnricherHooks(journal, html: JQuery, _data) {
         const rolls = { 
             "Teamwork": "startTeamworkTest",
             "RollSkill": "rollSkill", 

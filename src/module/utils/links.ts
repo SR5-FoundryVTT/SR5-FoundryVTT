@@ -30,7 +30,7 @@ export class LinksHelpers {
         try {
             new URL(candidate, window.location.origin);
             return true;
-        } catch (error) {
+        } catch {
             return false;
         }
     }
@@ -95,7 +95,6 @@ export class LinksHelpers {
 
         const resolvedUuid = foundry.utils.parseUuid(source)?.uuid;
 
-        type docType = foundry.abstract.Document.ImplementationFor<CONST.ALL_DOCUMENT_TYPES>;
         const uuid = resolvedUuid?.split('#')[0];
         const anchor = resolvedUuid?.split('#')[1];
         const document = uuid ? await fromUuid(uuid) : null;

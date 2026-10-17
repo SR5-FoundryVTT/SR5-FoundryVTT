@@ -17,7 +17,7 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { parseDropData } from '../utils/sheets';
 
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
-import { AmmunitionType, RangeType } from '../types/item/Weapon';
+import { AmmunitionType } from '../types/item/Weapon';
 
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import ItemSheet = foundry.applications.sheets.ItemSheet;
@@ -905,7 +905,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
-    static async #toggleEquipped(this: SR5ItemSheet, event: Event) {
+    static async #toggleEquipped(this: SR5ItemSheet) {
         if (this.item.isType('device') && this.item.parent instanceof SR5Actor) {
             await this.item.parent.equipOnlyOneItemOfType(this.item);
             void this.render();
@@ -1275,7 +1275,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @protected
      */
     // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
-    async _onDropFolder(event, folder) {
+    async _onDropFolder(_event, _folder) {
         return null;
     }
 

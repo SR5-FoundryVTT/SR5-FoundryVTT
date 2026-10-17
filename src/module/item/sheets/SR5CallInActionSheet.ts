@@ -83,14 +83,14 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
     /**
      * Handling the removal of a spirit by any sheet action.
      */
-    static async #removeSpirit(this: SR5CallInActionSheet, event: Event) {
+    static async #removeSpirit(this: SR5CallInActionSheet) {
         await this.item.update({ system: { spirit: { uuid: '' } } });
     }
     
     /**
      * User requested removal of the prepared sprite.
      */
-    static async #removeSprite(this: SR5CallInActionSheet, event: Event) {
+    static async #removeSprite(this: SR5CallInActionSheet) {
         await this.item.update({ system: { sprite: { uuid: '' } } });
     }
 

@@ -62,7 +62,7 @@ export const OverwatchStorage = {
         const documents = uuids.map(uuid => ({uuid, document: fromUuidSync(uuid)}));
         
         // Remove any deleted actors.
-        const deletedActors = documents.filter(({uuid, document}) => document === null);
+        const deletedActors = documents.filter(({document}) => document === null);
         if (deletedActors.length > 0) {
             deletedActors.forEach(({uuid}) => {
                 const uuidStorage = Helpers.uuidForStorage(uuid);

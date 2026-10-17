@@ -449,9 +449,6 @@ export class BulkImporter extends BaseClass {
     ): Promise<void> {
         await super._onRender(context, options);
 
-        // Checkbox: Assign icons
-        const setIcon = this.element.querySelector<HTMLSelectElement>("#setIcon");
-
         // Select: Import mode
         const importMode = this.element.querySelector<HTMLSelectElement>("#importMode");
         importMode?.addEventListener("change", (event) => {

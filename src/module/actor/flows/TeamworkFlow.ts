@@ -17,8 +17,8 @@ export class TeamworkTest {
         html = $(html);
         if( !html?.find('.sr5-teamwork-addparticipant') ) return;
 
-        $(html).find('.sr5-teamwork-addparticipant').on('click', async _ => await this.addParticipant(message));
-        $(html).find('.sr5-teamwork-start').on('click', _ => this.rollTeamworkTest(message));
+        $(html).find('.sr5-teamwork-addparticipant').on('click', async () => await this.addParticipant(message));
+        $(html).find('.sr5-teamwork-start').on('click', () => this.rollTeamworkTest(message));
     }
 
     /**

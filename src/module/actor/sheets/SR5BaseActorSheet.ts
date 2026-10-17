@@ -1627,7 +1627,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     static #handleFilterActiveSkills(
-        this: SR5BaseActorSheet, event: KeyboardEvent | null, query: string, rgx: RegExp, content: HTMLElement | null
+        this: SR5BaseActorSheet, event: KeyboardEvent | null, query: string, _rgx: RegExp, _content: HTMLElement | null
     ) {
         this._filters.skills = query;
         this.#filterActiveSkillsElements();

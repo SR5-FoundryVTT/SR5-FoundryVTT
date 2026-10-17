@@ -372,7 +372,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param item The item holding the action configuration.
      * @param actor The actor used for value calculation.
      */
-    static _getDocumentTestAction(item: SR5Item, actor: SR5Actor): DeepPartial<MinimalActionType> {
+    static _getDocumentTestAction(_item: SR5Item, _actor: SR5Actor): DeepPartial<MinimalActionType> {
         return {};
     }
 
@@ -394,13 +394,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param previousMessageId The id this message action is sourced from.
      */
     // oxlint-disable-next-line typescript/require-await -- Async hook that subclasses override with awaiting implementations.
-    static async _getOpposedActionTestData(testData: DeepPartial<SuccessTestData>, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
+    static async _getOpposedActionTestData(_testData: DeepPartial<SuccessTestData>, _actor: SR5Actor|SR5Item, _previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
         return undefined;
     }
 
     // oxlint-disable-next-line typescript/require-await -- Async hook that subclasses override with awaiting implementations.
-    static async _getResistActionTestData(testData: DeepPartial<SuccessTestData>, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
+    static async _getResistActionTestData(_testData: DeepPartial<SuccessTestData>, _actor: SR5Actor|SR5Item, _previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support resist message actions`);
         return undefined;
     }
@@ -2051,7 +2051,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * This listener needs to be registered to the 'renderChatMessage' FoundryVTT hook.
      */
-    static async chatMessageListeners(message: ChatMessage, html, data) {
+    static async chatMessageListeners(message: ChatMessage, html) {
         await this._hydrateValueModifierTooltips(message, html);
 
         $(html).find('.test-parameter').on('click', this._chatToggleParameterDetails.bind(this));
@@ -2066,9 +2066,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         $(html).find('.chat-select-link').on('click', this._selectSceneToken.bind(this));
         $(html).find('.test-action').on('click', this._castTestAction.bind(this));
 
-        DamageApplicationFlow.handleRenderChatMessage(message, html, data);
+        DamageApplicationFlow.handleRenderChatMessage(message, html);
 
-        await GmOnlyMessageContentFlow.chatMessageListeners(message, html, data);
+        await GmOnlyMessageContentFlow.chatMessageListeners(message, html);
     }
 
     static async _hydrateValueModifierTooltips(message: ChatMessage, html: HTMLElement | JQuery) {

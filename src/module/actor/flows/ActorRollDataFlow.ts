@@ -25,7 +25,7 @@ export const ActorRollDataFlow = {
     /**
      * Inject Driver's Attributes into the RollData if the vehicle is controlled by a driver
      */
-    injectVehicleDriverRollData: function(actor: SR5Actor, rollData: SR5Actor['system'], options: RollDataOptions = {}) {
+    injectVehicleDriverRollData: function(actor: SR5Actor, rollData: SR5Actor['system'], _options: RollDataOptions = {}) {
         const driver = actor.getVehicleDriver()
         if (!driver) return;
 
@@ -44,6 +44,6 @@ export const ActorRollDataFlow = {
      * @param rollData 
      * @param options 
      */
-    injectAstralRollData: function(actor: SR5Actor, rollData: any, options: RollDataOptions) {
+    injectAstralRollData: function(_actor: SR5Actor, _rollData: any, _options: RollDataOptions) {
     },
 }

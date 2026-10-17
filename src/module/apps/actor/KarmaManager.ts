@@ -91,7 +91,7 @@ export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<Karm
         await this.close();
     }
 
-    static #cancel(this: KarmaManager, event: Event) {
+    static #cancel(this: KarmaManager) {
         void this.close();
     }
 

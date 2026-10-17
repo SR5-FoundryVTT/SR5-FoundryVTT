@@ -294,7 +294,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         Hooks.call('sr5_processTagifyElements', this.element);
     }
 
-    static #onOpenHelp(this: SR5ActiveEffectConfig, event: PointerEvent, target: HTMLElement) {
+    static #onOpenHelp(this: SR5ActiveEffectConfig, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
         LinksHelpers.openSourceURL(SR5ActiveEffectConfig.HELP_PAGE_URL);

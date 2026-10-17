@@ -42,7 +42,7 @@ export const registerBasicHelpers = () => {
      * 
      * Example: pilot_ground_craft => SR5.Skill.PilotGroundCraft => "Pilot Ground Craft" (EN)
      */
-    Handlebars.registerHelper('localizeActionSkill', function (skill: string, options): string {
+    Handlebars.registerHelper('localizeActionSkill', function (skill: string): string {
         return SkillNamingFlow.localizeSkillName(skill);
     });
 
@@ -154,7 +154,7 @@ export const registerBasicHelpers = () => {
         return val || undefined;
     });
     // TODO: This helper doesn't work... Don't know why, but it doesn't.
-    Handlebars.registerHelper('localizeShortened', function (label: string, length: number, options: any): SafeString {
+    Handlebars.registerHelper('localizeShortened', function (label: string, length: number): SafeString {
         return new Handlebars.SafeString(Helpers.shortenAttributeLocalization(label, length));
     });
 
