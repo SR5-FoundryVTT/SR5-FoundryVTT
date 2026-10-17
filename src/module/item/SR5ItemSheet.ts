@@ -912,6 +912,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @param event
      */
     static async #toggleFreshImportFlag(this: SR5ItemSheet, event: Event) {
+        // Save any in-progress form edits before the document update rerenders the sheet.
+        await this.submit();
         const onOff = !this.item.system.importFlags?.isFreshImport;
         console.debug('Toggling isFreshImport on item to ->', onOff, event);
         const item = this.item;
@@ -961,6 +963,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     static async #addEffect(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
+        await this.submit();
         const effect = [{
             name: game.i18n.localize("SR5.ActiveEffect.New"),
         }];
@@ -978,35 +981,50 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const effectId = SheetFlow.closestEffectId(event.target);
         const effect = this.item.effects.get(effectId);
         if (effect instanceof SR5ActiveEffect) {
-            await effect.sheet?.render(true);
+            await this.submit();
+            const submittedEffect = this.item.effects.get(effectId);
+            if (submittedEffect instanceof SR5ActiveEffect) {
+                await submittedEffect.sheet?.render(true);
+            }
         } else {
             const uuid = SheetFlow.closestUuid(event.target);
             const doc = fromUuidSync(uuid);
             if (doc instanceof SR5ActiveEffect) {
-                await doc.sheet?.render(true);
+                await this.submit();
+                const submittedDoc = fromUuidSync(uuid);
+                if (submittedDoc instanceof SR5ActiveEffect) {
+                    await submittedDoc.sheet?.render(true);
+                }
             }
         }
     }
 
     static async #toggleEffect(this: SR5ItemSheet, event: MouseEvent) {
         const effectId = SheetFlow.closestEffectId(event.target);
-        const effect = this.item.effects.get(effectId);
+        let effect = this.item.effects.get(effectId);
         if (effect instanceof SR5ActiveEffect) {
+            await this.submit();
+            effect = this.item.effects.get(effectId);
+            if (!(effect instanceof SR5ActiveEffect)) return;
             await effect.update({ disabled: !effect.disabled })
         } else {
             const uuid = SheetFlow.closestUuid(event.target);
-            const doc = await fromUuid(uuid);
+            let doc = await fromUuid(uuid);
             if (doc instanceof SR5ActiveEffect) {
+                await this.submit();
+                doc = await fromUuid(uuid);
+                if (!(doc instanceof SR5ActiveEffect)) return;
                 await doc.update({ disabled: !doc.disabled })
             }
         }
     }
 
     static async #deleteEffect(this: SR5ItemSheet, event: MouseEvent) {
+        const effectId = SheetFlow.closestEffectId(event.target);
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const effectId = SheetFlow.closestEffectId(event.target);
+        await this.submit();
         if (this.item._isNestedItem) {
             this.item.effects.delete(effectId);
             await this.render(true);
