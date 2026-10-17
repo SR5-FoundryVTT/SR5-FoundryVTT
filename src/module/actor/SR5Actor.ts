@@ -1792,8 +1792,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * NOTE: These will return selections only without higher level selections applied.
      *       You'll have to manually trigger .applyAll or apply what's needed.
      */
-    getSituationModifiers(): DocumentSituationModifiers {
-        return DocumentSituationModifiers.getDocumentModifiers(this);
+    getSituationModifiers(sourceToken?: TokenDocument | null): DocumentSituationModifiers {
+        return DocumentSituationModifiers.getDocumentModifiers(this, sourceToken);
     }
 
     /**

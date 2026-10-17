@@ -68,6 +68,22 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             }
         });
 
+        it('Should import the magical type', () => {
+            if (!actor) throw new Error('No actor created');
+            assert.strictEqual(actor.system.magic.type, 'mystic_adept', 'Chummer flags mystic adepts as magician and adept');
+
+            const chummer = (flags: Record<string, string>, qualities: string[] = []) => ({
+                ...flags,
+                qualities: { quality: qualities.map(name => ({ name_english: name })) },
+            }) as any;
+            assert.strictEqual(CI.parseMagicalType(chummer({ magician: 'True', adept: 'False' })), 'magician');
+            assert.strictEqual(CI.parseMagicalType(chummer({ magician: 'False', adept: 'True' })), 'adept');
+            assert.strictEqual(
+                CI.parseMagicalType(chummer({ magician: 'True', adept: 'False' }, ['Aspected Magician'])),
+                'aspected_magician',
+            );
+        });
+
         it('Should have the correct skills', async () => {
             if (!actor) throw new Error('No actor created');
 

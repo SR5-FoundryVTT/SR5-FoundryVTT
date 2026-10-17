@@ -254,6 +254,9 @@ export class SituationModifier {
                 if (!applicable.includes(selection)) delete this.applied.active[selection];
             });
         }
+
+        // Positional Region selections participate in category-specific rules and effect compensation.
+        this._applyRegionalModifiers(options);
         
         // Apply effects applicable to situational modifiers.
         this.effects.applyAllEffects(options.test);
@@ -267,8 +270,14 @@ export class SituationModifier {
         if (this.hasFixed) this.applied.total = this.applied.fixed as number;
         else this.applied.total = this._calcActiveTotal(options);
 
+        // Region values are positional and transient, so add them after resolving persisted choices.
+        this.applied.total += this.modifiers?.regionalModifierFor(this.type ?? '') ?? 0;
+
         console.debug(`Shadowrun 5e | Totalled situational modifiers for ${this.modifiers?.document?.name} to be: ${this.applied.total}`, this.applied);
     }
+
+    /** Allow category handlers to merge transient Region data before effects and total calculation. */
+    _applyRegionalModifiers(_options: SituationalModifierApplyOptions): void {}
 
     /**
      * Add scene modifier sources into the applicable sources, when an actor is present on scene

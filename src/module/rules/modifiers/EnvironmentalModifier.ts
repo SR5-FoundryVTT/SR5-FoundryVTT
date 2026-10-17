@@ -1,74 +1,106 @@
 import { SR } from '../../constants';
-import { SituationModifier } from './SituationModifier';
+import { SituationModifier, SituationalModifierApplyOptions } from './SituationModifier';
 import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifiersSourceData = Shadowrun.EnvironmentalModifiersSourceData;
 import EnvironmentalModifiersData = Shadowrun.EnvironmentalModifiersData;
 
 /**
-  * Rules application of situation modifieres for matrix.
+ * Light and glare share a single column of the environmental modifiers table (SR5#175), which holds one
+ * selection. Its kind only decides which compensation applies, like low-light for light or flare
+ * compensation for glare. Each kind maps to the other one.
+ */
+const LIGHT_GLARE = { light: 'glare', glare: 'light' } as const;
+
+/**
+ * Rules application of situation modifiers for environmental conditions.
  */
 export class EnvironmentalModifier extends SituationModifier {
     declare source: EnvironmentalModifiersSourceData
     declare applied: EnvironmentalModifiersData
     override type: Shadowrun.SituationModifierType = 'environmental';
 
-    
     get levels(): EnvironmentalModifierLevels {
         return SR.combat.environmental.levels;
     }
 
-    /**
-     * How many selectios / modifiers are active per level of enviornmental modifiers.
-     * 
-     * A level would be light and fitting modifiers would be 'Light Rain', 'Light Winds' or Medium Range.
-     * 
-     * @param values Active modifier values to be matched to level values
-     * @returns A count per level of modifiers on that level
-     */
-    activeLevels(values: number[]): Record<string, number> {
-        return {
-            light: values.reduce((count: number, value: number) => (value === this.levels.light ? count + 1 : count), 0),
-            moderate: values.reduce((count: number, value: number) => (value === this.levels.moderate ? count + 1 : count), 0),
-            heavy: values.reduce((count: number, value: number) => (value === this.levels.heavy ? count + 1 : count), 0),
-            extreme: values.reduce((count: number, value: number) => (value === this.levels.extreme ? count + 1 : count), 0)
+    override _applyRegionalModifiers(options: SituationalModifierApplyOptions): void {
+        const regional = this.modifiers?.regional.physical;
+        if (!regional) return;
+
+        const { good } = this.levels;
+        const applicable = options.applicable?.length ? new Set(options.applicable) : null;
+        for (const category of ['visibility', 'wind'] as const) {
+            const regionValue = regional[category];
+            if (applicable && !applicable.has(category)) continue;
+            if (regionValue >= good) continue;
+            this.applied.active[category] = Math.min(this.applied.active[category] ?? good, regionValue);
         }
+
+        // A region's light or glare replaces the selection in that column unless the selection is worse.
+        const { light, glare } = regional;
+        const kind = glare < good ? 'glare' : 'light';
+        const regionValue = kind === 'glare' ? glare : light;
+        if (regionValue >= good || (applicable && !applicable.has(kind))) return;
+        const current = Math.min(this.applied.active.light ?? good, this.applied.active.glare ?? good);
+        if (regionValue > current) return;
+        this.applied.active[kind] = regionValue;
+        this.applied.active[LIGHT_GLARE[kind]] = good;
     }
 
     /**
      * Apply rules for environmental modifier selection to calculate a total modifier value.
-     * 
+     *
+     * Only the most severe condition counts. Two or more conditions tied for most severe bump it up a row.
+     *
      * SR5#173 'Environmental Modifiers'
      */
     override _calcActiveTotal(): number {
         // A fixed value selection overrides other selections.
-        if (this.applied.active.value)
-            return this.applied.active.value;
+        const { value: fixed, light, glare, ...others } = this.applied.active;
+        if (fixed) return fixed;
 
-        // Calculation based on active modifier categories, excluding manual overwrite.
-        const activeCategories = Object.entries(this.applied.active);
-        // Should an active category miss a level set, ignore and fail gracefully.
-        const activeValues = activeCategories.map(([category, level]) => level || 0);
-        // Calculate the amout of categor
-        const count = this.activeLevels(activeValues);
+        // Light and glare are one column, so only one can contribute a penalty.
+        const conditions = [...Object.values(others), Math.min(light || 0, glare || 0)];
 
-        if (count.extreme > 0 || count.heavy >= 2) {
-            return this.levels.extreme;
-        }
-        else if (count.heavy === 1 || count.moderate >= 2) {
-            return this.levels.heavy;
-        }
-        else if (count.moderate === 1 || count.light >= 2) {
-            return this.levels.moderate;
-        }
-        else if (count.light === 1) {
-            return this.levels.light;
-        } 
+        // Rows of the environmental modifiers table, from good to extreme.
+        const rows = Object.values(this.levels);
+        // Should a condition miss a level, ignore it and fail gracefully.
+        const levels = conditions.filter(condition => rows.includes(condition));
 
-        return this.levels.good;
+        const { good } = this.levels;
+        const worst = Math.min(good, ...levels);
+        const count = levels.filter(level => level === worst).length;
+        if (worst === good || count < 2) return worst;
+        return rows[Math.min(rows.indexOf(worst) + 1, rows.length - 1)];
     }
 
+    /**
+     * Selecting light clears glare and the other way around, also over a parent document's selection.
+     */
+    override setActive(modifier: string, level: number): void {
+        const other = LIGHT_GLARE[modifier];
+        if (other) this.source.active[other] = this.levels.good;
+        super.setActive(modifier, level);
+    }
+
+    override toggleSelection(modifier: string, value: number): void {
+        if (modifier === 'light' && value === this.levels.good) {
+            this.setActive(modifier, value);
+            return;
+        }
+        super.toggleSelection(modifier, value);
+    }
+
+    /**
+     * A selection inherited from a parent document, like the scene, can't be removed on this document.
+     * Override it with a good condition instead. Light and glare are cleared together.
+     */
     override setInactive(modifier: string): void {
-        if (this.source.active[modifier] !== this.applied.active[modifier]) this.setActive(modifier, 0);
-        else delete this.source.active[modifier];
+        const other = LIGHT_GLARE[modifier];
+        for (const key of other ? [modifier, other] : [modifier]) {
+            if (this.source.active[key] !== this.applied.active[key]) this.source.active[key] = this.levels.good;
+            else delete this.source.active[key];
+        }
+        this._updateDocumentSourceModifiers();
     }
 }

@@ -193,7 +193,7 @@ export const MatrixTestDataFlow = {
 
         // 2. Noise Penalty: Applies if NOT directly connected
         if (!directConnection)
-            pool.setUnique('SR5.ModifierTypes.Noise', test.actor.modifiers.totalFor('noise'));
+            pool.setUnique('SR5.ModifierTypes.Noise', test.actor.modifiers.totalFor('noise', { test, reapply: true }));
     },
 
     /**

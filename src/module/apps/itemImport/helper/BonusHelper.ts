@@ -118,6 +118,22 @@ export class BonusHelper {
         });
     }
 
+    /** Add the physical sense a Chummer item grants. Gear and ware only grant it while equipped. */
+    public static addSense(sheet: BC.DocCreateData, sourceId: string): void {
+        const sense = BC.BonusConstant.senseGrants[sourceId];
+        if (!sense) return;
+
+        sheet.effects ??= [];
+        sheet.effects.push({
+            name: sheet.name,
+            img: sheet.img,
+            system: {
+                onlyForEquipped: 'technology' in sheet.system!,
+                changes: [{ key: `system.visibilityChecks.capabilities.physical.${sense}`, type: 'override', value: true }],
+            },
+        });
+    }
+
     public static addBonus(sheet: BC.DocCreateData, bonus?: BonusSchema): void {
         if (!bonus) return;
         this.addEffects(sheet, bonus);
