@@ -92,6 +92,7 @@
             "Addiction": "Ações de Vício",
             "AddictionMental": "Vício Mental",
             "AddictionPhysical": "Vício Físico",
+            "Alchemy": "Ações de Alquimia",
             "Attack": "Ações de Ataque",
             "AttackMelee": "Ataque Corpo a Corpo",
             "AttackRanged": "Ataque à Distância",
@@ -1179,6 +1180,7 @@
             "Lifestyle": "Estilo de Vida",
             "Metamagic": "Metamagia",
             "Modification": "Modificação",
+            "Preparation": "Preparado",
             "Program": "Programa",
             "Quality": "Qualidade",
             "Ritual": "Ritual",
@@ -1234,6 +1236,7 @@
                 "ICConfiguration": "Configuração de GELO",
                 "Matrix": "Matriz",
                 "PersonalInventory": "Pessoal",
+                "Preparations": "Preparados",
                 "ResetActorForNewRun": "Resetar Ator para Nova Corrida",
                 "Rituals": "Rituais",
                 "RollDroneInfiltration": "Infiltração de Drone",
@@ -1490,6 +1493,75 @@
         "PowerPoints": "PP",
         "PowerType": "Tipo",
         "Powers": "Poderes",
+        "Preparation": {
+            "Alchemical": "Alquímico",
+            "CraftingTime": "Tempo de Preparo",
+            "CraftingTimeMinutes": "{minutes} minutos",
+            "Create": "Criar Preparado",
+            "CreationTimeDialog": {
+                "Edit": "Editar momento da criação",
+                "Invalid": "Informe uma data e hora de criação válidas.",
+                "Title": "Momento da Criação do Preparado",
+                "UseCurrent": "Usar Horário Atual"
+            },
+            "Expired": "Expirado",
+            "ExpiredAt": "Expirou em {time}",
+            "ExpiredMessage": "{name} perdeu sua potência. O feitiço armazenado se perdeu.",
+            "Expires": "Expira",
+            "ExpiresIn": "Expira daqui a {duration}",
+            "FIELDS": {
+                "created": {
+                    "hint": "Quando o preparado foi criado.",
+                    "label": "Criado",
+                    "worldTime": {
+                        "hint": "Tempo do mundo em que o preparado foi criado.",
+                        "label": "Momento da Criação"
+                    }
+                },
+                "force": {
+                    "hint": "A Força com que o preparado foi criado.",
+                    "label": "Força"
+                },
+                "potency": {
+                    "base": {
+                        "hint": "Sucessos líquidos obtidos ao criar o preparado.",
+                        "label": "Potência Criada"
+                    },
+                    "hint": "Intensidade do feitiço armazenado.",
+                    "label": "Potência",
+                    "value": {
+                        "hint": "Potência restante após a deterioração.",
+                        "label": "Potência Atual"
+                    }
+                },
+                "spellUuid": {
+                    "hint": "O feitiço a partir do qual este preparado foi criado.",
+                    "label": "Feitiço de Origem"
+                },
+                "trigger": {
+                    "hint": "A condição que libera o feitiço armazenado.",
+                    "label": "Gatilho"
+                },
+                "triggerTime": {
+                    "hint": "Contagem regressiva até um gatilho de tempo liberar o feitiço, na unidade selecionada.",
+                    "label": "Tempo do Gatilho"
+                }
+            },
+            "Formulae": "Fórmulas Alquímicas",
+            "FullPotencyUntil": "Potência total até",
+            "Lynchpin": "Âncora",
+            "Potency": "Potência",
+            "Spent": "Gasto",
+            "Trigger": {
+                "Command": "Comando",
+                "Contact": "Contato",
+                "Time": "Tempo"
+            },
+            "TriggerDueMessage": {
+                "Header": "Gatilho de tempo alcançado",
+                "Roll": "Rolar Preparado"
+            }
+        },
         "Program": "Programa",
         "ProgramType": "Tipo",
         "Programs": "Programas",
@@ -1671,6 +1743,7 @@
         "Specialization": "Especialização",
         "Specializations": "Especializações",
         "Spell": {
+            "AlchemicalFormula": "Fórmula Alquímica",
             "Attack": "Ataque Mágico",
             "Cast": "Lançar Magia",
             "CatCombat": "Combate",
@@ -1882,6 +1955,8 @@
             "AttackDoesNoPhysicalDamageToVehicle": "Ataque Acerta Mas Não Causa Dano Físico Ao Veículo",
             "AttackHits": "Ataque Acerta",
             "Failure": "Falha!",
+            "PreparationFailure": "O feitiço escapa da âncora",
+            "PreparationSuccess": "O preparado retém o feitiço",
             "ResistedAllDamage": "Nenhum Dano Sofrido!",
             "ResistedSomeDamage": "Dano Sofrido!",
             "Results": "Resultados",
@@ -1909,12 +1984,15 @@
             "NaturalRecoveryStunTest": "Recuperação Natural de Atordoamento",
             "OpposedCompileSpriteTest": "Opor à Compilação",
             "OpposedMatrixTest": "Teste Oposto de Matriz",
+            "OpposedPreparationForceTest": "Resistir com Força",
             "OpposedRitualTest": "Selar o Ritual",
             "OpposedSummonSpiritTest": "Opor à Invocação",
             "OpposedTest": "Teste Oposto",
             "PhysicalDefenseTest": "Defesa Física",
             "PhysicalResistTest": "Resistência a Dano Físico",
             "PilotVehicleTest": "Teste de Pilotagem de Veículo",
+            "PreparationCreationTest": "Criar Preparado",
+            "PreparationTriggerTest": "Ativar Preparado",
             "RangedAttackTest": "Ataque de Arma à Distância",
             "RitualSpellcastingTest": "Rolagem de Feitiço Ritual",
             "SkillTest": "Teste de Pericia",
@@ -2041,6 +2119,14 @@
                 "stun_track": "Modifica a monitor de dano atordoante",
                 "walk": "Modifica a distância de caminhada por múltiplos do atributo de agilidade",
                 "wound_tolerance": "Modifica o dano por modificador de ferida"
+            },
+            "Preparation": {
+                "Craft": "Tempo de preparo ininterrupto necessário antes de rolar o teste",
+                "Force": "Força do preparado, até o dobro do seu atributo Magia",
+                "Potency": "Sucessos líquidos do teste de criação. Diminui com o tempo e substitui Conjuração ao ser ativado",
+                "ReagentDrams": "Dracmas de reagentes usados, que substituem a Força como limite",
+                "Trigger": "A condição que libera o feitiço armazenado",
+                "TriggerTime": "Contagem regressiva até o feitiço ser liberado, limitada pela potência resultante em horas"
             },
             "RangedAttack": {
                 "Recoil": "Recuo Progressivo",
@@ -2207,6 +2293,10 @@
             "InvalidSummoningForce": "O valor da força escolhido não adere às regras",
             "NegativeLimitValue": "Os valores do limite devem ser números positivos",
             "NoFireModeConfigured": "A arma de fogo não tem modo de fogo configurado. Usará tiro único.",
+            "PreparationDepleted": "Este preparado não tem mais potência. Seu feitiço foi perdido.",
+            "PreparationForceTooHigh": "A Força do preparado é inválida ou maior que o dobro do seu atributo Magia.",
+            "PreparationNotConcluded": "O preparado ainda não está pronto. Deixe a Força dele resistir primeiro.",
+            "PreparationTriggerTimeTooLong": "O gatilho de tempo está além da potência do preparado em horas. Ele será ativado antes do previsto.",
             "RitualInvalidForce": "A força do ritual é inválida ou maior do que a nível do seu alojamento.",
             "RitualNotConcluded": "Ritual incompleto. Aguarde o ritual se opor à conjuração para determinar o dreno.",
             "RitualNotEnoughReagents": "Não foram oferecidos reagentes suficientes.",
@@ -2360,6 +2450,7 @@
             "lifestyle": "Estilo de Vida",
             "metamagic": "Metamagia",
             "modification": "Modificação de Equipamento",
+            "preparation": "Preparado",
             "program": "Programa",
             "quality": "Qualidade",
             "ritual": "Ritual",

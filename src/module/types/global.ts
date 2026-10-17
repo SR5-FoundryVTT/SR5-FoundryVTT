@@ -42,6 +42,7 @@ import { Metamagic } from './item/Metamagic';
 import { Modification } from './item/Modification';
 import { Program } from './item/Program';
 import { Quality } from './item/Quality';
+import { Preparation } from "./item/Preparation";
 import { Ritual } from "./item/Ritual";
 import { Sin } from './item/Sin';
 import { Spell } from './item/Spell';
@@ -176,6 +177,7 @@ declare module "fvtt-types/configuration" {
             modification: typeof Modification;
             program: typeof Program;
             quality: typeof Quality;
+            preparation: typeof Preparation;
             ritual: typeof Ritual;
             sin: typeof Sin;
             skill: typeof Skill;

@@ -65,6 +65,14 @@ export const TestCreator = {
      */
     fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item|null, options?: Partial<TestOptions>): Promise<SuccessTest | undefined> {
         if (!document) document = item.parent;
+
+        // A preparation rolls on its own Force and Potency, so one without an actor can still be triggered. SR5#306.
+        if (!document && item.isType('preparation')) {
+            const action = item.getAction();
+            if (!action) return;
+            return TestCreator.fromAction(foundry.utils.duplicate(action) as ActionRollType, item, options);
+        }
+
         if (!(document instanceof SR5Actor)) {
             console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.")
             return;

@@ -1,0 +1,47 @@
+<form>
+    <div class="dialog-content-common">
+        {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.hbs'}}
+        <hr />
+        <div>
+            <div class="form-group">
+                <label data-tooltip="SR5.Tooltips.Preparation.Force">{{localize "SR5.Force"}}</label>
+                <input name="test.data.force" type="number" class="disabled-for-display" value="{{test.data.force}}" />
+            </div>
+            <div class="form-group">
+                <label data-tooltip="SR5.Tooltips.Preparation.ReagentDrams">{{localize "SR5.Reagent"}}</label>
+                <input name="test.data.reagents" type="number" class="disabled-for-display" value="{{test.data.reagents}}" />
+            </div>
+            <div class="form-group">
+                <label data-tooltip="SR5.Tooltips.Preparation.Trigger">{{localize "SR5.Preparation.FIELDS.trigger.label"}}</label>
+                <select name="test.data.trigger">
+                    {{selectOptions config.preparationTriggers selected=test.data.trigger localize=true}}
+                </select>
+            </div>
+            {{#if (eq test.data.trigger 'time')}}
+                <div class="form-group trigger-time-row">
+                    <label data-tooltip="SR5.Tooltips.Preparation.TriggerTime">{{localize "SR5.Preparation.FIELDS.triggerTime.label"}}</label>
+                    <div class="trigger-time-fields">
+                        <input name="test.data.triggerTime.value" type="number" min="0" step="any"
+                               class="disabled-for-display" value="{{test.data.triggerTime.value}}"
+                               aria-label="{{localize 'SR5.Preparation.FIELDS.triggerTime.label'}}" />
+                        <select name="test.data.triggerTime.unit" data-dtype="String"
+                                aria-label="{{localize 'SR5.ActiveEffect.Duration.Units'}}">
+                            {{selectOptions test.triggerTimeUnits selected=test.data.triggerTime.unit localize=true}}
+                        </select>
+                    </div>
+                </div>
+            {{/if}}
+            <div class="form-group">
+                <label>{{localize "SR5.DrainValue"}} (F{{signedValue test.item.system.drain}})</label>
+                <input disabled type="number" class="disabled-for-display" value="{{test.data.drain}}" />
+            </div>
+            <div class="form-group">
+                <label data-tooltip="SR5.Tooltips.Preparation.Craft">{{localize "SR5.Preparation.CraftingTime"}}</label>
+                <input disabled type="text" class="disabled-for-display text-value" value="{{test.craftingTimeLabel}}" />
+            </div>
+        </div>
+    </div>
+    <div>
+        {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs'}}
+    </div>
+</form>

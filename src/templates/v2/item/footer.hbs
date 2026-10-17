@@ -26,6 +26,8 @@
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/lifestyle.hbs" item=item }}
         {{else if (isType item 'quality')}}
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/quality.hbs" item=item }}
+        {{else if (isType item 'preparation')}}
+            {{> "systems/shadowrun5e/dist/templates/v2/item/footer/preparation.hbs" item=item }}
         {{else if (isType item 'spell')}}
             {{#if system.category}}
                 <label>{{localizeOb system.category @root.config.spellCategories}}</label>

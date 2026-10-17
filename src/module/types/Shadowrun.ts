@@ -76,6 +76,7 @@ declare namespace Shadowrun {
         'addiction_mental' | // resisting against mental addiction
         'addiction_physical' | // resisting against physical addiction
         'addiction' | // resisting against addiction in general
+        'alchemy' | // creating an alchemical preparation
         'attack_matrix' | // matrix attacks, like data spike or IC attacks
         'attack_melee' | // attacks made with melee weapons
         'attack_ranged' | // attacks made with ranged weapons

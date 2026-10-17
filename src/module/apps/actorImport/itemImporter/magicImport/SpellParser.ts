@@ -28,6 +28,9 @@ export class SpellParser extends Parser<'spell'> {
 
         const dvRaw = itemData.dv_english ?? itemData.dv;
         system.drain = parseInt(dvRaw.replace(/[A-Z]+/gi, ''), 10);
+
+        // Chummer tracks the alchemical variant of a spell as a separate known spell. SR5#304.
+        system.alchemical = itemData.alchemy === 'True';
     }
 
     private parseDuration(system: BlankItem<'spell'>['system'], itemData: ExtractItemType<'spells', 'spell'>) {

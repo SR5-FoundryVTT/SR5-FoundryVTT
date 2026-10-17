@@ -132,6 +132,10 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
     hasInventory: boolean;
     selectedInventory: string;
     spells: Record<string, SR5Item[]>;
+    hasSpells: boolean;
+    // Alchemical spells are a separate formula group from sorcery spells. SR5#69, SR5#304.
+    alchemicalSpells: Record<string, SR5Item[]>;
+    hasAlchemicalSpells: boolean;
     program_count: string;
 
     // UI
@@ -431,7 +435,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         data.inventories = await this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
-        data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
+        // Sorcery spells and alchemical formulae are learned separately and counted separately,
+        // so they get their own sections. SR5#69, SR5#304.
+        const spellItems = data.itemType["spell"] ?? [];
+        const alchemicalSpells = spellItems.filter(spell => spell.asType('spell')?.system.alchemical);
+        const sorcerySpells = spellItems.filter(spell => !spell.asType('spell')?.system.alchemical);
+
+        data.spells = this._prepareSortedCategorizedSpells(sorcerySpells);
+        data.hasSpells = sorcerySpells.length > 0;
+        data.alchemicalSpells = this._prepareSortedCategorizedSpells(alchemicalSpells);
+        data.hasAlchemicalSpells = alchemicalSpells.length > 0;
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
         data.program_count = this._prepareProgramCount(data.itemType);
@@ -544,7 +557,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     protected _hasMagicItems() {
-        return this.actor.hasItemOfType('spell', 'adept_power', 'ritual', 'call_in_action');
+        return this.actor.hasItemOfType('spell', 'adept_power', 'ritual', 'preparation', 'call_in_action');
     }
 
     override async _onRender(
@@ -1012,6 +1025,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Inject special case context based on item type
         if (type === 'call_in_action') this._handleCreateCallInActionItem(event, itemData);
+        if (type === 'spell') this._handleCreateSpellItem(event, itemData);
         if (type === 'skill') this._handleCreateSkillItem(event, itemData);
         if (type === 'matrix_action') this._handleCreateMatrixActionItem(event, itemData);
 
@@ -1037,6 +1051,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const actorType = SheetFlow.closestAction(event.target)!.dataset.actorType;
         if (!actorType) console.error(`Shadowrun 5e | Tried to create a Call In Action item without an actor-type data attribute context!`);
         itemData['system.actor_type'] = actorType;
+    }
+
+    /**
+     * Spells need to prefill the alchemical flag, as it decides which of the two spell sections the
+     * new item shows up in and which test it rolls. See SR5#304.
+     */
+    _handleCreateSpellItem(event: PointerEvent, itemData: Item.CreateData) {
+        const alchemical = SheetFlow.closestAction(event.target)!.dataset.alchemical === 'true';
+        itemData['system.alchemical'] = alchemical;
     }
 
     /**
@@ -1448,6 +1471,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         setVisibility('adept_power');
         setVisibility('spell');
         setVisibility('ritual');
+        setVisibility('preparation');
         setVisibility('summoning');
 
         return contentVisibility;
