@@ -80,7 +80,7 @@ export class SuppressiveFireTemplateFlow {
     }
 
     static chatMessageListeners(html: HTMLElement | JQuery) {
-        $(html).find('.place-suppressive-fire-template').on('click', this.drawChatPreviewFromMessage);
+        $(html).find('.place-suppressive-fire-template').on('click', this.drawChatPreviewFromMessage.bind(this));
     }
 
     async #startPreview(meters: number) {

@@ -181,7 +181,7 @@ export const shadowrunChatMessageLayoutTesting = (context: QuenchBatchContext) =
                 const line = (await renderCard(test))
                     .querySelector<HTMLElement>('.card-content--parameters') as HTMLElement;
                 for (const parameter of line.querySelectorAll('.test-parameter'))
-                    parameter.addEventListener('click', SuccessTest._chatToggleParameterDetails);
+                    parameter.addEventListener('click', SuccessTest._chatToggleParameterDetails.bind(SuccessTest));
                 return line;
             }
 

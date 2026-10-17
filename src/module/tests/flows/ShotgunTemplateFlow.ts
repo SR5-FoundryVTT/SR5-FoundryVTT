@@ -106,7 +106,7 @@ export class ShotgunTemplateFlow {
     }
 
     static chatMessageListeners(html: HTMLElement | JQuery) {
-        $(html).find('.place-shotgun-template').on('click', this.drawChatPreviewFromMessage);
+        $(html).find('.place-shotgun-template').on('click', this.drawChatPreviewFromMessage.bind(this));
     }
 
     async #startPreview(ranges: RangesTemplateType, choke: ShotgunChoke) {

@@ -117,5 +117,25 @@
         "typescript/prefer-regexp-exec": "error",
         "typescript/prefer-string-starts-ends-with": "error",
         "typescript/restrict-plus-operands": "error"
-    }
+    },
+    "overrides": [
+        {
+            // Foundry ApplicationV2 `DEFAULT_OPTIONS.actions` and `handler` maps reference static/private methods
+            // that Foundry invokes with the application instance as `this`. Those methods are typed with an
+            // explicit instance `this` and use it, so `this: void` would break them and the references cannot be bound.
+            "files": [
+                "src/module/actor/sheets/**/*.ts",
+                "src/module/item/sheets/**/*.ts",
+                "src/module/item/SR5ItemSheet.ts",
+                "src/module/apps/**/*.ts",
+                "src/module/handlebars/SR5ApplicationMixin.ts",
+                "src/module/effect/SR5ActiveEffectConfig.ts",
+                "src/module/effect/SR5ActiveEffectValueEditor.ts",
+                "src/module/settings/AbstractCompendiaSettings.ts"
+            ],
+            "rules": {
+                "typescript/unbound-method": "off"
+            }
+        }
+    ]
 }

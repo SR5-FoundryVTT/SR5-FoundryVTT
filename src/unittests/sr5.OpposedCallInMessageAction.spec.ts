@@ -33,8 +33,8 @@ async function runWithPatches(
 ): Promise<{ capturedDocument: any; executeCount: number; getOpposedCount: number }> {
     const clsAny = cls as any;
     const originalGetOpposed = clsAny._getOpposedActionTestData;
-    const originalExecute = cls.prototype.execute;
-    const originalSelectedActors = Helpers.getSelectedActorsOrCharacter;
+    const originalExecute = Reflect.get(cls.prototype, 'execute');
+    const originalSelectedActors = Helpers.getSelectedActorsOrCharacter.bind(Helpers);
 
     let capturedDocument: any = null;
     let executeCount = 0;
