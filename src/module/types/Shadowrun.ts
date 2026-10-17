@@ -1,3 +1,4 @@
+// oxlint-disable-next-line typescript/no-unused-vars -- Ambient global declared by the system, only referenced via typeof.
 declare const SR5CONFIG: any;
 
 declare namespace Shadowrun {
