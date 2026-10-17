@@ -9,10 +9,12 @@ import { ModifiableValue } from './mods/ModifiableValue';
 import { SuccessTestData } from "./tests/SuccessTest";
 import { Translation } from './utils/strings';
 import { AttributeFieldType } from "./types/template/Attributes";
-import { SkillFieldType, SkillsType } from "./types/template/Skills";
+import { SkillFieldType } from "./types/template/Skills";
 import { ModifiedDamageType } from "./types/rolls/ActorRolls";
 import { RangeTemplateType } from "./types/template/Weapon";
 import { MatrixTestData, OpposedMatrixTestData } from './tests/MatrixTest';
+
+import ApplicationV2 = foundry.applications.api.ApplicationV2;
 
 type OneOrMany<T> = T | T[];
 
@@ -99,7 +101,7 @@ export class Helpers {
         return false;
     }
 
-    static setupCustomCheckbox(app: unknown, html: JQuery) {
+    static setupCustomCheckbox(app: ApplicationV2, html: JQuery) {
         const setContent = (el) => {
             const checkbox = $(el).children('input[type=checkbox]');
             const checkmark = $(el).children('.checkmark');
