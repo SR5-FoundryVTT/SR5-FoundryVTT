@@ -26,7 +26,7 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
         prepared.fade ||= 0;
         prepared.fadeDamage ||= DataDefaults.createData('damage');
 
-        return prepared as ComplexFormTestData;
+        return prepared;
     }
 
     override get _dialogTemplate()  {

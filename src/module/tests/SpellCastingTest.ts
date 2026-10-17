@@ -38,7 +38,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         prepared.reckless ||= false;
         prepared.drainDamage ||= DataDefaults.createData('damage');
 
-        return prepared as SpellCastingTestData;
+        return prepared;
     }
 
     override get _dialogTemplate()  {

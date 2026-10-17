@@ -156,10 +156,10 @@ export class VehiclePrep {
         // algorithm to determine speed, CRB pg 202 table.
         // Allow ActiveEffects to apply to movement directly.
         movement.walk.base = 5 * Math.pow(2, speedTotal - 1);
-        movement.walk.value = ModifiableValue.calcTotal(movement.walk as ModifiableValueType, {min: 0});
+        movement.walk.value = ModifiableValue.calcTotal(movement.walk, {min: 0});
 
         movement.run.base = 10 * Math.pow(2, speedTotal - 1);
-        movement.run.value = ModifiableValue.calcTotal(movement.run as ModifiableValueType, {min: 0});
+        movement.run.value = ModifiableValue.calcTotal(movement.run, {min: 0});
     }
 
     /**

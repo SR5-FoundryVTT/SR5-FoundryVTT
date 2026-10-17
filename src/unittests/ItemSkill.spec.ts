@@ -787,10 +787,10 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
 
             assert.exists(groupItem);
 
-            await SkillItemFlow.changeSkillRating(actor, groupItem!.id!, 1);
+            await SkillItemFlow.changeSkillRating(actor, groupItem.id!, 1);
             await SkillGroupFlow.syncSkillItemGroups(actor);
 
-            const groupOn = actor.items.get(groupItem!.id!) as SR5Item<'skill'> | undefined;
+            const groupOn = actor.items.get(groupItem.id!) as SR5Item<'skill'> | undefined;
             const pistolsOn = actor.items.find(item => {
                 return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';
             }) as SR5Item<'skill'> | undefined;
@@ -800,10 +800,10 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(groupOn?.system.group.rating, 1);
             assert.strictEqual(pistolsOn?.system.skill.rating, 1);
 
-            await SkillItemFlow.changeSkillRating(actor, groupItem!.id!, 0);
+            await SkillItemFlow.changeSkillRating(actor, groupItem.id!, 0);
             await SkillGroupFlow.syncSkillItemGroups(actor);
 
-            const groupOff = actor.items.get(groupItem!.id!) as SR5Item<'skill'> | undefined;
+            const groupOff = actor.items.get(groupItem.id!) as SR5Item<'skill'> | undefined;
             const pistolsOff = actor.items.find(item => {
                 return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';
             }) as SR5Item<'skill'> | undefined;
@@ -1034,7 +1034,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 const importedActor = created.find(actor => actor.name === '#QUENCH Imported');
                 assert.exists(importedActor);
 
-                const pistols = importedActor!.items.filter(item => item.name === 'Pistols');
+                const pistols = importedActor.items.filter(item => item.name === 'Pistols');
                 assert.lengthOf(pistols, 1);
                 assert.strictEqual(foundry.utils.getProperty(pistols[0], 'system.skill.rating'), 6);
             });

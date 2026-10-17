@@ -130,7 +130,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.isTrue(migrated);
             assert.lengthOf(source.items, 4);
 
-            const pistols = source.items.find(item => item.type === 'skill' && item.name === 'Pistols') as Item.CreateData | undefined;
+            const pistols = source.items.find(item => item.type === 'skill' && item.name === 'Pistols');
             assert.exists(pistols);
             assert.strictEqual(foundry.utils.getProperty(pistols, 'system.skill.category'), 'active');
             assert.strictEqual(foundry.utils.getProperty(pistols, 'system.skill.rating'), 4);
@@ -140,12 +140,12 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(foundry.utils.getProperty(pistols, 'system.description.source'), 'SR5 Core 130');
             assert.strictEqual(pistols?.name, 'Pistols');
 
-            const customSkill = source.items.find(item => item.type === 'skill' && item.name === 'Freestyle Gunnery') as Item.CreateData | undefined;
+            const customSkill = source.items.find(item => item.type === 'skill' && item.name === 'Freestyle Gunnery');
             assert.exists(customSkill);
             assert.deepEqual(foundry.utils.getProperty(customSkill, 'system.skill.specializations'), [{ name: 'Trick Shots' }]);
             assert.strictEqual(customSkill?.img, 'icons/svg/target.svg');
 
-            const languageSkill = source.items.find(item => item.type === 'skill' && item.name === 'Spanish') as Item.CreateData | undefined;
+            const languageSkill = source.items.find(item => item.type === 'skill' && item.name === 'Spanish');
             assert.exists(languageSkill);
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.category'), 'language');
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.rating'), 12);
@@ -153,7 +153,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.defaulting'), false);
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.language.isNative'), true);
 
-            const knowledgeSkill = source.items.find(item => item.type === 'skill' && item.name === 'Gang Politics') as Item.CreateData | undefined;
+            const knowledgeSkill = source.items.find(item => item.type === 'skill' && item.name === 'Gang Politics');
             assert.exists(knowledgeSkill);
             assert.strictEqual(foundry.utils.getProperty(knowledgeSkill, 'system.skill.category'), 'knowledge');
             assert.strictEqual(foundry.utils.getProperty(knowledgeSkill, 'system.skill.knowledgeType'), 'street');

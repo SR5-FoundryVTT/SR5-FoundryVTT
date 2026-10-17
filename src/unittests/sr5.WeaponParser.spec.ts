@@ -358,7 +358,7 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
     });
 
     describe("Item Import Ammo Bonus Values", () => {
-        const ammoParser = new TestItemAmmoParser([] as any);
+        const ammoParser = new TestItemAmmoParser([]);
 
         it("Parses signed elemental ammo damage bonuses", () => {
             const output = ammoParser.getSystem({

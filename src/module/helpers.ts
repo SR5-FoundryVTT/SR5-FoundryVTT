@@ -583,7 +583,7 @@ export class Helpers {
 
             const foundItem = token.actor.items.get(itemId);
             if (foundItem) {
-                tokenItem = foundItem as unknown as SR5Item;
+                tokenItem = foundItem;
             }
         });
 
@@ -746,10 +746,10 @@ export class Helpers {
             return Helpers.getEntityFromCollection(data.pack, data.id) as Promise<SR5Item>;
 
         if (data.type === 'Actor')
-            return game.actors.get(data.id) as SR5Actor;
+            return game.actors.get(data.id);
 
         if (data.type === 'Item')
-            return game.items.get(data.id) as SR5Item;
+            return game.items.get(data.id);
 
         return undefined;
     }

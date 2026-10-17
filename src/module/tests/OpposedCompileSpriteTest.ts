@@ -76,7 +76,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
 
         prepared.compiledSpriteUuid ||= '';
 
-        return prepared as OpposedCompileSpriteTestData;
+        return prepared;
     }
 
     override get _chatMessageTemplate(): string {

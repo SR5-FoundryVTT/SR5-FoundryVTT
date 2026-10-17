@@ -428,7 +428,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         try {
             const changes = {};
             SR5ActiveEffect._applyChangeUnguided(object, change, changes);
-            return changes as Record<string, unknown>;
+            return changes;
         } catch (err) {
             console.error(`Test [${object.constructor.name}] | Failed to apply active effect change for ${change.key}: "${change.value}"`, err);
             return {};
@@ -583,7 +583,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Overwrite foundry priority handling, as they provide a defaultPriority in CHANGE_TYPES but use
         // priority in their ActiveEffect#prepareBaseData implementation.
         for ( const change of this.system.changes ) {
-          change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type!]?.defaultPriority : change.priority;
+          change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type]?.defaultPriority : change.priority;
         }
     }
 }

@@ -132,7 +132,7 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
         const visibility = record?.permissions.visibility ?? 'gmAndOwner';
         context.visibilityOptions = (['public', 'gmAndOwner', 'selectedUsers', 'gmOnly'] as ExtendedTestVisibility[]).map(value => ({
             value,
-            label: game.i18n.localize(`SR5.ExtendedTestManager.Visibility.${value}` as Parameters<typeof game.i18n.localize>[0]),
+            label: game.i18n.localize(`SR5.ExtendedTestManager.Visibility.${value}`),
             selected: visibility === value,
         }));
 

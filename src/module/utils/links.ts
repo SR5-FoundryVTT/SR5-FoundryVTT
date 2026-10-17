@@ -98,7 +98,7 @@ export class LinksHelpers {
         type docType = foundry.abstract.Document.ImplementationFor<CONST.ALL_DOCUMENT_TYPES>;
         const uuid = resolvedUuid?.split('#')[0];
         const anchor = resolvedUuid?.split('#')[1];
-        const document = uuid ? await fromUuid(uuid) as docType | null : null;
+        const document = uuid ? await fromUuid(uuid) : null;
 
         if (!document) {
             ui.notifications.error('SR5.SourceFieldEmptyError', { localize: true });

@@ -37,7 +37,7 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
         prepared.fade ||= 0;
         prepared.fadeDamage ||= DataDefaults.createData('damage');
 
-        return prepared as CompileSpriteTestData;
+        return prepared;
     }
 
     _prepareCompilationData(data) {

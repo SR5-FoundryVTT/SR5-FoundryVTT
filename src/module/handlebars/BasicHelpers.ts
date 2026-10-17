@@ -43,7 +43,7 @@ export const registerBasicHelpers = () => {
      * Example: pilot_ground_craft => SR5.Skill.PilotGroundCraft => "Pilot Ground Craft" (EN)
      */
     Handlebars.registerHelper('localizeActionSkill', function (skill: string, options): string {
-        return SkillNamingFlow.localizeSkillName(skill as string);
+        return SkillNamingFlow.localizeSkillName(skill);
     });
 
     /**

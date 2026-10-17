@@ -1023,7 +1023,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Add the item to the selected inventory.
         if (this.selectedInventory !== this.actor.defaultInventory.name) {
-            await this.actor.inventory.addItems(this.selectedInventory, items as SR5Item[]);
+            await this.actor.inventory.addItems(this.selectedInventory, items);
         }
         for (const item of items) {
             await item.sheet?.render(true, { mode: 'edit' } as any);
@@ -1171,7 +1171,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
 
         const data: Actor.UpdateData = {};
-        let value = Number(target.dataset.value as string);
+        let value = Number(target.dataset.value);
 
         // if the clicked on cell is the current value for it's track, set the value to 0 to clear it
         if (track === 'stun' && this.actor.getStunTrack()?.value === value) {

@@ -210,7 +210,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
             value,
             label: game.i18n.localize(value === 'all'
                 ? 'SR5.ExtendedTestManager.Filters.AllStatuses'
-                : `SR5.ExtendedTestManager.Status.${value}` as Parameters<typeof game.i18n.localize>[0]),
+                : `SR5.ExtendedTestManager.Status.${value}`),
         }));
         context.periodOptions = ['any', ...Object.keys(PERIODS)].map(value => ({
             value,
@@ -219,7 +219,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
         context.sortOptions = (['name', 'createdAt', 'updatedAt', 'createdWorldTime', 'threshold',
             'accumulatedHits', 'progress', 'rollCount', 'status', 'interval'] as SortKey[]).map(value => ({
             value,
-            label: game.i18n.localize(`SR5.ExtendedTestManager.Sort.${value}` as Parameters<typeof game.i18n.localize>[0]),
+            label: game.i18n.localize(`SR5.ExtendedTestManager.Sort.${value}`),
         }));
 
         // Actors referenced by any visible record, for the actor filter. Under their folders,
@@ -318,8 +318,8 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
         return {
             record,
             threshold: ExtendedTestRules.threshold(record),
-            statusLabel: game.i18n.localize(`SR5.ExtendedTestManager.Status.${record.status}` as Parameters<typeof game.i18n.localize>[0]),
-            visibilityLabel: game.i18n.localize(`SR5.ExtendedTestManager.Visibility.${record.permissions.visibility}` as Parameters<typeof game.i18n.localize>[0]),
+            statusLabel: game.i18n.localize(`SR5.ExtendedTestManager.Status.${record.status}`),
+            visibilityLabel: game.i18n.localize(`SR5.ExtendedTestManager.Visibility.${record.permissions.visibility}`),
             actorName: (actor as { name?: string } | null)?.name,
             creatorName: userName(record.creatorUserId),
             progress: ExtendedTestRules.progress(record),
@@ -351,7 +351,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
                 userName: userName(roll.userId),
             })) : [],
             log: expanded ? record.log.map(entry => ({
-                actionLabel: game.i18n.localize(`SR5.ExtendedTestManager.Log.${entry.action}` as Parameters<typeof game.i18n.localize>[0]),
+                actionLabel: game.i18n.localize(`SR5.ExtendedTestManager.Log.${entry.action}`),
                 detail: entry.detail,
                 realTime: WorldTimeFlow.formatRealTime(entry.timestamp),
                 userName: userName(entry.userId),

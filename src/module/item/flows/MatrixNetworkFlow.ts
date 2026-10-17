@@ -33,7 +33,7 @@ export class MatrixNetworkFlow {
     static resolveItemLink(link: string) {
         const document = this.resolveLink(link);
         if (!(document instanceof SR5Item)) throw new Error(`Document with uuid ${link} is not an item`);
-        return document as unknown as SR5Item;
+        return document;
     }
 
     /**

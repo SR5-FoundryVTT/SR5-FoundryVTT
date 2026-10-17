@@ -93,7 +93,7 @@ export const shadowrunOpposedCallInMessageActionTesting = (context: QuenchBatchC
 
             it('shows error and does not execute when all resolution paths are empty', async () => {
                 const originalCharacterId = game.user?.character?.id ?? null;
-                await game.user?.update({ character: null } as any);
+                await game.user?.update({ character: null });
 
                 const notifications = ui.notifications as any;
                 const originalError = notifications?.error;
@@ -111,7 +111,7 @@ export const shadowrunOpposedCallInMessageActionTesting = (context: QuenchBatchC
                     assert.strictEqual(errors, 1);
                 } finally {
                     notifications.error = originalError;
-                    await game.user?.update({ character: originalCharacterId } as any);
+                    await game.user?.update({ character: originalCharacterId });
                 }
             });
         });

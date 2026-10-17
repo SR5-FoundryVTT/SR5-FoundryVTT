@@ -194,7 +194,7 @@ export class Version0_33_0 extends VersionMigration {
         const entries: Record<string, unknown> =
             'value' in skillContainer && skillContainer.value && typeof skillContainer.value === 'object'
                 ? skillContainer.value as Record<string, unknown>
-            : skillContainer as Record<string, unknown>;
+            : skillContainer;
         const listAttribute = typeof skillContainer.attribute === 'string' ? skillContainer.attribute : '';
 
         return Object.entries(entries).flatMap(([key, skill]) => {

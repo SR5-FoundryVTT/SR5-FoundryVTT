@@ -38,13 +38,13 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             });
 
             await (weapon as SR5Item<'weapon'>).createNestedItem(ammo.toObject());
-            const test = await TestCreator.fromItem(weapon as SR5Item<'weapon'>, actor, {
+            const test = await TestCreator.fromItem(weapon, actor, {
                 showDialog: false,
                 showMessage: false,
             });
 
             assert.instanceOf(test, RangedAttackTest);
-            const rangedTest = test as RangedAttackTest;
+            const rangedTest = test;
             assert.isTrue(rangedTest.canPlaceBlastTemplate);
             assert.deepEqual(rangedTest.blastTemplateFlow.blastData, { radius: 4, dropoff: 1 });
         });

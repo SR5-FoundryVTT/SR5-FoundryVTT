@@ -192,7 +192,7 @@ export class CompendiumBrowser extends BaseClass {
         for (const [type, packs] of Object.entries(groupedPacks)) {
             searchOptions[type] = {
                 packs: packs!.map(pack => pack.collection),
-                types: foundry.documents[type].TYPES as string[],
+                types: foundry.documents[type].TYPES,
             };
         }
 
@@ -254,7 +254,7 @@ export class CompendiumBrowser extends BaseClass {
     protected override async _preparePartContext(
         ...[partId, context, options]: Parameters<BaseClassType["_preparePartContext"]>
     ) {
-        const typedContext = context as CompendiumBrowserTypes.Context;
+        const typedContext = context;
 
         await super._preparePartContext(partId, typedContext, options);
         if (partId === "filters") {

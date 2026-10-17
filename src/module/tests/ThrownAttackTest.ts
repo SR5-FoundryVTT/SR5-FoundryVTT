@@ -25,7 +25,7 @@ export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
 
         WeaponRangeTestBehavior.prepareData(this, prepared);
 
-        return prepared as ThrownAttackTestData;
+        return prepared;
     }
 
     override get canBeExtended() {

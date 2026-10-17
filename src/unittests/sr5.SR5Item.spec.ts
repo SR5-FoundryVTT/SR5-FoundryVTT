@@ -21,8 +21,8 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             const owner = sheet.element.querySelector('[name="system.action.category.matrix.owner"]') as HTMLInputElement | null;
             assert.isNotNull(marks);
             assert.isNotNull(owner);
-            marks!.value = '2';
-            owner!.checked = true;
+            marks.value = '2';
+            owner.checked = true;
             await sheet.submit();
             await sheet.close();
 
@@ -49,7 +49,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             assert.notStrictEqual(item.id, null);
 
             // Check foundry item collection integrity
-            const itemFromCollection = game.items.get(item.id!);
+            const itemFromCollection = game.items.get(item.id);
             assert.notStrictEqual(itemFromCollection, null);
             assert.strictEqual(item.id, itemFromCollection?.id);
         });

@@ -56,7 +56,7 @@ export const MatrixSheetFlow = {
 
             // update the embedded item with the new wireless state
             await actor.updateEmbeddedDocuments('Item', [{
-                '_id': device._id!,
+                '_id': device._id,
                 system: { technology: { wireless: newState } }
             }]);
         } else {

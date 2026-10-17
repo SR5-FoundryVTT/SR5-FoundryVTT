@@ -556,7 +556,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *  Please check SR5ActorType for reference.
      */
     isType<ST extends readonly Actor.ConfiguredSubType[]>(this: SR5Actor, ...types: ST): this is SR5Actor<ST[number]> {
-        return types.includes(this.type as ST[number]);
+        return types.includes(this.type);
     }
 
     asType<ST extends readonly Actor.ConfiguredSubType[]>(this: SR5Actor, ...types: ST): SR5Actor<ST[number]> | undefined {
@@ -1535,7 +1535,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Remove out old defeated effects.
         if (removeStatus.length) {
             const existing = this.effects.reduce<string[]>((arr, e) => {
-                if ((e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status))) arr.push(e.id as string);
+                if ((e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status))) arr.push(e.id);
                 return arr;
             }, []);
 
