@@ -35,7 +35,7 @@ export namespace SR5ApplicationMixinTypes {
     };
 
     export interface Configuration extends ApplicationV2.Configuration, HandlebarsApplicationMixin.Configuration {
-        filters?: SearchFilter.Configuration[];
+        filters?: foundry.applications.ux.SearchFilter.Configuration[];
         dragDrop?: DragDrop.Configuration[];
     };
 
@@ -70,7 +70,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         declare isEditable?: boolean;
         declare document?: SR5Item | SR5Actor;
 
-        readonly #filters: SearchFilter[];
+        readonly #filters: foundry.applications.ux.SearchFilter[];
         readonly #dragDrop: SR5DragDropHandler[];
         private readonly expandedUuids = new Set<string>();
         private editIcon?: HTMLElement;
