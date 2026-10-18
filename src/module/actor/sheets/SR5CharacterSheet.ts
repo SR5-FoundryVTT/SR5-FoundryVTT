@@ -224,17 +224,17 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
 
     static async #openKarmaManager(this: SR5CharacterSheet) {
         const app = new KarmaManager(this.actor);
-        await app.render(true);
+        await app.render({ force: true });
     }
 
     static async #openNuyenManager(this: SR5CharacterSheet) {
         const app = new NuyenManager(this.actor);
-        await app.render(true);
+        await app.render({ force: true });
     }
 
     static async #openReputationManager(this: SR5CharacterSheet) {
         const app = new ReputationManager(this.actor);
-        await app.render(true);
+        await app.render({ force: true });
     }
 
 }

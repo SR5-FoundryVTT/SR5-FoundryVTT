@@ -882,7 +882,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         event.preventDefault();
 
         await this.item.disconnectFromNetwork();
-        void this.render(false);
+        void this.render({ force: false });
     }
 
     static async #removeLinkedActor(this: SR5ItemSheet, event: Event) {
@@ -994,7 +994,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const effectId = SheetFlow.closestEffectId(event.target);
         if (this.item._isNestedItem) {
             this.item.effects.delete(effectId);
-            await this.render(true);
+            await this.render({ force: true });
         } else {
             await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
         }
@@ -1081,7 +1081,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                     if (effectId) {
                         if (this.item._isNestedItem) {
                             this.item.effects.delete(effectId);
-                            await this.render(true);
+                            await this.render({ force: true });
                         } else {
                             await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
                         }

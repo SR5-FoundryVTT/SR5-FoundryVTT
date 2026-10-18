@@ -77,7 +77,7 @@ export const MatrixSheetFlow = {
      */
     async promptConnectToMatrixNetwork(actor: SR5Actor): Promise<boolean> {
         const app = new NetworkManager(actor);
-        await app.render(true);
+        await app.render({ force: true });
         return true;
     }
 }

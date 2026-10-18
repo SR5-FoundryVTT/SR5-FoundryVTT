@@ -326,7 +326,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     static async #manageNetwork(this: SR5MatrixActorSheet) {
         const app = new NetworkManager(this.actor);
-        await app.render(true);
+        await app.render({ force: true });
     }
 
     /**

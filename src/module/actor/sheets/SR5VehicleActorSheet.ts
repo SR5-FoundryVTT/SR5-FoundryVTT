@@ -178,7 +178,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             const device = driver.getMatrixDevice();
             if (device) {
                 await device.addSlave(this.actor);
-                void this.render(false);
+                void this.render({ force: false });
             } else {
                 ui.notifications.error("No Device found on Driver")
             }

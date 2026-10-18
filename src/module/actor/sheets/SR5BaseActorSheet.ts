@@ -2394,7 +2394,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             return;
         }
         const app = new InventoryRenameApp(this.actor, inventory, 'edit');
-        await app.render(true);
+        await app.render({ force: true });
     }
     /**
      * Create an inventory place on the actor for gear organization.
@@ -2402,7 +2402,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     static async #createInventory(this: SR5BaseActorSheet, event: Event) {
         event.preventDefault();
         const app = new InventoryRenameApp(this.actor, '', 'create');
-        await app.render(true);
+        await app.render({ force: true });
         void this.render();
     }
 
