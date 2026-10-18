@@ -19,6 +19,16 @@ export const registerItemHeaderHelpers = () => {
     });
 
     /**
+     * Return a data object to be injected into the addItem action for spells.
+     *
+     * The alchemical formulae section must create alchemical spells, otherwise the new item lands
+     * in the sorcery section instead. SR5#304.
+     */
+    Handlebars.registerHelper('spellHeaderAddData', (alchemical: boolean) => {
+        return { 'alchemical': alchemical ? 'true' : 'false' };
+    });
+
+    /**
      * Return a data object to be injected into the addItem action for skills.
      */
     Handlebars.registerHelper('skillAddItemData', (skillCategory: string, skillKnowledgeType: string, skillTypeOrOptions: string | Handlebars.HelperOptions) => {
