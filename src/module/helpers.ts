@@ -666,7 +666,7 @@ export class Helpers {
      * @param value Whatever needs to be stored.
      *
      */
-    static getUpdateDataEntry(path: string, value: any): Record<string, unknown> {
+    static getUpdateDataEntry(path: string, value: unknown): Record<string, unknown> {
         return { [path]: value };
     }
 
