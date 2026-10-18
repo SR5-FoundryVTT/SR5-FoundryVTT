@@ -255,7 +255,7 @@ export const registerBasicHelpers = () => {
     /**
      * Expects a config object and turns it into an array of objects for FormGroup options
      */
-    Handlebars.registerHelper('tests2Array', function (config: Record<string, any>) {
+    Handlebars.registerHelper('tests2Array', function (config: Record<string, unknown>) {
         return Object.keys(config).map(test => ({
             label: test,
             value: test
