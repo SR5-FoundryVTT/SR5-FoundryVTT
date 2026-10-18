@@ -145,7 +145,7 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
         form: HTMLFormElement,
         formData: foundry.applications.ux.FormDataExtended
     ) {
-        const data = formData.object as Record<string, unknown>;
+        const data = formData.object as Record<string, string | number | boolean | undefined>;
 
         const readUsers = (prefix: string): string[] =>
             Object.entries(data)
