@@ -57,6 +57,10 @@ import ThermographicVisionDetectionMode from "../vision/thermographicVision/ther
 import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
 
+/**
+ * TODO: fvtt-types v14 - Update global module declarations to match updated types in fvtt-types.
+ */
+
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
         ActiveEffect: typeof SR5ActiveEffect;
