@@ -33,7 +33,7 @@ export class ItemsParser {
 
         Parser.compendiumCache.clear();
         for (const packId of compendiumList) {
-            const pack = game.packs.get(packId) as CompendiumCollection<"Item"> | undefined;
+            const pack = game.packs.get(packId) as foundry.documents.collections.CompendiumCollection<"Item"> | undefined;
             if (pack?.metadata.type !== "Item") continue;
 
             const index = await pack.getIndex({ fields: ["_id", "name", "type"] });
