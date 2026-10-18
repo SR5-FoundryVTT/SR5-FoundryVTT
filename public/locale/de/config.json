@@ -2703,6 +2703,10 @@
             "DetectionDirectional": "Gerichtet",
             "DetectionPsychic": "Übersinnlich",
             "FIELDS": {
+                "alchemical": {
+                    "hint": "This spell was learned as an alchemical formula and can be made into a preparation.",
+                    "label": "Alchemical"
+                },
                 "category": {
                     "hint": "Zauberkategorie",
                     "label": "Kategorie"

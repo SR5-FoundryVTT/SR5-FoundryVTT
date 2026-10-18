@@ -55,3 +55,12 @@ export function unitLabel(unit: ExtendedIntervalUnit): string {
 export const INTERVAL_UNITS: ExtendedIntervalUnit[] = [
     'rounds', 'seconds', 'minutes', 'hours', 'days', 'weeks', 'months',
 ];
+
+/**
+ * Units offered for a preparation's time trigger, which is limited to potency in hours. SR5#305.
+ */
+export const TRIGGER_TIME_UNITS = {
+    seconds: 'EFFECT.DURATION.UNITS.seconds',
+    minutes: 'EFFECT.DURATION.UNITS.minutes',
+    hours: 'EFFECT.DURATION.UNITS.hours',
+} as const satisfies Partial<Record<ExtendedIntervalUnit, string>>;
