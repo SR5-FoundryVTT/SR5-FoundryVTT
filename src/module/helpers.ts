@@ -202,7 +202,7 @@ export class Helpers {
      * @param id The token's ID. If omitted, returns the first controlled token or undefined.
      * @returns The Token instance or undefined if not found.
      */
-    static getToken(id?: string): Token | undefined {
+    static getToken(id?: string): foundry.canvas.placeables.Token | undefined {
         if (!canvas || !canvas.ready || !canvas.tokens) return undefined;
 
         if (id) return canvas.tokens.placeables.find(token => token.id === id);
@@ -235,7 +235,7 @@ export class Helpers {
         return token;
     }
 
-    static getUserTargets(user?: User | null): Token[] {
+    static getUserTargets(user?: User | null): foundry.canvas.placeables.Token[] {
         user = user || game.user;
 
         if (!user) return []
@@ -330,7 +330,7 @@ export class Helpers {
         return Math.round(length * LENGTH_UNIT_TO_METERS_MULTIPLIERS[fromUnit]);
     }
 
-    static getControlledTokens(): Token[] {
+    static getControlledTokens(): foundry.canvas.placeables.Token[] {
         if (!canvas || !canvas.ready || !canvas.tokens) return [];
         return canvas.tokens.controlled;
     }
@@ -359,7 +359,7 @@ export class Helpers {
      * return all tokens a user has targeted at the moment.
      * @returns An array tokens.
      */
-    static getTargetedTokens(): Token[] {
+    static getTargetedTokens(): foundry.canvas.placeables.Token[] {
         if (!canvas.ready || !game.user) return [];
 
         return Array.from(game.user.targets);
