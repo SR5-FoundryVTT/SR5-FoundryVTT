@@ -44,6 +44,6 @@ export const ActorRollDataFlow = {
      * @param rollData 
      * @param options 
      */
-    injectAstralRollData: function(_actor: SR5Actor, _rollData: any, _options: RollDataOptions) {
+    injectAstralRollData: function(_actor: SR5Actor, _rollData: unknown, _options: RollDataOptions) {
     },
 }
