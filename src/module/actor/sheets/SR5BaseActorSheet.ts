@@ -599,7 +599,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     _onDragDropFavorite(event: DragEvent) {
         const target = event.target;
         const favorites = this.actor.system.favorites.slice();
-        const data = TextEditor.getDragEventData(event) as any;
+        const data = TextEditor.getDragEventData(event) as { uuid: string, id: string };
         const srcUuid = data.uuid;
         let sourceIndex = favorites.indexOf(srcUuid);
         if (sourceIndex < 0) {

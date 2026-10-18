@@ -136,6 +136,17 @@
             "rules": {
                 "typescript/unbound-method": "off"
             }
+        },
+        {
+            // Migrators read and rewrite untyped legacy JSON from older system versions, and unit tests build
+            // partial Foundry documents. Typing these as `unknown` would need runtime guards or extra casts for no gain.
+            "files": [
+                "src/module/migrator/**/*.ts",
+                "src/unittests/**/*.ts"
+            ],
+            "rules": {
+                "typescript/no-explicit-any": "off"
+            }
         }
     ]
 }

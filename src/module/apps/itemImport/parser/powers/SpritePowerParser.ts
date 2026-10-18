@@ -9,8 +9,8 @@ export class SpritePowerParser extends Parser<'sprite_power'> {
     protected override getSystem(jsonData: Power) {
         const system = this.getBaseSystem();
 
-        system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() as any : 'always';
-        system.action.type = jsonData.action ? jsonData.action._TEXT.toLowerCase() as any : '';
+        system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() as typeof system.duration : 'always';
+        system.action.type = jsonData.action ? jsonData.action._TEXT.toLowerCase() as typeof system.action.type : '';
 
         return system;
     }

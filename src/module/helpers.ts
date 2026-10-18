@@ -798,7 +798,7 @@ export class Helpers {
      */
     static async renderDocumentSheet(uuid: string, resolveTokenToActor = true) {
         if (!uuid) return;
-        let document = await fromUuid(uuid as any);
+        let document: unknown = await fromUuid(uuid);
         if (!document) return;
         if (document instanceof TokenDocument && resolveTokenToActor && document.actor)
             document = document.actor;

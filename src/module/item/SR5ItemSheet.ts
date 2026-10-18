@@ -371,7 +371,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         if ('technology' in itemData && itemData.technology) {
             try {
-                const technology = itemData.technology as any;
+                const technology = itemData.technology as { rating?: number; quantity?: number; cost?: { base?: number } };
                 if (technology.rating === 0) delete technology.rating;
                 if (technology.quantity === 0) delete technology.quantity;
                 if (technology.cost?.base === 0) delete technology.cost.base;

@@ -72,9 +72,9 @@ export class NuyenManager extends HandlebarsApplicationMixin(ApplicationV2)<Nuye
         options: DeepPartial<ApplicationV2.RenderOptions>
     ) {
         this.element.querySelector<HTMLInputElement>('[name="incoming-nuyen"]')
-            ?.addEventListener('change', (event: any) => {
+            ?.addEventListener('change', (event: Event) => {
                 console.log(event);
-                this.nuyenModifier = Number(event.target?.value ?? 0);
+                this.nuyenModifier = Number((event.target as HTMLInputElement | null)?.value ?? 0);
                 void this.render();
             }
         );

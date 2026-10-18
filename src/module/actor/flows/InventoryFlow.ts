@@ -32,7 +32,7 @@ export class InventoryFlow {
         // This will happen if there has been some tempering with inventory data.
         // To prevent this causing issues, just set it to default data
         if (actor.system.inventories === undefined) {
-            actor.system.inventories = foundry.utils.duplicate((game.model.Actor[actor.type] as any).inventories);
+            actor.system.inventories = foundry.utils.duplicate((game.model.Actor[actor.type] as { inventories: typeof actor.system.inventories }).inventories);
         }
 
         this.actor = actor;

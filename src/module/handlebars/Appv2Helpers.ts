@@ -51,14 +51,14 @@ export const registerAppv2Helpers = () => {
         return new Handlebars.SafeString(nav.outerHTML);
     });
 
-    Handlebars.registerHelper('isType', function(document: any, ...types: any[]): boolean {
+    Handlebars.registerHelper('isType', function(document: unknown, ...types: unknown[]): boolean {
         if (!document) return false;
         if (!(document instanceof SR5Item || document instanceof SR5Actor)) {
             return false;
         }
         // remove options from the captured string
         types.splice(types.length - 1, 1);
-        return (document as { isType: (...types: string[]) => boolean }).isType(...types);
+        return (document as { isType: (...types: unknown[]) => boolean }).isType(...types);
     })
 
 }

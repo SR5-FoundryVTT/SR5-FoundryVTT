@@ -618,7 +618,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     _getTestOptions() {
         const options: Record<string, Translation> = {};
 
-        for (const test of Object.values(game.shadowrun5e.tests) as any[]) {
+        for (const test of Object.values(game.shadowrun5e.tests) as { name: string, label: Translation }[]) {
             options[test.name] = test.label;
         }
 

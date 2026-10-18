@@ -84,9 +84,9 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         // filter out illegal actions from the matrix actions
         return (await PackItemFlow.getMatrixPackActions()).filter((action) => {
             return !MatrixRules.isIllegalAction(
-                        action.getAction()?.attribute as any,
-                        action.getAction()?.attribute2 as any,
-                        action.getAction()?.limit?.attribute as any);
+                        action.getAction()?.attribute as Shadowrun.ActorAttribute,
+                        action.getAction()?.attribute2 as Shadowrun.ActorAttribute,
+                        action.getAction()?.limit?.attribute as Shadowrun.ActorAttribute);
         });
     }
 
