@@ -10,14 +10,14 @@ export const ActionFollowupFlow = {
         $(html).find('.followup-action').on('click', ActionFollowupFlow.castFollowupAction.bind(this));
     },
 
-    castFollowupAction: async (event: Event) => {
+    castFollowupAction: async (event: JQuery.TriggeredEvent) => {
         event.preventDefault();
 
         const button = $(event.currentTarget as HTMLElement);
         const card = button.closest('.chat-message');
         const messageId = card.data('messageId');
 
-        const showDialog = TestCreator.shouldShowDialog(event);
+        const showDialog = TestCreator.shouldShowDialog(event as unknown as Event);
         const test = await TestCreator.fromMessage(messageId, {showDialog});
         if (!test) return;
 

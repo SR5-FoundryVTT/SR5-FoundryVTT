@@ -2237,7 +2237,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * 
      * @param event Any pointer event
      */
-    static async _castTestAction(event: Event) {
+    static async _castTestAction(event: JQuery.TriggeredEvent) {
         event.preventDefault();
 
         const element = $(event.currentTarget as HTMLElement);
@@ -2247,7 +2247,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         if (!item) return console.error("Shadowrun 5e | Item doesn't exist for uuid", uuid);
 
-        void item.castAction(event);
+        void item.castAction(event as unknown as Event);
     }
 
     /**
@@ -2409,7 +2409,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * @param event A PointerEvent by user-interaction
      */
-    static async _castResultAction(event: Event) {
+    static async _castResultAction(event: JQuery.TriggeredEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -2417,7 +2417,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const messageId = element.closest('.chat-message').data('messageId');
         const resultAction = element.data('action');
 
-        await ActionResultFlow.executeResult(resultAction, {event, element, messageId});
+        await ActionResultFlow.executeResult(resultAction, {event: event as unknown as Event, element, messageId});
     }
 
     /**

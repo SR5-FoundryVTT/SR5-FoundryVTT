@@ -209,7 +209,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
      *
      * @param event A PointerEvent by user interaction to trigger the test action.
      */
-    static async _castResistAction(event: Event) {
+    static async _castResistAction(event: JQuery.TriggeredEvent) {
         event.preventDefault();
 
         const button = $(event.currentTarget as HTMLElement);
@@ -219,7 +219,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         const messageId = card.data('messageId');
         const resistActionTest = button.data('action');
 
-        const showDialog = !TestCreator.shouldHideDialog(event);
+        const showDialog = !TestCreator.shouldHideDialog(event as unknown as Event);
         await TestCreator.fromMessageAction(messageId, resistActionTest, {showDialog});
     }
 
@@ -228,7 +228,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
      *
      * @param event A PointerEvent by user interaction to trigger the test action.
      */
-    static async _castOpposedAction(event: Event) {
+    static async _castOpposedAction(event: JQuery.TriggeredEvent) {
         event.preventDefault();
 
         const button = $(event.currentTarget as HTMLElement);
@@ -238,7 +238,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         const messageId = card.data('messageId');
         const opposedActionTest = button.data('action');
 
-        const showDialog = !TestCreator.shouldHideDialog(event);
+        const showDialog = !TestCreator.shouldHideDialog(event as unknown as Event);
         await TestCreator.fromMessageAction(messageId, opposedActionTest, {showDialog});
     }
 
