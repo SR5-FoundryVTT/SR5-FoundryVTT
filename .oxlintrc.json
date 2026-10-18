@@ -147,6 +147,19 @@
             "rules": {
                 "typescript/no-explicit-any": "off"
             }
+        },
+        {
+            // global.ts augments Foundry hook signatures whose parameter types Foundry does not type precisely.
+            // Socket payloads are untyped message bodies by design. Typing them as `unknown` would push casts into every handler.
+            "files": [
+                "src/module/types/global.ts",
+                "src/module/types/Socket.ts",
+                "src/module/sockets.ts",
+                "src/module/flows/SocketMessageFlow.ts"
+            ],
+            "rules": {
+                "typescript/no-explicit-any": "off"
+            }
         }
     ]
 }
