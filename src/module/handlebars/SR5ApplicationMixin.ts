@@ -36,7 +36,7 @@ export namespace SR5ApplicationMixinTypes {
 
     export interface Configuration extends ApplicationV2.Configuration, HandlebarsApplicationMixin.Configuration {
         filters?: foundry.applications.ux.SearchFilter.Configuration[];
-        dragDrop?: DragDrop.Configuration[];
+        dragDrop?: foundry.applications.ux.DragDrop.Configuration[];
     };
 
     export interface RenderOptions extends ApplicationV2.RenderOptions, HandlebarsApplicationMixin.RenderOptions {
