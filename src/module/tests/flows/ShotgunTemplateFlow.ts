@@ -85,7 +85,7 @@ export class ShotgunTemplateFlow {
         await this.#startPreview(ranges, choke);
     }
 
-    static async drawChatPreviewFromMessage(event: Event) {
+    static async drawChatPreviewFromMessage(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 

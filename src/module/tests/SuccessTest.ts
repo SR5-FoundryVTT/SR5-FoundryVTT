@@ -2215,7 +2215,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Select a Token on the current scene based on the link id.
      * @params event Any user PointerEvent
     */
-    static _selectSceneToken(event: Event) {
+    static _selectSceneToken(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -2323,7 +2323,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return options;
     }
 
-    static _chatToggleParameterDetails(event: Event) {
+    static _chatToggleParameterDetails(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -2346,7 +2346,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         parameter.setAttribute('aria-expanded', String(expand));
     }
 
-    static async _chatOpenModifierSource(event: Event) {
+    static async _chatOpenModifierSource(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -2354,7 +2354,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         await LinksHelpers.openSource(source);
     }
 
-    static _chatToggleCardRolls(event: Event) {
+    static _chatToggleCardRolls(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -2389,7 +2389,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * This will hide / show them, when called with a card event.
      */
-    static _chatToggleCardDescription(event: Event) {
+    static _chatToggleCardDescription(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 

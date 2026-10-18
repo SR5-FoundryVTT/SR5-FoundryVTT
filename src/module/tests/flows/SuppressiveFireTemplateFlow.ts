@@ -64,7 +64,7 @@ export class SuppressiveFireTemplateFlow {
         await this.#startPreview(this.test.data.suppressiveFireWidth);
     }
 
-    static async drawChatPreviewFromMessage(event: Event) {
+    static async drawChatPreviewFromMessage(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 

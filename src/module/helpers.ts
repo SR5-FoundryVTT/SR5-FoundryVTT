@@ -784,7 +784,7 @@ export class Helpers {
      *
      * @param event A PointerEvent by user interaction.
      */
-    static async renderEntityLinkSheet(event: Event) {
+    static async renderEntityLinkSheet(event: Event | JQuery.ClickEvent) {
         const element = $(event.currentTarget as HTMLElement);
         const uuid = element.data('uuid');
         await Helpers.renderDocumentSheet(uuid);

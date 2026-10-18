@@ -793,7 +793,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * - this is more of a band-aid until we do appv2
      * @param event
      */
-    async _onInitiativePerceptionChange(event: Event) {
+    async _onInitiativePerceptionChange(event: Event | JQuery.ChangeEvent) {
         const newValue = (event.currentTarget as HTMLSelectElement)?.value as InitiativeModeOptions | undefined;
         if (!newValue) return;
 
@@ -1846,7 +1846,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @param event A DOM mouse/touch event
      */
-    async _onListItemChangeQuantity(event: Event) {
+    async _onListItemChangeQuantity(event: Event | JQuery.ChangeEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
         const iid = SheetFlow.closestItemId(event.currentTarget);
         const item = this.actor.items.get(iid);
         const quantity = parseInt((event.currentTarget as HTMLInputElement).value);
@@ -1948,10 +1948,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     /**
      * Change selected inventory for this sheet.
      */
-    _onSelectInventory(event: Event) {
+    _onSelectInventory(event: Event | JQuery.ChangeEvent) {
         event.preventDefault();
 
-        const inventory = String($(event.currentTarget!).val());
+        const inventory = String($(event.currentTarget).val());
 
         if (inventory)
             this.selectedInventory = inventory;
@@ -1962,7 +1962,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     /**
      * After selecting a new ammo for a weapon
      */
-    async _onWeaponAmmoSelect(event: Event) {
+    async _onWeaponAmmoSelect(event: Event | JQuery.ChangeEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
         const id = SheetFlow.closestItemId(event.currentTarget);
         const item = this.actor.items.get(id);
         if (!item?.isType('weapon')) return;
@@ -1995,7 +1995,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @param event A mouse/pointer event
      */
-    async _onMatrixAttributeSelected(event: Event) {
+    async _onMatrixAttributeSelected(event: Event | JQuery.ChangeEvent) {
         if (!("matrix" in this.actor.system)) return;
 
         const iid = this.actor.system.matrix!.device;
@@ -2013,7 +2013,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return item.changeMatrixAttributeSlot(changedSlot, attribute);
     }
 
-    async _onChangeSkillRating(event: Event) {
+    async _onChangeSkillRating(event: Event | JQuery.ChangeEvent) {
         event.preventDefault();
         if (!isElementInstance(event.target, HTMLInputElement)) return;
         const closest = this._closestSkillTarget(event.target);

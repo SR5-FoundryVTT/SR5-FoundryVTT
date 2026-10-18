@@ -481,7 +481,7 @@ export class MatrixNetworkFlow {
      *
      * @param event User clicking on button in chat message.
      */
-    static async acknowledgeMarkInvite(event: Event) {
+    static async acknowledgeMarkInvite(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 

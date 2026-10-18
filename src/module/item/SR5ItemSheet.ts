@@ -547,11 +547,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.update({ system: { linkedActor: actor.uuid } });
     }
 
-    async _onSelectRangedRangeCategory(event: Event) {
+    async _onSelectRangedRangeCategory(event: Event | JQuery.ChangeEvent) {
         await this._onSelectRangeCategory("system.range.ranges", event);
     }
 
-    async _onSelectThrownRangeCategory(event: Event) {
+    async _onSelectThrownRangeCategory(event: Event | JQuery.ChangeEvent) {
         await this._onSelectRangeCategory("system.thrown.ranges", event);
     }
 
@@ -566,7 +566,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             await this.item.update({ system: { description: { source: data.uuid } } });
     }
 
-    async _onSelectRangeCategory(key: string, event: Event) {
+    async _onSelectRangeCategory(key: string, event: Event | JQuery.ChangeEvent) {
         event.stopPropagation();
         const selectedRangeCategory = (event.currentTarget as HTMLSelectElement).value as keyof typeof SR5.weaponRangeCategories;
 
@@ -593,7 +593,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * User selected a new matrix attribute on a specific matrix attribute slot (att1, att2,)
      * Switch out slots for the old and selected matrix attribute.
      */
-    async _onMatrixAttributeSelected(event: Event) {
+    async _onMatrixAttributeSelected(event: Event | JQuery.ChangeEvent) {
         if (!this.item.system.atts) return;
 
         const target = event.currentTarget as HTMLSelectElement;
@@ -734,7 +734,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.update({ system: { ammo: { spare_clips: { value: spareClips } } } });
     }
 
-    _onAmmoSelect(event: Event) {
+    _onAmmoSelect(event: Event | JQuery.ChangeEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
         const id = SheetFlow.closestItemId(event.currentTarget);
 
         if (!id) return;
@@ -788,7 +788,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         void this.render();
     }
 
-    async _onMarksQuantityChange(event: Event) {
+    async _onMarksQuantityChange(event: Event | JQuery.ChangeEvent) {
         event.stopPropagation();
 
         if (!this.item.isType('host')) return;
@@ -808,7 +808,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * Change the quantity on a nested item shown within this item sheet's list.
      * @param event A DOM event
      */
-    async _onListItemChangeQuantity(event: Event) {
+    async _onListItemChangeQuantity(event: Event | JQuery.ChangeEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
         const iid = SheetFlow.closestItemId(event.currentTarget);
         const item = this.item.getOwnedItem(iid);
         const quantity = parseInt((event.currentTarget as HTMLInputElement).value);
