@@ -116,7 +116,7 @@ export class Helpers {
         html.find('label.checkbox').each(function (this: HTMLElement) {
             setContent(this);
         });
-        html.find('label.checkbox').click((event) => setContent(event.currentTarget));
+        html.find('label.checkbox').on('click', (event) => setContent(event.currentTarget));
     }
 
     static label(str: string) {
