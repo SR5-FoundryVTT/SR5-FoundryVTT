@@ -1137,7 +1137,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @protected
      */
     override async _onDrop(event: DragEvent) {
-        const data = TextEditor.getDragEventData(event) as { type: Parameters<typeof foundry.utils.getDocumentClass>[0]; uuid?: string };
+        const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event) as { type: Parameters<typeof foundry.utils.getDocumentClass>[0]; uuid?: string };
         if (!data) return;
 
         const targetElement = event.target as HTMLElement | null;

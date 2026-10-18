@@ -333,7 +333,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * The original naming leans on the dnd5e systems use of it for chat messages.
      * NOTE: This is very legacy, difficult to read and should be improved upon.
      */
-    async getChatData(htmlOptions: TextEditor.EnrichmentOptions = {}) {
+    async getChatData(htmlOptions: foundry.applications.ux.TextEditor.EnrichmentOptions = {}) {
         const system = foundry.utils.duplicate(this.system) as SR5Item['system'];
 
         system.description.value = await foundry.applications.ux.TextEditor.implementation.enrichHTML(system.description.value, htmlOptions);

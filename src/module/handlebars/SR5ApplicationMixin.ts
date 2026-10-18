@@ -354,7 +354,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
          * @param options TextEditor, enrichHTML.options passed through
          * @returns Enriched HTML result
          */
-        async enrichEditorFieldToHTML(editorValue: string, options?: TextEditor.EnrichmentOptions): Promise<string> {
+        async enrichEditorFieldToHTML(editorValue: string, options?: foundry.applications.ux.TextEditor.EnrichmentOptions): Promise<string> {
             return foundry.applications.ux.TextEditor.implementation.enrichHTML(editorValue, options);
         }
 
