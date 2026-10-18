@@ -554,12 +554,12 @@ ___________________
         HooksManager.configureTextEnrichers();
 
         // Preload might reduce loading time during play.
-        HandlebarManager.loadTemplates();
+        void HandlebarManager.loadTemplates();
 
         // Register Tours
-        registerSR5Tours();
+        void registerSR5Tours();
 
-        DataStorage.validate();
+        void DataStorage.validate();
     }
 
     static async ready() {
@@ -595,7 +595,7 @@ ___________________
     static hotbarDrop(bar, dropData, slot): boolean {
         switch (dropData.type) {
             case 'Item':
-                createItemMacro(dropData, slot);
+                void createItemMacro(dropData, slot);
                 return false;
         }
         return true;
@@ -749,15 +749,15 @@ ___________________
 
     static async chatMessageListeners(message: ChatMessage, html, data) {
         await SuccessTest.chatMessageListeners(message, html, data);
-        BlastTemplateFlow.chatMessageListeners(html, test => BlastScatterFlow.handle(test));
+        BlastTemplateFlow.chatMessageListeners(html, async test => BlastScatterFlow.handle(test));
         SuppressiveFireTemplateFlow.chatMessageListeners(html);
         ShotgunTemplateFlow.chatMessageListeners(html);
         await OpposedTest.chatMessageListeners(message, html, data);
-        await ActionFollowupFlow.chatMessageListeners(message, html, data);
-        await TeamworkTest.chatMessageListeners(message, html);
-        await JournalEnrichers.messageRequestHooks(html);
-        await MatrixNetworkFlow.chatMessageListeners(message, html, data);
-        await ExtendedTestDueFlow.chatMessageListeners(message, html);
+        ActionFollowupFlow.chatMessageListeners(message, html, data);
+        TeamworkTest.chatMessageListeners(message, html);
+        JournalEnrichers.messageRequestHooks(html);
+        MatrixNetworkFlow.chatMessageListeners(message, html, data);
+        ExtendedTestDueFlow.chatMessageListeners(message, html);
         PreparationDecayFlow.chatMessageListeners(message, html);
     }
 

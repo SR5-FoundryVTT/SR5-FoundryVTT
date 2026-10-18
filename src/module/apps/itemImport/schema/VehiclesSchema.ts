@@ -8,12 +8,12 @@ export interface Mod {
     ammobonus?: { _TEXT: IntegerString; };
     ammobonuspercent?: { _TEXT: IntegerString; };
     ammoreplace?: { _TEXT: "100(belt)"; };
-    avail: { _TEXT: IntegerString | string; };
+    avail: { _TEXT: string; };
     bonus?: BonusSchema;
     capacity?: { _TEXT: IntegerString; };
     category: { _TEXT: string; };
     conditionmonitor?: { _TEXT: IntegerString; };
-    cost: { _TEXT: IntegerString | string; };
+    cost: { _TEXT: string; };
     downgrade?: Empty;
     forbidden?: ConditionsSchema;
     hide?: Empty;
@@ -25,7 +25,7 @@ export interface Mod {
     rating: { _TEXT: IntegerString | "Seats" | "body" | "qty"; };
     ratinglabel?: { _TEXT: "String_Hours" | "String_UpgradedRating"; };
     required?: ConditionsSchema;
-    slots: { _TEXT: IntegerString | string; };
+    slots: { _TEXT: string; };
     source?: { _TEXT: IntegerString | "BB" | "HT" | "KK" | "R5" | "RF" | "SAG" | "SFME" | "SHB" | "SHB3" | "SL" | "SR5" | "SS" | "TCT"; };
     subsystems?: {
         subsystem: Many<{ _TEXT: string; }>;
@@ -40,7 +40,7 @@ export interface Mod {
 export interface Vehicle {
     accel: { _TEXT: IntegerString | "1/1" | "1/2" | "1/3" | "2/3" | "2/4" | "3/2"; };
     armor: { _TEXT: IntegerString; };
-    avail: { _TEXT: IntegerString | string; };
+    avail: { _TEXT: string; };
     body: { _TEXT: IntegerString; };
     bodymodslots?: { _TEXT: IntegerString; };
     category: { _TEXT: string; };
@@ -70,7 +70,7 @@ export interface Vehicle {
             _TEXT?: string;
         }>;
     };
-    handling: { _TEXT: IntegerString | string; };
+    handling: { _TEXT: string; };
     hide?: Empty;
     id: { _TEXT: string; };
     mods?: {
@@ -93,7 +93,7 @@ export interface Vehicle {
     protectionmodslots?: { _TEXT: IntegerString; };
     seats?: { _TEXT: IntegerString; };
     sensor: { _TEXT: IntegerString; };
-    source?: { _TEXT: IntegerString | string; };
+    source?: { _TEXT: string; };
     speed: { _TEXT: IntegerString | "1/1" | "1/4" | "1/7" | "2/3" | "2/5" | "3/4" | "3/6" | "4/3" | "4/4" | "4/5" | "5/3"; };
     weaponmodslots?: { _TEXT: IntegerString; };
     weaponmounts?: {

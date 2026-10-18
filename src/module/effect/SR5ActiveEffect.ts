@@ -119,7 +119,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * target and changes have a concrete destination. Effects created with explicit targets (tests,
      * imports, migration) keep theirs.
      */
-    protected override async _preCreate(...args: Parameters<ActiveEffect['_preCreate']>): Promise<boolean | void> {
+    protected override async _preCreate(...args: Parameters<ActiveEffect['_preCreate']>): Promise<boolean | undefined> {
         const allowed = await super._preCreate(...args);
         if (allowed === false) return false;
 
@@ -293,7 +293,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Re-enable an expired effect, reset its anchor, and re-register it with the expiry registry.
      * Use this to restart a duration that was consumed (e.g. buff renewed for another combat).
      */
-    async restart(): Promise<this | void> {
+    async restart(): Promise<this | undefined> {
         const combat = this.actor?.inCombat ? (game.combat ?? undefined) : undefined;
         return this.update({
             disabled: false,
@@ -527,14 +527,14 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @returns {Array<*>}      The parsed delta cast as a typed array
      */
     private static __castArray(raw: string, type: foundry.utils.DataType) {
-        let delta: any[];
+        let delta: unknown[];
         try {
-            delta = this.__parseOrString(raw);
-            delta = delta instanceof Array ? delta : [delta];
+            const parsed = this.__parseOrString(raw);
+            delta = parsed instanceof Array ? parsed : [parsed];
         } catch (e) {
             delta = [raw];
         }
-        return delta.map(d => this.__castDelta(d, type));
+        return delta.map(d => this.__castDelta(d as string, type));
     }
 
     /**
@@ -544,8 +544,8 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param {string} type     The target data type that the raw value should be cast to match
      * @returns {*}             The parsed delta cast to the target data type
      */
-    private static __castDelta(raw: string, type: foundry.utils.DataType) {
-        let delta;
+    private static __castDelta(raw: string, type: foundry.utils.DataType): unknown {
+        let delta: unknown;
         switch (type) {
             case "boolean":
                 delta = Boolean(SR5ActiveEffect.__parseOrString(raw));
@@ -569,7 +569,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param {string} raw      A raw serialized string
      * @returns {*}             The parsed value, or the original value if parsing failed
      */
-    private static __parseOrString(raw: string) {
+    private static __parseOrString(raw: string): unknown {
         try {
             return JSON.parse(raw);
         } catch (err) {

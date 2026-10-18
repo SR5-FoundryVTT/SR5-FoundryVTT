@@ -242,6 +242,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         await TestCreator.fromMessageAction(messageId, opposedActionTest, {showDialog});
     }
 
+    // oxlint-disable-next-line typescript/require-await -- Overrides the async SuccessTest hook, which must keep returning a Promise.
     static override async chatMessageListeners(message: ChatMessage, html: HTMLElement, data) {
         $(html).find<HTMLElement>('.opposed-action').on('click', OpposedTest._castOpposedAction.bind(this));
         $(html).find<HTMLElement>('.resist-action').on('click', OpposedTest._castResistAction.bind(this));
@@ -266,7 +267,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
      * This class should be used for the opposing test implementation.
      * - the resist class test will resist any damage
      */
-    override get _resistTestClass(): any | undefined {
+    override get _resistTestClass(): any {
         if (this.success || !this.data.against?.opposed?.resist) return;
         return TestCreator._getTestClass(this.data.against.opposed.resist.test);
     }

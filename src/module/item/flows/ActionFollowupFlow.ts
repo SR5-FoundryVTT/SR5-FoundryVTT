@@ -6,7 +6,7 @@ import { TestCreator } from "../../tests/TestCreator";
  * This would be triggered from a chat message interaction, with the chat message containing the test to follow up on.
  */
 export const ActionFollowupFlow = {
-    chatMessageListeners: async (message: ChatMessage, html, data) => {
+    chatMessageListeners: (message: ChatMessage, html, data) => {
         $(html).find('.followup-action').on('click', ActionFollowupFlow.castFollowupAction.bind(this));
     },
 

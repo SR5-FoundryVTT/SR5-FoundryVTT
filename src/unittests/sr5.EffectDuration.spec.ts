@@ -451,7 +451,7 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
                 await combat.startCombat();
                 for (const c of combat.combatants) await c.update({ initiative: 20 });
 
-                registry.refresh = (event: string, ctx: any) => { events.push(event); return originalRefresh(event, ctx); };
+                registry.refresh = async (event: string, ctx: any) => { events.push(event); return originalRefresh(event, ctx); };
                 await drive(combat);
             } finally {
                 registry.refresh = originalRefresh;

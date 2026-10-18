@@ -156,7 +156,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         }
 
         if (!game.user?.isGM) {
-            await this._sendCreateTargetedEffectsSocketMessage(actor, effectsData);
+            this._sendCreateTargetedEffectsSocketMessage(actor, effectsData);
         } else {
             await SuccessTestEffectsFlow._createTargetedEffectsAsGM(actor, effectsData);
         }
@@ -248,7 +248,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @param actor The actor to create the effects on.
      * @param effectsData The effects data to be applied;
      */
-    async _sendCreateTargetedEffectsSocketMessage(actor: SR5Actor, effectsData: SR5ActiveEffect[]) {
+    _sendCreateTargetedEffectsSocketMessage(actor: SR5Actor, effectsData: SR5ActiveEffect[]) {
         SocketMessage.emitForGM(FLAGS.CreateTargetedEffects, { actorUuid: actor.uuid, effectsData });
     }
 

@@ -6,7 +6,7 @@ import { TestCreator } from '../TestCreator';
 
 interface ShotgunTemplateFlowHost {
     actor: {
-        getToken(): TokenDocument | null
+        getToken: () => TokenDocument | null
     } | undefined
     data: {
         ranges: RangesTemplateType
@@ -15,7 +15,7 @@ interface ShotgunTemplateFlowHost {
 }
 
 interface ShotgunTest extends ShotgunTemplateFlowHost {
-    populateDocuments(): Promise<void>
+    populateDocuments: () => Promise<void>
     shotgunTemplateFlow: ShotgunTemplateFlow
 }
 
@@ -69,7 +69,7 @@ export class ShotgunTemplateFlow {
         event.stopPropagation();
 
         if (this.#placement) {
-            this.cancelPreview();
+            void this.cancelPreview();
             return;
         }
 
@@ -78,7 +78,7 @@ export class ShotgunTemplateFlow {
 
     async drawChatPreview(ranges = this.test.data.ranges, choke = this.test.data.shotgunChoke) {
         if (this.#placement) {
-            this.cancelPreview();
+            void this.cancelPreview();
             return;
         }
 

@@ -536,7 +536,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         // Inline change handlers for nested list items (qty inputs in edit mode)
         html.find('input[data-system-action="changeItemQty"]').on('change', this._onListItemChangeQuantity.bind(this));
-        html.find('input[data-system-action="changeItemMatrixDamage"]').on('change', event => SheetFlow.changeItemMatrixDamage(event, this.item));
+        html.find('input[data-system-action="changeItemMatrixDamage"]').on('change', async event => SheetFlow.changeItemMatrixDamage(event, this.item));
 
         // Marks handling
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
@@ -1112,7 +1112,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     ) {
         if (this.item._isNestedItem) {
             await this.item.update(submitData, options);
-            return undefined as any;
+            return undefined as never;
         }
 
         return await super._processSubmitData(event, form, submitData, options);
@@ -1289,6 +1289,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      *                                           value to indicate failure or no action being taken
      * @protected
      */
+    // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
     async _onDropFolder(event, folder) {
         return null;
     }
@@ -1299,6 +1300,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @returns {Promise<void>}
      * @protected
      */
+    // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
     override async _onDragStart(event: DragEvent) {
         const target = event.currentTarget as HTMLElement;
         const targetElement = event.target as HTMLElement;
@@ -1364,7 +1366,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     /**
      * Handle interaction with a damage track title.
      */
-    static async #rollConditionMonitor(this: SR5ItemSheet, event: Event) {
+    static #rollConditionMonitor(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
     }
 }

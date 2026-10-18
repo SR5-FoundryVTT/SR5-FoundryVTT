@@ -92,7 +92,7 @@ export class SR5Combat extends Combat<"base"> {
         const method = combat?.[fnName] as unknown;
         if (typeof method !== 'function') return;
 
-        return await method.call(combat);
+        return await (method.call(combat) as Promise<unknown>);
     }
 
     // =========================================================
@@ -220,7 +220,7 @@ export class SR5Combat extends Combat<"base"> {
         } as Combat.UpdateData;
         const updateOptions = {direction: 1, worldTime: { delta: advanceTime }} as Combat.Database.UpdateOperation;
 
-        // @ts-expect-error
+        // @ts-expect-error TODO: fvtt-types v14 - The combatRound hook typings do not match the data passed here.
         Hooks.callAll("combatRound", this, updateData, updateOptions);
         await this.update(updateData, updateOptions);
 
@@ -313,7 +313,7 @@ export class SR5Combat extends Combat<"base"> {
                 updateData.combatants = [{ _id: this.combatant.id!, system: { acted: true } }];
         }
 
-        // @ts-expect-error
+        // @ts-expect-error TODO: fvtt-types v14 - The combatTurn hook typings do not match the data passed here.
         Hooks.callAll("combatTurn", this, updateData, updateOptions);
         await this.update(updateData, updateOptions);
 

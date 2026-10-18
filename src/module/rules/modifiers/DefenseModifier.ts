@@ -11,9 +11,7 @@ export class DefenseModifier extends SituationModifier {
     /**
      * Defense modifier is a legacy modifier but can differ based set actor modifiers
      */
-    static override get hasSourceData() {
-        return false;
-    }
+    static override readonly hasSourceData = false;
 
     /**
      * Depending on the test context additional defense modifiers might apply

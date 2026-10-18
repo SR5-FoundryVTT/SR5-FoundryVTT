@@ -727,6 +727,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * Create an item in this item
      * @param effectData
      */
+    // oxlint-disable-next-line typescript/require-await -- Public Promise based item API, callers await it.
     async createNestedActiveEffect(effectData: ActiveEffect.Stored | ActiveEffect.Stored[]) {
         if (!Array.isArray(effectData)) effectData = [effectData];
 
@@ -1265,6 +1266,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * @returns A list of slaved devices.
      */
+    // oxlint-disable-next-line typescript/require-await -- Public Promise based item API, kept async for consistency.
     async getDevices() {
         const host = this.asType('host');
         if (!host) return [];
@@ -1555,10 +1557,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // Attributes for hosts work only within their own attributes.
         if (this.isType('host')) {
             const rollData = this.getRollData();
-            return rollData.attributes?.[name];
+            return rollData.attributes?.[name] as AttributeFieldType | undefined;
         }
 
-        return rollData.attributes?.[name];
+        return rollData.attributes?.[name] as AttributeFieldType | undefined;
     }
 
     /**

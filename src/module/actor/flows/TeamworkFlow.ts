@@ -13,12 +13,12 @@ export interface TeamworkMessageData {
  
 export class TeamworkTest {
     
-    static async chatMessageListeners(message: ChatMessage, html) {
+    static chatMessageListeners(message: ChatMessage, html) {
         html = $(html);
         if( !html?.find('.sr5-teamwork-addparticipant') ) return;
 
         $(html).find('.sr5-teamwork-addparticipant').on('click', async _ => await this.addParticipant(message));
-        $(html).find('.sr5-teamwork-start').on('click', async _ => await this.rollTeamworkTest(message));
+        $(html).find('.sr5-teamwork-start').on('click', _ => this.rollTeamworkTest(message));
     }
 
     /**
@@ -40,7 +40,7 @@ export class TeamworkTest {
         const teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData
         const results = await actor?.rollSkill(teamworkData.skill) as SuccessTest;
         if(results.rolls.length > 0) {
-            void this.addResultsToMessage(message, actor, results, teamworkData)
+            this.addResultsToMessage(message, actor, results, teamworkData)
         }
     }
 
@@ -51,7 +51,7 @@ export class TeamworkTest {
      * @param results of the roll
      * @param teamworkData flag data to add too
      */
-    static async addResultsToMessage(message: ChatMessage, actor: SR5Actor, results: SuccessTest, teamworkData: TeamworkMessageData) {
+    static addResultsToMessage(message: ChatMessage, actor: SR5Actor, results: SuccessTest, teamworkData: TeamworkMessageData) {
         //wrap the old content to presever it, this is necessary for pre-render hooks
         const wrapper = document.createElement("dív");
         wrapper.innerHTML = message.content;
@@ -84,7 +84,7 @@ export class TeamworkTest {
             void message.update({content: wrapper.innerHTML})
         }
         else {
-            void this._sendUpdateSocketMessage(message, wrapper.innerHTML, teamworkData)
+            this._sendUpdateSocketMessage(message, wrapper.innerHTML, teamworkData)
         }
 
     }
@@ -93,7 +93,7 @@ export class TeamworkTest {
      * This method prompts the roll of the final teamwork test of the leader
      * @param message 
      */
-    static async rollTeamworkTest(message: ChatMessage) {
+    static rollTeamworkTest(message: ChatMessage) {
         const teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData
         const actor = game.actors?.get(message.speaker.actor!) as SR5Actor;
         
@@ -105,7 +105,7 @@ export class TeamworkTest {
      * @param actor The actor to create the effects on.
      * @param effectsData The effects data to be applied;
      */
-    static async _sendUpdateSocketMessage(message: ChatMessage, content: string, teamworkData: TeamworkMessageData) {
+    static _sendUpdateSocketMessage(message: ChatMessage, content: string, teamworkData: TeamworkMessageData) {
         return SocketMessage.emitForGM(FLAGS.TeamworkTestFlow, { messageUuid: message.uuid, content, teamworkData });
     }
 

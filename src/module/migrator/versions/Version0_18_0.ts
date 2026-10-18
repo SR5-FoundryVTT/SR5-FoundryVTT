@@ -17,10 +17,10 @@ export class Version0_18_0 extends VersionMigration {
     }
 
     override migrateActor(actor: any) {
-        const toDelete = actor.effects.filter(effect => effect.origin?.includes('.Item.'));
+        const toDelete = actor.effects.filter((effect: { origin?: string }) => effect.origin?.includes('.Item.'));
         if (toDelete.length > 0) {
             console.log(`Actor (${actor._id}). Delete these effects:`, toDelete);
-            actor.effects = actor.effects.filter(effect => !effect.origin?.includes('.Item.'));
+            actor.effects = actor.effects.filter((effect: { origin?: string }) => !effect.origin?.includes('.Item.'));
         }
     }
 

@@ -174,6 +174,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     /**
      * Prepare start details from the working clone so staged restarts are reflected before submit.
      */
+    // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
     protected override async _prepareStartContext(): Promise<ActiveEffectConfig.StartContext | null> {
         const start = this.clone.toObject().start;
         if (!start) return null;
@@ -556,10 +557,10 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     }
 
     prepareChangePriorityPlaceholders() {
-        return Object.entries(SR5ActiveEffect.CHANGE_TYPES).reduce((placeholders, [type, data]) => {
+        return Object.entries(SR5ActiveEffect.CHANGE_TYPES).reduce<Record<string, string>>((placeholders, [type, data]) => {
             placeholders[type] = String(data?.defaultPriority ?? '');
             return placeholders;
-        }, {} as Record<string, string>);
+        }, {});
     }
 
     prepareSelectionModeOptions() {
@@ -692,7 +693,6 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         if (isElementInstance(target, HTMLSelectElement) && name === 'duration.expiry') {
             this._syncFormIntoClone();
             void this.render();
-            return;
         }
     }
 

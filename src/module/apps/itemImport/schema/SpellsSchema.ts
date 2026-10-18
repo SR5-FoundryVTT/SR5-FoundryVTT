@@ -10,7 +10,7 @@ export interface Spell {
     damage: { _TEXT: IntegerString | "P" | "S" | "Special"; };
     descriptor: Empty | { _TEXT: string; };
     duration: { _TEXT: "I" | "P" | "S" | "Special"; };
-    dv: { _TEXT: IntegerString | string; };
+    dv: { _TEXT: string; };
     id: { _TEXT: string; };
     name: { _TEXT: string; };
     page?: { _TEXT: IntegerString; };

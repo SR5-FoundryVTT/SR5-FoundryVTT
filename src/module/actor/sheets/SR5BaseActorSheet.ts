@@ -433,7 +433,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.effects = prepareSortedEffects(this.actor.effects.contents);
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
 
-        data.inventories = await this._prepareItemsInventory();
+        data.inventories = this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
         // Sorcery spells and alchemical formulae are learned separately and counted separately,
         // so they get their own sections. SR5#69, SR5#304.
@@ -653,7 +653,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         html.find('input[data-system-action="changeSkillRating"]').on('change', this._onChangeSkillRating.bind(this));
         html.find('input[data-system-action="changeItemQty"]').on('change', this._onListItemChangeQuantity.bind(this));
-        html.find('input[data-system-action="changeItemMatrixDamage"]').on('change', event => SheetFlow.changeItemMatrixDamage(event));
+        html.find('input[data-system-action="changeItemMatrixDamage"]').on('change', async event => SheetFlow.changeItemMatrixDamage(event));
     }
 
     private async _onSourceDrop(event?: DragEvent) {
@@ -857,13 +857,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * NOTE: The current drag&drop implementation is borked and needs cleanup across: SR5ApplicationMixin as base for actor and item sheets.
      */
     protected override async _onDrop(event: DragEvent) {
-        return await (ActorSheetV2.prototype as any)._onDrop.call(this, event);
+        return await ((ActorSheetV2.prototype as any)._onDrop.call(this, event) as Promise<void>);
     }
 
     /**
      * Guard against non-HTMLElement drag sources and keep actor item/effect drag payload creation stable.
      * NOTE: The current drag&drop implementation is borked and needs cleanup across: SR5ApplicationMixin as base for actor and item sheets.
      */
+    // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
     protected override async _onDragStart(event: DragEvent) {
         const target = event.currentTarget as HTMLElement | null;
         const targetElement = event.target as HTMLElement | null;
@@ -1309,7 +1310,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const { modifiers } = sheetData.system;
 
         const modifierList = Object.keys(modifiers);
-        modifierList.sort();
+        modifierList.sort((a, b) => a < b ? -1 : a > b ? 1 : 0); // Same code unit order as the default sort.
         // shift global to the front of the list
         modifierList.splice(modifierList.indexOf("global"), 1);
         modifierList.unshift('global');
@@ -1328,7 +1329,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * Each item can  be in one custom inventory or the default inventory.
      */
-    async _prepareItemsInventory() {
+    _prepareItemsInventory() {
         // All custom and default actor inventories.
         const inventoriesSheet: InventoriesSheetData = {};
         // Simple item to inventory mapping.
@@ -1639,7 +1640,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /** Setup untrained skill filter within getData */
-    static async #filterUntrainedSkills(this: SR5BaseActorSheet, event: PointerEvent) {
+    static #filterUntrainedSkills(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
         if (!isElementInstance(event.target, HTMLElement)) return;
         this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
@@ -1649,7 +1650,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         this.#filterActiveSkillsElements();
     }
 
-    static async #handleFilterActiveSkills(
+    static #handleFilterActiveSkills(
         this: SR5BaseActorSheet, event: KeyboardEvent | null, query: string, rgx: RegExp, content: HTMLElement | null
     ) {
         this._filters.skills = query;

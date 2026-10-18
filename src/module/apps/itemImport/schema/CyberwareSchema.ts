@@ -17,17 +17,17 @@ export interface Cyberware {
     allowsubsystems?: {
         category: OneOrMany<{ _TEXT: string; }>;
     };
-    avail: { _TEXT: IntegerString | string; };
+    avail: { _TEXT: string; };
     bannedgrades?: {
         grade: Many<{ _TEXT: "Greyware" | "Greyware (Adapsin)" | "Used" | "Used (Adapsin)"; }>;
     };
     blocksmounts?: { _TEXT: string; };
     bonus?: BonusSchema;
-    capacity: { _TEXT: IntegerString | string; };
+    capacity: { _TEXT: string; };
     category: { _TEXT: string; };
-    cost: { _TEXT: IntegerString | string; };
+    cost: { _TEXT: string; };
     devicerating?: { _TEXT: "{Rating}"; };
-    ess: { _TEXT: IntegerString | string; };
+    ess: { _TEXT: string; };
     forbidden?: ConditionsSchema;
     forcegrade?: { _TEXT: "None" | "Standard"; };
     gears?: {

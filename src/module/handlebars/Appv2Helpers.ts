@@ -51,7 +51,7 @@ export const registerAppv2Helpers = () => {
         return new Handlebars.SafeString(nav.outerHTML);
     });
 
-    Handlebars.registerHelper('isType', function(document: SR5Item | SR5Actor | any, ...types: any[]): boolean {
+    Handlebars.registerHelper('isType', function(document: any, ...types: any[]): boolean {
         if (!document) return false;
         if (!(document instanceof SR5Item || document instanceof SR5Actor)) {
             return false;

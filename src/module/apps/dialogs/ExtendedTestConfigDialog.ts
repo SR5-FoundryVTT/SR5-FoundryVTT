@@ -189,7 +189,7 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
         void this.close();
     }
 
-    protected override _onClose(options: Parameters<ApplicationV2['_onClose']>[0]) {
+    protected override async _onClose(options: Parameters<ApplicationV2['_onClose']>[0]) {
         this.#resolve?.();
         return super._onClose(options);
     }

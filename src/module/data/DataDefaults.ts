@@ -160,7 +160,7 @@ export class DataDefaults {
      */
     static baseSystemData<EntityType extends SystemEntityType>(
         entity: EntityType,
-        createData: SystemConstructorArgs<EntityType> = undefined
+        createData?: SystemConstructorArgs<EntityType>
     ): ReturnType<SystemByType<EntityType>['toObject']> {
         if (createData) {
             let correctionLogs: CorrectionLog | null;
@@ -176,6 +176,6 @@ export class DataDefaults {
                 console.table(correctionLogs);
             }
         }
-        return new (systemMap[entity] as any)(createData).toObject();
+        return new (systemMap[entity] as any)(createData).toObject() as ReturnType<SystemByType<EntityType>['toObject']>;
     }
 }
