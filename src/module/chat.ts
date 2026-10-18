@@ -21,7 +21,7 @@ export async function createChatMessage(template: string, templateData): Promise
 // templateData has no datatype to pipe through whatever it's given.
 // Clean up your data within templateData creation functions!
 const createChatData = async (template: string, templateData) => {
-    const html = await renderTemplate(template, templateData);
+    const html = await foundry.applications.handlebars.renderTemplate(template, templateData);
 
     const chatData = {
         user: game.user?.id,

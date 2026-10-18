@@ -1824,7 +1824,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Prepare message content.
         const templateData = await this._prepareMessageTemplateData();
-        const content = await renderTemplate(this._chatMessageTemplate, templateData);
+        const content = await foundry.applications.handlebars.renderTemplate(this._chatMessageTemplate, templateData);
         // Prepare the actual message.
         const messageData = await this._prepareMessageData(content);
 

@@ -104,7 +104,7 @@ export class JournalEnrichers {
     }
 
     static async createChatMessage (templateData) {
-        const html = await renderTemplate('systems/shadowrun5e/dist/templates/chat/rollRequest.hbs', templateData);
+        const html = await foundry.applications.handlebars.renderTemplate('systems/shadowrun5e/dist/templates/chat/rollRequest.hbs', templateData);
     
         const chatData = {
             user: game.user?.id,
