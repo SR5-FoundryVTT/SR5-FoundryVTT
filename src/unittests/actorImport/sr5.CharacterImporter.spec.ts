@@ -245,7 +245,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(vehicle.system.armor.rating.value, 9, 'Armor');
             assert.strictEqual(vehicle.system.vehicle_stats.sensor.value, 1, 'Sensor');
             assert.strictEqual(vehicle.system.vehicle_stats.seats.value, 2, 'Seats');
-            assert.strictEqual(vehicle.system.availability, '0', 'Availability');
+            assert.strictEqual(vehicle.system.availability.value, 0, 'Availability');
+            assert.strictEqual(vehicle.system.availability.label, '0', 'Availability label');
             assert.strictEqual(vehicle.system.cost, 10000, 'Cost');
             assert.strictEqual(vehicle.system.importFlags?.isFreshImport, true, 'Vehicle import flag');
             assert.strictEqual(vehicle.system.importFlags?.category, 'Bikes', 'Vehicle category import flag');
