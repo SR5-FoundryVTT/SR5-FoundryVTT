@@ -6,15 +6,18 @@ import { TechnologyAttributes } from "./Attributes";
 import { ModifiableField } from "../fields/ModifiableField";
 const { SchemaField, NumberField, BooleanField, StringField, DocumentUUIDField } = foundry.data.fields;
 
+/** Availability as a modifiable number plus its restriction, with the composed '12R' label. */
+export const AvailabilityField = () => new ModifiableField({
+    ...ModifiableValueSchema(),
+    restriction: new StringField({ required: true, nullable: false, initial: 'none', choices: SR5.availabilityRestrictions }),
+    label: new StringField({ required: true, nullable: false, initial: '0' }),
+});
+
 export const TechnologyData = () => ({
     // === Basic Info ===
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
     max_rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
-    availability: new ModifiableField({
-        ...ModifiableValueSchema(),
-        restriction: new StringField({ required: true, nullable: false, initial: 'none', choices: SR5.availabilityRestrictions }),
-        label: new StringField({ required: true, nullable: false, initial: '0' }),
-    }),
+    availability: AvailabilityField(),
     quantity: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
     cost: new ModifiableField(ModifiableValueSchema({ integer: false })),
     equipped: new BooleanField(),

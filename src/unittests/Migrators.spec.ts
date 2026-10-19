@@ -1038,4 +1038,41 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(item.effects[0].flags.shadowrun5e.ratingMultiplier, 'cost');
         });
     });
+
+    describe('Version0_38_0 vehicle availability migration', () => {
+        it('migrates vehicle availability into base/value fields', () => {
+            const migrator = new Version0_38_0();
+            const actor: any = { type: 'vehicle', system: { availability: '12R' } };
+
+            assert.isTrue(migrator.handlesActor(actor));
+            migrator.migrateActor(actor);
+
+            assert.deepEqual(actor.system.availability, {
+                base: 12,
+                value: 12,
+                changes: [],
+                restriction: 'restricted',
+                label: '12R',
+            });
+        });
+
+        it('migrates an empty vehicle availability to zero', () => {
+            const migrator = new Version0_38_0();
+            const actor: any = { type: 'vehicle', system: { availability: '' } };
+
+            migrator.migrateActor(actor);
+
+            assert.strictEqual(actor.system.availability.base, 0);
+            assert.strictEqual(actor.system.availability.restriction, 'none');
+        });
+
+        it('leaves non-vehicle actors untouched', () => {
+            const migrator = new Version0_38_0();
+            const actor: any = { type: 'character', system: { availability: '12R' } };
+
+            migrator.migrateActor(actor);
+
+            assert.strictEqual(actor.system.availability, '12R');
+        });
+    });
 };

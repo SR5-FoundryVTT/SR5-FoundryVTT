@@ -9,8 +9,21 @@ export class Version0_38_0 extends VersionMigration {
     readonly TargetVersion = '0.38.0';
 
     // Each branch contributing to 0.38.0 keeps its whole flow in its own migrate<Branch> method, called here.
+    override migrateActor(actor: any): void {
+        this.migrateVehicleAvailability(actor);
+    }
+
     override migrateItem(item: any): void {
         this.migrateItemSheetRework(item);
+    }
+
+    private migrateVehicleAvailability(actor: any): void {
+        if (actor.type !== 'vehicle' || !actor.system) return;
+
+        const availability = actor.system.availability;
+        if (availability && typeof availability === 'object') return;
+
+        actor.system.availability = { ...ItemAvailabilityFlow.parseAvailabilityString(String(availability ?? '')), changes: [] };
     }
 
     /**
