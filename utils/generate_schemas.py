@@ -20,7 +20,7 @@ from lxml import etree  # type: ignore
 # Repository details for fetching XML files if no local path is provided
 OWNER = "chummer5a"
 REPO = "chummer5a"
-BRANCH = "291d9562b9f6c093e3f2c2f28c535ff340ecb3ef"  # v5.226.194
+BRANCH = "908afb5b751f5d15cee0f5fb42c521932ea02fac"  # v5.226.216
 
 OUT_DIR = (Path(__file__).parent / "../src/module/apps/itemImport/schema").resolve()
 
@@ -156,12 +156,16 @@ def infer_type(samples: list[str]) -> str:
     unique = sorted(set(samples))
     literals = [s for s in unique if not is_number(s)]
 
+    union = " | ".join('"' + s.replace('"', '\\"') + '"' for s in literals)
+    if len(union) >= STRING_LIMIT:
+        # IntegerString is already a string, so a union with it would be redundant.
+        return "string"
+
     parts = []
     if len(literals) < len(unique):
         parts.append("IntegerString")
     if literals:
-        union = " | ".join('"' + s.replace('"', '\\"') + '"' for s in literals)
-        parts.append(union if len(union) < STRING_LIMIT else "string")
+        parts.append(union)
 
     return " | ".join(parts) or "string"
 

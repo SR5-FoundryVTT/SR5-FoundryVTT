@@ -69,7 +69,8 @@ export interface Cyberware {
         };
         specificskill?: {
             bonus: { _TEXT: IntegerString; };
-            name: { _TEXT: "Palming" | "Swimming"; };
+            condition?: { _TEXT: "LimitCondition_SkillsActiveGymnasticsClimbing"; };
+            name: { _TEXT: "Gymnastics" | "Palming" | "Swimming"; };
         };
         sprintbonus?: {
             category: { _TEXT: "Swim"; };
@@ -132,8 +133,9 @@ export interface Cyberware {
             name: { _TEXT: "Combat Active"; };
         };
         specificskill?: {
-            bonus: { _TEXT: IntegerString; };
-            name: { _TEXT: "Navigation" | "Perception"; };
+            bonus: { _TEXT: IntegerString | "Rating"; };
+            condition?: { _TEXT: string; };
+            name: { _TEXT: "Navigation" | "Perception" | "Performance"; };
         };
     };
     wirelesspairbonus?: {

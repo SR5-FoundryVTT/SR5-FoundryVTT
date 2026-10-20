@@ -38,10 +38,13 @@ export interface Bioware {
     pairbonus?: {
         reach?: { _TEXT: IntegerString; $: { name: "Claws (Bio-Weapon)" | "Retractable Claws (Bio-Weapon)"; }; };
         unarmeddv?: { _TEXT: IntegerString; };
-        unarmedreach?: { _TEXT: IntegerString; };
         walkmultiplier?: {
             category: { _TEXT: "Swim"; };
             val: { _TEXT: IntegerString; };
+        };
+        weaponaccuracy?: {
+            name: { _TEXT: "Large Tusk(s)" | "Medium Tusk(s)"; };
+            value: { _TEXT: IntegerString; };
         };
     };
     pairinclude?: {

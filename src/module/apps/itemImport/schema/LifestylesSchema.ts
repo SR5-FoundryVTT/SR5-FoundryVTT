@@ -67,7 +67,6 @@ export interface Quality {
     category: { _TEXT: string; };
     comforts?: { _TEXT: IntegerString; };
     comfortsmaximum?: { _TEXT: IntegerString; };
-    comfortsminimum?: { _TEXT: IntegerString; };
     cost?: { _TEXT: IntegerString | "100000 div 12" | "25000 div 12" | "5000 div 12" | "50000 div 12"; };
     forbidden?: ConditionsSchema;
     id: { _TEXT: string; };
@@ -78,7 +77,7 @@ export interface Quality {
     page?: { _TEXT: IntegerString; };
     required?: ConditionsSchema;
     security?: { _TEXT: IntegerString; };
-    securityminimum?: { _TEXT: IntegerString; };
+    securitymaximum?: { _TEXT: IntegerString; };
     source?: { _TEXT: "CA" | "CF" | "HT" | "RF" | "SFB" | "SFCR" | "SR5"; };
     translate?: OneOrMany<{ _TEXT: string; }>;
     altpage?: OneOrMany<{ _TEXT: string; }>;

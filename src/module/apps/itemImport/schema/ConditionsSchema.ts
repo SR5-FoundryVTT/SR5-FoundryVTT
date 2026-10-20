@@ -11,12 +11,13 @@ export interface ConditionsSchema {
         };
         critterpower?: { _TEXT: "Dual Natured"; };
         cyberware?: OneOrMany<{ _TEXT: string; }>;
-        ess?: { _TEXT: IntegerString; };
+        ess?: { _TEXT: IntegerString; $?: { grade: "Used,Standard,Alphaware,Betaware,Deltaware,Gammaware,Omegaware,Greyware"; }; };
         group?: Many<{
             critterpower?: { _TEXT: "Armor"; };
             quality?: { _TEXT: "Infected: Fomoraig"; };
         }>;
         initiategrade?: { _TEXT: IntegerString; };
+        lifestyle?: { _TEXT: "Bolt Hole" | "Traveler"; };
         magenabled?: Empty;
         metamagic?: { _TEXT: "Advanced Alchemy" | "Home Advantage" | "Patronage" | "Sacrifice"; };
         metamagicart?: { _TEXT: string; };
@@ -57,7 +58,6 @@ export interface ConditionsSchema {
         category?: { _TEXT: "Drugs"; };
         name?: { _TEXT: "Altskin" | "Binoculars (2050)" | "Goggles (2050)" | "Microphone, Laser"; };
     };
-    lifestyle?: { _TEXT: "Bolt Hole" | "Traveler"; };
     oneof?: {
         accessory?: OneOrMany<{ _TEXT: string; }>;
         armormod?: { _TEXT: "Responsive Interface Gear: Armor"; $: { sameparent: "True"; }; };
@@ -72,7 +72,7 @@ export interface ConditionsSchema {
         gear?: { _TEXT: "Fake SIN"; $: { minrating: IntegerString; }; };
         group?: OneOrMany<{
             grouponeof?: {
-                tradition: Many<{ _TEXT: "Black Magic" | "Black Magic [Alt]"; }>;
+                tradition: Many<{ _TEXT: "Black Magic" | "Black Magic [Alt]" | "Wicca, Gardnerian" | "Wicca, Goddess"; }>;
             };
             initiategrade?: { _TEXT: IntegerString; };
             martialtechnique?: { _TEXT: "Dim Mak"; };
@@ -85,7 +85,7 @@ export interface ConditionsSchema {
                 val: { _TEXT: IntegerString; };
             }>;
             spell?: { _TEXT: "Shapechange" | "[Critter] Form"; };
-            tradition?: { _TEXT: "Buddhism" | "Chaos Magic" | "Islam" | "Red Magic" | "Sioux" | "Wicca" | "Wuxing"; };
+            tradition?: { _TEXT: "Buddhism" | "Chaos Magic" | "Islam" | "Red Magic" | "Sioux" | "Wuxing"; };
         }>;
         lifestylequality?: OneOrMany<{ _TEXT: string; }>;
         magenabled?: Empty;

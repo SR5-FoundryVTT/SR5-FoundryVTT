@@ -69,7 +69,7 @@ export interface BonusSchema {
         type: { _TEXT: "Cyberware"; };
     };
     addweapon?: {
-        name: { _TEXT: "Elemental Body"; };
+        name: { _TEXT: "Corrosive Spit (Critter)" | "Elemental Body"; };
     };
     adeptpowerpoints?: { _TEXT: IntegerString; };
     allowskilldefaulting?: Empty;
@@ -86,7 +86,7 @@ export interface BonusSchema {
     availability?: { _TEXT: IntegerString; $: { condition: "career"; }; };
     biowareessmultiplier?: { _TEXT: IntegerString; };
     blackmarketdiscount?: Empty;
-    blockskillcategorydefaulting?: Many<{ _TEXT: "Academic" | "Professional" | "Technical Active"; }>;
+    blockskillcategorydefaulting?: OneOrMany<{ _TEXT: "Academic" | "Professional" | "Social Active" | "Technical Active"; }>;
     blockspelldescriptor?: { _TEXT: "Spell"; };
     body?: { _TEXT: IntegerString | "-Rating"; };
     burnoutsway?: Empty;
@@ -194,7 +194,7 @@ export interface BonusSchema {
     limitmodifier?: OneOrMany<{
         condition?: { _TEXT: string; };
         limit: { _TEXT: "Mental" | "Physical" | "Social"; };
-        value: { _TEXT: IntegerString | "Rating"; };
+        value: { _TEXT: IntegerString | "Rating" | "{MAG}"; };
     }>;
     limitspellcategory?: Empty | { _TEXT?: "Rituals"; $?: { exclude: "Rituals"; }; };
     limitspiritcategory?: Empty | {
@@ -231,7 +231,7 @@ export interface BonusSchema {
         reach: { _TEXT: IntegerString; };
         source?: { _TEXT: "DTR" | "HS"; };
         useskill: { _TEXT: "Exotic Melee Weapon" | "Unarmed Combat"; };
-        useskillspec?: { _TEXT: "Quills" | "Trunk"; };
+        useskillspec?: { _TEXT: "Quills" | "Spines" | "Trunk"; };
     };
     newspellkarmacost?: { _TEXT: IntegerString; $: { type: "Spells"; }; };
     notoriety?: { _TEXT: IntegerString; };
@@ -348,7 +348,7 @@ export interface BonusSchema {
         name: { _TEXT: "INT" | "LOG" | "MAG" | "WIL"; };
     }>;
     skillcategory?: OneOrMany<{
-        bonus: { _TEXT: IntegerString | "-Rating" | "Rating"; };
+        bonus: { _TEXT: IntegerString | "-Rating" | "Rating" | "{MAG}"; };
         condition?: { _TEXT: string; };
         exclude?: { _TEXT: "Gunnery" | "Intimidation" | "Perception"; };
         name: { _TEXT: string; };
@@ -411,7 +411,7 @@ export interface BonusSchema {
     }>;
     specificskill?: OneOrMany<{
         applytorating?: { _TEXT: "True"; };
-        bonus: { _TEXT: IntegerString | "Rating"; };
+        bonus: { _TEXT: IntegerString | "Rating" | "Rating * 2"; };
         condition?: { _TEXT: string; };
         name: { _TEXT: string; };
     }>;
@@ -469,7 +469,7 @@ export interface BonusSchema {
     toxininjectionresist?: { _TEXT: IntegerString | "Rating"; };
     trustfund?: { _TEXT: IntegerString; };
     unarmedap?: { _TEXT: "-Rating"; };
-    unarmeddv?: { _TEXT: IntegerString | "Rating*0.5" | "Rating-1"; };
+    unarmeddv?: { _TEXT: IntegerString | "Rating-1" | "floor(Rating div 2)"; };
     unarmeddvphysical?: Empty;
     unarmedreach?: { _TEXT: IntegerString; };
     uneducated?: Empty;
@@ -499,5 +499,5 @@ export interface BonusSchema {
         value: { _TEXT: IntegerString; };
     };
     weaponspecificdice?: { _TEXT: "Rating"; $: { type: "Melee"; }; };
-    _TEXT?: IntegerString | "-Rating" | "Rating";
+    _TEXT?: IntegerString | "-Rating" | "Rating" | "Rating * 2" | "{MAG}";
 };

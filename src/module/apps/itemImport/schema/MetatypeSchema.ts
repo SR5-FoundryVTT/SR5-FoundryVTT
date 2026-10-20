@@ -41,9 +41,9 @@ export interface Metatype {
     inimax: { _TEXT: string; };
     inimin: { _TEXT: string; };
     initiativedice?: { _TEXT: IntegerString; };
-    intaug: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F-1" | "F-2"; };
-    intmax: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F-1" | "F-2"; };
-    intmin: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F-1" | "F-2"; };
+    intaug: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F-2"; };
+    intmax: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F-2"; };
+    intmin: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F-2"; };
     karma?: { _TEXT: IntegerString; };
     logaug: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F-1" | "F-2"; };
     logmax: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F+4" | "F-1" | "F-2"; };

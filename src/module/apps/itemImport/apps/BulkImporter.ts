@@ -98,8 +98,8 @@ export class BulkImporter extends BaseClass {
     private static readonly githubConfig = {
         owner: "chummer5a",
         repo: "chummer5a",
-        version: "v5.226.194",
-        branch: "291d9562b9f6c093e3f2c2f28c535ff340ecb3ef",
+        version: "v5.226.216",
+        branch: "908afb5b751f5d15cee0f5fb42c521932ea02fac",
     } as const;
 
     static readonly SUPPORTED_LANGUAGES = [
