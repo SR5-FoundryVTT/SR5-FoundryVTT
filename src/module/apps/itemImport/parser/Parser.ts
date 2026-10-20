@@ -254,6 +254,23 @@ export abstract class Parser<SubType extends SystemEntityType> {
             const slots = 'slots' in jsonData ? jsonData.slots?._TEXT : undefined;
             add('system.slots', slots ?? ChummerFormulaParser.usedCapacity(capacity ?? ''));
         }
+        if (this.parseType === 'weapon') {
+            // Attribute formulas like ({STR}+2)P are parsed with the damage; only rating formulas need an effect.
+            const damage = 'damage' in jsonData ? /^\((.*\bRating\b.*)\)[PSM]?$/i.exec(jsonData.damage?._TEXT ?? '')?.[1] : undefined;
+            add('system.action.damage', damage);
+
+            const ap = 'ap' in jsonData ? jsonData.ap?._TEXT : undefined;
+            if (ap && /\bRating\b/i.test(ap)) {
+                const formula = ChummerFormulaParser.parse(ap, { minRating, identifiers });
+                if (!formula) {
+                    ChummerImportCoverage.skip(`system.action.damage.ap: ${ChummerFormulaParser.classify(ap, { minRating })}`, `${entity.name}: ${ap}`);
+                } else {
+                    // Chummer rounds a fractional AP away from zero.
+                    override('system.action.damage.ap', `(${formula.value}) < 0 ? floor(${formula.value}) : ceil(${formula.value})`);
+                    ChummerImportCoverage.add('system.action.damage.ap');
+                }
+            }
+        }
         if (!changes.length) return;
         const targets = [{ id: 'item', applyTo: 'item' }, { id: 'parent', applyTo: 'parent_item' }]
             .filter(target => changes.some(change => change.target === target.id));
