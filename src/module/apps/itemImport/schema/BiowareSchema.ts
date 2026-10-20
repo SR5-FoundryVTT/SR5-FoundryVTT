@@ -16,7 +16,7 @@ export interface Bioware {
     allowsubsystems?: {
         category: { _TEXT: "Chemical Gland Modifications"; };
     };
-    avail: { _TEXT: IntegerString | string; };
+    avail: { _TEXT: string; };
     bannedgrades?: {
         grade: Many<{ _TEXT: "Alphaware" | "Omegaware" | "Standard" | "Standard (Burnout's Way)" | "Used" | "Used (Adapsin)"; }>;
     };
@@ -24,8 +24,8 @@ export interface Bioware {
     bonus?: BonusSchema;
     capacity: { _TEXT: IntegerString; };
     category: { _TEXT: string; };
-    cost: { _TEXT: IntegerString | string; };
-    ess: { _TEXT: IntegerString | string; };
+    cost: { _TEXT: string; };
+    ess: { _TEXT: string; };
     forbidden?: ConditionsSchema;
     forcegrade?: { _TEXT: "None"; };
     hide?: Empty;

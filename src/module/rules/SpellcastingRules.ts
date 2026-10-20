@@ -20,18 +20,14 @@ export class SpellcastingRules {
     /**
      * As defined in SR5#282 - Step 6 Resist Drain
      */
-    static get minimalDrain(): number {
-        return 2;
-    }
+    static readonly minimalDrain: number = 2;
 
     /**
      * As defined in SR5#281 - Step 4 Cast Spell.
      *
      * Reckless spellcasting will alter drain damage.
      */
-    static get recklessDrainModifier(): number {
-        return 3;
-    }
+    static readonly recklessDrainModifier: number = 3;
 
     /**
      * Based on the minimal drain value use this as the minimal usable force value.

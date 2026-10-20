@@ -23,6 +23,8 @@ import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import ItemSheet = foundry.applications.sheets.ItemSheet;
 import { Translation } from '../utils/strings';
 import { SkillSelectionFlow } from '../flows/SkillSelectionFlow';
+import { WorldTimeFlow } from '../flows/WorldTimeFlow';
+import { PreparationTimeDialog } from '../apps/dialogs/PreparationTimeDialog';
 
 const { fromUuid, fromUuidSync } = foundry.utils;
 
@@ -48,6 +50,9 @@ export interface SR5BaseItemSheetData extends ItemSheet.RenderContext, SR5Applic
     // State flags
     isNestedItem: boolean;
     isUsingRangeCategory: boolean;
+
+    // Preparation item display data.
+    preparationCreationTime?: string;
 
     // Tests
     tests: typeof game.shadowrun5e.tests;
@@ -167,6 +172,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             modifyConditionMonitor: SR5ItemSheet.#modifyConditionMonitor,
             clearConditionMonitor: SR5ItemSheet.#clearConditionMonitor,
             rollConditionMonitor: SR5ItemSheet.#rollConditionMonitor,
+            editPreparationCreationTime: SR5ItemSheet.#editPreparationCreationTime,
         },
         dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
     }
@@ -373,7 +379,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             try {
                 const technology = itemData.technology as any;
                 if (technology.rating === 0) delete technology.rating;
-                if (technology.quantity === 0) delete technology.quantity;
                 if (technology.cost?.base === 0) delete technology.cost.base;
             } catch (e) {
                 console.log(e);
@@ -456,6 +461,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             }
         }
 
+        if (this.item.isType('preparation')) {
+            data.preparationCreationTime = WorldTimeFlow.format(this.item.system.created.worldTime);
+        }
+
         data.rollModes = CONFIG.ChatMessage.modes;
 
         data.item = this.item;
@@ -527,7 +536,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         // Inline change handlers for nested list items (qty inputs in edit mode)
         html.find('input[data-system-action="changeItemQty"]').on('change', this._onListItemChangeQuantity.bind(this));
-        html.find('input[data-system-action="changeItemMatrixDamage"]').on('change', event => SheetFlow.changeItemMatrixDamage(event, this.item));
+        html.find('input[data-system-action="changeItemMatrixDamage"]').on('change', async event => SheetFlow.changeItemMatrixDamage(event, this.item));
 
         // Marks handling
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
@@ -619,6 +628,13 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #addLicense(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         await this.item.addNewLicense();
+    }
+
+    static #editPreparationCreationTime(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+        if (!this.isEditMode || !this.item.isOwner || !this.item.isType('preparation')) return;
+
+        PreparationTimeDialog.open(this.item);
     }
 
     static async #removeLicense(this: SR5ItemSheet, event: Event) {
@@ -813,7 +829,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const item = this.item.getOwnedItem(iid);
         const quantity = parseInt((event.currentTarget as HTMLInputElement).value);
 
-        if (!quantity || !item?.system?.technology) {
+        if (!Number.isFinite(quantity) || !item?.system?.technology) {
             console.error(`Shadowrun 5e | Tried altering technology quantity on an item without technology data: ${item?.id}`, item);
             return;
         }
@@ -1085,7 +1101,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     ) {
         if (this.item._isNestedItem) {
             await this.item.update(submitData, options);
-            return undefined as any;
+            return undefined as never;
         }
 
         return await super._processSubmitData(event, form, submitData, options);
@@ -1262,6 +1278,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      *                                           value to indicate failure or no action being taken
      * @protected
      */
+    // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
     async _onDropFolder(event, folder) {
         return null;
     }
@@ -1272,6 +1289,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @returns {Promise<void>}
      * @protected
      */
+    // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
     override async _onDragStart(event: DragEvent) {
         const target = event.currentTarget as HTMLElement;
         const targetElement = event.target as HTMLElement;
@@ -1337,7 +1355,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     /**
      * Handle interaction with a damage track title.
      */
-    static async #rollConditionMonitor(this: SR5ItemSheet, event: Event) {
+    static #rollConditionMonitor(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
     }
 }

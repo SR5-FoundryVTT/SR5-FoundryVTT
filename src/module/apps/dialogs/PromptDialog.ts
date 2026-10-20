@@ -189,6 +189,7 @@ export class PromptDialog extends HandlebarsApplicationMixin(ApplicationV2)<Prom
         return {};
     }
 
+    // oxlint-disable-next-line typescript/require-await -- Default for an async hook that subclasses override with awaiting implementations.
     async onAfterClose(html: JQuery, selectedButton?: string) {
         return {} as object;
     }

@@ -132,6 +132,10 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
     hasInventory: boolean;
     selectedInventory: string;
     spells: Record<string, SR5Item[]>;
+    hasSpells: boolean;
+    // Alchemical spells are a separate formula group from sorcery spells. SR5#69, SR5#304.
+    alchemicalSpells: Record<string, SR5Item[]>;
+    hasAlchemicalSpells: boolean;
     program_count: string;
 
     // UI
@@ -429,9 +433,18 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.effects = prepareSortedEffects(this.actor.effects.contents);
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
 
-        data.inventories = await this._prepareItemsInventory();
+        data.inventories = this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
-        data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
+        // Sorcery spells and alchemical formulae are learned separately and counted separately,
+        // so they get their own sections. SR5#69, SR5#304.
+        const spellItems = data.itemType["spell"] ?? [];
+        const alchemicalSpells = spellItems.filter(spell => spell.asType('spell')?.system.alchemical);
+        const sorcerySpells = spellItems.filter(spell => !spell.asType('spell')?.system.alchemical);
+
+        data.spells = this._prepareSortedCategorizedSpells(sorcerySpells);
+        data.hasSpells = sorcerySpells.length > 0;
+        data.alchemicalSpells = this._prepareSortedCategorizedSpells(alchemicalSpells);
+        data.hasAlchemicalSpells = alchemicalSpells.length > 0;
         data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
         data.program_count = this._prepareProgramCount(data.itemType);
@@ -544,7 +557,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     protected _hasMagicItems() {
-        return this.actor.hasItemOfType('spell', 'adept_power', 'ritual', 'call_in_action');
+        return this.actor.hasItemOfType('spell', 'adept_power', 'ritual', 'preparation', 'call_in_action');
     }
 
     override async _onRender(
@@ -640,7 +653,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         html.find('input[data-system-action="changeSkillRating"]').on('change', this._onChangeSkillRating.bind(this));
         html.find('input[data-system-action="changeItemQty"]').on('change', this._onListItemChangeQuantity.bind(this));
-        html.find('input[data-system-action="changeItemMatrixDamage"]').on('change', event => SheetFlow.changeItemMatrixDamage(event));
+        html.find('input[data-system-action="changeItemMatrixDamage"]').on('change', async event => SheetFlow.changeItemMatrixDamage(event));
     }
 
     private async _onSourceDrop(event?: DragEvent) {
@@ -844,13 +857,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * NOTE: The current drag&drop implementation is borked and needs cleanup across: SR5ApplicationMixin as base for actor and item sheets.
      */
     protected override async _onDrop(event: DragEvent) {
-        return await (ActorSheetV2.prototype as any)._onDrop.call(this, event);
+        return await ((ActorSheetV2.prototype as any)._onDrop.call(this, event) as Promise<void>);
     }
 
     /**
      * Guard against non-HTMLElement drag sources and keep actor item/effect drag payload creation stable.
      * NOTE: The current drag&drop implementation is borked and needs cleanup across: SR5ApplicationMixin as base for actor and item sheets.
      */
+    // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
     protected override async _onDragStart(event: DragEvent) {
         const target = event.currentTarget as HTMLElement | null;
         const targetElement = event.target as HTMLElement | null;
@@ -1012,6 +1026,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Inject special case context based on item type
         if (type === 'call_in_action') this._handleCreateCallInActionItem(event, itemData);
+        if (type === 'spell') this._handleCreateSpellItem(event, itemData);
         if (type === 'skill') this._handleCreateSkillItem(event, itemData);
         if (type === 'matrix_action') this._handleCreateMatrixActionItem(event, itemData);
 
@@ -1037,6 +1052,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const actorType = SheetFlow.closestAction(event.target)!.dataset.actorType;
         if (!actorType) console.error(`Shadowrun 5e | Tried to create a Call In Action item without an actor-type data attribute context!`);
         itemData['system.actor_type'] = actorType;
+    }
+
+    /**
+     * Spells need to prefill the alchemical flag, as it decides which of the two spell sections the
+     * new item shows up in and which test it rolls. See SR5#304.
+     */
+    _handleCreateSpellItem(event: PointerEvent, itemData: Item.CreateData) {
+        const alchemical = SheetFlow.closestAction(event.target)!.dataset.alchemical === 'true';
+        itemData['system.alchemical'] = alchemical;
     }
 
     /**
@@ -1286,7 +1310,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const { modifiers } = sheetData.system;
 
         const modifierList = Object.keys(modifiers);
-        modifierList.sort();
+        modifierList.sort((a, b) => a < b ? -1 : a > b ? 1 : 0); // Same code unit order as the default sort.
         // shift global to the front of the list
         modifierList.splice(modifierList.indexOf("global"), 1);
         modifierList.unshift('global');
@@ -1305,7 +1329,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * Each item can  be in one custom inventory or the default inventory.
      */
-    async _prepareItemsInventory() {
+    _prepareItemsInventory() {
         // All custom and default actor inventories.
         const inventoriesSheet: InventoriesSheetData = {};
         // Simple item to inventory mapping.
@@ -1448,6 +1472,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         setVisibility('adept_power');
         setVisibility('spell');
         setVisibility('ritual');
+        setVisibility('preparation');
         setVisibility('summoning');
 
         return contentVisibility;
@@ -1615,7 +1640,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /** Setup untrained skill filter within getData */
-    static async #filterUntrainedSkills(this: SR5BaseActorSheet, event: PointerEvent) {
+    static #filterUntrainedSkills(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
         if (!isElementInstance(event.target, HTMLElement)) return;
         this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
@@ -1625,7 +1650,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         this.#filterActiveSkillsElements();
     }
 
-    static async #handleFilterActiveSkills(
+    static #handleFilterActiveSkills(
         this: SR5BaseActorSheet, event: KeyboardEvent | null, query: string, rgx: RegExp, content: HTMLElement | null
     ) {
         this._filters.skills = query;
@@ -1851,7 +1876,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const quantity = parseInt((event.currentTarget as HTMLInputElement).value);
 
         // Inform users about issues with templating or programming.
-        if (!quantity || !item?.system?.technology) {
+        if (!Number.isFinite(quantity) || !item?.system?.technology) {
             console.error(`Shadowrun 5e | Tried altering technology quantity on an item without technology data: ${item?.id}`, item);
             return;
         }

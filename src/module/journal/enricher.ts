@@ -38,7 +38,7 @@ export class JournalEnrichers {
      * @param html the triggering html
      * @param data 
      */
-    static async setEnricherHooks(journal, html, data) {
+    static setEnricherHooks(journal, html, data) {
         const rolls = { 
             "Teamwork": "startTeamworkTest",
             "RollSkill": "rollSkill", 
@@ -84,7 +84,7 @@ export class JournalEnrichers {
         return rollEntity;
     }
 
-    static async messageRequestHooks(html) {
+    static messageRequestHooks(html) {
         $(html).find('.sr5-requestAnswer').on('click', async (ev) => {
             const element = ev.currentTarget
 

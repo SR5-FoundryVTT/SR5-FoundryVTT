@@ -9,9 +9,13 @@
         "typescript/no-deprecated": "warn",
         "typescript/await-thenable": "warn",
         "typescript/no-floating-promises": "warn",
-        "typescript/no-misused-promises": "warn",
+        // Async handlers passed to jQuery `.on(...)`, `Hooks.on(...)` and Foundry option callbacks are the
+        // standard pattern here; the caller ignores the returned promise either way. Only the void-return check is disabled.
+        "typescript/no-misused-promises": ["warn", { "checksVoidReturn": false }],
         "typescript/prefer-promise-reject-errors": "warn",
-        "typescript/promise-function-async": "warn",
+        // Conflicts with require-await: a function that returns a promise without awaiting anything can't satisfy both rules.
+        // require-await is kept, so promise-returning functions are not forced to be async.
+        "typescript/promise-function-async": "off",
         "typescript/require-await": "warn",
         "typescript/return-await": "off",
         "typescript/consistent-type-assertions": "warn",
@@ -29,7 +33,9 @@
         "typescript/no-unsafe-assignment": "warn",
         "typescript/no-unsafe-call": "warn",
 
-        "eqeqeq": "warn",
+        // `== null` / `!= null` deliberately cover both null and undefined, which Foundry and legacy data mix constantly.
+        // Strict `=== null` alone would change behavior; the explicit form is longer without being clearer.
+        "eqeqeq": ["warn", "always", { "null": "ignore" }],
         "no-case-declarations": "off",
         "no-empty": "warn",
         "no-fallthrough": "warn",
@@ -71,7 +77,7 @@
         "typescript/explicit-function-return-type": "off",
         "typescript/no-confusing-non-null-assertion": "off",
         "typescript/no-confusing-void-expression": "off",
-        "typescript/no-dynamic-delete": "warn",
+        "typescript/no-dynamic-delete": "off",
         "typescript/no-empty-function": "off",
         "typescript/no-extraneous-class": "off",
         "typescript/no-namespace": "off",

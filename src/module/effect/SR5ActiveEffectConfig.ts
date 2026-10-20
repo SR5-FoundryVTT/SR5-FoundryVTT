@@ -11,6 +11,7 @@ import { SR5ActiveEffectValueEditor } from './SR5ActiveEffectValueEditor';
 import { Translation } from '../utils/strings';
 import { EffectDurationStatus, prepareEffectDurationStatus } from './EffectDurationStatus';
 import { isElementInstance } from '@/module/utils/dom';
+import { SR5Item } from '../item/SR5Item';
 
 /**
  * Data Object that gets provided to the templates for ActiveEffects
@@ -34,6 +35,10 @@ type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
     expiryActionOptions: { label: string, value: 'default' | 'update' | 'delete', selected: boolean }[];
     system: ActiveEffectDM;
     systemFields: typeof ActiveEffectDM.schema.fields;
+
+    /** Whether the parent item has the state the matching restriction checks for. */
+    showOnlyForEquipped: boolean;
+    showOnlyForWireless: boolean;
 
     /** Prepared boundary choices for the expiry trigger select. */
     boundaryOptions: { value: string; label: string; selected: boolean }[];
@@ -169,6 +174,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     /**
      * Prepare start details from the working clone so staged restarts are reflected before submit.
      */
+    // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
     protected override async _prepareStartContext(): Promise<ActiveEffectConfig.StartContext | null> {
         const start = this.clone.toObject().start;
         if (!start) return null;
@@ -220,6 +226,11 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         data.changeTypes = this.prepareChangeTypes();
         data.changePriorityPlaceholders = this.prepareChangePriorityPlaceholders();
         data.expiryActionOptions = this.prepareExpiryActionOptions(data.source);
+
+        // Only offer the item state restrictions the parent item actually has a state for.
+        const item = this.document.parent instanceof SR5Item ? this.document.parent : null;
+        data.showOnlyForEquipped = !!item?.canBeEquipped();
+        data.showOnlyForWireless = !!item?.isMatrixDevice;
 
         // Duration tab context
         data.boundaryOptions = this.prepareBoundaryOptions(data.source);
@@ -546,10 +557,10 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     }
 
     prepareChangePriorityPlaceholders() {
-        return Object.entries(SR5ActiveEffect.CHANGE_TYPES).reduce((placeholders, [type, data]) => {
+        return Object.entries(SR5ActiveEffect.CHANGE_TYPES).reduce<Record<string, string>>((placeholders, [type, data]) => {
             placeholders[type] = String(data?.defaultPriority ?? '');
             return placeholders;
-        }, {} as Record<string, string>);
+        }, {});
     }
 
     prepareSelectionModeOptions() {
@@ -682,7 +693,6 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         if (isElementInstance(target, HTMLSelectElement) && name === 'duration.expiry') {
             this._syncFormIntoClone();
             void this.render();
-            return;
         }
     }
 

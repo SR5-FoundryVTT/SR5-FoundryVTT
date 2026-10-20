@@ -74,8 +74,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             const originalGetPackSkills = PackItemFlow.getPackSkills;
             const originalGetPackSkillgroups = PackItemFlow.getPackSkillgroups;
 
-            PackItemFlow.getPackSkills = async () => [skillTemplate];
-            PackItemFlow.getPackSkillgroups = async () => [groupTemplate];
+            PackItemFlow.getPackSkills = () => Promise.resolve([skillTemplate]);
+            PackItemFlow.getPackSkillgroups = () => Promise.resolve([groupTemplate]);
 
             try {
                 await SkillSetFlow.applySkillSetToActor(actor, skillSet);
@@ -134,11 +134,11 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
             const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
 
-            PackItemFlow.prepareSkillsForSkillSet = async () => [skillTemplate.toObject()];
-            PackItemFlow.prepareSkillGroupsForSkillSet = async () => {
+            PackItemFlow.prepareSkillsForSkillSet = () => Promise.resolve([skillTemplate.toObject()]);
+            PackItemFlow.prepareSkillGroupsForSkillSet = () => {
                 const groupData = groupTemplate.toObject();
                 groupData.system.group.rating = 4;
-                return [groupData];
+                return Promise.resolve([groupData]);
             };
 
             try {
@@ -202,14 +202,14 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
 
             PackItemFlow.prepareSkillsForSkillSet = originalGetSkillsForSkillSet;
-            PackItemFlow.prepareSkillGroupsForSkillSet = async () => {
+            PackItemFlow.prepareSkillGroupsForSkillSet = () => {
                 const groupData = groupTemplate.toObject();
                 groupData.system.group.rating = 4;
-                return [groupData];
+                return Promise.resolve([groupData]);
             };
 
             const originalGetPackSkills = PackItemFlow.getPackSkills;
-            PackItemFlow.getPackSkills = async () => [skillTemplate];
+            PackItemFlow.getPackSkills = () => Promise.resolve([skillTemplate]);
 
             try {
                 await SkillSetFlow.applySkillSetToActor(actor, skillSet);
@@ -235,8 +235,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
 
             try {
                 // monkey patch pack flows to avoid default skillset application from interfering.
-                PackItemFlow.getPackSkills = async () => [];
-                PackItemFlow.getPackSkillgroups = async () => [];
+                PackItemFlow.getPackSkills = () => Promise.resolve([]);
+                PackItemFlow.getPackSkillgroups = () => Promise.resolve([]);
 
                 const actor = await factory.createActor({ type: 'character' });
                 const skillSet = await factory.createItem({
@@ -260,7 +260,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                     system: { type: 'skill' },
                 });
 
-                PackItemFlow.getPackSkills = async () => [skillTemplate];
+                PackItemFlow.getPackSkills = () => Promise.resolve([skillTemplate]);
 
                 await SkillSetFlow.applySkillSetToActor(actor, skillSet);
 
@@ -308,9 +308,9 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
             const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
 
-            PackItemFlow.getAllPackSkillSets = async () => [skillSet];
-            PackItemFlow.prepareSkillsForSkillSet = async () => [skillTemplate.toObject()];
-            PackItemFlow.prepareSkillGroupsForSkillSet = async () => [];
+            PackItemFlow.getAllPackSkillSets = () => Promise.resolve([skillSet]);
+            PackItemFlow.prepareSkillsForSkillSet = () => Promise.resolve([skillTemplate.toObject()]);
+            PackItemFlow.prepareSkillGroupsForSkillSet = () => Promise.resolve([]);
 
             try {
                 const actor = await factory.createActor({
@@ -372,15 +372,15 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
             const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
 
-            PackItemFlow.getAllPackSkillSets = async () => [];
-            PackItemFlow.prepareSkillsForSkillSet = async () => [skillTemplate.toObject()];
-            PackItemFlow.prepareSkillGroupsForSkillSet = async () => [];
+            PackItemFlow.getAllPackSkillSets = () => Promise.resolve([]);
+            PackItemFlow.prepareSkillsForSkillSet = () => Promise.resolve([skillTemplate.toObject()]);
+            PackItemFlow.prepareSkillGroupsForSkillSet = () => Promise.resolve([]);
 
             try {
                 const actor = await factory.createActor({ type: 'character' });
                 assert.lengthOf(actor.items, 0);
 
-                PackItemFlow.getAllPackSkillSets = async () => [skillSet];
+                PackItemFlow.getAllPackSkillSets = () => Promise.resolve([skillSet]);
 
                 const duplicate = await actor.clone({
                     name: 'Duplicated Character',
@@ -445,8 +445,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             const originalGetPackSkills = PackItemFlow.getPackSkills;
             const originalGetPackSkillgroups = PackItemFlow.getPackSkillgroups;
 
-            PackItemFlow.getPackSkills = async () => [skillTemplate];
-            PackItemFlow.getPackSkillgroups = async () => [groupTemplate];
+            PackItemFlow.getPackSkills = () => Promise.resolve([skillTemplate]);
+            PackItemFlow.getPackSkillgroups = () => Promise.resolve([groupTemplate]);
 
             try {
                 await SkillSetFlow.applySkillSetToActor(actor, skillSet);
@@ -498,7 +498,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
         // Guards item sheets from losing their current value when the selected skill is no longer in the pack.
         it('injects a selected missing skill for sidebar item sheets', async () => {
             const originalGetPackSkills = PackItemFlow.getPackSkills;
-            PackItemFlow.getPackSkills = async () => [];
+            PackItemFlow.getPackSkills = () => Promise.resolve([]);
 
             try {
                 const skills = await SkillSelectionFlow.getSkillSelection(undefined, {
@@ -514,7 +514,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
 
         it('injects a selected missing skill using canonical keys for action selectors', async () => {
             const originalGetPackSkills = PackItemFlow.getPackSkills;
-            PackItemFlow.getPackSkills = async () => [];
+            PackItemFlow.getPackSkills = () => Promise.resolve([]);
 
             try {
                 const skills = await SkillSelectionFlow.getSkillSelection(undefined, {
@@ -533,7 +533,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
         it('injects a selected missing skill for owned item sheets', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const originalGetPackSkills = PackItemFlow.getPackSkills;
-            PackItemFlow.getPackSkills = async () => [];
+            PackItemFlow.getPackSkills = () => Promise.resolve([]);
 
             try {
                 const skills = await SkillSelectionFlow.getSkillSelection(actor, {
@@ -572,7 +572,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             });
 
             const originalGetPackSkills = PackItemFlow.getPackSkills;
-            PackItemFlow.getPackSkills = async () => [firstSkill, secondSkill];
+            PackItemFlow.getPackSkills = () => Promise.resolve([firstSkill, secondSkill]);
 
             try {
                 const skills = await SkillSelectionFlow.getSkillSelection(actor, {
@@ -610,7 +610,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             });
 
             const originalGetPackSkills = PackItemFlow.getPackSkills;
-            PackItemFlow.getPackSkills = async () => [firstSkill, secondSkill];
+            PackItemFlow.getPackSkills = () => Promise.resolve([firstSkill, secondSkill]);
 
             try {
                 const skills = await SkillSelectionFlow.getSkillSelection(actor, {

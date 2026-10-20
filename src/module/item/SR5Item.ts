@@ -13,6 +13,8 @@ import { SinPrep } from './prep/SinPrep';
 import { ActionPrep } from './prep/functions/ActionPrep';
 import { RangePrep } from './prep/functions/RangePrep';
 import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
+import { PreparationPrep } from './prep/PreparationPrep';
+import { PreparationDecayFlow } from '../flows/PreparationDecayFlow';
 import { ArmorPrep } from './prep/functions/ArmorPrep';
 
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
@@ -231,6 +233,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             SinPrep.prepareBaseData(this.system);
         else if (this.isType('bioware', 'cyberware'))
             WarePrep.prepareBaseData(this.system, equippedMods);
+        else if (this.isType('preparation')) {
+            PreparationPrep.prepareBaseData(this.system);
+            PreparationDecayFlow.track(this);
+        }
     }
 
     override prepareDerivedData(this: SR5Item): void {
@@ -331,7 +337,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             actor = this.actor ?? undefined;
         }
 
-        if (!actor) return;
+        // A preparation rolls on its own Force and Potency, it doesn't need an actor. SR5#306.
+        if (!actor && !this.isType('preparation')) return;
 
         const showDialog = !TestCreator.shouldHideDialog(event);
         const test = await TestCreator.fromItem(this, actor, { showDialog });
@@ -733,6 +740,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * Create an item in this item
      * @param effectData
      */
+    // oxlint-disable-next-line typescript/require-await -- Public Promise based item API, callers await it.
     async createNestedActiveEffect(effectData: ActiveEffect.Stored | ActiveEffect.Stored[]) {
         if (!Array.isArray(effectData)) effectData = [effectData];
 
@@ -1025,7 +1033,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     isAreaOfEffect(): boolean {
         return (this.isType('weapon') && this.system.category === 'thrown' && this.system.thrown.blast.radius > 0)
             || (this.isType('weapon') && (this.getEquippedAmmo()?.system.blast?.radius ?? 0) > 0)
-            || (this.isType('spell') && this.system.range === 'los_a')
+            || this.asType('spell', 'preparation')?.system.range === 'los_a'
             || (this.isType('ammo') && this.system.blast.radius > 0);
     }
 
@@ -1140,6 +1148,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     canBeEquipped(this: SR5Item): boolean {
+        // critter and sprite powers use their optional state as their equipped state
+        if (this.isType('critter_power', 'sprite_power')) return true;
         // currently only technology items with technology can be equipped
         return !!this.getTechnologyData();
     }
@@ -1269,6 +1279,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * @returns A list of slaved devices.
      */
+    // oxlint-disable-next-line typescript/require-await -- Public Promise based item API, kept async for consistency.
     async getDevices() {
         const host = this.asType('host');
         if (!host) return [];
@@ -1559,10 +1570,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // Attributes for hosts work only within their own attributes.
         if (this.isType('host')) {
             const rollData = this.getRollData();
-            return rollData.attributes?.[name];
+            return rollData.attributes?.[name] as AttributeFieldType | undefined;
         }
 
-        return rollData.attributes?.[name];
+        return rollData.attributes?.[name] as AttributeFieldType | undefined;
     }
 
     /**

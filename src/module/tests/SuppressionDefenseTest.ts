@@ -14,6 +14,7 @@ export class SuppressionDefenseTest extends PhysicalDefenseTest<PhysicalDefenseT
         return ['defense_suppression'];
     }
 
+    // oxlint-disable-next-line typescript/require-await -- Overrides the async SuccessTest hook, which must keep returning a Promise.
     override async processFailure() {
         this.data.modifiedDamage = CombatRules.modifyDamageAfterSuppressionHit(this.data.incomingDamage);
     }

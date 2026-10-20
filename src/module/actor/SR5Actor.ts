@@ -358,11 +358,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         if (id === undefined) return;
         const attributes = this.getAttributes();
         if (!attributes) return;
-        return attributes[id];
+        return attributes[id] as AttributeFieldType | undefined;
     }
 
     findVehicleStat(statName: string): AttributeFieldType | undefined {
-        return this.getVehicleStats()?.[statName];
+        return this.getVehicleStats()?.[statName] as AttributeFieldType | undefined;
     }
 
     findLimitFromAttribute(this: SR5Actor, attributeName?: string): LimitFieldType | undefined {
@@ -374,7 +374,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     findLimit(this: SR5Actor, limitName?: string): LimitFieldType | undefined {
         if (!limitName || !('limits' in this.system)) return undefined;
-        return this.system.limits?.[limitName];
+        return this.system.limits?.[limitName] as LimitFieldType | undefined;
     }
 
     getWoundModifier(this: SR5Actor): number {
@@ -532,15 +532,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const rollData = options?.rollData ?? this.getRollData({copySystem: true});
         // First check vehicle stats, as they don't always exist.
         const stats = rollData.vehicle_stats ?? this.getVehicleStats();
-        if (stats?.[name]) return stats[name];
+        if (stats?.[name]) return stats[name] as AttributeFieldType;
 
         // Finally, check general attributes.
         const attributes = rollData.attributes ?? this.getAttributes();
-        return attributes[name];
+        return attributes[name] as AttributeFieldType;
     }
 
     getLimit(this: SR5Actor, name: string): LimitFieldType | undefined {
-        return this.system.limits?.[name];
+        return this.system.limits?.[name] as LimitFieldType | undefined;
     }
 
     /**

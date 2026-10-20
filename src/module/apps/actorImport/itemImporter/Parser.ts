@@ -174,6 +174,7 @@ export abstract class Parser<T extends ItemSystems> {
     }
 
     protected abstract parseItem(item: BlankItem<T>, itemData: BaseType): void;
+    // oxlint-disable-next-line typescript/require-await -- Default for an async hook that subclasses override with awaiting implementations.
     protected async getEmbeddedItems(itemData: BaseType): Promise<Item.Source[]> {
         return [] as Item.Source[];
     }

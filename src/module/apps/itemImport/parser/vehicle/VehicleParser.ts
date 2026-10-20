@@ -1,4 +1,5 @@
 import { Parser } from '../Parser';
+import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
 import { Vehicle } from '../../schema/VehiclesSchema';
 import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH, NotEmpty, RetrievedItem } from '../../helper/ImportHelper';
@@ -74,7 +75,7 @@ export class VehicleParser extends Parser<'vehicle'> {
         system.vehicle_stats.seats.base = Number(jsonData.seats?._TEXT) || 0;
         system.attributes.body.base = Number(jsonData.body._TEXT) || 0;
         system.armor.rating.base = Number(jsonData.armor._TEXT) || 0;
-        system.availability = jsonData.avail?._TEXT || '';
+        Object.assign(system.availability, ItemAvailabilityFlow.parseAvailabilityString(jsonData.avail?._TEXT || ''));
         system.cost = Number(jsonData.cost?._TEXT) || 0;
         system.isDrone = jsonData.category._TEXT.includes("Drone") || false;
 

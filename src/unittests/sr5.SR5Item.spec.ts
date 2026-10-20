@@ -71,6 +71,19 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
         });
 
         describe('Testing related data injection', () => {
+            it('Correctly injects tests on creation, not only on update', async () => {
+                // Regression guard: the document is built from a clone of the creation data before
+                // _preCreate runs, so the injection has to reach the document's own source.
+                const item = await factory.createItem({
+                    type: 'spell',
+                    system: { category: 'combat', combat: { type: 'indirect' } }
+                });
+
+                assert.equal(item.system.action.test, 'SpellCastingTest');
+                assert.equal(item.system.action.followed.test, 'DrainTest');
+                assert.equal(item.system.action.opposed.test, 'PhysicalDefenseTest');
+                assert.equal(item.system.action.opposed.resist.test, 'PhysicalResistTest');
+            });
             it('Correctly adds defense tests without resist tests to direct combat spells', async () => {
                 const item = await factory.createItem({type: 'spell'});
 

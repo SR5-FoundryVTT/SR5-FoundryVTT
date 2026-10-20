@@ -65,6 +65,14 @@ export const TestCreator = {
      */
     fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item|null, options?: Partial<TestOptions>): Promise<SuccessTest | undefined> {
         if (!document) document = item.parent;
+
+        // A preparation rolls on its own Force and Potency, so one without an actor can still be triggered. SR5#306.
+        if (!document && item.isType('preparation')) {
+            const action = item.getAction();
+            if (!action) return;
+            return TestCreator.fromAction(foundry.utils.duplicate(action) as ActionRollType, item, options);
+        }
+
         if (!(document instanceof SR5Actor)) {
             console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.")
             return;
@@ -99,6 +107,7 @@ export const TestCreator = {
      * @param document The document to use for retrieving source values defined within the action.
      * @param options See TestOptions documentation.
      */
+    // oxlint-disable-next-line typescript/require-await -- Public Promise based factory, callers await it.
     fromAction: async function(action: ActionRollType, document: SR5Actor | SR5Item, options: Partial<TestOptions> = {}): Promise<SuccessTest | undefined> {
         if (!action.test) {
             action.test = 'SuccessTest';
@@ -142,6 +151,7 @@ export const TestCreator = {
      * 
      * @param id The message id to retrieve test data from.
      */
+    // oxlint-disable-next-line typescript/require-await -- Public Promise based factory, callers await it.
     fromMessage: async function(id: string, options: Partial<TestOptions> = {}): Promise<SuccessTest | undefined> {
         const flagData = TestCreator.getTestDataFromMessage(id);
         if (flagData)
@@ -253,6 +263,7 @@ export const TestCreator = {
      * @param opposed The opposed test to create a resist test with.
      * @param options See TestOptions documentation.
      */
+    // oxlint-disable-next-line typescript/require-await -- Public Promise based factory, callers await it.
     fromOpposedTestResistTest: async function(opposed: OpposedTest, options: Partial<TestOptions> = {}): Promise<SuccessTest | undefined> {
         // Don't change the data's source.
         const opposedData = foundry.utils.duplicate(opposed.data) as OpposedTestData;
@@ -288,13 +299,23 @@ export const TestCreator = {
      * @param test Any test implementation with an action providing a follow up test.
      * @param options See TestOptions documentation.
      */
-    fromFollowupTest: async function(test: SuccessTest, options: Partial<TestOptions> = {}): Promise<SuccessTest | void> {
+    // oxlint-disable-next-line typescript/require-await -- Public Promise based factory, callers await it.
+    fromFollowupTest: async function(test: SuccessTest, options: Partial<TestOptions> = {}): Promise<SuccessTest | undefined> {
         if (!test?.data?.action?.followed?.test) return;
-        if (!test.item) return console.error(`Shadowrun 5e | Test doesn't have a populated item document`);
-        if (!test.actor) return console.error(`Shadowrun 5e | Test doesn't have a populated actor document`);
+        if (!test.item) {
+            console.error(`Shadowrun 5e | Test doesn't have a populated item document`);
+            return;
+        }
+        if (!test.actor) {
+            console.error(`Shadowrun 5e | Test doesn't have a populated actor document`);
+            return;
+        }
 
         const testCls = TestCreator._getTestClass(test.data.action.followed.test);
-        if (!testCls) return console.error(`Shadowrun 5e | A ${test.constructor.name} has a unregistered follow up test configured`, this);
+        if (!testCls) {
+            console.error(`Shadowrun 5e | A ${test.constructor.name} has a unregistered follow up test configured`, this);
+            return;
+        }
 
         const data = Object.assign(TestCreator._minimalTestData(), {
             title: testCls.label,
@@ -351,6 +372,7 @@ export const TestCreator = {
      *
      * @param testCls A test class implementation to use for retrieving action data.
      */
+    // oxlint-disable-next-line typescript/require-await -- Promise based factory helper, callers await it.
     _getTestDataFromItemAction: async function(testCls: typeof SuccessTest, item: SR5Item, actor: SR5Actor): Promise<TestData> {
         // Prepare general data structure with labeling.
         const data = TestCreator._minimalTestData();

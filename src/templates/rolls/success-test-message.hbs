@@ -114,6 +114,36 @@
                     <span class="value-result">{{test.netHits.value}}</span>
                 </div>
                 {{/if}}
+                {{#if test.canPlaceBlastTemplate}}
+                <div class="test-value metric-row metric-row--template">
+                    <span class="value" data-tooltip="SR5.PlaceTemplate">{{localize "SR5.PlaceTemplate"}}:</span>
+                    <span class="value-result">
+                        {{> 'systems/shadowrun5e/dist/templates/common/template-preview-button.hbs'
+                            actionClass='roll place-template'
+                            tooltip='SR5.PlaceTemplate' }}
+                    </span>
+                </div>
+                {{/if}}
+                {{#if test.canPlaceSuppressiveFireTemplate}}
+                <div class="test-value metric-row metric-row--template">
+                    <span class="value" data-tooltip="SR5.PlaceTemplate">{{localize "SR5.PlaceTemplate"}}:</span>
+                    <span class="value-result">
+                        {{> 'systems/shadowrun5e/dist/templates/common/template-preview-button.hbs'
+                            actionClass='roll place-suppressive-fire-template'
+                            tooltip='SR5.PlaceTemplate' }}
+                    </span>
+                </div>
+                {{/if}}
+                {{#if test.canPlaceShotgunTemplate}}
+                <div class="test-value metric-row metric-row--template">
+                    <span class="value" data-tooltip="SR5.PlaceTemplate">{{localize "SR5.PlaceTemplate"}}:</span>
+                    <span class="value-result">
+                        {{> 'systems/shadowrun5e/dist/templates/common/template-preview-button.hbs'
+                            actionClass='roll place-shotgun-template'
+                            tooltip='SR5.PlaceTemplate' }}
+                    </span>
+                </div>
+                {{/if}}
             </div>
         </div>
         {{#if showDescription}}
@@ -213,7 +243,7 @@
             {{#if test.showsOutcome}}
             <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}} {{#if test.criticalGlitched}}glitch-content--critical{{else if test.glitched}}glitch-content--warning{{/if}}">
                 <div class="test-outcome">
-                    {{#unless test.autoSuccess}}{{#if test.hasBuyHits}}<i class="test-outcome-bought-hits fa-solid fa-coins" role="img" data-tooltip="SR5.HitsBought" aria-label="{{localize 'SR5.HitsBought'}}"></i>{{/if}}<span class="test-outcome-hits" data-tooltip-source="hits"><span class="test-outcome-hits-value">{{test.outcomeHits.value}}</span> {{localize test.outcomeHits.label}}</span>{{/unless}}
+                    {{#unless test.autoSuccess}}<span class="test-outcome-hits" data-tooltip-source="hits">{{#if test.hasBuyHits}}<i class="test-outcome-bought-hits fa-solid fa-coins" role="img" data-tooltip="SR5.HitsBought" aria-label="{{localize 'SR5.HitsBought'}}"></i>{{/if}}<span class="test-outcome-hits-value">{{test.outcomeHits.value}}</span> {{localize test.outcomeHits.label}}</span>{{/unless}}
                     {{#if test.outcomeLabel}}
                     <span class="glitch" {{#if (and showGlitchAnimation test.criticalGlitched)}} data-glitch="{{localize test.outcomeLabel}}" {{/if}}>{{localize test.outcomeLabel}}</span>
                     {{/if}}

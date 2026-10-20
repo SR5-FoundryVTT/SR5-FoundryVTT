@@ -13,6 +13,7 @@ import { MatrixRules } from '@/module/rules/MatrixRules';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { ItemPrep } from './functions/ItemPrep';
+import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
 
 export class VehiclePrep {
     static prepareBaseData(system: Actor.SystemOfType<'vehicle'>) {
@@ -44,6 +45,8 @@ export class VehiclePrep {
         ItemPrep.prepareArmor(system, items);
         CharacterPrep.prepareRecoil(system);
         VehiclePrep.prepareRecoilCompensation(system);
+
+        ItemAvailabilityFlow.calculateValue(system.availability);
     }
 
     static prepareVehicleStats(system: Actor.SystemOfType<'vehicle'>) {

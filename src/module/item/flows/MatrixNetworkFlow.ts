@@ -523,7 +523,7 @@ export class MatrixNetworkFlow {
         await ChatMessage.create(messageData);
     }
 
-    static async chatMessageListeners(message: ChatMessage, html, data) {
+    static chatMessageListeners(message: ChatMessage, html, data) {
         $(html).find('.button[data-action="matrix-network-mark-invite"]').on('click', MatrixNetworkFlow.acknowledgeMarkInvite.bind(this));
     }
 

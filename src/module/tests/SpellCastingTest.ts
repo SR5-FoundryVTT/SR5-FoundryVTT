@@ -7,6 +7,8 @@ import ModifierTypes = Shadowrun.ModifierTypes;
 import { DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 import { SR5Item } from "../item/SR5Item";
+import { getItemScatterKind } from "../rules/ScatterRules";
+import { BlastTemplateFlow } from './flows/BlastTemplateFlow';
 
 
 export interface SpellCastingTestData extends SuccessTestData {
@@ -22,7 +24,13 @@ export interface SpellCastingTestData extends SuccessTestData {
  * Spellcasting tests as described on SR5#281 in the spellcasting chapter.
  */
 export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
-    public override item: SR5Item<'spell'> | undefined = undefined;
+    // A preparation carries the same spell fields a spell item does, and PreparationTriggerTest
+    // runs this flow with one.
+    public override item: SR5Item<'spell' | 'preparation'> | undefined = undefined;
+    public blastTemplateFlow = new BlastTemplateFlow(this, {
+        getBlastData: () => this.getBlastData(),
+        canScatter: () => getItemScatterKind(this.item) !== undefined,
+    });
 
     override _prepareData(data: DeepPartial<SpellCastingTestData>, options: Partial<TestOptions>): SpellCastingTestData {
         const prepared = super._prepareData(data, options);
@@ -50,6 +58,10 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         return false;
     }
 
+    get canPlaceBlastTemplate(): boolean {
+        return this.blastTemplateFlow.canPlace;
+    }
+
     static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
         return {
             skill: 'spellcasting',
@@ -61,12 +73,12 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
      * Spellcasting test category directly depends on the spell cast.
      */
     override get testCategories(): Shadowrun.ActionCategories[] {
-        const spell = this.item?.asType('spell');
+        const spell = this.item?.asType('spell', 'preparation')?.system;
         if (!spell) return [];
 
-        switch (spell.system.category) {
+        switch (spell.category) {
             case 'combat':
-                if (spell.system.combat.type === 'indirect' && spell.system.range === 'los')
+                if (spell.combat.type === 'indirect' && spell.range === 'los')
                     return ['spell_combat', 'attack', 'attack_ranged'];
 
                 return ['spell_combat'];
@@ -77,8 +89,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
             case 'manipulation': return ['spell_manipulation'];
         }
 
-        return []
-
+        return [];
     }
 
     override get testModifiers(): ModifierTypes[] {
@@ -89,6 +100,29 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         this.prepareInitialForceValue();
 
         await super.prepareDocumentData();
+    }
+
+    getBlastData() {
+        if (!this.item?.isAreaOfEffect()) return this.item?.getBlastData();
+
+        return {
+            radius: Number(this.data.force) * (this.item.system.extended ? 10 : 1),
+            dropoff: 0,
+        };
+    }
+
+    override _testDialogListeners() {
+        return [...super._testDialogListeners(), ...this.blastTemplateFlow.dialogListeners()];
+    }
+
+    override async _cleanUpAfterDialogCancel() {
+        await this.blastTemplateFlow.cancelPreview();
+        await super._cleanUpAfterDialogCancel();
+    }
+
+    override async _cleanUpAfterDialog() {
+        await this.blastTemplateFlow.finalizePreview();
+        await super._cleanUpAfterDialog();
     }
 
     /**

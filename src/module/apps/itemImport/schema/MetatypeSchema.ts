@@ -37,9 +37,9 @@ export interface Metatype {
     forms?: Empty;
     halveattributepoints?: Empty;
     id: { _TEXT: string; };
-    iniaug: { _TEXT: IntegerString | string; };
-    inimax: { _TEXT: IntegerString | string; };
-    inimin: { _TEXT: IntegerString | string; };
+    iniaug: { _TEXT: string; };
+    inimax: { _TEXT: string; };
+    inimin: { _TEXT: string; };
     initiativedice?: { _TEXT: IntegerString; };
     intaug: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F-1" | "F-2"; };
     intmax: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+3" | "F-1" | "F-2"; };
@@ -61,7 +61,7 @@ export interface Metatype {
     };
     page?: { _TEXT: IntegerString; };
     powers?: {
-        power: OneOrMany<{ _TEXT: string; $?: { rating?: IntegerString | "F"; select?: IntegerString | string; }; }>;
+        power: OneOrMany<{ _TEXT: string; $?: { rating?: IntegerString | "F"; select?: string; }; }>;
     };
     qualities?: {
         negative?: {

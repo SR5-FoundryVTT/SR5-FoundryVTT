@@ -26,8 +26,35 @@ export type DiceSoNicePreset = {
     valueMap?: Record<string | number, number>,
 };
 
+/**
+ * A preset as Dice So Nice stores it once registered: a `DicePreset` instance,
+ * not the plain registration data. Bump maps live on `bumps` here, while
+ * `addDicePreset` expects them on `bumpMaps`.
+ *
+ * Instances can be shared between Dice So Nice rebuilds (the base presets are
+ * module level singletons), so they must never be mutated.
+ */
+export type DiceSoNiceLoadedPreset = {
+    type: DiceSoNiceDieType,
+    labels: string[],
+    system: string,
+    colorset?: string | null,
+    font?: string,
+    fontScale?: number | Record<string, number> | null,
+    bumps?: string[],
+    emissiveMaps?: string[],
+    emissive?: string | number,
+    emissiveIntensity?: number,
+    atlas?: string | null,
+    backgrounds?: DiceSoNicePreset['backgrounds'],
+    labelScale?: number,
+    modelFile?: string | null,
+    scaleModifier?: number,
+    valueMap?: Record<string | number, number> | null,
+};
+
 export type DiceSoNiceSystem = {
-    dice: Map<DiceSoNiceDieType, DiceSoNicePreset>
+    dice: Map<DiceSoNiceDieType, DiceSoNiceLoadedPreset>
 };
 
 /*
@@ -90,16 +117,36 @@ const D6_DIE_TYPE = 'd6';
 const SR5_DIE_TYPE = `d${SR5Die.DENOMINATION}` as const;
 
 /**
- * Clone a loaded `d6` Dice So Nice preset into an SR5 `ds` preset.
+ * Build SR5 `ds` registration data from a loaded `d6` Dice So Nice preset.
  *
- * The cloned preset keeps the original asset references and presentation
+ * The new preset keeps the original asset references and presentation
  * settings, but changes the die type to `ds` so SR5 rolls continue to use
  * their own denomination and any `ds`-specific effects keep working.
+ *
+ * The source is read field by field into a new plain object: it is a
+ * `DicePreset` instance, which `foundry.utils.deepClone` returns by reference.
  */
-export function mirrorD6Preset(source: DiceSoNicePreset, system: string): DiceSoNicePreset {
-    const preset = foundry.utils.deepClone(source);
-    preset.type = SR5_DIE_TYPE;
-    preset.system = system;
+export function mirrorD6Preset(source: DiceSoNiceLoadedPreset, system: string): DiceSoNicePreset {
+    const preset: DiceSoNicePreset = {
+        type: SR5_DIE_TYPE,
+        labels: [...source.labels],
+        system,
+    };
+
+    if (source.colorset) preset.colorset = source.colorset;
+    if (source.font) preset.font = source.font;
+    if (source.fontScale != null) preset.fontScale = foundry.utils.deepClone(source.fontScale);
+    if (source.bumps?.length) preset.bumpMaps = [...source.bumps];
+    if (source.emissiveMaps?.length) preset.emissiveMaps = [...source.emissiveMaps];
+    if (source.emissive) preset.emissive = source.emissive;
+    if (source.emissiveIntensity != null) preset.emissiveIntensity = source.emissiveIntensity;
+    if (source.atlas) preset.atlas = source.atlas;
+    if (source.backgrounds) preset.backgrounds = foundry.utils.deepClone(source.backgrounds);
+    if (source.labelScale != null) preset.labelScale = source.labelScale;
+    if (source.modelFile) preset.modelFile = source.modelFile;
+    if (source.scaleModifier != null) preset.scaleModifier = source.scaleModifier;
+    if (source.valueMap) preset.valueMap = { ...source.valueMap };
+
     return preset;
 }
 

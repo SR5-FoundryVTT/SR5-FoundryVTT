@@ -1,5 +1,4 @@
 import { SR5 } from "../config";
-import Template from "../template";
 import { Helpers } from "../helpers";
 import { SR5Die } from "../rolls/SR5Die";
 import { SR5Item } from "../item/SR5Item";
@@ -133,6 +132,14 @@ export interface SuccessTestData extends TestData {
     // Scene Token Ids marked as targets of this test.
     targetActorsUuid: string[]
     targetUuids: string[]
+}
+
+/** Entry of the chat message context menu, using the name based format Foundry hooks still provide. */
+interface ChatMessageContextOption {
+    name: string
+    callback: (li: unknown) => unknown
+    condition: boolean | ((li: unknown) => boolean)
+    icon: string
 }
 
 export interface TestOptions {
@@ -386,11 +393,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param actor The actor for this opposing test.
      * @param previousMessageId The id this message action is sourced from.
      */
+    // oxlint-disable-next-line typescript/require-await -- Async hook that subclasses override with awaiting implementations.
     static async _getOpposedActionTestData(testData: DeepPartial<SuccessTestData>, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
         return undefined;
     }
 
+    // oxlint-disable-next-line typescript/require-await -- Async hook that subclasses override with awaiting implementations.
     static async _getResistActionTestData(testData: DeepPartial<SuccessTestData>, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support resist message actions`);
         return undefined;
@@ -518,7 +527,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * it's behavior without the need to sub-class TestDialog.
      */
     _testDialogListeners() {
-        return [] as TestDialogListener[]
+        return [] as TestDialogListener[];
     }
 
     /**
@@ -560,6 +569,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Override this method if there needs to be some cleanup after a user has canceled a dialog 
      * but before the tests actual execution.
      */
+    // oxlint-disable-next-line typescript/require-await -- Async hook that subclasses override with awaiting implementations.
     async _cleanUpAfterDialogCancel() {
         this.dialog = null;
     }
@@ -730,6 +740,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * Prepare missing data based on tests Documents before anything else is done.
      */
+    // oxlint-disable-next-line typescript/require-await -- Async hook that subclasses override with awaiting implementations.
     async prepareDocumentData() {
         // Calculate damage here to have access to actor AND item used.
         this.data.damage = ActionFlow.calcDamageData(this.data.damage, this.actor, this.item);
@@ -826,7 +837,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     _getModifierTypeLabel(type: ModifierTypes): string {
-        return SR5.modifierTypes[type];
+        return SR5.modifierTypes[type] as string;
     }
 
     /**
@@ -1861,7 +1872,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             followupActions: this._prepareFollowupActionsTemplateData(),
             resistActions: this._prepareResistActionsTemplateData(),
             resultActions: this._prepareResultActionsTemplateData(),
-            previewTemplate: this._canPlaceBlastTemplate,
             // Without content the toggle would open an empty panel, so drop the control with it.
             showDescription: this._canShowDescription && this._hasDescriptionContent(description),
             description,
@@ -1890,16 +1900,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         };
 
         return Boolean(text?.value?.trim()) || Boolean(properties?.length);
-    }
-
-    /**
-     * Indicate if this test can be used to place a blast template using the shown chat message.
-     *
-     * This is indicated by the source items ability to cause an area of effect blast and which kind
-     * of test is used.
-     */
-    get _canPlaceBlastTemplate(): boolean {
-        return this.item?.hasBlastTemplate || false;
     }
 
     /**
@@ -1940,7 +1940,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return [{ label: testCls.label }]
     }
 
-    get _resistTestClass(): any | undefined {
+    get _resistTestClass(): any {
         return undefined; // by default we don't want to show any resist test in a success test
     }
 
@@ -2062,7 +2062,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         $(html).find('.show-roll').on('click', this._chatToggleCardRolls.bind(this));
         $(html).find('.show-description').on('click', this._chatToggleCardDescription.bind(this));
         $(html).find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet.bind(Helpers));
-        $(html).find('.place-template').on('click', this._placeItemBlastZoneTemplate.bind(this));
         $(html).find('.result-action').on('click', this._castResultAction.bind(this));
         $(html).find('.chat-select-link').on('click', this._selectSceneToken.bind(this));
         $(html).find('.test-action').on('click', this._castTestAction.bind(this));
@@ -2252,37 +2251,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
-     * Items with an area of effect will allow users to place a measuring template matching the items blast values.
-     *
-     * @param event A PointerEvent triggered from anywhere within the chat-card
-     */
-    static async _placeItemBlastZoneTemplate(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        // Get test data from message.
-        const element = $(event.currentTarget as HTMLElement);
-        const card = element.closest<HTMLElement>('.chat-message');
-        const messageId = card.data('messageId');
-        const test = await TestCreator.fromMessage(messageId);
-        if (!test) return;
-
-        // Get item used in test
-        await test.populateDocuments();
-
-        // Place template based on last used spell force for the item.
-        if (!test.item) return;
-        const template = Template.fromItem(test.item);
-        if (!template) return;
-        await template.drawPreview();
-    }
-
-    /**
      * Foundry ChatMessage context options (right click) used for all test types.
      * @param app The ChatLog application. 
      * @param options The list of options to be shown in the context menu.
      */
-    static chatMessageContextOptions(app, options) {
+    static chatMessageContextOptions(app, options: ChatMessageContextOption[]) {
         const pushTheLimit = async (li) => {
             const messageId = $(li).data().messageId;
             const test = await TestCreator.fromMessage(messageId);
@@ -2321,7 +2294,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         };
 
         // Keep Foundry delete option at the context menus bottom.
-        const deleteOption = options.pop();
+        const deleteOption = options.pop() as ChatMessageContextOption;
 
         options.push({
             name: game.i18n.localize('SR5.PushTheLimit'),
@@ -2381,7 +2354,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         await LinksHelpers.openSource(source);
     }
 
-    static async _chatToggleCardRolls(event: Event) {
+    static _chatToggleCardRolls(event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -2455,7 +2428,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     static async executeMessageAction(againstData: SuccessTestData, messageId: string, options: Partial<TestOptions>) {
         // Determine actors to roll test with.
         // build documents based on the category, matrix can target individual icons
-        let documents = await Helpers.getOpposedTestTargets(againstData);
+        const documents = await Helpers.getOpposedTestTargets(againstData);
         // if the test had matrix data, push in the matrix test targets to the front
         if (againstData.categories.includes('matrix')) {
             documents.unshift(...await Helpers.getMatrixTestTargetDocuments(againstData as any));

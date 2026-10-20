@@ -182,8 +182,13 @@
             {{#if @root.isEditMode}}
                 <div class="basic-row">
                     <label>{{localize "SR5.Availability"}}</label>
-                    {{formInput systemFields.availability value=source.system.availability
+                    {{formInput systemFields.availability.fields.base value=source.system.availability.base
                                 classes="short availability" rootId=rootId }}
+                    <span data-tooltip="SR5.AvailabilityRestriction">
+                        {{formInput systemFields.availability.fields.restriction value=source.system.availability.restriction
+                                    choices=config.availabilityRestrictionSuffixes localize=true
+                                    classes="short availability-restriction-select" rootId=rootId }}
+                    </span>
                 </div>
                 <div class="basic-row">
                     <label data-tooltip="{{localize 'SR5.Cost'}}"><i class="fas fa-yen-sign"></i></label>
@@ -191,7 +196,7 @@
                                 classes="short nuyen" rootId=rootId }}
                 </div>
             {{else}}
-                <label>{{localize "SR5.Availability"}}&nbsp;{{system.availability}}</label>
+                <label>{{localize "SR5.Availability"}}&nbsp;{{system.availability.label}}</label>
                 <label data-tooltip="{{localize 'SR5.Cost'}}"><i class="fas fa-yen-sign"></i>&nbsp;{{nuyenValue system.cost}}</label>
             {{/if}}
 

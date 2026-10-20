@@ -15,12 +15,12 @@ export interface Gear {
     armorcapacity?: { _TEXT: IntegerString | "Rating/[1]" | "[0]" | "[1]" | "[2]" | "[3]" | "[4]" | "[5]" | "[6]" | "[Rating]"; };
     attack?: { _TEXT: IntegerString | "{CHA}"; };
     attributearray?: { _TEXT: string; };
-    avail: { _TEXT: IntegerString | string; };
+    avail: { _TEXT: string; };
     bonus?: BonusSchema;
     canformpersona?: { _TEXT: "Parent" | "Self"; };
-    capacity?: { _TEXT: IntegerString | string; };
+    capacity?: { _TEXT: string; };
     category: { _TEXT: string; };
-    cost: { _TEXT: IntegerString | string; };
+    cost: { _TEXT: string; };
     costfor?: { _TEXT: IntegerString; };
     dataprocessing?: { _TEXT: IntegerString | "Rating" | "{LOG}"; };
     devicerating?: { _TEXT: IntegerString | "Rating" | "{RES}" | "{Rating}"; };
@@ -65,7 +65,7 @@ export interface Gear {
     required?: ConditionsSchema;
     requireparent?: Empty;
     sleaze?: { _TEXT: IntegerString | "{INT}"; };
-    source?: { _TEXT: IntegerString | string; };
+    source?: { _TEXT: string; };
     weaponbonus?: {
         accuracy?: { _TEXT: IntegerString; };
         accuracyreplace?: { _TEXT: IntegerString; };

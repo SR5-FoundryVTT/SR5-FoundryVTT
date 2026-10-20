@@ -93,14 +93,14 @@ export class SituationModifier {
      * Determine if the source document used is an actor.
      */
     get sourceDocumentIsActor(): boolean {
-        return this.modifiers !== undefined && this.modifiers.documentIsActor;
+        return this.modifiers?.documentIsActor ?? false;
     }
 
     /**
      * Determine if the source document used is a scene.
      */
     get sourceDocumentIsScene(): boolean {
-        return this.modifiers !== undefined && this.modifiers.documentIsScene;
+        return this.modifiers?.documentIsScene ?? false;
     }    
 
     /**
@@ -117,9 +117,7 @@ export class SituationModifier {
      * 
      * @returns false, when a handler doesn't use any document source data.
      */
-    static get hasSourceData(): boolean {
-        return true;
-    }
+    static readonly hasSourceData: boolean = true;
 
     /**
      * Determine if the source data has an active modifier set for this situational modifier.
@@ -293,7 +291,7 @@ export class SituationModifier {
         // A placed token must apply it's scene modifiers first.
         const modifiers = DocumentSituationModifiers.getDocumentModifiers(document);
         // Select the modifier category only.
-        return modifiers.source[this.type];
+        return modifiers.source[this.type] as SourceModifierData | undefined;
     }
 
     /**

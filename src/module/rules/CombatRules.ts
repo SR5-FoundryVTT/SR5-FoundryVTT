@@ -229,7 +229,7 @@ export class CombatRules {
         }
 
         const damageSourceItem = Helpers.findDamageSource(damage);
-        if (damageSourceItem && damageSourceItem.isCombatSpell() && damageSourceItem.system.combat.type === 'direct') {
+        if (damageSourceItem?.isCombatSpell() && damageSourceItem.system.combat.type === 'direct') {
             // Damage from direct combat spells is never converted
             return updatedDamage;
         }

@@ -4,6 +4,7 @@ import { shadowrunTestValueResolution } from './sr5.TestValueResolution.spec';
 import { shadowrunMarks } from './sr5.Marks.spec';
 import { shadowrunRolling } from './sr5.SR5Roll.spec';
 import { shadowrunSR5RangedWeaponRules } from './sr5.RangedWeapon.spec';
+import { regionsTesting } from './Regions.spec';
 import { shadowrunAttackTesting } from './sr5.AttackTests.spec';
 import { shadowrunRulesModifiers } from './sr5.Modifiers.spec';
 import { shadowrunSR5Item } from './sr5.SR5Item.spec';
@@ -33,8 +34,10 @@ import { shadowrunOpposedCompileSpriteTesting } from './sr5.OpposedCompileSprite
 import { shadowrunOpposedCallInMessageActionTesting } from './sr5.OpposedCallInMessageAction.spec';
 import { actorArmorFlowTesting } from './sr5.ActorArmorFlow.spec';
 import { shadowrunDiceSoNiceTesting } from './sr5.DiceSoNice.spec';
+import { scatterRulesTesting } from './ScatterRules.spec';
 import { shadowrunDataStorage } from './sr5.DataStorage.spec';
 import { shadowrunChatMessageLayoutTesting } from './sr5.ChatMessageLayout.spec';
+import { shadowrunAlchemy } from './sr5.Alchemy.spec';
 
 import { Quench, QuenchRegisterBatchFunction, QuenchRegisterBatchOptions } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
@@ -80,6 +83,12 @@ export const quenchRegister = (quench: Quench) => {
     });
     registerBatch(quench, 'shadowrun5e.rules.ranged_weapon', shadowrunSR5RangedWeaponRules, {
         displayName: 'SHADOWRUN5e: Ranged Weapon Rules Test',
+    });
+    registerBatch(quench, 'shadowrun5e.canvas.regions', regionsTesting, {
+        displayName: 'SHADOWRUN5e: Region Test',
+    });
+    registerBatch(quench, 'shadowrun5e.rules.scatter', scatterRulesTesting, {
+        displayName: 'SHADOWRUN5e: Scatter Rules Test',
     });
     registerBatch(quench, 'shadowrun5e.characterImporter', characterImporterTesting, {
         displayName: 'SHADOWRUN5e: Chummer Character Importer',
@@ -172,6 +181,9 @@ export const quenchRegister = (quench: Quench) => {
     });
     registerBatch(quench, 'shadowrun5e.actor.armor_flow', actorArmorFlowTesting, {
         displayName: 'SHADOWRUN5e: Actor Armor Flow Test',
+    });
+    registerBatch(quench, 'shadowrun5e.rules.alchemy', shadowrunAlchemy, {
+        displayName: 'SHADOWRUN5e: Alchemy Preparations',
     });
     registerBatch(quench, 'shadowrun5e.migrators', Migrators, {
         displayName: 'SHADOWRUN5e: Migrators Test',

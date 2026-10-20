@@ -643,6 +643,7 @@
 
         .card-content--metrics {
             cursor: pointer;
+            flex-flow: row wrap;
 
             // Handlebars whitespace prevents using :empty.
             .left-side:not(:has(*)),
@@ -652,18 +653,19 @@
 
             .metric-row--template .value-result {
                 color: var(--sr5-card-accent);
-            }
 
-            .place-template {
-                color: var(--sr5-card-accent);
-                font-size: 1.05rem;
-                line-height: 1;
-                padding: 0 0.1rem;
-
-                &:hover {
-                    text-shadow: 0 0 8px rgba(variables.$yellow, 0.55);
+                .template-preview-button {
+                    color: var(--sr5v2-text-primary);
                 }
             }
+
+        }
+
+        .scatter-metrics-row {
+            display: flex;
+            flex: 1 1 100%;
+            width: 100%;
+            gap: 0.5rem;
         }
 
         .card-content--results {
@@ -827,14 +829,32 @@
         }
 
         .test-outcome {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: center;
+            gap: 0.15rem 0.4rem;
+            min-width: 0;
+            max-width: 100%;
+            padding: 0.25rem 0.5rem;
             text-align: center;
 
             .glitch {
-                display: inline;
+                display: block;
+                min-width: 0;
+                max-width: 100%;
+                padding: 0;
+                overflow-wrap: anywhere;
+
+                &::before,
+                &::after {
+                    inset: 0;
+                }
             }
         }
 
         .test-outcome-hits {
+            white-space: nowrap;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             font-size: var(--font-size-13);
@@ -848,10 +868,6 @@
             .test-outcome-hits-value {
                 font-size: var(--font-size-18);
                 color: var(--sr5-card-accent);
-            }
-
-            &:has(+ .glitch)::after {
-                content: ' -';
             }
         }
 
