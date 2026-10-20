@@ -187,6 +187,17 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.deepEqual(quality.effects!.map(effect => effect.system.changes[0].key),
                 ['system.notoriety', 'system.public_awareness']);
         });
+
+        it('imports attribute-valued bonuses and narrows situational conditions', () => {
+            const power = { name: 'Empathy', system: {}, effects: [] } as unknown as DocCreateData;
+            BonusHelper.addBonus(power, {
+                limitmodifier: { limit: { _TEXT: 'Mental' }, value: { _TEXT: '{MAG}' }, condition: { _TEXT: 'LimitCondition_TestScent' } },
+            } as BonusSchema);
+            const [effect] = power.effects!;
+            assert.strictEqual(effect.system.changes[0].value, '(@actor.system.attributes.magic.value)');
+            assert.isTrue(effect.disabled);
+            assert.deepEqual(effect.system.targets[0].conditions.map(condition => condition.type), ['limits', 'skills']);
+        });
     });
 
     describe('TechnologyData preparation', () => {

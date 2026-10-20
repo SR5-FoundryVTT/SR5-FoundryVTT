@@ -197,6 +197,54 @@ export class BonusConstant {
             disabled: true,
             conditions: [{ type: 'categories', mode: 'include', values: ['attack_melee'] }],
         },
+        LimitCondition_SkillsActivePerceptionScent: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['perception'] }],
+        },
+        LimitCondition_SkillsActivePerceptionTaste: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['perception'] }],
+        },
+        LimitCondition_SkillsActivePerceptionTouch: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['perception'] }],
+        },
+        LimitCondition_TestEnhancedSense: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['perception'] }],
+        },
+        LimitCondition_TestScent: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['perception', 'tracking'] }],
+        },
+        LimitCondition_UsingScent: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['tracking'] }],
+        },
+        LimitCondition_IdentifySound: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['perception'] }],
+        },
+        LimitCondition_ExamineCloseActive: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['perception'] }],
+        },
+        LimitCondition_EscapeRestraints: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['escape_artist'] }],
+        },
+        LimitCondition_Rappelling: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['free_fall'] }],
+        },
+        LimitCondition_TestDiagnosis: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['first_aid', 'medicine'] }],
+        },
+        LimitCondition_TestBuySellProduct: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['negotiation'] }],
+        },
     } as const;
 
     public static readonly simpleEffects = {

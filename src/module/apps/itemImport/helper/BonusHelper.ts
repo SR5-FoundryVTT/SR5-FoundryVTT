@@ -35,6 +35,12 @@ export class BonusHelper {
             value = value.replace("Rating", path);
         }
 
+        // Chummer's {MAG}, {BOD}... read the owning character's attribute.
+        value = value.replace(/\{([A-Z]{3})\}/g, (match, attribute: string) => {
+            const key = Constants.attributeTable[attribute as keyof typeof Constants.attributeTable];
+            return key ? `(@actor.system.attributes.${key}.value)` : match;
+        });
+
         return value;
     }
 
@@ -103,6 +109,7 @@ export class BonusHelper {
             const translation = BC.BonusConstant.limitConditionTable[conditionKey] as BC.LimitConditionTranslation | undefined;
             if (!translation) {
                 effect.disabled = true;
+                ChummerImportCoverage.skip(`condition ${conditionKey}: no filter, imported disabled`, sheet.name ?? 'unnamed');
             } else {
                 const target = IH.getArray(effect.system?.targets).find(target => target.id === targetId);
                 if (!target) {
@@ -260,8 +267,7 @@ export class BonusHelper {
                 const excludedSkill = this.normalizeSkillName(skillCategory.exclude?._TEXT ?? "");
 
                 type Keys = keyof typeof BC.BonusConstant.skillCategoryTable;
-                const categoryName = skillCategory.name._TEXT === 'Social'
-                    ? 'Social Active' : skillCategory.name._TEXT;
+                const categoryName = skillCategory.name._TEXT;
                 const categorySkills = BC.BonusConstant.skillCategoryTable[categoryName as Keys];
                 if (!categorySkills) {
                     ChummerImportCoverage.skip('bonus.skillcategory: unknown category', `${sheet.name}: ${categoryName}`);
