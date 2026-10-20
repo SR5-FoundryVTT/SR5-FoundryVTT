@@ -1,4 +1,6 @@
 import { Constants, CompendiumKey, ChummerFile } from '../importer/Constants';
+import { SR5 } from '../../../config';
+import { DamageType } from '../../../types/item/Action';
 import CompendiumCollection = foundry.documents.collections.CompendiumCollection;
 
 export type OneOrMany<T> = T | T[];
@@ -58,6 +60,16 @@ export class ImportHelper {
         if (value)
             return Array.isArray(value) ? value : [value];
         return [];
+    }
+
+    /**
+     * Convert Chummer's comma-separated spell elements, like "Fire, Water", to a damage element.
+     * Foundry damage holds a single element, so only the first one listed is kept.
+     * @param elements Chummer's English element names
+     */
+    public static parseElements(elements: string | undefined | null): DamageType['element']['base'] {
+        const element = elements?.split(',')[0].trim().toLowerCase() ?? '';
+        return element in SR5.elementTypes ? element as keyof typeof SR5.elementTypes : '';
     }
 
     /**

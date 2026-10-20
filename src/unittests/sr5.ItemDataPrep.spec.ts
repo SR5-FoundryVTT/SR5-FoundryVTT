@@ -12,6 +12,10 @@ import { Parser } from '../module/apps/itemImport/parser/Parser';
 import { WeaponModParser } from '../module/apps/itemImport/parser/mod/WeaponModParser';
 import { VehicleModParser } from '../module/apps/itemImport/parser/mod/VehicleModParser';
 import { LifestyleParser } from '../module/apps/itemImport/parser/misc/LifestyleParser';
+import { RangedParser } from '../module/apps/itemImport/parser/weapon/RangedParser';
+import { CombatSpellParser } from '../module/apps/itemImport/parser/spell/CombatSpellParser';
+import { SpellParser } from '../module/apps/actorImport/itemImporter/magicImport/SpellParser';
+import { ImportHelper as IH } from '../module/apps/itemImport/helper/ImportHelper';
 import { DynamicValueEvaluator } from '../module/effect/DynamicValueEvaluator';
 import { BonusHelper } from '../module/apps/itemImport/helper/BonusHelper';
 import type { BonusSchema } from '../module/apps/itemImport/schema/BonusSchema';
@@ -65,6 +69,83 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.isTrue(wireless.isSuppressed);
             await device.update({ system: { technology: { wireless: 'online' } } });
             assert.isFalse(wireless.isSuppressed);
+        });
+
+        it('imports rating-dependent weapon damage and AP as item effects', async () => {
+            class BowParser extends RangedParser {
+                protected override async getFolder() { return { id: null } as unknown as Folder; }
+            }
+            const source = await new BowParser().Parse({
+                id: { _TEXT: 'c965dee9-de62-4569-b96a-4026105440b1' },
+                name: { _TEXT: 'Dynamic Tension Bow' },
+                category: { _TEXT: 'Bows' },
+                type: { _TEXT: 'Ranged' },
+                conceal: { _TEXT: '8' },
+                accuracy: { _TEXT: '5' },
+                damage: { _TEXT: '(Rating+2)P' },
+                ap: { _TEXT: '-(Rating/4)' },
+                mode: { _TEXT: 'SS' },
+                rc: { _TEXT: '0' },
+                ammo: { _TEXT: '1' },
+                avail: { _TEXT: '12' },
+                cost: { _TEXT: '1200' },
+                minrating: { _TEXT: '1' },
+                rating: { _TEXT: '10' },
+                useskill: { _TEXT: 'Archery' },
+            } as never, 'Weapon') as Item.CreateData;
+            const { folder: _folder, ...itemData } = source;
+            const bow = await factory.createItem({ ...itemData, type: 'weapon' });
+
+            assert.strictEqual(bow.system.technology.rating, 1);
+            assert.strictEqual(bow.system.technology.max_rating, 10);
+            assert.strictEqual(bow.system.action.damage.value, 3);
+            assert.strictEqual(bow.system.action.damage.ap.value, -1);
+            await bow.update({ system: { technology: { rating: 5 } } });
+            bow.prepareData();
+            assert.strictEqual(bow.system.action.damage.value, 7);
+            assert.strictEqual(bow.system.action.damage.ap.value, -2);
+            await bow.update({ system: { technology: { rating: 10 } } });
+            bow.prepareData();
+            assert.strictEqual(bow.system.action.damage.value, 12);
+            assert.strictEqual(bow.system.action.damage.ap.value, -3);
+        });
+
+        it('imports the first Chummer spell element as the damage element', async () => {
+            class FirewaterParser extends CombatSpellParser {
+                protected override async getFolder() { return { id: null } as unknown as Folder; }
+            }
+            const source = await new FirewaterParser().Parse({
+                id: { _TEXT: 'b4e7e3b0-7a5f-4b0a-9a6b-0a3c1f5d8e21' },
+                name: { _TEXT: 'Firewater' },
+                category: { _TEXT: 'Combat' },
+                type: { _TEXT: 'P' },
+                range: { _TEXT: 'LOS' },
+                damage: { _TEXT: 'P' },
+                elements: { _TEXT: 'Fire, Water' },
+                duration: { _TEXT: 'I' },
+                dv: { _TEXT: 'F-1' },
+                descriptor: { _TEXT: 'Indirect, Elemental' },
+            } as never, 'Spell') as Item.CreateData;
+            const { folder: _folder, ...itemData } = source;
+            const spell = await factory.createItem({ ...itemData, type: 'spell' });
+            assert.strictEqual(spell.system.action.damage.element.value, 'fire');
+
+            class ActorSpellParser extends SpellParser {
+                parse(itemData: object) {
+                    const item = this.createItem({ name: 'Flamethrower' });
+                    this.parseItem(item, itemData as never);
+                    return item;
+                }
+            }
+            const exported = {
+                category_english: 'Combat', type: 'P', range: 'LOS', dv: 'F-1', duration: 'I', alchemy: 'False',
+                descriptors_english: 'Indirect, Elemental', damage_english: 'P',
+            };
+            const parser = new ActorSpellParser();
+            assert.strictEqual(parser.parse({ ...exported, elements: 'Feu', elements_english: 'Fire' }).system.action.damage.element.base, 'fire');
+            assert.strictEqual(parser.parse({ ...exported, elements_english: '' }).system.action.damage.element.base, '');
+            assert.strictEqual(IH.parseElements('Radiation'), 'radiation');
+            assert.strictEqual(IH.parseElements('Mana'), '');
         });
 
         it('translates arithmetic and Chummer boolean casts without accepting parent references', () => {
