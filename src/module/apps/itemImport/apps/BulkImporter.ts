@@ -1,6 +1,7 @@
 import JSZip from "jszip";
 import { Constants, ChummerFile } from "../importer/Constants";
 import { ImportHelper } from "../helper/ImportHelper";
+import { ChummerImportCoverage } from "../helper/ChummerImportCoverage";
 import { SYSTEM_NAME, FLAGS } from "@/module/constants";
 
 import { ActionImporter } from "../importer/ActionImporter";
@@ -429,6 +430,7 @@ export class BulkImporter extends BaseClass {
 
             BulkImporter.isImporting = false;
             await this.render();
+            ChummerImportCoverage.flush();
 
             // Clear ImportHelper caches
             ImportHelper.folders = {};
