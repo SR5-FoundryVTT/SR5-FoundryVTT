@@ -9,9 +9,22 @@ export class BonusHelper {
     /** Chummer bonus keys that addEffects turns into effects. */
     private static readonly handledBonuses = new Set<string>([
         ...Object.keys(BC.BonusConstant.simpleEffects),
-        'conditionmonitor', 'limitmodifier', 'skillattribute', 'skillcategory',
-        'skillgroup', 'specificattribute', 'specificskill',
+        'conditionmonitor', 'essencepenaltyt100', 'limitmodifier', 'runmultiplier', 'skillattribute',
+        'skillcategory', 'skillgroup', 'specificattribute', 'specificskill', 'spellcategory',
+        'unarmedap', 'unarmeddv', 'walkmultiplier',
     ]);
+
+    /** Chummer spell categories and the test category Foundry gives spellcasting tests of that category. */
+    private static readonly spellCategories: Record<string, string> = {
+        Combat: 'spell_combat',
+        Detection: 'spell_detection',
+        Health: 'spell_healing',
+        Illusion: 'spell_illusion',
+        Manipulation: 'spell_manipulation',
+    };
+
+    /** Chummer's base ground movement multipliers, which a percent bonus scales. */
+    private static readonly movementRates = { walk: 2, run: 4 } as const;
 
     private static normalizeValue(sheet: BC.DocCreateData, value: string | number): string {
         if (typeof value === 'number')
@@ -34,6 +47,8 @@ export class BonusHelper {
 
             value = value.replace("Rating", path);
         }
+
+        value = value.replace(/\bdiv\b/g, '/');
 
         // Chummer's {MAG}, {BOD}... read the owning character's attribute.
         value = value.replace(/\{([A-Z]{3})\}/g, (match, attribute: string) => {
@@ -337,6 +352,74 @@ export class BonusHelper {
                     }, 'skill_filter', skill.condition
                 );
             }
+        }
+
+        // Essence penalty in hundredths of a point.
+        if (bonus.essencepenaltyt100) {
+            this.createEffect(
+                sheet, {
+                    system: { changes: [{ key: "system.attributes.essence", value: `(${bonus.essencepenaltyt100._TEXT}) / 100` }] },
+                }
+            );
+        }
+
+        for (const [key, entries] of [['walk', bonus.walkmultiplier], ['run', bonus.runmultiplier]] as const) {
+            for (const movement of IH.getArray(entries)) {
+                if (movement.category._TEXT !== 'Ground') {
+                    ChummerImportCoverage.skip(`bonus.${key}multiplier: ${movement.category._TEXT} movement has no field`, sheet.name ?? 'unnamed');
+                    continue;
+                }
+
+                // Foundry moves Agility × (rate + modifier), so a percent of the rate becomes a flat modifier.
+                const value = (Number(movement.val?._TEXT) || 0)
+                    + this.movementRates[key] * (Number(movement.percent?._TEXT) || 0) / 100;
+                if (!value) continue;
+
+                this.createEffect(
+                    sheet, {
+                        system: { changes: [{ key: `system.modifiers.${key}`, value: value.toString() }] },
+                    }
+                );
+            }
+        }
+
+        if (bonus.spellcategory) {
+            for (const spellCategory of IH.getArray(bonus.spellcategory)) {
+                const category = this.spellCategories[spellCategory.name._TEXT];
+                if (!category) {
+                    ChummerImportCoverage.skip('bonus.spellcategory: unknown category', `${sheet.name}: ${spellCategory.name._TEXT}`);
+                    continue;
+                }
+
+                // Only spellcasting tests, so alchemical preparation triggers and rituals are left out.
+                this.createEffect(
+                    sheet, {
+                        system: {
+                            changes: [{ key: "data.pool", value: spellCategory.val._TEXT, target: 'spell_filter' }],
+                            targets: [{ id: 'spell_filter', applyTo: 'test_all', conditions: [
+                                { type: 'tests', mode: 'include', values: ['SpellCastingTest'] },
+                                { type: 'categories', mode: 'include', values: [category] },
+                            ] }],
+                        },
+                    }
+                );
+            }
+        }
+
+        for (const [key, value] of [['data.damage', bonus.unarmeddv], ['data.damage.ap', bonus.unarmedap]] as const) {
+            if (!value) continue;
+
+            this.createEffect(
+                sheet, {
+                    system: {
+                        changes: [{ key, value: value._TEXT, target: 'unarmed_filter' }],
+                        targets: [{ id: 'unarmed_filter', applyTo: 'test_all', conditions: [
+                            { type: 'skills', mode: 'include', values: ['unarmed_combat'] },
+                            { type: 'categories', mode: 'include', values: ['attack_melee'] },
+                        ] }],
+                    },
+                }
+            );
         }
     }
 

@@ -58,7 +58,7 @@ export abstract class DataImporter {
         try {
             return await this._parse(schema);
         } finally {
-            ChummerImportCoverage.report(this.files.join(', '));
+            ChummerImportCoverage.report(`${this.constructor.name}: ${this.files.join(', ')}`);
         }
     }
 

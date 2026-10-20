@@ -198,6 +198,42 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.isTrue(effect.disabled);
             assert.deepEqual(effect.system.targets[0].conditions.map(condition => condition.type), ['limits', 'skills']);
         });
+
+        it('imports essence, movement, spellcasting, unarmed and judge intentions bonuses', () => {
+            const changesOf = (bonus: object) => {
+                const sheet = { name: 'Bonus', system: { technology: { rating: 2 } }, effects: [] } as unknown as DocCreateData;
+                BonusHelper.addBonus(sheet, bonus as BonusSchema);
+                return sheet.effects!.map(effect => ({ ...effect.system.changes[0], conditions: effect.system.targets?.[0]?.conditions }));
+            };
+
+            const [essence] = changesOf({ essencepenaltyt100: { _TEXT: '-50' } });
+            assert.strictEqual(essence.key, 'system.attributes.essence');
+            assert.strictEqual(essence.value, '(-50) / 100');
+
+            const movement = changesOf({
+                walkmultiplier: [
+                    { category: { _TEXT: 'Ground' }, percent: { _TEXT: '-50' } },
+                    { category: { _TEXT: 'Swim' }, val: { _TEXT: '1' } },
+                ],
+                runmultiplier: { category: { _TEXT: 'Ground' }, val: { _TEXT: '1' } },
+            });
+            assert.deepEqual(movement.map(change => [change.key, change.value]),
+                [['system.modifiers.walk', '-1'], ['system.modifiers.run', '1']]);
+
+            const [focus] = changesOf({ spellcategory: { name: { _TEXT: 'Health' }, val: { _TEXT: 'Rating' }, condition: { _TEXT: 'not(/spell/alchemical)' } } });
+            assert.strictEqual(focus.key, 'data.pool');
+            assert.deepEqual(focus.conditions.map(condition => condition.values), [['SpellCastingTest'], ['spell_healing']]);
+
+            const unarmed = changesOf({ unarmeddv: { _TEXT: 'floor(Rating div 2)' }, unarmedap: { _TEXT: '-Rating' } });
+            assert.deepEqual(unarmed.map(change => [change.key, change.value]), [
+                ['data.damage', 'floor((@system.technology.rating) / 2)'],
+                ['data.damage.ap', '-(@system.technology.rating)'],
+            ]);
+            assert.deepEqual(unarmed[0].conditions.map(condition => condition.values), [['unarmed_combat'], ['attack_melee']]);
+
+            const [judge] = changesOf({ judgeintentionsoffense: { _TEXT: '-Rating' } });
+            assert.strictEqual(judge.key, 'system.modifiers.judge_intentions');
+        });
     });
 
     describe('TechnologyData preparation', () => {

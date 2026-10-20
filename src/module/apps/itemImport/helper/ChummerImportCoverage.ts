@@ -27,6 +27,7 @@ export class ChummerImportCoverage {
 
     /** Keep the coverage of the file just imported, to be logged by {@link flush}. */
     static report(file: string) {
+        if (!this.converted.size && !this.skipped.size) return;
         this.reports.push({
             file,
             converted: Object.fromEntries(this.converted),

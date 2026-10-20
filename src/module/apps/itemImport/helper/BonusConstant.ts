@@ -298,6 +298,7 @@ export class BonusConstant {
         initiativedice: { system: { changes: [{ key: "system.initiative.meatspace.dice" }] } },
         initiativepass: { system: { changes: [{ key: "system.initiative.meatspace.dice" }] } },
         judgeintentions: { system: { changes: [{ key: "system.modifiers.judge_intentions"}] } },
+        judgeintentionsoffense: { system: { changes: [{ key: "system.modifiers.judge_intentions"}] } },
         matrixinitiativediceadd: { system: { changes: [{ key: "system.initiative.matrix.dice" }] } },
         mentallimit: { system: { changes: [{ key: "system.limits.mental" }] } },
         memory: { system: { changes: [{ key: "system.modifiers.memory" }] } },
