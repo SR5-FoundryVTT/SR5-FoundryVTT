@@ -11,6 +11,7 @@ export interface Spell {
     descriptor: Empty | { _TEXT: string; };
     duration: { _TEXT: "I" | "P" | "S" | "Special"; };
     dv: { _TEXT: string; };
+    elements?: { _TEXT: string; };
     id: { _TEXT: string; };
     name: { _TEXT: string; };
     page?: { _TEXT: IntegerString; };

@@ -7,8 +7,11 @@ import { Empty, Many, OneOrMany, IntegerString } from './Types';
 export interface Bioware {
     addtoparentess?: Empty;
     addweapon?: Empty | { _TEXT: string; };
+    allowdrug?: {
+        drugcategory: Many<{ _TEXT: "BTLs" | "Custom Drugs" | "Drugs" | "Toxins"; }>;
+    };
     allowgear?: {
-        gearcategory: Many<{ _TEXT: "Chemicals" | "Custom" | "Custom Drug" | "Drugs" | "Toxins"; }>;
+        gearcategory: Many<{ _TEXT: "Chemicals" | "Custom"; }>;
     };
     allowsubsystems?: {
         category: { _TEXT: "Chemical Gland Modifications"; };
@@ -35,10 +38,13 @@ export interface Bioware {
     pairbonus?: {
         reach?: { _TEXT: IntegerString; $: { name: "Claws (Bio-Weapon)" | "Retractable Claws (Bio-Weapon)"; }; };
         unarmeddv?: { _TEXT: IntegerString; };
-        unarmedreach?: { _TEXT: IntegerString; };
         walkmultiplier?: {
             category: { _TEXT: "Swim"; };
             val: { _TEXT: IntegerString; };
+        };
+        weaponaccuracy?: {
+            name: { _TEXT: "Large Tusk(s)" | "Medium Tusk(s)"; };
+            value: { _TEXT: IntegerString; };
         };
     };
     pairinclude?: {

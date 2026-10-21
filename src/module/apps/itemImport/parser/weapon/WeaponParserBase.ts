@@ -29,7 +29,8 @@ export class WeaponParserBase extends Parser<'weapon'> {
         const result: Item.Source[] = [];
         for (const accessory of accessories) {
             const name = accessory.name._TEXT;
-            const item = itemMap.get(name);
+            // A weapon can list the same accessory twice, which must become separate items.
+            const item = foundry.utils.deepClone(itemMap.get(name));
 
             if (!item) {
                 console.warn(`[Accessory Missing]\nWeapon: ${jsonData.name._TEXT}\nAccessory: ${name}`);
@@ -44,6 +45,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
             if (ratingText)
                 system.technology.rating = Number(ratingText) || 0;
 
+            Parser.includeInParent(item);
             result.push(item);
         }
 
@@ -113,9 +115,10 @@ export class WeaponParserBase extends Parser<'weapon'> {
 
     public parseDamageData(damageText: string | number, apText: string | number, normalWeapon = false): DamageType {
         const partialDamageData: Partial<DamageType> = { normal_weapon: normalWeapon };
-        const parsedDamageText = String(damageText).trim();
+        // Blast dropoff and radius, like '(-1/m)' or '(10m Radius)', are parsed with the blast.
+        const parsedDamageText = String(damageText).replace(/\s*\((?:-?\d+\/m|\d+m(?:\s+radius)?)\)/gi, '').trim();
 
-        const attributeDamage = /^(?:\((.+)\)|(.+?))([PSM])?(?:\(([a-zA-Z]+)\))?(?:\s+\(-?\d+\/m\))?$/i.exec(parsedDamageText);
+        const attributeDamage = /^(?:\((.+)\)|(.+?))([PSM])?(?:\s*\(([a-zA-Z]+)\))?$/i.exec(parsedDamageText);
         if (attributeDamage) {
             const formulaText = attributeDamage[1] ?? attributeDamage[2];
             if (formulaText.includes('{')) {
@@ -135,7 +138,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
         }
 
         if (partialDamageData.base === undefined) {
-            const simpleDamage = /^([+-]?\d+(?:\.\d+)?)([PSM])?(?:\(([a-zA-Z]+)\))?(?:\s+\(-?\d+\/m\))?$/i.exec(parsedDamageText);
+            const simpleDamage = /^([+-]?\d+(?:\.\d+)?)([PSM])?(?:\s*\(([a-zA-Z]+)\))?$/i.exec(parsedDamageText);
             if (simpleDamage) {
                 const damageType = this.parseDamageType(simpleDamage[2]);
                 const damageElement = this.parseDamageElement(simpleDamage[3]);
@@ -205,13 +208,12 @@ export class WeaponParserBase extends Parser<'weapon'> {
         }
     }
 
+    /** Chummer's '(f)' marks flechette damage, which has no element. */
     protected parseDamageElement(parsedElement: string | undefined): DamageElement {
         switch(parsedElement?.toLowerCase()) {
             case 'e':
             case '(e)':
                 return 'electricity';
-            case 'f':
-            case '(f)':
             case 'fire':
             case '(fire)':
                 return 'fire';

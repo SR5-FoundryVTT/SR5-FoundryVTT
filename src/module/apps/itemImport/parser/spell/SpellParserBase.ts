@@ -28,6 +28,10 @@ export class SpellParserBase extends Parser<'spell'> {
             system.action.damage.type.value = 'stun';
         }
 
+        const element = IH.parseElements(jsonData.elements?._TEXT);
+        system.action.damage.element.base = element;
+        system.action.damage.element.value = element;
+
         const duration = jsonData.duration._TEXT;
         if (duration === 'I')
             system.duration = 'instant';

@@ -7,6 +7,7 @@ import { Cyberware, CyberwareSchema } from "../schema/CyberwareSchema";
 import { Complexform, ComplexformsSchema } from "../schema/ComplexformsSchema";
 import { Echo, EchoesSchema } from "../schema/EchoesSchema";
 import { Gear, GearSchema } from "../schema/GearSchema";
+import { Lifestyle, LifestylesSchema } from "../schema/LifestylesSchema";
 import { Metatype, MetatypeSchema } from "../schema/MetatypeSchema";
 import { Power, Enhancement, PowersSchema } from "../schema/PowersSchema";
 import { Quality, QualitiesSchema } from "../schema/QualitiesSchema";
@@ -25,8 +26,8 @@ export type SkillGroup = {
 
 export type Schemas =
     ActionsSchema | ArmorSchema | BiowareSchema | CritterpowersSchema | CyberwareSchema | ComplexformsSchema | EchoesSchema |
-    GearSchema | MetatypeSchema | PowersSchema | QualitiesSchema | SkillsSchema | SpellsSchema | VehiclesSchema | WeaponsSchema;
+    GearSchema | LifestylesSchema | MetatypeSchema | PowersSchema | QualitiesSchema | SkillsSchema | SpellsSchema | VehiclesSchema | WeaponsSchema;
 
 export type ParseData =
-    Action | Armor | ArmorMod | Bioware | CritterPower | Cyberware | Complexform | Echo | Gear | Metatype |
+    Action | Armor | ArmorMod | Bioware | CritterPower | Cyberware | Complexform | Echo | Gear | Lifestyle | Metatype |
     Power | Enhancement | Quality | Skill | SkillGroup | Spell | Vehicle | VehicleMod | Weaponmount | Weapon | Accessory;
