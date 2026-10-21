@@ -113,7 +113,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
         if (!this.isActor()) {
             this.addFormulaEffects(entity as Item.CreateData, jsonData);
             if ('wirelessbonus' in jsonData && jsonData.wirelessbonus)
-                BH.addBonus(entity, jsonData.wirelessbonus as never, { onlyForWireless: true });
+                BH.addBonus(entity, jsonData.wirelessbonus, { onlyForWireless: true });
         }
         for (const [block, reason] of Object.entries(this.unsupportedBlocks())) {
             if (block in jsonData && jsonData[block as keyof ParseData])
