@@ -296,7 +296,7 @@ export class BlastTemplateFlow {
         });
 
         this.#overlay = canvas.regions.preview!.addChild(new PIXI.Container());
-        this.#graphics = this.#overlay!.addChild(new PIXI.Graphics());
+        this.#graphics = this.#overlay.addChild(new PIXI.Graphics());
         this.#refreshBlastOverlay();
 
         return this.#placement;

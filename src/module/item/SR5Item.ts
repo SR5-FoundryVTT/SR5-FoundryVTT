@@ -340,7 +340,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * The original naming leans on the dnd5e systems use of it for chat messages.
      * NOTE: This is very legacy, difficult to read and should be improved upon.
      */
-    async getChatData(htmlOptions: TextEditor.EnrichmentOptions = {}) {
+    async getChatData(htmlOptions: foundry.applications.ux.TextEditor.EnrichmentOptions = {}) {
         const system = foundry.utils.duplicate(this.system) as SR5Item['system'];
 
         system.description.value = await foundry.applications.ux.TextEditor.implementation.enrichHTML(system.description.value, htmlOptions);
@@ -699,7 +699,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     static getTargets() {
         if (!game.ready || !game.user) return;
         const { character } = game.user;
-        const { controlled } = canvas.tokens!;
+        const { controlled } = canvas.tokens;
         const targets = controlled.reduce<SR5Actor[]>((arr, t) => t.actor ? [...arr, t.actor] : arr, []);
         if (character instanceof SR5Actor && controlled.length === 0) targets.push(character);
         if (!targets.length) throw new Error(`You must designate a specific Token as the roll target`);
@@ -1003,7 +1003,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     isType<ST extends readonly Item.ConfiguredSubType[]>(this: SR5Item, ...types: ST): this is SR5Item<ST[number]> {
-        return types.includes(this.type as ST[number]);
+        return types.includes(this.type);
     }
 
     asType<ST extends readonly Item.ConfiguredSubType[]>(this: SR5Item, ...types: ST): SR5Item<ST[number]> | undefined {

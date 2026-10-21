@@ -37,7 +37,7 @@ export type ExtractItemType<
 > = Unwrap<NonNullable<ActorSchema[FieldKey]>[InnerKey]>;
 
 export type BlankItem<T extends ItemSystems> = ReturnType<Parser<T>["createItem"]>;
-type CacheType = Awaited<ReturnType<CompendiumCollection<'Item'>['getIndex']>>;
+type CacheType = Awaited<ReturnType<foundry.documents.collections.CompendiumCollection<'Item'>['getIndex']>>;
 
 export abstract class Parser<T extends ItemSystems> {
     protected abstract readonly parseType: T;
@@ -71,7 +71,7 @@ export abstract class Parser<T extends ItemSystems> {
                             ?? indexes.find(e => e.name === itemData.name_english && e.type === this.parseType);
 
             if (itemIndex) {
-                const pack = game.packs.get(packId) as CompendiumCollection<"Item"> | undefined;
+                const pack = game.packs.get(packId) as foundry.documents.collections.CompendiumCollection<"Item"> | undefined;
                 const item = await pack?.getDocument(itemIndex._id);
                 if (item)
                     return game.items.fromCompendium(item) as Item.CreateData as BlankItem<T>;
@@ -175,7 +175,7 @@ export abstract class Parser<T extends ItemSystems> {
 
     protected abstract parseItem(item: BlankItem<T>, itemData: BaseType): void;
     // oxlint-disable-next-line typescript/require-await -- Default for an async hook that subclasses override with awaiting implementations.
-    protected async getEmbeddedItems(itemData: BaseType): Promise<Item.Source[]> {
+    protected async getEmbeddedItems(_itemData: BaseType): Promise<Item.Source[]> {
         return [] as Item.Source[];
     }
 }

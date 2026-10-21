@@ -99,7 +99,7 @@ export class Version0_31_0 extends VersionMigration {
                     }
                 }
             });
-            _actor.effects.push(...effectData);
+            (_actor.effects as unknown[]).push(...effectData);
         }
     }
 }

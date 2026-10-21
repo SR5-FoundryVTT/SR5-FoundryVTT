@@ -35,8 +35,8 @@ export namespace SR5ApplicationMixinTypes {
     };
 
     export interface Configuration extends ApplicationV2.Configuration, HandlebarsApplicationMixin.Configuration {
-        filters?: SearchFilter.Configuration[];
-        dragDrop?: DragDrop.Configuration[];
+        filters?: foundry.applications.ux.SearchFilter.Configuration[];
+        dragDrop?: foundry.applications.ux.DragDrop.Configuration[];
     };
 
     export interface RenderOptions extends ApplicationV2.RenderOptions, HandlebarsApplicationMixin.RenderOptions {
@@ -70,7 +70,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         declare isEditable?: boolean;
         declare document?: SR5Item | SR5Actor;
 
-        readonly #filters: SearchFilter[];
+        readonly #filters: foundry.applications.ux.SearchFilter[];
         readonly #dragDrop: SR5DragDropHandler[];
         private readonly expandedUuids = new Set<string>();
         private editIcon?: HTMLElement;
@@ -250,19 +250,19 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
             return this._mode === 'play';
         }
 
-        protected _canDragStart(selector?: string | null): boolean {
+        protected _canDragStart(_selector?: string | null): boolean {
             return !!this.isEditable;
         }
 
-        protected _canDragDrop(selector?: string | null): boolean {
+        protected _canDragDrop(_selector?: string | null): boolean {
             return !!this.isEditable;
         }
 
-        protected _onDragStart(event: DragEvent) { }
+        protected _onDragStart(_event: DragEvent) { }
 
-        protected _onDragOver(event: DragEvent) { }
+        protected _onDragOver(_event: DragEvent) { }
 
-        protected async _onDrop(event: DragEvent) { }
+        protected async _onDrop(_event: DragEvent) { }
 
         protected override async _prepareContext(
             options: Parameters<BaseType["_prepareContext"]>[0]
@@ -354,7 +354,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
          * @param options TextEditor, enrichHTML.options passed through
          * @returns Enriched HTML result
          */
-        async enrichEditorFieldToHTML(editorValue: string, options?: TextEditor.EnrichmentOptions): Promise<string> {
+        async enrichEditorFieldToHTML(editorValue: string, options?: foundry.applications.ux.TextEditor.EnrichmentOptions): Promise<string> {
             return foundry.applications.ux.TextEditor.implementation.enrichHTML(editorValue, options);
         }
 

@@ -58,7 +58,7 @@ export class Version0_38_0 extends VersionMigration {
 
             const fieldLabel = field === 'cost' ? 'SR5.Cost' : 'SR5.Availability';
             item.effects ??= [];
-            item.effects.push({
+            (item.effects as unknown[]).push({
                 _id: randomID(),
                 name: `${game.i18n.localize('SR5.Rating')} ${game.i18n.localize(fieldLabel)}`,
                 type: 'base',

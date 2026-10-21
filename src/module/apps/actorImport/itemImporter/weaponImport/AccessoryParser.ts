@@ -12,7 +12,7 @@ export class AccessoryParser extends Parser<'modification'> {
     protected parseItem(item: BlankItem<'modification'>, itemData: AccessoryType) {
         const system = item.system;
         system.type = 'weapon';
-        system.mod_weapon.mount_point = itemData.mount.toLowerCase() as any;
+        system.mod_weapon.mount_point = itemData.mount.toLowerCase() as typeof system.mod_weapon.mount_point;
         system.mod_weapon.accuracy = Number(itemData.accuracy) || 0;
         system.mod_weapon.rc = Number(itemData.rc) || 0;
         system.mod_weapon.conceal = Number(itemData.conceal) || 0;

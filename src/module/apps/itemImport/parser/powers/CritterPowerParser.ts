@@ -15,17 +15,17 @@ export class CritterPowerParser extends Parser<'critter_power'> {
 
         let category = jsonData.category._TEXT.toLowerCase();
         category = (category.includes("infected") ? "infected" : category);
-        system.category = CritterPowerCategories.includes(category as any)
+        system.category = CritterPowerCategories.includes(category as (typeof CritterPowerCategories)[number])
             ? (category as typeof system.category)
             : "";
 
-        system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() as any : "";
+        system.duration = (jsonData.duration ? jsonData.duration._TEXT.toLowerCase() : "") as typeof system.duration;
 
         const range = jsonData.range ? jsonData.range._TEXT : "";
-        system.range = CritterPowerParser.rangeMap[range] as any ?? 'special';
+        system.range = CritterPowerParser.rangeMap[range] as typeof system.range ?? 'special';
 
         const type = jsonData.type ? jsonData.type._TEXT : "";
-        system.powerType = CritterPowerParser.typeMap[type] as any ?? "";
+        system.powerType = CritterPowerParser.typeMap[type] as typeof system.powerType ?? "";
 
         system.rating = 1;
 

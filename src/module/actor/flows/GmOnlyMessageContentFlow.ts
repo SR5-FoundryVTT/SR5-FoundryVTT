@@ -16,8 +16,8 @@ export const GmOnlyMessageContentFlow = {
     /**
      * Add chat listener for GM only content.
      */
-    async chatMessageListeners(message: ChatMessage, html: JQuery, data: any) {
-        await GmOnlyMessageContentFlow.showGmOnlyContent(message, html, data);
+    async chatMessageListeners(message: ChatMessage, html: JQuery) {
+        await GmOnlyMessageContentFlow.showGmOnlyContent(message, html);
     },
     /**
      * Should GMOnly content be applied or not?
@@ -44,7 +44,7 @@ export const GmOnlyMessageContentFlow = {
      * @param html The DOM elements of the chat message contents
      * @param data The message data used to render the chat message
      */
-    async showGmOnlyContent(message: ChatMessage, html, data) {
+    async showGmOnlyContent(message: ChatMessage, html) {
         // Directly access test data to avoid unnecessary test creation.
         const testData = TestCreator.getTestDataFromMessage(message.id as string);
         if (!testData?.data) return;

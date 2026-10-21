@@ -5,7 +5,6 @@ import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import { SR5Die } from "../rolls/SR5Die";
-import { SR5TokenDocument } from "../token/SR5TokenDocument";
 import SocketMessageData = Shadowrun.SocketMessageData;
 import BaseCombat = foundry.documents.BaseCombat;
 
@@ -310,7 +309,7 @@ export class SR5Combat extends Combat<"base"> {
             updateData.system = { history: this._nextHistory() };
 
             if (this.combatant)
-                updateData.combatants = [{ _id: this.combatant.id!, system: { acted: true } }];
+                updateData.combatants = [{ _id: this.combatant.id, system: { acted: true } }];
         }
 
         // @ts-expect-error TODO: fvtt-types v14 - The combatTurn hook typings do not match the data passed here.

@@ -10,7 +10,7 @@ export class VehicleModParser extends Parser<'modification'> {
         const system = this.getBaseSystem();
         system.type = 'vehicle';
 
-        system.modification_category = jsonData.category._TEXT?.toLowerCase() as any;
+        system.modification_category = jsonData.category._TEXT?.toLowerCase() as typeof system.modification_category;
 
         const slots = jsonData.slots._TEXT.match(/[0-9]\.?[0-9]*/g);
         if (slots)

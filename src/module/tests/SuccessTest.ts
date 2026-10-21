@@ -372,7 +372,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param item The item holding the action configuration.
      * @param actor The actor used for value calculation.
      */
-    static _getDocumentTestAction(item: SR5Item, actor: SR5Actor): DeepPartial<MinimalActionType> {
+    static _getDocumentTestAction(_item: SR5Item, _actor: SR5Actor): DeepPartial<MinimalActionType> {
         return {};
     }
 
@@ -394,13 +394,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param previousMessageId The id this message action is sourced from.
      */
     // oxlint-disable-next-line typescript/require-await -- Async hook that subclasses override with awaiting implementations.
-    static async _getOpposedActionTestData(testData: DeepPartial<SuccessTestData>, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
+    static async _getOpposedActionTestData(_testData: DeepPartial<SuccessTestData>, _actor: SR5Actor|SR5Item, _previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
         return undefined;
     }
 
     // oxlint-disable-next-line typescript/require-await -- Async hook that subclasses override with awaiting implementations.
-    static async _getResistActionTestData(testData: DeepPartial<SuccessTestData>, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
+    static async _getResistActionTestData(_testData: DeepPartial<SuccessTestData>, _actor: SR5Actor|SR5Item, _previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support resist message actions`);
         return undefined;
     }
@@ -1824,7 +1824,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Prepare message content.
         const templateData = await this._prepareMessageTemplateData();
-        const content = await renderTemplate(this._chatMessageTemplate, templateData);
+        const content = await foundry.applications.handlebars.renderTemplate(this._chatMessageTemplate, templateData);
         // Prepare the actual message.
         const messageData = await this._prepareMessageData(content);
 
@@ -2051,7 +2051,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * This listener needs to be registered to the 'renderChatMessage' FoundryVTT hook.
      */
-    static async chatMessageListeners(message: ChatMessage, html, data) {
+    static async chatMessageListeners(message: ChatMessage, html) {
         await this._hydrateValueModifierTooltips(message, html);
 
         $(html).find('.test-parameter').on('click', this._chatToggleParameterDetails.bind(this));
@@ -2066,9 +2066,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         $(html).find('.chat-select-link').on('click', this._selectSceneToken.bind(this));
         $(html).find('.test-action').on('click', this._castTestAction.bind(this));
 
-        DamageApplicationFlow.handleRenderChatMessage(message, html, data);
+        DamageApplicationFlow.handleRenderChatMessage(message, html);
 
-        await GmOnlyMessageContentFlow.chatMessageListeners(message, html, data);
+        await GmOnlyMessageContentFlow.chatMessageListeners(message, html);
     }
 
     static async _hydrateValueModifierTooltips(message: ChatMessage, html: HTMLElement | JQuery) {
@@ -2215,7 +2215,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Select a Token on the current scene based on the link id.
      * @params event Any user PointerEvent
     */
-    static _selectSceneToken(event: Event) {
+    static _selectSceneToken(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -2237,7 +2237,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * 
      * @param event Any pointer event
      */
-    static async _castTestAction(event: Event) {
+    static async _castTestAction(event: JQuery.TriggeredEvent) {
         event.preventDefault();
 
         const element = $(event.currentTarget as HTMLElement);
@@ -2247,7 +2247,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         if (!item) return console.error("Shadowrun 5e | Item doesn't exist for uuid", uuid);
 
-        void item.castAction(event);
+        void item.castAction(event as unknown as Event);
     }
 
     /**
@@ -2323,7 +2323,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return options;
     }
 
-    static _chatToggleParameterDetails(event: Event) {
+    static _chatToggleParameterDetails(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -2346,7 +2346,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         parameter.setAttribute('aria-expanded', String(expand));
     }
 
-    static async _chatOpenModifierSource(event: Event) {
+    static async _chatOpenModifierSource(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -2354,7 +2354,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         await LinksHelpers.openSource(source);
     }
 
-    static _chatToggleCardRolls(event: Event) {
+    static _chatToggleCardRolls(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -2389,7 +2389,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * This will hide / show them, when called with a card event.
      */
-    static _chatToggleCardDescription(event: Event) {
+    static _chatToggleCardDescription(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -2409,15 +2409,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * @param event A PointerEvent by user-interaction
      */
-    static async _castResultAction(event) {
+    static async _castResultAction(event: JQuery.TriggeredEvent) {
         event.preventDefault();
         event.stopPropagation();
 
-        const element = $(event.currentTarget)
+        const element = $(event.currentTarget as HTMLElement)
         const messageId = element.closest('.chat-message').data('messageId');
         const resultAction = element.data('action');
 
-        await ActionResultFlow.executeResult(resultAction, {event, element, messageId});
+        await ActionResultFlow.executeResult(resultAction, {event: event as unknown as Event, element, messageId});
     }
 
     /**

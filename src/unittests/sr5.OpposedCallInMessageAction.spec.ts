@@ -33,8 +33,8 @@ async function runWithPatches(
 ): Promise<{ capturedDocument: any; executeCount: number; getOpposedCount: number }> {
     const clsAny = cls as any;
     const originalGetOpposed = clsAny._getOpposedActionTestData;
-    const originalExecute = cls.prototype.execute;
-    const originalSelectedActors = Helpers.getSelectedActorsOrCharacter;
+    const originalExecute = Reflect.get(cls.prototype, 'execute');
+    const originalSelectedActors = Helpers.getSelectedActorsOrCharacter.bind(Helpers);
 
     let capturedDocument: any = null;
     let executeCount = 0;
@@ -93,7 +93,7 @@ export const shadowrunOpposedCallInMessageActionTesting = (context: QuenchBatchC
 
             it('shows error and does not execute when all resolution paths are empty', async () => {
                 const originalCharacterId = game.user?.character?.id ?? null;
-                await game.user?.update({ character: null } as any);
+                await game.user?.update({ character: null });
 
                 const notifications = ui.notifications as any;
                 const originalError = notifications?.error;
@@ -111,7 +111,7 @@ export const shadowrunOpposedCallInMessageActionTesting = (context: QuenchBatchC
                     assert.strictEqual(errors, 1);
                 } finally {
                     notifications.error = originalError;
-                    await game.user?.update({ character: originalCharacterId } as any);
+                    await game.user?.update({ character: originalCharacterId });
                 }
             });
         });

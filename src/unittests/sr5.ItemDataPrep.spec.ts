@@ -483,7 +483,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             ActionPrep.prepareDamageSource(action.system.action, action)
 
             assert.deepEqual(action.system.action?.damage.source, {
-                actorId: character.id!,
+                actorId: character.id,
                 itemId: action.id!,
                 itemName: action.name,
                 itemType: action.type

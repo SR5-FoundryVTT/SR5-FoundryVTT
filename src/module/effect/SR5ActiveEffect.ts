@@ -1,4 +1,3 @@
-import { SR } from '../constants';
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
@@ -400,7 +399,7 @@ export class SR5ActiveEffect extends ActiveEffect {
                 delta = SR5ActiveEffect.__castArray(String(change.value), innerType);
             }
             else delta = SR5ActiveEffect.__castDelta(String(change.value), targetType);
-        } catch (err) {
+        } catch {
             console.warn(`Test [${object.constructor.name}] | Unable to parse active effect change for ${change.key}: "${change.value}"`);
             return {};
         }
@@ -428,7 +427,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         try {
             const changes = {};
             SR5ActiveEffect._applyChangeUnguided(object, change, changes);
-            return changes as Record<string, unknown>;
+            return changes;
         } catch (err) {
             console.error(`Test [${object.constructor.name}] | Failed to apply active effect change for ${change.key}: "${change.value}"`, err);
             return {};
@@ -531,7 +530,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         try {
             const parsed = this.__parseOrString(raw);
             delta = parsed instanceof Array ? parsed : [parsed];
-        } catch (e) {
+        } catch {
             delta = [raw];
         }
         return delta.map(d => this.__castDelta(d as string, type));
@@ -572,7 +571,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     private static __parseOrString(raw: string): unknown {
         try {
             return JSON.parse(raw);
-        } catch (err) {
+        } catch {
             return raw;
         }
     }
@@ -583,7 +582,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Overwrite foundry priority handling, as they provide a defaultPriority in CHANGE_TYPES but use
         // priority in their ActiveEffect#prepareBaseData implementation.
         for ( const change of this.system.changes ) {
-          change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type!]?.defaultPriority : change.priority;
+          change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type]?.defaultPriority : change.priority;
         }
     }
 }

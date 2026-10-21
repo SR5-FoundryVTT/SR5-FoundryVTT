@@ -90,7 +90,7 @@ export const FireModeRules = {
      * 
      * @returns A list of firemodes sorted by weapon mode and rounds necessary.
      */
-    availableFireModes: function (rangedWeaponModes: FiringModeType, ammoLeft?: number): FireModeType[] {
+    availableFireModes: function (rangedWeaponModes: FiringModeType): FireModeType[] {
         // Reduce all fire modes to what's available on weapon
         // TODO: rounds check
         return SR5.fireModes

@@ -54,7 +54,7 @@ export const registerRollAndLabelHelpers = () => {
         const descriptors: string[] = [];
         const localizeConfig = (value: string | undefined, map: Record<string, string> | undefined) => {
             if (!value || !map?.[value]) return '';
-            return game.i18n.localize(map[value] as string);
+            return game.i18n.localize(map[value]);
         };
         const addDescriptor = (value: string) => {
             if (value && !descriptors.includes(value)) descriptors.push(value);

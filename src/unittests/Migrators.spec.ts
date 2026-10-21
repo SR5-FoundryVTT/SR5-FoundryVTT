@@ -21,6 +21,18 @@ export const Migrators = (context: QuenchBatchContext) => {
         language: LegacySkillContainerTestData;
         knowledge: Record<string, LegacySkillContainerTestData>;
     };
+    type LegacyItemFixture = {
+        _id: string;
+        name: string;
+        type: string;
+        system?: object;
+        effects?: unknown[];
+        flags?: object;
+    };
+    type LegacySpriteSystem = ReturnType<typeof DataDefaults.baseSystemData<'sprite'>> & {
+        level?: number;
+        modifiers: { matrix_initiative?: number };
+    };
 
     class TestMigration extends VersionMigration {
         readonly TargetVersion = '0.0.0' as const;
@@ -118,7 +130,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.isTrue(migrated);
             assert.lengthOf(source.items, 4);
 
-            const pistols = source.items.find(item => item.type === 'skill' && item.name === 'Pistols') as Item.CreateData | undefined;
+            const pistols = source.items.find(item => item.type === 'skill' && item.name === 'Pistols');
             assert.exists(pistols);
             assert.strictEqual(foundry.utils.getProperty(pistols, 'system.skill.category'), 'active');
             assert.strictEqual(foundry.utils.getProperty(pistols, 'system.skill.rating'), 4);
@@ -128,12 +140,12 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(foundry.utils.getProperty(pistols, 'system.description.source'), 'SR5 Core 130');
             assert.strictEqual(pistols?.name, 'Pistols');
 
-            const customSkill = source.items.find(item => item.type === 'skill' && item.name === 'Freestyle Gunnery') as Item.CreateData | undefined;
+            const customSkill = source.items.find(item => item.type === 'skill' && item.name === 'Freestyle Gunnery');
             assert.exists(customSkill);
             assert.deepEqual(foundry.utils.getProperty(customSkill, 'system.skill.specializations'), [{ name: 'Trick Shots' }]);
             assert.strictEqual(customSkill?.img, 'icons/svg/target.svg');
 
-            const languageSkill = source.items.find(item => item.type === 'skill' && item.name === 'Spanish') as Item.CreateData | undefined;
+            const languageSkill = source.items.find(item => item.type === 'skill' && item.name === 'Spanish');
             assert.exists(languageSkill);
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.category'), 'language');
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.rating'), 12);
@@ -141,7 +153,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.defaulting'), false);
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.language.isNative'), true);
 
-            const knowledgeSkill = source.items.find(item => item.type === 'skill' && item.name === 'Gang Politics') as Item.CreateData | undefined;
+            const knowledgeSkill = source.items.find(item => item.type === 'skill' && item.name === 'Gang Politics');
             assert.exists(knowledgeSkill);
             assert.strictEqual(foundry.utils.getProperty(knowledgeSkill, 'system.skill.category'), 'knowledge');
             assert.strictEqual(foundry.utils.getProperty(knowledgeSkill, 'system.skill.knowledgeType'), 'street');
@@ -406,7 +418,7 @@ export const Migrators = (context: QuenchBatchContext) => {
     });
 
     describe('Version0_35_0 spirit legacy migration', () => {
-        const createSkillItem = (name: string, rating = 0): any => ({
+        const createSkillItem = (name: string, rating = 0) => ({
             _id: foundry.utils.randomID(16),
             name,
             type: 'skill',
@@ -420,12 +432,12 @@ export const Migrators = (context: QuenchBatchContext) => {
             }),
         });
 
-        const createSpirit = (spiritType: string, force = 6): any => ({
+        const createSpirit = (spiritType: string, force = 6) => ({
             _id: foundry.utils.randomID(16),
             _stats: { systemVersion: '0.33.9' },
             name: 'Legacy Spirit',
             type: 'spirit',
-            items: [] as any[],
+            items: [] as LegacyItemFixture[],
             effects: [],
             system: DataDefaults.baseSystemData('spirit', {
                 spiritType,
@@ -458,8 +470,8 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.initiative.astral.constant.base, 0);
             assert.strictEqual(actor.system.initiative.astral.dice.base, 3);
 
-            const assensing = actor.items.find((item: any) => item.name === 'Assensing');
-            const arcana = actor.items.find((item: any) => item.name === 'Arcana');
+            const assensing = actor.items.find(item => item.name === 'Assensing') as LegacyItemFixture;
+            const arcana = actor.items.find(item => item.name === 'Arcana') as LegacyItemFixture;
             assert.strictEqual(foundry.utils.getProperty(assensing, 'system.skill.rating'), 1);
             assert.strictEqual(foundry.utils.getProperty(arcana, 'system.skill.rating'), 0);
         });
@@ -492,8 +504,8 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.initiative.astral.constant.base, 0);
             assert.strictEqual(actor.system.initiative.astral.dice.base, 1);
 
-            const assensing = actor.items.find((item: any) => item.name === 'Assensing');
-            const unarmedCombat = actor.items.find((item: any) => item.name === 'Unarmed Combat');
+            const assensing = actor.items.find(item => item.name === 'Assensing') as LegacyItemFixture;
+            const unarmedCombat = actor.items.find(item => item.name === 'Unarmed Combat') as LegacyItemFixture;
             assert.strictEqual(foundry.utils.getProperty(assensing, 'system.skill.rating'), 1);
             assert.strictEqual(foundry.utils.getProperty(unarmedCombat, 'system.skill.rating'), 0);
         });
@@ -518,7 +530,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.initiative.astral.attribute_b, 'force');
             assert.strictEqual(actor.system.initiative.astral.dice.base, 3);
 
-            const assensing = actor.items.find((item: any) => item.name === 'Assensing');
+            const assensing = actor.items.find(item => item.name === 'Assensing') as LegacyItemFixture;
             assert.strictEqual(foundry.utils.getProperty(assensing, 'system.skill.rating'), 3);
         });
 
@@ -563,7 +575,7 @@ export const Migrators = (context: QuenchBatchContext) => {
     });
 
     describe('Version0_35_0 sprite legacy migration', () => {
-        const createSkillItem = (name: string, rating = 0, category: 'active' | 'knowledge' | 'language' = 'active'): any => ({
+        const createSkillItem = (name: string, rating = 0, category: 'active' | 'knowledge' | 'language' = 'active') => ({
             _id: foundry.utils.randomID(16),
             name,
             type: 'skill',
@@ -577,12 +589,12 @@ export const Migrators = (context: QuenchBatchContext) => {
             }),
         });
 
-        const createSprite = (spriteType: string, level = 6): any => ({
+        const createSprite = (spriteType: string, level = 6) => ({
             _id: foundry.utils.randomID(16),
             _stats: { systemVersion: '0.34.0' },
             name: 'Legacy Sprite',
             type: 'sprite',
-            items: [] as any[],
+            items: [] as LegacyItemFixture[],
             effects: [],
             system: DataDefaults.baseSystemData('sprite', {
                 spriteType,
@@ -596,7 +608,7 @@ export const Migrators = (context: QuenchBatchContext) => {
                     data_processing: { base: 0 },
                     firewall: { base: 0 },
                 },
-            }),
+            }) as LegacySpriteSystem,
         });
 
         it('migrates known legacy sprite type into offsets, level toggles, initiative formula constant, and skill toggles', () => {
@@ -628,9 +640,9 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.attributes.level.base, 6);
             assert.isUndefined(actor.system.level);
 
-            const computer = actor.items.find((item: any) => item.name === 'Computer');
-            const hacking = actor.items.find((item: any) => item.name === 'Hacking');
-            const hardware = actor.items.find((item: any) => item.name === 'Hardware');
+            const computer = actor.items.find(item => item.name === 'Computer') as LegacyItemFixture;
+            const hacking = actor.items.find(item => item.name === 'Hacking') as LegacyItemFixture;
+            const hardware = actor.items.find(item => item.name === 'Hardware') as LegacyItemFixture;
             assert.strictEqual(foundry.utils.getProperty(computer, 'system.skill.rating'), 1);
             assert.strictEqual(foundry.utils.getProperty(hacking, 'system.skill.rating'), 1);
             assert.strictEqual(foundry.utils.getProperty(hardware, 'system.skill.rating'), 0);
@@ -661,9 +673,9 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.matrix.firewall.base, 1);
             assert.strictEqual(actor.system.initiative.matrix.constant.base, 4);
 
-            const computer = actor.items.find((item: any) => item.name === 'Computer');
-            const electronicWarfare = actor.items.find((item: any) => item.name === 'Electronic Warfare');
-            const cybercombat = actor.items.find((item: any) => item.name === 'Cybercombat');
+            const computer = actor.items.find(item => item.name === 'Computer') as LegacyItemFixture;
+            const electronicWarfare = actor.items.find(item => item.name === 'Electronic Warfare') as LegacyItemFixture;
+            const cybercombat = actor.items.find(item => item.name === 'Cybercombat') as LegacyItemFixture;
             assert.strictEqual(foundry.utils.getProperty(computer, 'system.skill.rating'), 1);
             assert.strictEqual(foundry.utils.getProperty(electronicWarfare, 'system.skill.rating'), 1);
             assert.strictEqual(foundry.utils.getProperty(cybercombat, 'system.skill.rating'), 0);
@@ -684,7 +696,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.matrix.attack.base, 7);
             assert.strictEqual(actor.system.initiative.matrix.constant.base, 2);
 
-            const computer = actor.items.find((item: any) => item.name === 'Computer');
+            const computer = actor.items.find(item => item.name === 'Computer') as LegacyItemFixture;
             assert.strictEqual(foundry.utils.getProperty(computer, 'system.skill.rating'), 3);
         });
 
@@ -752,7 +764,7 @@ export const Migrators = (context: QuenchBatchContext) => {
                     },
                 },
                 system: DataDefaults.baseSystemData('weapon'),
-            } as any);
+            });
 
             migrator.migrateActor(actor);
 

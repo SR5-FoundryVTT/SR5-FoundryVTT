@@ -165,7 +165,7 @@ export const shadowrunChatMessageLayoutTesting = (context: QuenchBatchContext) =
         });
 
         describe('parameter modifier panels', () => {
-            const renderCard = async (test): Promise<HTMLElement> => {
+            const renderCard = async (test: SuccessTest): Promise<HTMLElement> => {
                 const wrapper = document.createElement('div');
                 wrapper.innerHTML = await foundry.applications.handlebars.renderTemplate(
                     'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',
@@ -181,7 +181,7 @@ export const shadowrunChatMessageLayoutTesting = (context: QuenchBatchContext) =
                 const line = (await renderCard(test))
                     .querySelector<HTMLElement>('.card-content--parameters') as HTMLElement;
                 for (const parameter of line.querySelectorAll('.test-parameter'))
-                    parameter.addEventListener('click', SuccessTest._chatToggleParameterDetails);
+                    parameter.addEventListener('click', SuccessTest._chatToggleParameterDetails.bind(SuccessTest));
                 return line;
             }
 

@@ -441,7 +441,7 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
             const combatants: { actorId: string }[] = [];
             for (let i = 0; i < count; i++) {
                 const actor = await factory.createActor({ type: 'character' });
-                combatants.push({ actorId: actor.id! });
+                combatants.push({ actorId: actor.id });
             }
             const events: string[] = [];
             const registry = foundry.documents.ActiveEffect.registry;
