@@ -100,41 +100,60 @@ export class ChummerFormulaParser {
         return result;
     }
 
+    /** Translate one Chummer value into an effect expression, or null when effects can't evaluate it. */
     private static parseEntry(raw: string, options: ChummerFormulaOptions) {
+        const { entry, restriction } = this.splitRestriction(raw, options.availability);
+        if (/\bMinRating\b/i.test(entry) && options.minRating == null) return null;
+
+        // Longer names first, so 'Armor Cost' isn't read as 'Armor'.
+        const identifiers = Object.entries(options.identifiers ?? {}).sort(([a], [b]) => b.length - a.length);
+        const value = this.translate(entry, options.minRating, identifiers);
+        if (!this.isSafe(value, identifiers.map(([, path]) => path)) || !this.evaluates(value)) return null;
+        return { value, restriction };
+    }
+
+    /** Remove an entry's brackets and, for an availability, its R or F suffix as the restriction. */
+    private static splitRestriction(raw: string, availability = false): { entry: string; restriction: AvailabilityRestriction } {
         let entry = raw.trim();
         if (/^\[.*\]$/.test(entry)) entry = entry.slice(1, -1);
-        let restriction: AvailabilityRestriction = 'none';
-        if (options.availability && /[RF]$/i.test(entry)) {
-            restriction = /f$/i.test(entry) ? 'forbidden' : 'restricted';
-            entry = entry.slice(0, -1).trim();
-        }
-        entry = entry.replace(/\{Rating\}/gi, 'Rating');
-        entry = entry.replace(/\bRating\b/gi, this.RATING);
-        if (/\bMinRating\b/i.test(entry)) {
-            if (options.minRating == null) return null;
-            entry = entry.replace(/\bMinRating\b/gi, String(options.minRating));
-        }
-        // Chummer's number(predicate) casts a comparison to 0 or 1.
-        entry = entry.replace(/number\(([^()]*)\)/gi, (_match, predicate: string) =>
-            `((${predicate.replace(/(?<![=!<>])=(?!=)/g, '==')}) ? 1 : 0)`);
-        entry = entry.replace(/\bmod\b/g, '%');
-        // Longer names first, so 'Armor Cost' isn't read as 'Armor'. A reference to a missing
-        // document, like the parent of a compendium item, counts as 0.
-        const paths = Object.entries(options.identifiers ?? {}).sort(([a], [b]) => b.length - a.length);
-        for (const [identifier, path] of paths)
-            entry = entry.replace(new RegExp(`\\b${identifier}\\b`, 'g'), `(${path} ?? 0)`);
-        if (!/^[\d\s@.\w+*/%()?:<>=!&|,-]+$/.test(entry)) return null;
-        // Whitelist identifiers; no arbitrary Chummer field or function may pass through.
-        const references = [this.RATING, ...paths.map(([, path]) => path)];
-        const identifiers = references.reduce((rest, path) => rest.split(path).join(''), entry)
-            .match(/\b[A-Za-z_]\w*\b/g) ?? [];
-        if (identifiers.some(identifier => !['min', 'max'].includes(identifier))) return null;
-        for (const rating of [1, 2, 6]) {
-            const resolved = DynamicValueEvaluator.evaluate(entry, path =>
+        const suffix = availability ? /[RF]$/i.exec(entry)?.[0] : undefined;
+        if (!suffix) return { entry, restriction: 'none' };
+        return {
+            entry: entry.slice(0, -1).trim(),
+            restriction: suffix.toUpperCase() === 'F' ? 'forbidden' : 'restricted',
+        };
+    }
+
+    /** Rewrite Chummer names and syntax as effect references and operators. */
+    private static translate(entry: string, minRating: number | undefined, identifiers: [string, string][]): string {
+        let value = entry
+            .replace(/\{Rating\}/gi, 'Rating')
+            .replace(/\bRating\b/gi, this.RATING)
+            .replace(/\bMinRating\b/gi, String(minRating))
+            // Chummer's number(predicate) casts a comparison to 0 or 1.
+            .replace(/number\(([^()]*)\)/gi, (_match, predicate: string) =>
+                `((${predicate.replace(/(?<![=!<>])=(?!=)/g, '==')}) ? 1 : 0)`)
+            .replace(/\bmod\b/g, '%');
+        // A reference to a missing document, like the parent of a compendium item, counts as 0.
+        for (const [identifier, path] of identifiers)
+            value = value.replace(new RegExp(`\\b${identifier}\\b`, 'g'), `(${path} ?? 0)`);
+        return value;
+    }
+
+    /** Whether an expression uses only arithmetic, min, max and the given references, so no other Chummer field or function passes through. */
+    private static isSafe(value: string, references: string[]): boolean {
+        if (!/^[\d\s@.\w+*/%()?:<>=!&|,-]+$/.test(value)) return false;
+        const rest = [this.RATING, ...references].reduce((text, reference) => text.split(reference).join(''), value);
+        return (rest.match(/\b[A-Za-z_]\w*\b/g) ?? []).every(name => ['min', 'max'].includes(name));
+    }
+
+    /** Whether an expression resolves to a finite number at a few ratings, with every other reference as 1. */
+    private static evaluates(value: string): boolean {
+        return [1, 2, 6].every(rating => {
+            const resolved = DynamicValueEvaluator.evaluate(value, path =>
                 path === 'system.technology.rating' ? rating : 1);
-            if (typeof resolved !== 'number' || !Number.isFinite(resolved)) return null;
-        }
-        return { value: entry, restriction };
+            return typeof resolved === 'number' && Number.isFinite(resolved);
+        });
     }
 
     private static splitEntries(source: string): string[] {
