@@ -8,12 +8,14 @@ import { ItemAvailabilityFlow } from "@/module/item/flows/ItemAvailabilityFlow";
 import { TechnologyType } from "src/module/types/template/Technology";
 import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
 import TypeDataModel = foundry.abstract.TypeDataModel;
-import { ChummerFormulaParser } from '../helper/ChummerFormula';
-import { ChummerImportCoverage } from '../helper/ChummerImportCoverage';
+import { ChummerFormulaOptions, ChummerFormulaParser } from '../helper/ChummerFormula';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import type { DocCreateData } from '../helper/BonusConstant';
 
 export type SystemType<T extends SystemEntityType> = ReturnType<Parser<T>["getBaseSystem"]>;
+
+/** A change of the effect holding an item's Chummer formulas. */
+type FormulaChange = { key: string; value: string; type: 'override' | 'add'; priority?: number; target: 'item' | 'parent' };
 
 export abstract class Parser<SubType extends SystemEntityType> {
     protected abstract readonly parseType: SubType;
@@ -115,10 +117,6 @@ export abstract class Parser<SubType extends SystemEntityType> {
             if ('wirelessbonus' in jsonData && jsonData.wirelessbonus)
                 BH.addBonus(entity, jsonData.wirelessbonus, { onlyForWireless: true });
         }
-        for (const [block, reason] of Object.entries(this.unsupportedBlocks())) {
-            if (block in jsonData && jsonData[block as keyof ParseData])
-                ChummerImportCoverage.skip(`${block}: ${reason}`, entity.name);
-        }
 
         if (jsonData.page && jsonData.source) {
             const page = IH.getArray(jsonData.altpage)[0]?._TEXT ?? jsonData.page._TEXT;
@@ -138,8 +136,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
     private setTechnology(technology: TechnologyType, jsonData: ParseData, identifiers: Record<string, string>) {
         if ('avail' in jsonData && jsonData.avail) {
             const raw = ChummerFormulaParser.firstAlternative(jsonData.avail._TEXT || '');
-            const isFormula = ChummerFormulaParser.isFormula(raw) || Parser.hasIdentifier(raw, identifiers);
-            const formula = isFormula && !ChummerFormulaParser.isRelative(raw)
+            const formula = ChummerFormulaParser.isFormula(raw, identifiers) && !ChummerFormulaParser.isRelative(raw)
                 ? ChummerFormulaParser.parse(raw, { availability: true, minRating: this.getMinRating(jsonData), identifiers }) : null;
             Object.assign(technology.availability, ItemAvailabilityFlow.parseAvailabilityString(formula ? '0' : raw));
             if (formula?.restriction && !formula.restriction.startsWith('['))
@@ -165,19 +162,6 @@ export abstract class Parser<SubType extends SystemEntityType> {
         return Number.isFinite(value) ? value : undefined;
     }
 
-    /** Chummer blocks that need context an imported item doesn't have, with the reason reported. */
-    private unsupportedBlocks(): Record<string, string> {
-        return {
-            pairbonus: 'requires matching owned items',
-            wirelesspairbonus: 'requires matching owned items',
-            wirelesspairinclude: 'requires matching owned items',
-            wirelessweaponbonus: 'requires weapon context',
-            flechetteweaponbonus: 'requires weapon context',
-            // Ammo applies its weapon bonus itself.
-            ...(this.parseType === 'ammo' ? {} : { weaponbonus: 'requires weapon context' }),
-        };
-    }
-
     /** Chummer names this item's formulas may use, mapped to effect value references. */
     protected formulaIdentifiers(system: object): Record<string, string> {
         return 'slots' in system ? { Slots: '@system.slots' } : {};
@@ -189,93 +173,99 @@ export abstract class Parser<SubType extends SystemEntityType> {
             && ['weapon', 'armor', 'ware'].includes(String(system.type));
     }
 
-    private static hasIdentifier(raw: string, identifiers: Record<string, string>) {
-        return Object.keys(identifiers).some(identifier => new RegExp(`\\b${identifier}\\b`).test(raw));
-    }
-
+    /** Add an effect that turns Chummer formulas in the item's values, like a rating-based cost, into changes. */
     private addFormulaEffects(entity: Item.CreateData, jsonData: ParseData) {
         const system = entity.system;
         if (!system) return;
-        type FormulaChange = { key: string; value: string; type: 'override' | 'add'; priority?: number; target: 'item' | 'parent' };
-        const changes: FormulaChange[] = [];
-        const override = (key: string, value: string) =>
-            changes.push({ key, value, type: 'override', priority: ModifiableValue.Priority.RATING, target: 'item' });
-        const minRating = this.getMinRating(jsonData);
-        const identifiers = this.formulaIdentifiers(system);
-        const addToParent = (field: string, raw: string, skip: (reason: string) => void) => {
-            const formula = ChummerFormulaParser.parse(raw, { availability: true, minRating, identifiers });
-            if (!formula) return skip(ChummerFormulaParser.classify(raw, { minRating }));
-            changes.push({ key: field, value: formula.value, type: 'add', target: 'parent' });
-            // A restricted modification makes its parent at least restricted, never less than forbidden.
-            const restriction = formula.restriction === 'restricted'
-                ? "@affected.system.technology.availability.restriction == 'forbidden' ? 'forbidden' : 'restricted'"
-                : formula.restriction;
-            if (restriction && restriction !== 'none')
-                changes.push({ key: `${field}.restriction`, value: restriction, type: 'override', priority: ModifiableValue.Priority.RATING, target: 'parent' });
-            ChummerImportCoverage.add(`${field}: parent item`);
-        };
-        const add = (field: string, raw: string | undefined, availability = false) => {
-            if (!raw) return;
-            if (availability) raw = ChummerFormulaParser.firstAlternative(raw);
-            const skip = (reason: string) => ChummerImportCoverage.skip(`${field}: ${reason}`, `${entity.name}: ${raw}`);
-            // A signed availability or capacity changes the parent; signed slots and cost stay the item's own.
-            if ((availability || field === 'system.capacity.total') && ChummerFormulaParser.isRelative(raw)) {
-                if (availability && this.changesParentItem(system)) return addToParent(field, raw, skip);
-                return skip('relative to parent');
-            }
-            if (!ChummerFormulaParser.isFormula(raw) && !Parser.hasIdentifier(raw, identifiers)) {
-                if ((availability && !ItemAvailabilityFlow.parseAvailability(raw).isValid)
-                    || (field === 'system.technology.cost' && !Number.isFinite(Number(raw))))
-                    skip(ChummerFormulaParser.classify(raw, { minRating }));
-                return;
-            }
-            const formula = ChummerFormulaParser.parse(raw, { availability, minRating, identifiers });
-            if (!formula) return skip(ChummerFormulaParser.classify(raw, { minRating }));
-            override(field, formula.value);
-            if (availability && formula.restriction?.startsWith('['))
-                override('system.technology.availability.restriction', formula.restriction);
-            ChummerImportCoverage.add(field);
-        };
+        const options = { minRating: this.getMinRating(jsonData), identifiers: this.formulaIdentifiers(system) };
+        const changes = [
+            ...this.technologyFormulas(system, jsonData, options),
+            ...this.capacityFormulas(system, jsonData, options),
+            ...(this.parseType === 'weapon' ? Parser.weaponFormulas(jsonData, options) : []),
+        ];
+        if (!changes.length) return;
 
-        if ('technology' in system && system.technology) {
-            add('system.technology.cost', 'cost' in jsonData ? jsonData.cost?._TEXT : undefined);
-            add('system.technology.availability', 'avail' in jsonData ? jsonData.avail?._TEXT : undefined, true);
-            if ('ess' in jsonData)
-                add('essence' in system ? 'system.essence' : 'system.technology.essence', jsonData.ess?._TEXT);
-        }
+        const targets = [{ id: 'item', applyTo: 'item' }, { id: 'parent', applyTo: 'parent_item' }]
+            .filter(target => changes.some(change => change.target === target.id));
+        const effects = (entity as DocCreateData).effects ??= [];
+        effects.push({ name: 'Chummer formulas', system: { targets, changes } });
+    }
+
+    /** Cost, availability and essence formulas. A signed availability adds to the parent item instead. */
+    private technologyFormulas(system: object, jsonData: ParseData, options: ChummerFormulaOptions): FormulaChange[] {
+        if (!('technology' in system && system.technology)) return [];
+        const changes = Parser.ownFormula('system.technology.cost', 'cost' in jsonData ? jsonData.cost?._TEXT : undefined, options);
+
+        const avail = ChummerFormulaParser.firstAlternative('avail' in jsonData ? jsonData.avail?._TEXT ?? '' : '');
+        if (!ChummerFormulaParser.isRelative(avail))
+            changes.push(...Parser.ownFormula('system.technology.availability', avail, { ...options, availability: true }));
+        else if (this.changesParentItem(system))
+            changes.push(...Parser.parentAvailability(avail, options));
+
+        if ('ess' in jsonData)
+            changes.push(...Parser.ownFormula('essence' in system ? 'system.essence' : 'system.technology.essence', jsonData.ess?._TEXT, options));
+        return changes;
+    }
+
+    /** Capacity and slot formulas. A signed capacity changes the parent, which an imported item can't. */
+    private capacityFormulas(system: object, jsonData: ParseData, options: ChummerFormulaOptions): FormulaChange[] {
+        const changes: FormulaChange[] = [];
         const capacity = 'armorcapacity' in jsonData ? jsonData.armorcapacity?._TEXT
             : 'capacity' in jsonData ? jsonData.capacity?._TEXT : undefined;
         if ('capacity' in system && capacity) {
             // Ware keeps its bracketed capacity as its total.
             const isWare = this.parseType === 'bioware' || this.parseType === 'cyberware';
-            add('system.capacity.total', isWare ? capacity : ChummerFormulaParser.splitCapacity(capacity).own);
+            const total = isWare ? capacity : ChummerFormulaParser.splitCapacity(capacity).own;
+            if (total && !ChummerFormulaParser.isRelative(total))
+                changes.push(...Parser.ownFormula('system.capacity.total', total, options));
         }
         if ('slots' in system) {
             const slots = 'slots' in jsonData ? jsonData.slots?._TEXT : undefined;
-            add('system.slots', slots ?? ChummerFormulaParser.usedCapacity(capacity ?? ''));
+            changes.push(...Parser.ownFormula('system.slots', slots ?? ChummerFormulaParser.usedCapacity(capacity ?? ''), options));
         }
-        if (this.parseType === 'weapon') {
-            // Attribute formulas like ({STR}+2)P are parsed with the damage; only rating formulas need an effect.
-            const damage = 'damage' in jsonData ? /^\((.*\bRating\b.*)\)[PSM]?$/i.exec(jsonData.damage?._TEXT ?? '')?.[1] : undefined;
-            add('system.action.damage', damage);
+        return changes;
+    }
 
-            const ap = 'ap' in jsonData ? jsonData.ap?._TEXT : undefined;
-            if (ap && /\bRating\b/i.test(ap)) {
-                const formula = ChummerFormulaParser.parse(ap, { minRating, identifiers });
-                if (!formula) {
-                    ChummerImportCoverage.skip(`system.action.damage.ap: ${ChummerFormulaParser.classify(ap, { minRating })}`, `${entity.name}: ${ap}`);
-                } else {
-                    // Chummer rounds a fractional AP away from zero.
-                    override('system.action.damage.ap', `(${formula.value}) < 0 ? floor(${formula.value}) : ceil(${formula.value})`);
-                    ChummerImportCoverage.add('system.action.damage.ap');
-                }
-            }
-        }
-        if (!changes.length) return;
-        const targets = [{ id: 'item', applyTo: 'item' }, { id: 'parent', applyTo: 'parent_item' }]
-            .filter(target => changes.some(change => change.target === target.id));
-        const effects = (entity as DocCreateData).effects ??= [];
-        effects.push({ name: 'Chummer formulas', system: { targets, changes } });
+    /** Rating formulas of weapon damage and AP. Attribute formulas like ({STR}+2)P are parsed with the damage. */
+    private static weaponFormulas(jsonData: ParseData, options: ChummerFormulaOptions): FormulaChange[] {
+        const damage = 'damage' in jsonData ? /^\((.*\bRating\b.*)\)[PSM]?$/i.exec(jsonData.damage?._TEXT ?? '')?.[1] : undefined;
+        const changes = Parser.ownFormula('system.action.damage', damage, options);
+
+        const ap = 'ap' in jsonData ? jsonData.ap?._TEXT : undefined;
+        const formula = ap && /\bRating\b/i.test(ap) ? ChummerFormulaParser.parse(ap, options) : null;
+        // Chummer rounds a fractional AP away from zero.
+        if (formula)
+            changes.push(Parser.ratingOverride('system.action.damage.ap', `(${formula.value}) < 0 ? floor(${formula.value}) : ceil(${formula.value})`));
+        return changes;
+    }
+
+    /** Override a value with the formula in raw, if it is one. A rating lookup of the restriction overrides that too. */
+    private static ownFormula(key: string, raw: string | undefined, options: ChummerFormulaOptions): FormulaChange[] {
+        const formula = raw && ChummerFormulaParser.isFormula(raw, options.identifiers) ? ChummerFormulaParser.parse(raw, options) : null;
+        if (!formula) return [];
+        const changes = [Parser.ratingOverride(key, formula.value)];
+        if (formula.restriction?.startsWith('['))
+            changes.push(Parser.ratingOverride(`${key}.restriction`, formula.restriction));
+        return changes;
+    }
+
+    /** Add a signed availability to the parent item's. */
+    private static parentAvailability(raw: string, options: ChummerFormulaOptions): FormulaChange[] {
+        const formula = ChummerFormulaParser.parse(raw, { ...options, availability: true });
+        if (!formula) return [];
+        const key = 'system.technology.availability';
+        const changes: FormulaChange[] = [{ key, value: formula.value, type: 'add', target: 'parent' }];
+        // A restricted modification makes its parent at least restricted, never less than forbidden.
+        const restriction = formula.restriction === 'restricted'
+            ? "@affected.system.technology.availability.restriction == 'forbidden' ? 'forbidden' : 'restricted'"
+            : formula.restriction;
+        if (restriction && restriction !== 'none')
+            changes.push(Parser.ratingOverride(`${key}.restriction`, restriction, 'parent'));
+        return changes;
+    }
+
+    private static ratingOverride(key: string, value: string, target: FormulaChange['target'] = 'item'): FormulaChange {
+        return { key, value, type: 'override', priority: ModifiableValue.Priority.RATING, target };
     }
 
     protected setImporterFlags(entity: Actor.CreateData | Item.CreateData, jsonData: ParseData) {

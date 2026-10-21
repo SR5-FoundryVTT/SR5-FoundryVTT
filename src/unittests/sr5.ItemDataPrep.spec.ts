@@ -171,11 +171,6 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.isFalse(ChummerFormulaParser.isRelative('Rating * 2'));
             assert.strictEqual(ChummerFormulaParser.firstAlternative('12R or Gear'), '12R');
             assert.strictEqual(ChummerFormulaParser.variableMinimum('Variable(50-500)'), 50);
-            assert.strictEqual(ChummerFormulaParser.classify('20000 + (99 * Gear Cost)'), 'requires child item');
-            assert.strictEqual(ChummerFormulaParser.classify('Parent Cost * 5'), 'requires parent item');
-            assert.strictEqual(ChummerFormulaParser.classify('1000 + 4000*number(Body >= 4)'), 'requires vehicle stats');
-            assert.strictEqual(ChummerFormulaParser.classify('(Rating - MinRating + 1) * 5000'), 'requires metatype minimum');
-            assert.strictEqual(ChummerFormulaParser.classify('[*]'), 'wildcard');
 
             assert.isNull(ChummerFormulaParser.parse('Slots * 100'));
             const slotCost = ChummerFormulaParser.parse('Slots * 100', { identifiers: { Slots: '@system.slots' } })!;

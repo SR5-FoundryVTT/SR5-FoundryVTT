@@ -3,17 +3,8 @@ import { Constants } from "../importer/Constants";
 import { BonusSchema } from "../schema/BonusSchema";
 import { ImportHelper as IH } from "./ImportHelper";
 import { SkillNamingFlow } from "@/module/flows/SkillNamingFlow";
-import { ChummerImportCoverage } from './ChummerImportCoverage';
 
 export class BonusHelper {
-    /** Chummer bonus keys that addEffects turns into effects. */
-    private static readonly handledBonuses = new Set<string>([
-        ...Object.keys(BC.BonusConstant.simpleEffects),
-        'conditionmonitor', 'essencepenaltyt100', 'limitmodifier', 'runmultiplier', 'skillattribute',
-        'skillcategory', 'skillgroup', 'specificattribute', 'specificskill', 'spellcategory',
-        'unarmedap', 'unarmeddv', 'walkmultiplier',
-    ]);
-
     /** Chummer spell categories and the test category Foundry gives spellcasting tests of that category. */
     private static readonly spellCategories: Record<string, string> = {
         Combat: 'spell_combat',
@@ -124,7 +115,6 @@ export class BonusHelper {
             const translation = BC.BonusConstant.limitConditionTable[conditionKey] as BC.LimitConditionTranslation | undefined;
             if (!translation) {
                 effect.disabled = true;
-                ChummerImportCoverage.skip(`condition ${conditionKey}: no filter, imported disabled`, sheet.name ?? 'unnamed');
             } else {
                 const target = IH.getArray(effect.system?.targets).find(target => target.id === targetId);
                 if (!target) {
@@ -157,12 +147,6 @@ export class BonusHelper {
                 effect.system ??= {};
                 effect.system.onlyForWireless = true;
             }
-        }
-        const block = options.onlyForWireless ? 'wirelessbonus' : 'bonus';
-        for (const key of Object.keys(bonus)) {
-            if (key === '$') continue;
-            if (this.handledBonuses.has(key)) ChummerImportCoverage.add(`${block}.${key}`);
-            else ChummerImportCoverage.skip(`${block}.${key}: no faithful target`, sheet.name ?? 'unnamed');
         }
     }
 
@@ -282,12 +266,8 @@ export class BonusHelper {
                 const excludedSkill = this.normalizeSkillName(skillCategory.exclude?._TEXT ?? "");
 
                 type Keys = keyof typeof BC.BonusConstant.skillCategoryTable;
-                const categoryName = skillCategory.name._TEXT;
-                const categorySkills = BC.BonusConstant.skillCategoryTable[categoryName as Keys];
-                if (!categorySkills) {
-                    ChummerImportCoverage.skip('bonus.skillcategory: unknown category', `${sheet.name}: ${categoryName}`);
-                    continue;
-                }
+                const categorySkills = BC.BonusConstant.skillCategoryTable[skillCategory.name._TEXT as Keys];
+                if (!categorySkills) continue;
                 const skills = categorySkills.filter(skillId => !excludedSkill || skillId !== excludedSkill);
 
                 if (!skills.length)
@@ -365,10 +345,8 @@ export class BonusHelper {
 
         for (const [key, entries] of [['walk', bonus.walkmultiplier], ['run', bonus.runmultiplier]] as const) {
             for (const movement of IH.getArray(entries)) {
-                if (movement.category._TEXT !== 'Ground') {
-                    ChummerImportCoverage.skip(`bonus.${key}multiplier: ${movement.category._TEXT} movement has no field`, sheet.name ?? 'unnamed');
-                    continue;
-                }
+                // Only ground movement has a modifier field.
+                if (movement.category._TEXT !== 'Ground') continue;
 
                 // Foundry moves Agility × (rate + modifier), so a percent of the rate becomes a flat modifier.
                 const value = (Number(movement.val?._TEXT) || 0)
@@ -386,10 +364,7 @@ export class BonusHelper {
         if (bonus.spellcategory) {
             for (const spellCategory of IH.getArray(bonus.spellcategory)) {
                 const category = this.spellCategories[spellCategory.name._TEXT];
-                if (!category) {
-                    ChummerImportCoverage.skip('bonus.spellcategory: unknown category', `${sheet.name}: ${spellCategory.name._TEXT}`);
-                    continue;
-                }
+                if (!category) continue;
 
                 // Only spellcasting tests, so alchemical preparation triggers and rituals are left out.
                 this.createEffect(

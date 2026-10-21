@@ -36,7 +36,9 @@ export class ChummerFormulaParser {
         Sensor: '@actor.system.vehicle_stats.sensor.base',
     };
 
-    static isFormula(value: string): boolean {
+    /** Whether a value is an expression rather than a plain number, counting the given identifiers as expressions. */
+    static isFormula(value: string, identifiers: Record<string, string> = {}): boolean {
+        if (Object.keys(identifiers).some(identifier => new RegExp(`\\b${identifier}\\b`).test(value))) return true;
         return /FixedValues\s*\(|\{?Rating\}?|[+*/()]/i.test(value) && !/^\s*[+-]?\d+(?:\.\d+)?[RF]?\s*$/i.test(value);
     }
 
@@ -70,18 +72,6 @@ export class ChummerFormulaParser {
     static variableMinimum(value: string): number | undefined {
         const match = /^\s*Variable\(\s*(\d+(?:\.\d+)?)\s*-/i.exec(value);
         return match ? Number(match[1]) : undefined;
-    }
-
-    /** Name the missing context of an expression that can't be parsed. */
-    static classify(value: string, options: ChummerFormulaOptions = {}): string {
-        if (/\b(?:Gear|Children)\s+Cost\b/i.test(value)) return 'requires child item';
-        if (/\b(?:Weapon|Parent|Armor|Vehicle)\s+Cost\b/i.test(value)) return 'requires parent item';
-        if (/\b(?:Body|Speed|Handling|Acceleration|Armor|Sensor)\b/.test(value)) return 'requires vehicle stats';
-        if (/\bMinRating\b/i.test(value) && options.minRating == null) return 'requires metatype minimum';
-        if (/\bCapacity\b/.test(value)) return 'requires parent capacity';
-        if (/^\s*Variable\(/i.test(value)) return 'user choice (base set to minimum)';
-        if (/^\s*\[?\s*\*\s*\]?\s*$/.test(value)) return 'wildcard';
-        return 'unsupported expression';
     }
 
     static parse(value: string, options: ChummerFormulaOptions = {}): ChummerFormula | null {
