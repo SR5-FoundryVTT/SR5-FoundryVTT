@@ -1,4 +1,5 @@
 import type { SR5ActiveEffect } from './SR5ActiveEffect';
+import { unitToSeconds } from '../utils/timeUnits';
 
 export type EffectDurationStatusState = 'permanent' | 'active' | 'pending' | 'expired' | 'restart-pending';
 
@@ -83,7 +84,7 @@ export function prepareEffectDurationStatus(
 
     // Relabel Foundry rounds as Shadowrun Combat Turns.
     const remainingLabel = rawDuration.units === 'rounds'
-        ? combatTurnLabel(effect.duration.remaining)
+        ? combatTurnLabel(remainingCombatTurns(effect))
         : (effect.duration.label ?? '');
     return {
         ...base,
@@ -119,6 +120,16 @@ function pendingTriggerText(expiry: string | null): { label: string; detail: str
         label: game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingTrigger'),
         detail: game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingTriggerDetail'),
     };
+}
+
+/**
+ * Remaining Combat Turns of a rounds-based effect. Without a combat tracking its owner, Foundry
+ * prepares a rounds duration as seconds, so convert those back into Combat Turns.
+ */
+function remainingCombatTurns(effect: SR5ActiveEffect): number | null | undefined {
+    const { units, remaining, secondsRemaining } = effect.duration;
+    if (units !== 'seconds') return remaining;
+    return typeof secondsRemaining === 'number' ? secondsRemaining / unitToSeconds('rounds') : remaining;
 }
 
 /** Shadowrun-flavoured remaining label for combat durations (Foundry "rounds" = SR Combat Turns). */
