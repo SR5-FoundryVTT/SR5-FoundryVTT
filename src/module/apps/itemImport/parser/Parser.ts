@@ -58,9 +58,12 @@ export abstract class Parser<SubType extends SystemEntityType> {
                 targets: { id: string; applyTo: string }[];
                 changes: { key: string; target: string }[];
             };
-            const droppedIds = new Set(effectSystem.targets.filter(target => applyTos.includes(target.applyTo)).map(target => target.id));
+            // As in SR5ActiveEffect.targetForChange, an effect without targets applies to the actor,
+            // and a change without a target applies to the effect's first target.
+            const targets = effectSystem.targets.length ? effectSystem.targets : [{ id: 'actor', applyTo: 'actor' }];
+            const droppedIds = new Set(targets.filter(target => applyTos.includes(target.applyTo)).map(target => target.id));
             effectSystem.targets = effectSystem.targets.filter(target => !droppedIds.has(target.id));
-            effectSystem.changes = effectSystem.changes.filter(change => !droppedIds.has(change.target)
+            effectSystem.changes = effectSystem.changes.filter(change => !droppedIds.has(change.target || targets[0].id)
                 && !keys.some(key => change.key.startsWith(key)));
             return effectSystem.changes.length > 0;
         });
@@ -173,14 +176,20 @@ export abstract class Parser<SubType extends SystemEntityType> {
             && ['weapon', 'armor', 'ware'].includes(String(system.type));
     }
 
+    /** Whether the item's Chummer Essence counts as its own Essence. */
+    protected importsEssence(jsonData: ParseData): boolean {
+        return true;
+    }
+
     /** Add an effect that turns Chummer formulas in the item's values, like a rating-based cost, into changes. */
     private addFormulaEffects(entity: Item.CreateData, jsonData: ParseData) {
         const system = entity.system;
         if (!system) return;
         const options = { minRating: this.getMinRating(jsonData), identifiers: this.formulaIdentifiers(system) };
+        // Changes apply in order, so slots come before a cost that reads them.
         const changes = [
-            ...this.technologyFormulas(system, jsonData, options),
             ...this.capacityFormulas(system, jsonData, options),
+            ...this.technologyFormulas(system, jsonData, options),
             ...(this.parseType === 'weapon' ? Parser.weaponFormulas(jsonData, options) : []),
         ];
         if (!changes.length) return;
@@ -202,7 +211,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
         else if (this.changesParentItem(system))
             changes.push(...Parser.parentAvailability(avail, options));
 
-        if ('ess' in jsonData)
+        if ('ess' in jsonData && this.importsEssence(jsonData))
             changes.push(...Parser.ownFormula('essence' in system ? 'system.essence' : 'system.technology.essence', jsonData.ess?._TEXT, options));
         return changes;
     }

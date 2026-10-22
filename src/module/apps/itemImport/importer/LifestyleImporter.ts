@@ -11,7 +11,8 @@ export class LifestyleImporter extends DataImporter {
             {
                 compendiumKey: () => "Lifestyle",
                 parser: new LifestyleParser(),
-                filter: jsonData => !jsonData.hide,
+                // An empty <hide /> parses as null. A lifestyle's cost is monthly, so daily ones are left out.
+                filter: jsonData => !('hide' in jsonData) && jsonData.increment?._TEXT !== 'day',
                 documentType: "Lifestyles"
             }
         );

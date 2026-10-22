@@ -127,13 +127,14 @@ export class ChummerFormulaParser {
     /** Rewrite Chummer names and syntax as effect references and operators. */
     private static translate(entry: string, minRating: number | undefined, identifiers: [string, string][]): string {
         let value = entry
-            .replace(/\{Rating\}/gi, 'Rating')
-            .replace(/\bRating\b/gi, this.RATING)
-            .replace(/\bMinRating\b/gi, String(minRating))
             // Chummer's number(predicate) casts a comparison to 0 or 1.
             .replace(/number\(([^()]*)\)/gi, (_match, predicate: string) =>
                 `((${predicate.replace(/(?<![=!<>])=(?!=)/g, '==')}) ? 1 : 0)`)
-            .replace(/\bmod\b/g, '%');
+            .replace(/\bmod\b/g, '%')
+            .replace(/\{Rating\}/gi, 'Rating')
+            // Parenthesized, as a hyphen right after a reference, like Rating-1, belongs to its path.
+            .replace(/\bRating\b/gi, `(${this.RATING})`)
+            .replace(/\bMinRating\b/gi, String(minRating));
         // A reference to a missing document, like the parent of a compendium item, counts as 0.
         for (const [identifier, path] of identifiers)
             value = value.replace(new RegExp(`\\b${identifier}\\b`, 'g'), `(${path} ?? 0)`);

@@ -134,6 +134,12 @@ export class WeaponParserBase extends Parser<'weapon'> {
                     partialDamageData.type = { base: damageType, value: damageType };
                     partialDamageData.element = { base: damageElement, value: damageElement };
                 }
+            } else if (/\bRating\b/i.test(formulaText)) {
+                // A rating formula's value is an item effect, but its type and element are fixed.
+                const damageType = this.parseDamageType(attributeDamage[3]);
+                const damageElement = this.parseDamageElement(attributeDamage[4]);
+                partialDamageData.type = { base: damageType, value: damageType };
+                partialDamageData.element = { base: damageElement, value: damageElement };
             }
         }
 

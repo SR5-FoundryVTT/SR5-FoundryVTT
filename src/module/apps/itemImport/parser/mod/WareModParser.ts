@@ -13,6 +13,11 @@ export class WareModParser extends Parser<'modification'> {
     protected override formulaIdentifiers(system: object) {
         return { ...super.formulaIdentifiers(system), ...ChummerFormulaParser.PARENT_ITEM };
     }
+
+    /** A modification only costs Essence when Chummer adds it to the ware it sits in. */
+    protected override importsEssence(jsonData: Bioware | Cyberware) {
+        return 'addtoparentess' in jsonData;
+    }
     protected categories: (BiowareSchema | CyberwareSchema)['categories']['category'];
     protected wareType: WareType;
 

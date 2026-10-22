@@ -11,6 +11,7 @@ import { ChummerFormulaParser } from '../module/apps/itemImport/helper/ChummerFo
 import { Parser } from '../module/apps/itemImport/parser/Parser';
 import { WeaponModParser } from '../module/apps/itemImport/parser/mod/WeaponModParser';
 import { VehicleModParser } from '../module/apps/itemImport/parser/mod/VehicleModParser';
+import { WareModParser } from '../module/apps/itemImport/parser/mod/WareModParser';
 import { LifestyleParser } from '../module/apps/itemImport/parser/misc/LifestyleParser';
 import { RangedParser } from '../module/apps/itemImport/parser/weapon/RangedParser';
 import { CombatSpellParser } from '../module/apps/itemImport/parser/spell/CombatSpellParser';
@@ -99,6 +100,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(bow.system.technology.rating, 1);
             assert.strictEqual(bow.system.technology.max_rating, 10);
             assert.strictEqual(bow.system.action.damage.value, 3);
+            assert.strictEqual(bow.system.action.damage.type.value, 'physical');
             assert.strictEqual(bow.system.action.damage.ap.value, -1);
             await bow.update({ system: { technology: { rating: 5 } } });
             bow.prepareData();
@@ -153,6 +155,9 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.exists(formula);
             assert.strictEqual(DynamicValueEvaluator.evaluate(formula!.value, path =>
                 path === 'system.technology.rating' ? 2 : undefined), 6000);
+            const compact = ChummerFormulaParser.parse('Rating-1')!;
+            assert.strictEqual(DynamicValueEvaluator.evaluate(compact.value, path =>
+                path === 'system.technology.rating' ? 3 : undefined), 2);
             assert.isNull(ChummerFormulaParser.parse('Weapon Cost * Rating'));
             assert.isNull(ChummerFormulaParser.parse('Rating * Body'));
             assert.isFalse(ItemAvailabilityFlow.parseAvailability('12R or Gear').isValid);
@@ -786,6 +791,47 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             Parser.dropChanges(addedMod, ['actor']);
             assert.strictEqual(system(addedMod).slots, 2);
             assert.deepEqual(keys(addedMod), ['system.slots', 'system.technology.conceal']);
+
+            // Without targets an effect applies to the actor, and a change without a target to the first target.
+            const defaults = {
+                effects: [
+                    { system: { targets: [], changes: [{ key: 'system.vehicle_stats.handling', value: '1', type: 'add' }] } },
+                    { system: {
+                        targets: [{ id: 'actor', applyTo: 'actor' }, { id: 'item', applyTo: 'item' }],
+                        changes: [
+                            { key: 'system.vehicle_stats.speed', value: '1', type: 'add' },
+                            { key: 'system.technology.conceal', value: '1', type: 'add', target: 'item' },
+                        ],
+                    } },
+                ],
+            } as unknown as Item.Source;
+            Parser.dropChanges(defaults, ['actor']);
+            assert.deepEqual(keys(defaults), ['system.technology.conceal']);
+        });
+
+        it('imports ware modification Essence only when added to the ware, and slots before a cost that reads them', async () => {
+            class TestWareModParser extends WareModParser {
+                protected override async getFolder() { return { id: null } as unknown as Folder; }
+            }
+            const parse = async (data: Record<string, string>) => await new TestWareModParser('cyberware', []).Parse({
+                id: { _TEXT: 'e13eb55b-e957-426a-85ba-1943a936bdf9' },
+                name: { _TEXT: 'Chummer ware mod' },
+                ...Object.fromEntries(Object.entries({
+                    category: 'Cyberlimb Enhancement', capacity: '[1]', rating: '3', ess: 'Rating * 0.1', ...data,
+                }).map(([key, _TEXT]) => [key, { _TEXT }])),
+            } as never, 'Ware') as Item.CreateData;
+            const essenceChanges = async (data: Record<string, string>) =>
+                (((await parse(data)).effects ?? []) as { system: { changes: { key: string }[] } }[])
+                    .flatMap(effect => effect.system.changes).filter(change => change.key === 'system.essence');
+            assert.isEmpty(await essenceChanges({}));
+            assert.lengthOf(await essenceChanges({ addtoparentess: '' }), 1);
+
+            const { folder: _folder, ...modData } = await parse({ capacity: '[Rating]', cost: 'Slots * 100' });
+            const mod = await factory.createItem({ ...modData, type: 'modification' });
+            await mod.update({ system: { technology: { rating: 2 } } });
+            mod.prepareData();
+            assert.strictEqual(mod.system.slots, 2);
+            assert.strictEqual(mod.system.technology.cost.value, 200);
         });
 
         it('imports base lifestyles with their type and monthly cost', async () => {
