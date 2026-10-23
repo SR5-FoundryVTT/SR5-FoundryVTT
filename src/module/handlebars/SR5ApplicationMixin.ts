@@ -10,6 +10,7 @@ import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 import { isElementInstance } from '@/module/utils/dom';
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
+import HTMLProseMirrorElement = foundry.applications.elements.HTMLProseMirrorElement;
 
 const { TextEditor, SearchFilter } = foundry.applications.ux;
 const { fromUuid } = foundry.utils;
@@ -109,6 +110,31 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
             super(...args);
             this.#filters = this.#createFilters();
             this.#dragDrop = this.#createDragDropHandlers();
+        }
+
+        /**
+         * Save rich text editors holding unsaved content, which a rerender or close would discard.
+         * Only the editor fields are updated, so changes made by whatever triggered the rerender are kept.
+         * A failed update is reported and doesn't stop the rerender or close.
+         */
+        async #savePendingEditors() {
+            if (!this.document || !this.isEditable) return;
+            const editors = Array.from(this.form?.querySelectorAll<HTMLProseMirrorElement>('prose-mirror') ?? []);
+            const changes = Object.fromEntries(editors
+                .filter(editor => editor.name && editor.isDirty())
+                .map(editor => [editor.name, editor.value]));
+            if (foundry.utils.isEmpty(changes)) return;
+
+            try {
+                await this.document.update(changes);
+            } catch (error) {
+                ui.notifications?.error(error as Error, { console: true });
+            }
+        }
+
+        protected override async _preClose(options: Parameters<BaseType['_preClose']>[0]) {
+            await this.#savePendingEditors();
+            await super._preClose(options);
         }
 
         #isTrackableFormField(t: EventTarget | null): t is TrackableField {
@@ -267,6 +293,8 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         protected override async _prepareContext(
             options: Parameters<BaseType["_prepareContext"]>[0]
         ): Promise<SR5ApplicationMixinTypes.RenderContext> {
+            // Runs first on every render, before the context reads the document.
+            await this.#savePendingEditors();
             const context = await super._prepareContext(options) as SR5ApplicationMixinTypes.RenderContext;
             context.isEditMode = this.isEditMode;
             context.isPlayMode = this.isPlayMode;
