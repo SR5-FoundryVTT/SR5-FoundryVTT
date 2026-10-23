@@ -13,8 +13,6 @@ import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
 import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { prepareSortedEffects, prepareSortedItemEffects } from '../../effects';
 
-import { LinksHelpers } from '../../utils/links';
-
 import { InventoryType } from 'src/module/types/actor/Common';
 
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
@@ -1779,17 +1777,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (skillName) {
             await this.actor.rollSkill(skillName, { event, specialization: true });
         }
-    }
-
-    async _openSkillSource(target: HTMLElement) {
-        const skillId = this._closestSkillTarget(target)?.dataset.skillId;
-
-        const skill = skillId ? this.actor.getSkill(skillId) : null;
-        if (!skill) {
-            console.error(`Shadowrun 5e | Editing skill failed due to missing skill ${skillId}`); return;
-        }
-
-        await LinksHelpers.openSource(skill.link);
     }
 
     static async #rollAttribute(this: SR5BaseActorSheet, event: PointerEvent) {
