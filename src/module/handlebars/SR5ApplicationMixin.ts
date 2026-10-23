@@ -113,54 +113,28 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         }
 
         /**
-         * Submit pending editor content before any sheet action runs, as actions may rerender the sheet.
+         * Save rich text editors holding unsaved content, which a rerender or close would discard.
+         * Only the editor fields are updated, so changes made by whatever triggered the rerender are kept.
+         * A failed update is reported and doesn't stop the rerender or close.
          */
-        protected override _initializeApplicationOptions(
-            options: Parameters<BaseType['_initializeApplicationOptions']>[0]
-        ) {
-            const applicationOptions = super._initializeApplicationOptions(options);
-            type ClickAction = Extract<(typeof applicationOptions.actions)[string], Function>;
-            for (const [name, action] of Object.entries(applicationOptions.actions)) {
-                const { handler, buttons = [0] } = typeof action === 'function' ? { handler: action } : action;
-                applicationOptions.actions[name] = { buttons, handler: this._afterPendingEdits(handler.bind(this)) as ClickAction };
+        async #savePendingEditors() {
+            if (!this.document || !this.isEditable) return;
+            const editors = Array.from(this.form?.querySelectorAll<HTMLProseMirrorElement>('prose-mirror') ?? []);
+            const changes = Object.fromEntries(editors
+                .filter(editor => editor.name && editor.isDirty())
+                .map(editor => [editor.name, editor.value]));
+            if (foundry.utils.isEmpty(changes)) return;
+
+            try {
+                await this.document.update(changes);
+            } catch (error) {
+                ui.notifications?.error(error as Error, { console: true });
             }
-            return applicationOptions;
         }
 
-        /**
-         * Submit pending editor content before any context menu entry runs, as entries may rerender the sheet.
-         */
-        protected override _createContextMenu(
-            ...[handler, selector, options]: Parameters<BaseType['_createContextMenu']>
-        ) {
-            const entries = () => handler().map(entry => {
-                const wrapped = { ...entry };
-                for (const key of ['onClick', 'callback']) {
-                    if (typeof wrapped[key] === 'function') {
-                        wrapped[key] = this._afterPendingEdits(wrapped[key] as () => unknown);
-                    }
-                }
-                return wrapped;
-            });
-            return super._createContextMenu(entries, selector, options);
-        }
-
-        /**
-         * Wrap a callback to first submit the form when an open rich text editor holds unsaved content,
-         * which a rerender would discard. A failed submit is reported and the callback still runs. Without
-         * unsaved content it runs synchronously, so event handling like preventDefault keeps working.
-         */
-        protected _afterPendingEdits<Args extends unknown[], Return>(callback: (...args: Args) => Return) {
-            return (...args: Args) => {
-                const form = this.isEditable && this.options.form?.handler ? this.form : null;
-                const pending = Array.from(form?.querySelectorAll<HTMLProseMirrorElement>('prose-mirror') ?? [])
-                    .some(editor => editor.isDirty());
-                if (!pending) return callback(...args);
-
-                return this.submit()
-                    .catch((error: Error) => ui.notifications?.error(error, { console: true }))
-                    .then(() => callback(...args));
-            };
+        protected override async _preClose(options: Parameters<BaseType['_preClose']>[0]) {
+            await this.#savePendingEditors();
+            await super._preClose(options);
         }
 
         #isTrackableFormField(t: EventTarget | null): t is TrackableField {
@@ -319,6 +293,8 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         protected override async _prepareContext(
             options: Parameters<BaseType["_prepareContext"]>[0]
         ): Promise<SR5ApplicationMixinTypes.RenderContext> {
+            // Runs first on every render, before the context reads the document.
+            await this.#savePendingEditors();
             const context = await super._prepareContext(options) as SR5ApplicationMixinTypes.RenderContext;
             context.isEditMode = this.isEditMode;
             context.isPlayMode = this.isPlayMode;
