@@ -10,6 +10,7 @@ import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 import { isElementInstance } from '@/module/utils/dom';
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
+import HTMLProseMirrorElement = foundry.applications.elements.HTMLProseMirrorElement;
 
 const { TextEditor, SearchFilter } = foundry.applications.ux;
 const { fromUuid } = foundry.utils;
@@ -109,6 +110,57 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
             super(...args);
             this.#filters = this.#createFilters();
             this.#dragDrop = this.#createDragDropHandlers();
+        }
+
+        /**
+         * Submit pending editor content before any sheet action runs, as actions may rerender the sheet.
+         */
+        protected override _initializeApplicationOptions(
+            options: Parameters<BaseType['_initializeApplicationOptions']>[0]
+        ) {
+            const applicationOptions = super._initializeApplicationOptions(options);
+            type ClickAction = Extract<(typeof applicationOptions.actions)[string], Function>;
+            for (const [name, action] of Object.entries(applicationOptions.actions)) {
+                const { handler, buttons = [0] } = typeof action === 'function' ? { handler: action } : action;
+                applicationOptions.actions[name] = { buttons, handler: this._afterPendingEdits(handler.bind(this)) as ClickAction };
+            }
+            return applicationOptions;
+        }
+
+        /**
+         * Submit pending editor content before any context menu entry runs, as entries may rerender the sheet.
+         */
+        protected override _createContextMenu(
+            ...[handler, selector, options]: Parameters<BaseType['_createContextMenu']>
+        ) {
+            const entries = () => handler().map(entry => {
+                const wrapped = { ...entry };
+                for (const key of ['onClick', 'callback']) {
+                    if (typeof wrapped[key] === 'function') {
+                        wrapped[key] = this._afterPendingEdits(wrapped[key] as () => unknown);
+                    }
+                }
+                return wrapped;
+            });
+            return super._createContextMenu(entries, selector, options);
+        }
+
+        /**
+         * Wrap a callback to first submit the form when an open rich text editor holds unsaved content,
+         * which a rerender would discard. A failed submit is reported and the callback still runs. Without
+         * unsaved content it runs synchronously, so event handling like preventDefault keeps working.
+         */
+        protected _afterPendingEdits<Args extends unknown[], Return>(callback: (...args: Args) => Return) {
+            return (...args: Args) => {
+                const form = this.isEditable && this.options.form?.handler ? this.form : null;
+                const pending = Array.from(form?.querySelectorAll<HTMLProseMirrorElement>('prose-mirror') ?? [])
+                    .some(editor => editor.isDirty());
+                if (!pending) return callback(...args);
+
+                return this.submit()
+                    .catch((error: Error) => ui.notifications?.error(error, { console: true }))
+                    .then(() => callback(...args));
+            };
         }
 
         #isTrackableFormField(t: EventTarget | null): t is TrackableField {
