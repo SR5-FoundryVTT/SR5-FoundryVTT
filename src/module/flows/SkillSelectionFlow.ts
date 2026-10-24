@@ -1,4 +1,3 @@
-import { SR5Item } from '@/module/item/SR5Item';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { Helpers } from '@/module/helpers';
 import { SR5Actor } from '../actor/SR5Actor';

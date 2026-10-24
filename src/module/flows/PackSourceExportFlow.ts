@@ -3,6 +3,21 @@ import { Migrator } from '../migrator/Migrator';
 
 type ExportableDocumentName = string;
 
+interface PackSourceEntry {
+    _id?: string;
+    type?: string;
+    system?: Record<string, unknown>;
+    flags?: { shadowrun5e?: { embeddedItems?: PackSourceEntry[] } };
+    _stats?: { systemVersion?: string; systemId?: string };
+    [collection: string]: unknown;
+}
+
+interface ExportableDocumentConfig {
+    documentClass: (new (data: object, options: { strict: boolean }) => { toObject: () => { system?: Record<string, unknown> } })
+        & { metadata: { embedded?: Record<string, string> } };
+    dataModels?: Record<string, { schema?: foundry.data.fields.SchemaField.Any } | undefined>;
+}
+
 /** Developer tooling: export validated source data without updating any live documents. */
 export class PackSourceExportFlow {
     static get migrationVersion(): string {
@@ -17,10 +32,10 @@ export class PackSourceExportFlow {
     static prepare(source: Record<string, any>, documentName: ExportableDocumentName) {
         const data = foundry.utils.deepClone(source);
         const corrections: Record<string, CorrectionLog> = {};
-        const visit = (entry: any, kind: ExportableDocumentName, path: string) => {
-            const config = (CONFIG as Record<string, any>)[kind];
+        const visit = (entry: PackSourceEntry, kind: ExportableDocumentName, path: string) => {
+            const config = (CONFIG as unknown as Record<string, ExportableDocumentConfig | undefined>)[kind];
             if (!config?.documentClass) throw new Error(`${path}: unsupported document type ${kind}`);
-            const schema = config.dataModels?.[entry.type]?.schema;
+            const schema = config.dataModels?.[entry.type as string]?.schema;
             if (schema) {
                 const changes = Sanitizer.sanitize(schema, entry.system ??= {});
                 if (changes) corrections[path] = changes;
@@ -28,7 +43,7 @@ export class PackSourceExportFlow {
                 if (failure) throw new Error(`${path}: ${failure.toString()}`);
             }
             for (const [childKind, collection] of Object.entries(config.documentClass.metadata.embedded ?? {})) {
-                const children = entry[collection as string];
+                const children = entry[collection] as PackSourceEntry | PackSourceEntry[] | undefined;
                 for (const child of Array.isArray(children) ? children : children ? [children] : [])
                     visit(child, childKind, `${path}.${collection}.${child._id}`);
             }

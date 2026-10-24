@@ -305,7 +305,7 @@ export class SituationModifier {
      * 
      * @returns The total modifier value to be used for this situational modifier category.
      */
-    _calcActiveTotal(options: SituationalModifierApplyOptions={}): number {
+    _calcActiveTotal(_options: SituationalModifierApplyOptions={}): number {
         return Object.values(this.applied.active).reduce((sum, current) => sum + current, 0) || 0;
     }
 

@@ -6,7 +6,7 @@ import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
 interface InventoryRenameContext extends HandlebarsApplicationMixin.RenderContext {
-    actor: any;
+    actor: unknown;
     newName: string;
 };
 
@@ -42,7 +42,7 @@ export class InventoryRenameApp extends HandlebarsApplicationMixin(ApplicationV2
             await this.actor.inventory.rename(this.inventory, this.newName);
         }
         if (this.actor.sheet) {
-            (this.actor.sheet as any).selectedInventory = this.newName;
+            (this.actor.sheet as { selectedInventory?: string }).selectedInventory = this.newName;
             await this.actor.sheet.render();
         }
         void this.close();
@@ -57,8 +57,8 @@ export class InventoryRenameApp extends HandlebarsApplicationMixin(ApplicationV2
         options: DeepPartial<ApplicationV2.RenderOptions>
     ) {
         this.element.querySelector<HTMLInputElement>('[name="inventory-name"]')
-            ?.addEventListener('change', (event: any) => {
-                this.newName = event.target?.value ?? '';
+            ?.addEventListener('change', (event: Event) => {
+                this.newName = (event.target as HTMLInputElement | null)?.value ?? '';
             })
         return super._onRender(context, options);
     }

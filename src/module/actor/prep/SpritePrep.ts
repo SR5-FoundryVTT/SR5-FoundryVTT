@@ -17,7 +17,7 @@ export class SpritePrep {
         ModifiableFieldPrep.resetAllModifiers(system);
     }
 
-    static prepareDerivedData(system: Actor.SystemOfType<'sprite'>, items: SR5Item[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'sprite'>, _items: SR5Item[]) {
         const level = SpritePrep.getSpriteLevel(system);
 
         SpritePrep.prepareSpriteMatrixAttributes(system, level);

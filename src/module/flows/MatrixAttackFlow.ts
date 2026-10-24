@@ -27,9 +27,9 @@ export const MatrixAttackFlow = {
 
         // if we succeeded in defending against an ATTACK test, we need to send back "bad data" in the form of 1 matrix damage
         if (test.success && MatrixRules.isAttackAction(
-            against.data.action.attribute as any,
-            against.data.action.attribute2 as any,
-            against.data.action.limit.attribute as any
+            against.data.action.attribute as Shadowrun.ActorAttribute,
+            against.data.action.attribute2 as Shadowrun.ActorAttribute,
+            against.data.action.limit.attribute as Shadowrun.ActorAttribute
         )) {
             const alias = game.user?.name;
             const linkedTokens = actor.getActiveTokens(true) || [];

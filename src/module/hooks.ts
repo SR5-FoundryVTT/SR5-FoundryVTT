@@ -78,7 +78,7 @@ import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
 import { CheckOverwatchScoreTest } from '@/module/tests/CheckOverwatchScoreTest';
 import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
 
-import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
+import { createItemMacro, rollItemMacro, rollSkillMacro } from './macros';
 
 import { registerSystemKeybindings } from './keybindings';
 import { SkillTest } from './tests/SkillTest';
@@ -694,7 +694,7 @@ ___________________
      * @param data The update data given.
      * @param id The items id.
      */
-    static async updateIcConnectedToHostItem(item: SR5Item, data: Item.UpdateData, options: Item.Database.OnUpdateOptions, userId: string) {
+    static async updateIcConnectedToHostItem(item: SR5Item, _data: Item.UpdateData, _options: Item.Database.OnUpdateOptions, _userId: string) {
         // Trigger type specific behaviour.
         if (item.isType('host'))
             await MatrixICFlow.handleUpdateItemHost(item);
@@ -747,16 +747,16 @@ ___________________
         });
     }
 
-    static async chatMessageListeners(message: ChatMessage, html, data) {
-        await SuccessTest.chatMessageListeners(message, html, data);
+    static async chatMessageListeners(message: ChatMessage, html) {
+        await SuccessTest.chatMessageListeners(message, html);
         BlastTemplateFlow.chatMessageListeners(html, async test => BlastScatterFlow.handle(test));
         SuppressiveFireTemplateFlow.chatMessageListeners(html);
         ShotgunTemplateFlow.chatMessageListeners(html);
-        await OpposedTest.chatMessageListeners(message, html, data);
-        ActionFollowupFlow.chatMessageListeners(message, html, data);
+        await OpposedTest.chatMessageListeners(message, html);
+        ActionFollowupFlow.chatMessageListeners(message, html);
         TeamworkTest.chatMessageListeners(message, html);
         JournalEnrichers.messageRequestHooks(html);
-        MatrixNetworkFlow.chatMessageListeners(message, html, data);
+        MatrixNetworkFlow.chatMessageListeners(message, html);
         ExtendedTestDueFlow.chatMessageListeners(message, html);
         PreparationDecayFlow.chatMessageListeners(message, html);
     }

@@ -81,7 +81,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
 
         prepared.summonedSpiritUuid ||= '';
 
-        return prepared as OpposedSummonSpiritTestData;
+        return prepared;
     }
 
     override get _chatMessageTemplate(): string {

@@ -17,7 +17,7 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { parseDropData } from '../utils/sheets';
 
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
-import { AmmunitionType, RangeType } from '../types/item/Weapon';
+import { AmmunitionType } from '../types/item/Weapon';
 
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import ItemSheet = foundry.applications.sheets.ItemSheet;
@@ -377,7 +377,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         if ('technology' in itemData && itemData.technology) {
             try {
-                const technology = itemData.technology as any;
+                const technology = itemData.technology as { rating?: number; quantity?: number; cost?: { base?: number } };
                 if (technology.rating === 0) delete technology.rating;
                 if (technology.cost?.base === 0) delete technology.cost.base;
             } catch (e) {
@@ -556,11 +556,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.update({ system: { linkedActor: actor.uuid } });
     }
 
-    async _onSelectRangedRangeCategory(event: Event) {
+    async _onSelectRangedRangeCategory(event: Event | JQuery.ChangeEvent) {
         await this._onSelectRangeCategory("system.range.ranges", event);
     }
 
-    async _onSelectThrownRangeCategory(event: Event) {
+    async _onSelectThrownRangeCategory(event: Event | JQuery.ChangeEvent) {
         await this._onSelectRangeCategory("system.thrown.ranges", event);
     }
 
@@ -575,7 +575,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             await this.item.update({ system: { description: { source: data.uuid } } });
     }
 
-    async _onSelectRangeCategory(key: string, event: Event) {
+    async _onSelectRangeCategory(key: string, event: Event | JQuery.ChangeEvent) {
         event.stopPropagation();
         const selectedRangeCategory = (event.currentTarget as HTMLSelectElement).value as keyof typeof SR5.weaponRangeCategories;
 
@@ -602,7 +602,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * User selected a new matrix attribute on a specific matrix attribute slot (att1, att2,)
      * Switch out slots for the old and selected matrix attribute.
      */
-    async _onMatrixAttributeSelected(event: Event) {
+    async _onMatrixAttributeSelected(event: Event | JQuery.ChangeEvent) {
         if (!this.item.system.atts) return;
 
         const target = event.currentTarget as HTMLSelectElement;
@@ -750,7 +750,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.update({ system: { ammo: { spare_clips: { value: spareClips } } } });
     }
 
-    _onAmmoSelect(event: Event) {
+    _onAmmoSelect(event: Event | JQuery.ChangeEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
         const id = SheetFlow.closestItemId(event.currentTarget);
 
         if (!id) return;
@@ -804,7 +804,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         void this.render();
     }
 
-    async _onMarksQuantityChange(event: Event) {
+    async _onMarksQuantityChange(event: Event | JQuery.ChangeEvent) {
         event.stopPropagation();
 
         if (!this.item.isType('host')) return;
@@ -824,7 +824,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * Change the quantity on a nested item shown within this item sheet's list.
      * @param event A DOM event
      */
-    async _onListItemChangeQuantity(event: Event) {
+    async _onListItemChangeQuantity(event: Event | JQuery.ChangeEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
         const iid = SheetFlow.closestItemId(event.currentTarget);
         const item = this.item.getOwnedItem(iid);
         const quantity = parseInt((event.currentTarget as HTMLInputElement).value);
@@ -855,12 +855,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this._onMarksQuantityChangeBy(event, -1);
     }
 
-    async _onMarksQuantityChangeBy(event, by: number) {
+    async _onMarksQuantityChangeBy(event: Event, by: number) {
         event.stopPropagation();
 
         if (!this.item.isType('host')) return;
 
-        const markId = event.currentTarget.dataset.markId;
+        const markId = (event.currentTarget as HTMLElement).dataset.markId;
         if (!markId) return;
 
         const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
@@ -898,7 +898,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         event.preventDefault();
 
         await this.item.disconnectFromNetwork();
-        void this.render(false);
+        void this.render({ force: false });
     }
 
     static async #removeLinkedActor(this: SR5ItemSheet, event: Event) {
@@ -921,7 +921,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
-    static async #toggleEquipped(this: SR5ItemSheet, event: Event) {
+    static async #toggleEquipped(this: SR5ItemSheet) {
         if (this.item.isType('device') && this.item.parent instanceof SR5Actor) {
             await this.item.parent.equipOnlyOneItemOfType(this.item);
             void this.render();
@@ -1009,7 +1009,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const effectId = SheetFlow.closestEffectId(event.target);
         if (this.item._isNestedItem) {
             this.item.effects.delete(effectId);
-            await this.render(true);
+            await this.render({ force: true });
         } else {
             await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
         }
@@ -1086,7 +1086,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                     if (effectId) {
                         if (this.item._isNestedItem) {
                             this.item.effects.delete(effectId);
-                            await this.render(true);
+                            await this.render({ force: true });
                         } else {
                             await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
                         }
@@ -1142,7 +1142,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @protected
      */
     override async _onDrop(event: DragEvent) {
-        const data = TextEditor.getDragEventData(event) as any;
+        const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event) as { type: Parameters<typeof foundry.utils.getDocumentClass>[0]; uuid?: string };
         if (!data) return;
 
         const targetElement = event.target as HTMLElement | null;
@@ -1158,7 +1158,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         // Dropped Documents
         const documentClass = foundry.utils.getDocumentClass(data.type);
         if (documentClass) {
-            const document = await documentClass.fromDropData(data);
+            // fvtt-types declares ClientDocument.fromDropData(data: never) and getDocumentClass returns a union of classes.
+            const document = await documentClass.fromDropData(data as never);
             await this._onDropDocument(event, document);
         }
     }
@@ -1200,9 +1201,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      *                                                 created, or otherwise a nullish value
      * @protected
      */
-    override async _onDropActiveEffect(event, effect): Promise<any> {
+    override async _onDropActiveEffect(event, effect: ActiveEffect.Implementation): Promise<any> {
         if (!this.item.isOwner) return null;
-        const keepId = !this.item.effects.has(effect.id);
+        const keepId = !this.item.effects.has(effect.id as string);
         const result = await SR5ActiveEffect.create(effect.toObject(), { parent: this.item, keepId });
         return result ?? null;
     }
@@ -1279,7 +1280,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @protected
      */
     // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
-    async _onDropFolder(event, folder) {
+    async _onDropFolder(_event, _folder) {
         return null;
     }
 

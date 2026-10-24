@@ -19,7 +19,7 @@ export class ICPrep {
         ICPrep.addHostAttributes(system);
     }
 
-    static prepareDerivedData(system: Actor.SystemOfType<'ic'>, items: SR5Item[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'ic'>, _items: SR5Item[]) {
         ICPrep.prepareMatrixAttributes(system);
 
         ICSkillPrep.prepareSkills(system);

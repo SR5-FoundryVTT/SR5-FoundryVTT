@@ -49,7 +49,7 @@ export class SkillTest extends SuccessTest<SkillTestData> {
      * A SkillTest has the need to store attribute and limit selections
      */
     override _prepareData(data: DeepPartial<SkillTestData>, options: Partial<TestOptions>): SkillTestData {
-        const prepared = super._prepareData(data, options) as SkillTestData;
+        const prepared = super._prepareData(data, options);
 
         prepared.action ||= DataDefaults.createData('action_roll');
 
@@ -117,6 +117,6 @@ export class SkillTest extends SuccessTest<SkillTestData> {
         TestCreator.addCodeTermTrace(this.data, usedLimit);
 
         this.lastUsedLimit = selectedLimit;
-        this.data.action.limit.attribute = selectedLimit as Shadowrun.ActorAttribute;
+        this.data.action.limit.attribute = selectedLimit;
     }
 }

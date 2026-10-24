@@ -57,7 +57,7 @@ export const UpdateActionFlow = {
      * @param changeData The _update changes given by the event
      * @param item The item as context of what's being changed.
      */
-    onSkillUpdateAlterAttribute2(changeData: Item.UpdateData, item: SR5Item) {
+    onSkillUpdateAlterAttribute2(changeData: Item.UpdateData, _item: SR5Item) {
         if (!foundry.utils.getProperty(changeData, 'system.action.skill')) return;
 
         changeData['system.action.attribute2'] = '';
@@ -91,7 +91,7 @@ export const UpdateActionFlow = {
             'call_in_action': UpdateActionFlow.injectCallInActionTestIntoChangeData.bind(UpdateActionFlow)
         };
 
-        const handler = typeHandler[type];
+        const handler = typeHandler[type] as ((type: string, changeData: Item.UpdateData, applyData: object, item?: SR5Item) => void) | undefined;
         if (!handler) return;
 
         handler(type, changeData, applyData, item);

@@ -150,7 +150,7 @@ export class ImportHelper {
             const doc = await pack.getDocument(ids[0]);
             docs = doc ? [doc] : [];
         } else {
-            docs = await pack.getDocuments({ _id__in: ids }) as Item.Stored[];
+            docs = await pack.getDocuments({ _id__in: ids });
         }
 
         return docs.map(doc => ({

@@ -85,7 +85,7 @@ export class ShotgunTemplateFlow {
         await this.#startPreview(ranges, choke);
     }
 
-    static async drawChatPreviewFromMessage(event: Event) {
+    static async drawChatPreviewFromMessage(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -106,7 +106,7 @@ export class ShotgunTemplateFlow {
     }
 
     static chatMessageListeners(html: HTMLElement | JQuery) {
-        $(html).find('.place-shotgun-template').on('click', this.drawChatPreviewFromMessage);
+        $(html).find('.place-shotgun-template').on('click', this.drawChatPreviewFromMessage.bind(this));
     }
 
     async #startPreview(ranges: RangesTemplateType, choke: ShotgunChoke) {

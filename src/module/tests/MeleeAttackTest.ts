@@ -15,7 +15,7 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
 
         prepared.damage ||= DataDefaults.createData('damage');
 
-        return prepared as MeleeAttackData;
+        return prepared;
     }
 
     /**

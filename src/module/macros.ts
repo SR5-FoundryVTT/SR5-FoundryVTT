@@ -26,7 +26,7 @@ export async function createItemMacro(dropData, slot) {
     if (item.isType('skill')) return createSkillMacro({ skillId: item.id!, skill: SkillFieldPrep.createSkillField(item).skillField }, slot);
 
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
-    let macro = game.macros.contents.find((m: Macro.Stored<"script" | "chat">) => m.name === item.name) as Macro.Stored | undefined;
+    let macro = game.macros.contents.find((m: Macro.Stored<"script" | "chat">) => m.name === item.name);
     if (!macro) {
         macro = await Macro.create(
             {

@@ -20,7 +20,7 @@ export class JournalEnrichers {
         CONFIG.TextEditor.enrichers.push(
             {
                 pattern: new RegExp(`\\@(${JournalEnrichers.actorKeywords.join("|")})${opening}([a-z]+)${threshold}${closing}`, "g"),
-                enricher: (match, options) => {
+                enricher: (match) => {
                     const type = match[1]
                     const rollEntity = match[3]
                     const threshold = match[4]
@@ -38,7 +38,7 @@ export class JournalEnrichers {
      * @param html the triggering html
      * @param data 
      */
-    static setEnricherHooks(journal, html, data) {
+    static setEnricherHooks(journal, html: JQuery, _data) {
         const rolls = { 
             "Teamwork": "startTeamworkTest",
             "RollSkill": "rollSkill", 
@@ -96,7 +96,7 @@ export class JournalEnrichers {
 
             if (actor) {
                 //in a normal running game this should not happen
-                actor[rollType](rollEntity, {threshold: {base: threshold, value: threshold} })
+                (actor[rollType] as (entity: string | undefined, options: { threshold: { base: number, value: number } }) => unknown)(rollEntity, {threshold: {base: threshold, value: threshold} })
             } else {
                 ui.notifications?.error('SR5.Errors.NoAvailableActorFound', {localize: true});
             }
@@ -104,7 +104,7 @@ export class JournalEnrichers {
     }
 
     static async createChatMessage (templateData) {
-        const html = await renderTemplate('systems/shadowrun5e/dist/templates/chat/rollRequest.hbs', templateData);
+        const html = await foundry.applications.handlebars.renderTemplate('systems/shadowrun5e/dist/templates/chat/rollRequest.hbs', templateData);
     
         const chatData = {
             user: game.user?.id,

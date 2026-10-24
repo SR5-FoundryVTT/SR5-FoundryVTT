@@ -13,12 +13,12 @@ export interface TeamworkMessageData {
  
 export class TeamworkTest {
     
-    static chatMessageListeners(message: ChatMessage, html) {
+    static chatMessageListeners(message: ChatMessage, html: HTMLElement | JQuery) {
         html = $(html);
         if( !html?.find('.sr5-teamwork-addparticipant') ) return;
 
-        $(html).find('.sr5-teamwork-addparticipant').on('click', async _ => await this.addParticipant(message));
-        $(html).find('.sr5-teamwork-start').on('click', _ => this.rollTeamworkTest(message));
+        $(html).find('.sr5-teamwork-addparticipant').on('click', async () => await this.addParticipant(message));
+        $(html).find('.sr5-teamwork-start').on('click', () => this.rollTeamworkTest(message));
     }
 
     /**
@@ -125,8 +125,7 @@ export class TeamworkTest {
             return;
         }
 
-        // todo type this properly
-        const message = fromUuidSync(socketMessage.data.messageUuid) as any;
+        const message = fromUuidSync(socketMessage.data.messageUuid) as ChatMessage | null;
 
         await message?.setFlag(SYSTEM_NAME, FLAGS.Test, socketMessage.data.teamworkData);
         await message?.update({content: socketMessage.data.content});

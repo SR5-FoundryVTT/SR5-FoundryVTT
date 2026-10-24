@@ -42,8 +42,8 @@ export const registerBasicHelpers = () => {
      * 
      * Example: pilot_ground_craft => SR5.Skill.PilotGroundCraft => "Pilot Ground Craft" (EN)
      */
-    Handlebars.registerHelper('localizeActionSkill', function (skill: string, options): string {
-        return SkillNamingFlow.localizeSkillName(skill as string);
+    Handlebars.registerHelper('localizeActionSkill', function (skill: string): string {
+        return SkillNamingFlow.localizeSkillName(skill);
     });
 
     /**
@@ -59,7 +59,7 @@ export const registerBasicHelpers = () => {
         return args.filter(a => typeof a === 'string').join('');
     });
 
-    Handlebars.registerHelper('for', function (from: number, to: number, options) {
+    Handlebars.registerHelper('for', function (from: number, to: number, options: Handlebars.HelperOptions) {
         let accum = '';
         for (let i = from; i < to; i += 1) {
             accum += options.fn(i);
@@ -154,7 +154,7 @@ export const registerBasicHelpers = () => {
         return val || undefined;
     });
     // TODO: This helper doesn't work... Don't know why, but it doesn't.
-    Handlebars.registerHelper('localizeShortened', function (label: string, length: number, options: any): SafeString {
+    Handlebars.registerHelper('localizeShortened', function (label: string, length: number): SafeString {
         return new Handlebars.SafeString(Helpers.shortenAttributeLocalization(label, length));
     });
 
@@ -255,7 +255,7 @@ export const registerBasicHelpers = () => {
     /**
      * Expects a config object and turns it into an array of objects for FormGroup options
      */
-    Handlebars.registerHelper('tests2Array', function (config: Record<string, any>) {
+    Handlebars.registerHelper('tests2Array', function (config: Record<string, unknown>) {
         return Object.keys(config).map(test => ({
             label: test,
             value: test

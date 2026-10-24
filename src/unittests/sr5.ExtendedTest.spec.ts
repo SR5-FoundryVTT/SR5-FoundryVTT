@@ -316,16 +316,16 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.isFalse(ExtendedTestRules.canDelete(record, editor));
 
             assert.isTrue(ExtendedTestRules.canManage(record, creator));
-            assert.isTrue(ExtendedTestRules.canManage(record, game.user!));
+            assert.isTrue(ExtendedTestRules.canManage(record, game.user));
         });
 
         it('handles permissions for the GM user', () => {
             // Quench runs as GM: full access regardless of visibility.
             const record = baseRecord({ permissions: { visibility: 'gmOnly', visibleUsers: [], editUsers: [], rollUsers: [] } });
-            assert.isTrue(ExtendedTestRules.canView(record, game.user!));
-            assert.isTrue(ExtendedTestRules.canEdit(record, game.user!));
-            assert.isTrue(ExtendedTestRules.canRoll(record, game.user!));
-            assert.isTrue(ExtendedTestRules.canDelete(record, game.user!));
+            assert.isTrue(ExtendedTestRules.canView(record, game.user));
+            assert.isTrue(ExtendedTestRules.canEdit(record, game.user));
+            assert.isTrue(ExtendedTestRules.canRoll(record, game.user));
+            assert.isTrue(ExtendedTestRules.canDelete(record, game.user));
         });
 
         it('respects visibility for non-creator users', () => {
@@ -572,7 +572,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
 
             await ExtendedTestFlow._applyRollResult(record.id, {
                 hits: 3, glitch: false, criticalGlitch: false, poolUsed: 12,
-                timestamp: Date.now(), worldTime: game.time.worldTime, userId: game.user!.id!,
+                timestamp: Date.now(), worldTime: game.time.worldTime, userId: game.user.id,
             }, undefined as never);
 
             const updated = ExtendedTestStorage.get(record.id)!;
@@ -589,7 +589,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
 
             await ExtendedTestFlow._applyRollResult(record.id, {
                 hits: 3, glitch: false, criticalGlitch: false, poolUsed: 12,
-                timestamp: Date.now(), worldTime: game.time.worldTime, userId: game.user!.id!,
+                timestamp: Date.now(), worldTime: game.time.worldTime, userId: game.user.id,
             }, undefined as never);
 
             const unchanged = ExtendedTestStorage.get(record.id)!;
@@ -641,7 +641,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
 
             await ExtendedTestFlow._applyRollResult(record.id, {
                 hits: 1, glitch: true, criticalGlitch: true, poolUsed: 12,
-                timestamp: Date.now(), worldTime: game.time.worldTime, userId: game.user!.id!,
+                timestamp: Date.now(), worldTime: game.time.worldTime, userId: game.user.id,
             }, undefined as never);
 
             assert.strictEqual(ExtendedTestStorage.get(record.id)!.status, 'failed');

@@ -11,7 +11,6 @@ import { MatrixResistTest, MatrixResistTestData } from "../MatrixResistTest";
 import { BiofeedbackResistTest } from "../BiofeedbackResistTest";
 import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
 import { MatrixOpposedTargetFlow } from '@/module/tests/flows/MatrixOpposedTargetFlow';
-import Document = foundry.abstract.Document;
 
 /**
  * Apply Matrix Rules to Success Test Data relating to matrix.

@@ -46,7 +46,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
                 const targetChanges = effect.system.changes.filter(change => change.target === target.id);
                 changes.push(...targetChanges.map(change => {
-                    const c = foundry.utils.deepClone<typeof changes[number]>(change as any);
+                    const c = foundry.utils.deepClone<typeof changes[number]>(change as unknown as typeof changes[number]);
                     // TODO: v15 - Foundry used to change data. references in changes to system. But tests use data.
                     c.key = (c.key ?? '').replace(/^system\./, 'data.');
                     c.effect = effect;

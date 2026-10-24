@@ -71,8 +71,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 },
             });
 
-            const originalGetPackSkills = PackItemFlow.getPackSkills;
-            const originalGetPackSkillgroups = PackItemFlow.getPackSkillgroups;
+            const originalGetPackSkills = PackItemFlow.getPackSkills.bind(PackItemFlow);
+            const originalGetPackSkillgroups = PackItemFlow.getPackSkillgroups.bind(PackItemFlow);
 
             PackItemFlow.getPackSkills = () => Promise.resolve([skillTemplate]);
             PackItemFlow.getPackSkillgroups = () => Promise.resolve([groupTemplate]);
@@ -131,8 +131,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 },
             });
 
-            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
-            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
+            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet.bind(PackItemFlow);
+            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet.bind(PackItemFlow);
 
             PackItemFlow.prepareSkillsForSkillSet = () => Promise.resolve([skillTemplate.toObject()]);
             PackItemFlow.prepareSkillGroupsForSkillSet = () => {
@@ -198,8 +198,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 },
             });
 
-            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
-            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
+            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet.bind(PackItemFlow);
+            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet.bind(PackItemFlow);
 
             PackItemFlow.prepareSkillsForSkillSet = originalGetSkillsForSkillSet;
             PackItemFlow.prepareSkillGroupsForSkillSet = () => {
@@ -208,7 +208,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 return Promise.resolve([groupData]);
             };
 
-            const originalGetPackSkills = PackItemFlow.getPackSkills;
+            const originalGetPackSkills = PackItemFlow.getPackSkills.bind(PackItemFlow);
             PackItemFlow.getPackSkills = () => Promise.resolve([skillTemplate]);
 
             try {
@@ -230,8 +230,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
 
         // Guards skillset application so configured skill specializations survive into owned skills.
         it('applies configured skill set specializations to created skill items', async () => {
-            const originalGetPackSkills = PackItemFlow.getPackSkills;
-            const originalGetPackSkillgroups = PackItemFlow.getPackSkillgroups;
+            const originalGetPackSkills = PackItemFlow.getPackSkills.bind(PackItemFlow);
+            const originalGetPackSkillgroups = PackItemFlow.getPackSkillgroups.bind(PackItemFlow);
 
             try {
                 // monkey patch pack flows to avoid default skillset application from interfering.
@@ -304,9 +304,9 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 },
             });
 
-            const originalGetAllPackSkillSets = PackItemFlow.getAllPackSkillSets;
-            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
-            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
+            const originalGetAllPackSkillSets = PackItemFlow.getAllPackSkillSets.bind(PackItemFlow);
+            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet.bind(PackItemFlow);
+            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet.bind(PackItemFlow);
 
             PackItemFlow.getAllPackSkillSets = () => Promise.resolve([skillSet]);
             PackItemFlow.prepareSkillsForSkillSet = () => Promise.resolve([skillTemplate.toObject()]);
@@ -368,9 +368,9 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 },
             });
 
-            const originalGetAllPackSkillSets = PackItemFlow.getAllPackSkillSets;
-            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
-            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
+            const originalGetAllPackSkillSets = PackItemFlow.getAllPackSkillSets.bind(PackItemFlow);
+            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet.bind(PackItemFlow);
+            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet.bind(PackItemFlow);
 
             PackItemFlow.getAllPackSkillSets = () => Promise.resolve([]);
             PackItemFlow.prepareSkillsForSkillSet = () => Promise.resolve([skillTemplate.toObject()]);
@@ -442,8 +442,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 },
             });
 
-            const originalGetPackSkills = PackItemFlow.getPackSkills;
-            const originalGetPackSkillgroups = PackItemFlow.getPackSkillgroups;
+            const originalGetPackSkills = PackItemFlow.getPackSkills.bind(PackItemFlow);
+            const originalGetPackSkillgroups = PackItemFlow.getPackSkillgroups.bind(PackItemFlow);
 
             PackItemFlow.getPackSkills = () => Promise.resolve([skillTemplate]);
             PackItemFlow.getPackSkillgroups = () => Promise.resolve([groupTemplate]);
@@ -497,7 +497,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
     describe('SkillSelectionFlow.getSkillSelection', () => {
         // Guards item sheets from losing their current value when the selected skill is no longer in the pack.
         it('injects a selected missing skill for sidebar item sheets', async () => {
-            const originalGetPackSkills = PackItemFlow.getPackSkills;
+            const originalGetPackSkills = PackItemFlow.getPackSkills.bind(PackItemFlow);
             PackItemFlow.getPackSkills = () => Promise.resolve([]);
 
             try {
@@ -513,7 +513,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
         });
 
         it('injects a selected missing skill using canonical keys for action selectors', async () => {
-            const originalGetPackSkills = PackItemFlow.getPackSkills;
+            const originalGetPackSkills = PackItemFlow.getPackSkills.bind(PackItemFlow);
             PackItemFlow.getPackSkills = () => Promise.resolve([]);
 
             try {
@@ -532,7 +532,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
         // Guards owned item sheets from breaking when an actor still references a missing pack skill.
         it('injects a selected missing skill for owned item sheets', async () => {
             const actor = await factory.createActor({ type: 'character' });
-            const originalGetPackSkills = PackItemFlow.getPackSkills;
+            const originalGetPackSkills = PackItemFlow.getPackSkills.bind(PackItemFlow);
             PackItemFlow.getPackSkills = () => Promise.resolve([]);
 
             try {
@@ -571,7 +571,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 },
             });
 
-            const originalGetPackSkills = PackItemFlow.getPackSkills;
+            const originalGetPackSkills = PackItemFlow.getPackSkills.bind(PackItemFlow);
             PackItemFlow.getPackSkills = () => Promise.resolve([firstSkill, secondSkill]);
 
             try {
@@ -609,7 +609,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 },
             });
 
-            const originalGetPackSkills = PackItemFlow.getPackSkills;
+            const originalGetPackSkills = PackItemFlow.getPackSkills.bind(PackItemFlow);
             PackItemFlow.getPackSkills = () => Promise.resolve([firstSkill, secondSkill]);
 
             try {
@@ -787,10 +787,10 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
 
             assert.exists(groupItem);
 
-            await SkillItemFlow.changeSkillRating(actor, groupItem!.id!, 1);
+            await SkillItemFlow.changeSkillRating(actor, groupItem.id!, 1);
             await SkillGroupFlow.syncSkillItemGroups(actor);
 
-            const groupOn = actor.items.get(groupItem!.id!) as SR5Item<'skill'> | undefined;
+            const groupOn = actor.items.get(groupItem.id!) as SR5Item<'skill'> | undefined;
             const pistolsOn = actor.items.find(item => {
                 return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';
             }) as SR5Item<'skill'> | undefined;
@@ -800,10 +800,10 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(groupOn?.system.group.rating, 1);
             assert.strictEqual(pistolsOn?.system.skill.rating, 1);
 
-            await SkillItemFlow.changeSkillRating(actor, groupItem!.id!, 0);
+            await SkillItemFlow.changeSkillRating(actor, groupItem.id!, 0);
             await SkillGroupFlow.syncSkillItemGroups(actor);
 
-            const groupOff = actor.items.get(groupItem!.id!) as SR5Item<'skill'> | undefined;
+            const groupOff = actor.items.get(groupItem.id!) as SR5Item<'skill'> | undefined;
             const pistolsOff = actor.items.find(item => {
                 return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';
             }) as SR5Item<'skill'> | undefined;
@@ -934,7 +934,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
          * retrieval helper.
          */
         const withPackReadCounter = async (body: (reads: () => number) => Promise<void>) => {
-            const originalGetPackDocuments = PackItemFlow.getPackDocuments;
+            const originalGetPackDocuments = PackItemFlow.getPackDocuments.bind(PackItemFlow);
             let reads = 0;
 
             PackItemFlow.getPackDocuments = (async (...args: Parameters<typeof originalGetPackDocuments>) => {
@@ -1034,7 +1034,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 const importedActor = created.find(actor => actor.name === '#QUENCH Imported');
                 assert.exists(importedActor);
 
-                const pistols = importedActor!.items.filter(item => item.name === 'Pistols');
+                const pistols = importedActor.items.filter(item => item.name === 'Pistols');
                 assert.lengthOf(pistols, 1);
                 assert.strictEqual(foundry.utils.getProperty(pistols[0], 'system.skill.rating'), 6);
             });

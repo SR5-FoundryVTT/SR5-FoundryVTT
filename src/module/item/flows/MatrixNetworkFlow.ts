@@ -33,7 +33,7 @@ export class MatrixNetworkFlow {
     static resolveItemLink(link: string) {
         const document = this.resolveLink(link);
         if (!(document instanceof SR5Item)) throw new Error(`Document with uuid ${link} is not an item`);
-        return document as unknown as SR5Item;
+        return document;
     }
 
     /**
@@ -457,7 +457,7 @@ export class MatrixNetworkFlow {
             return;
         }
 
-        const content = await renderTemplate('systems/shadowrun5e/dist/templates/chat/matrix-network-mark-invite.hbs', {
+        const content = await foundry.applications.handlebars.renderTemplate('systems/shadowrun5e/dist/templates/chat/matrix-network-mark-invite.hbs', {
             target
         });
 
@@ -481,7 +481,7 @@ export class MatrixNetworkFlow {
      *
      * @param event User clicking on button in chat message.
      */
-    static async acknowledgeMarkInvite(event: Event) {
+    static async acknowledgeMarkInvite(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -523,7 +523,7 @@ export class MatrixNetworkFlow {
         await ChatMessage.create(messageData);
     }
 
-    static chatMessageListeners(message: ChatMessage, html, data) {
+    static chatMessageListeners(message: ChatMessage, html) {
         $(html).find('.button[data-action="matrix-network-mark-invite"]').on('click', MatrixNetworkFlow.acknowledgeMarkInvite.bind(this));
     }
 

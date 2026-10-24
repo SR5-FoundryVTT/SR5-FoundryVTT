@@ -612,7 +612,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     _onDragDropFavorite(event: DragEvent) {
         const target = event.target;
         const favorites = this.actor.system.favorites.slice();
-        const data = TextEditor.getDragEventData(event) as any;
+        const data = TextEditor.getDragEventData(event) as { uuid: string, id: string };
         const srcUuid = data.uuid;
         let sourceIndex = favorites.indexOf(srcUuid);
         if (sourceIndex < 0) {
@@ -806,7 +806,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * - this is more of a band-aid until we do appv2
      * @param event
      */
-    async _onInitiativePerceptionChange(event: Event) {
+    async _onInitiativePerceptionChange(event: Event | JQuery.ChangeEvent) {
         const newValue = (event.currentTarget as HTMLSelectElement)?.value as InitiativeModeOptions | undefined;
         if (!newValue) return;
 
@@ -857,7 +857,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * NOTE: The current drag&drop implementation is borked and needs cleanup across: SR5ApplicationMixin as base for actor and item sheets.
      */
     protected override async _onDrop(event: DragEvent) {
-        return await ((ActorSheetV2.prototype as any)._onDrop.call(this, event) as Promise<void>);
+        return await ((ActorSheetV2.prototype as unknown as { _onDrop: (event: DragEvent) => Promise<void> })._onDrop.call(this, event));
     }
 
     /**
@@ -1037,7 +1037,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Add the item to the selected inventory.
         if (this.selectedInventory !== this.actor.defaultInventory.name) {
-            await this.actor.inventory.addItems(this.selectedInventory, items as SR5Item[]);
+            await this.actor.inventory.addItems(this.selectedInventory, items);
         }
         for (const item of items) {
             await item.sheet?.render(true, { mode: 'edit' } as any);
@@ -1194,7 +1194,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
 
         const data: Actor.UpdateData = {};
-        let value = Number(target.dataset.value as string);
+        let value = Number(target.dataset.value);
 
         // if the clicked on cell is the current value for it's track, set the value to 0 to clear it
         if (track === 'stun' && this.actor.getStunTrack()?.value === value) {
@@ -1651,7 +1651,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     static #handleFilterActiveSkills(
-        this: SR5BaseActorSheet, event: KeyboardEvent | null, query: string, rgx: RegExp, content: HTMLElement | null
+        this: SR5BaseActorSheet, event: KeyboardEvent | null, query: string, _rgx: RegExp, _content: HTMLElement | null
     ) {
         this._filters.skills = query;
         this.#filterActiveSkillsElements();
@@ -1870,7 +1870,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @param event A DOM mouse/touch event
      */
-    async _onListItemChangeQuantity(event: Event) {
+    async _onListItemChangeQuantity(event: Event | JQuery.ChangeEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
         const iid = SheetFlow.closestItemId(event.currentTarget);
         const item = this.actor.items.get(iid);
         const quantity = parseInt((event.currentTarget as HTMLInputElement).value);
@@ -1972,10 +1972,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     /**
      * Change selected inventory for this sheet.
      */
-    _onSelectInventory(event: Event) {
+    _onSelectInventory(event: Event | JQuery.ChangeEvent) {
         event.preventDefault();
 
-        const inventory = String($(event.currentTarget!).val());
+        const inventory = String($(event.currentTarget).val());
 
         if (inventory)
             this.selectedInventory = inventory;
@@ -1986,7 +1986,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     /**
      * After selecting a new ammo for a weapon
      */
-    async _onWeaponAmmoSelect(event: Event) {
+    async _onWeaponAmmoSelect(event: Event | JQuery.ChangeEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
         const id = SheetFlow.closestItemId(event.currentTarget);
         const item = this.actor.items.get(id);
         if (!item?.isType('weapon')) return;
@@ -2019,7 +2019,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @param event A mouse/pointer event
      */
-    async _onMatrixAttributeSelected(event: Event) {
+    async _onMatrixAttributeSelected(event: Event | JQuery.ChangeEvent) {
         if (!("matrix" in this.actor.system)) return;
 
         const iid = this.actor.system.matrix!.device;
@@ -2037,7 +2037,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return item.changeMatrixAttributeSlot(changedSlot, attribute);
     }
 
-    async _onChangeSkillRating(event: Event) {
+    async _onChangeSkillRating(event: Event | JQuery.ChangeEvent) {
         event.preventDefault();
         if (!isElementInstance(event.target, HTMLInputElement)) return;
         const closest = this._closestSkillTarget(event.target);
@@ -2418,7 +2418,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             return;
         }
         const app = new InventoryRenameApp(this.actor, inventory, 'edit');
-        await app.render(true);
+        await app.render({ force: true });
     }
     /**
      * Create an inventory place on the actor for gear organization.
@@ -2426,7 +2426,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     static async #createInventory(this: SR5BaseActorSheet, event: Event) {
         event.preventDefault();
         const app = new InventoryRenameApp(this.actor, '', 'create');
-        await app.render(true);
+        await app.render({ force: true });
         void this.render();
     }
 
