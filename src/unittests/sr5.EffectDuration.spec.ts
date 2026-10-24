@@ -99,6 +99,28 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
             assert.notInclude(status.summary, 'Round');
         });
 
+        it('converts combat (rounds) durations prepared as seconds back into Combat Turns', () => {
+            const roundTime = CONFIG.time.roundTime || SR.combat.ROUND_TIME_SECONDS;
+            const status = durationStatus(
+                { value: 2, units: 'rounds', expired: false },
+                { units: 'seconds', remaining: 2 * roundTime, secondsRemaining: 2 * roundTime, label: `${2 * roundTime}s` },
+            );
+
+            assert.equal(status.state, 'active');
+            assert.equal(status.summary, game.i18n.format('SR5.ActiveEffect.Duration.CombatTurns', { turns: 2 }));
+        });
+
+        it('shows the selected Combat Turns for an out-of-combat effect', async () => {
+            const { effect } = await createEffect({ type: 'character' }, {
+                duration: { value: 1, units: 'rounds' },
+            });
+
+            const status = prepareEffectDurationStatus(effect);
+
+            assert.equal(status.state, 'active');
+            assert.equal(status.summary, game.i18n.format('SR5.ActiveEffect.Duration.CombatTurn', { turns: 1 }));
+        });
+
         it('renders reached, expired, and staged-restart states without negative time', () => {
             const pending = durationStatus(
                 { value: 1, units: 'rounds', expired: false, expiry: 'roundEnd' },
