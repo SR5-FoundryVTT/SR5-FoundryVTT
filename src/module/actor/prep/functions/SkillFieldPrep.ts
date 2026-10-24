@@ -68,8 +68,6 @@ export const SkillFieldPrep = {
                 attribute: skill.system.skill.attribute,
                 limit: skill.system.skill.limit.attribute,
                 canDefault: skill.system.skill.defaulting,
-                isNative: skill.system.skill.language.isNative,
-                link: skill.system.description.source,
                 requirement: skill.system.skill.requirement,
                 specs: skill.system.skill.specializations.map(spec => spec.name),
                 group
