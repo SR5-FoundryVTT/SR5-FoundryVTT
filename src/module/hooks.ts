@@ -50,6 +50,9 @@ import { OpposedTest } from "./tests/OpposedTest";
 import { PhysicalDefenseTest } from "./tests/PhysicalDefenseTest";
 import { RangedAttackTest } from "./tests/RangedAttackTest";
 import { PhysicalResistTest } from "./tests/PhysicalResistTest";
+import { FlowConditions } from "./flows/FlowPlan";
+import { FlowRunner } from "./flows/FlowRunner";
+import { FlowChatFlow } from "./flows/FlowChatFlow";
 import { MeleeAttackTest } from "./tests/MeleeAttackTest";
 import { SpellCastingTest } from "./tests/SpellCastingTest";
 import { DrainTest } from "./tests/DrainTest";
@@ -372,6 +375,14 @@ ___________________
             followedTests: {
                 DrainTest,
                 FadeTest
+            },
+
+            /**
+             * Test flow configuration.
+             * - conditions: named conditions flow steps can reference.
+             */
+            flow: {
+                conditions: FlowConditions,
             },
 
             /**
@@ -725,6 +736,8 @@ ___________________
             [FLAGS.UnsetDataStorage]: [DataStorage._handleUnsetDataStorageSocketMessage.bind(DataStorage)],
             [FLAGS.UpdateDocumentsAsGM]: [SocketMessageFlow.handleUpdateDocumentsAsGMMessage.bind(SocketMessage)],
             [FLAGS.ApplyExtendedTestRoll]: [ExtendedTestFlow._handleApplyRollSocketMessage.bind(ExtendedTestFlow)],
+            [FLAGS.FlowStepDone]: [FlowRunner._handleStepDoneSocketMessage.bind(FlowRunner)],
+            [FLAGS.FlowApplyDone]: [FlowRunner._handleApplyDoneSocketMessage.bind(FlowRunner)],
         } as const;
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData, senderId?: string) => {
@@ -753,6 +766,7 @@ ___________________
         SuppressiveFireTemplateFlow.chatMessageListeners(html);
         ShotgunTemplateFlow.chatMessageListeners(html);
         await OpposedTest.chatMessageListeners(message, html);
+        await FlowChatFlow.chatMessageListeners(message, html);
         ActionFollowupFlow.chatMessageListeners(message, html);
         TeamworkTest.chatMessageListeners(message, html);
         JournalEnrichers.messageRequestHooks(html);

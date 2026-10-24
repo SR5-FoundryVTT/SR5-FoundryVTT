@@ -42,6 +42,7 @@ import { shadowrunAlchemy } from './sr5.Alchemy.spec';
 import { Quench, QuenchRegisterBatchFunction, QuenchRegisterBatchOptions } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
 import { shadowrunMatrixDamageResist } from '@/unittests/sr5.MatrixDamageResist.spec';
+import { shadowrunFlowTesting } from '@/unittests/sr5.Flow.spec';
 
 const QUENCH_TIMEOUT_MS = 5000;
 
@@ -151,6 +152,9 @@ export const quenchRegister = (quench: Quench) => {
     });
     registerBatch(quench, 'shadowrun5e.flow.test_value_resolution', shadowrunTestValueResolution, { displayName: 'SHADOWRUN5e: Test Value Resolution' });
     registerBatch(quench, 'shadowrun5e.flow.tests_matrix', shadowrunMatrixTesting, { displayName: 'SHADOWRUN5e: Matrix Test' });
+    registerBatch(quench, 'shadowrun5e.flow.pipeline', shadowrunFlowTesting, {
+        displayName: 'SHADOWRUN5e: Test Flow Pipeline',
+    });
     registerBatch(quench, 'shadowrun5e.flow.tests_resist_matrix', shadowrunMatrixDamageResist, {
         displayName: 'SHADOWRUN5e: Resist Matrix Test'
     });

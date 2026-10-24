@@ -107,9 +107,9 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
     /**
      * Notify mancers about incomplete compilation. To avoid pre mature fade tests.
      */
-    override async executeFollowUpTest() {
+    override async executeFollowUpTest(testClsName?: string) {
         if (!this.data.fadeReady) ui.notifications?.warn('SR5.Warnings.CompilationNotConcluded', {localize: true});
-        await super.executeFollowUpTest();
+        await super.executeFollowUpTest(testClsName);
     }
 
     /**

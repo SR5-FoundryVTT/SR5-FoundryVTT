@@ -290,16 +290,4 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
 
         return [action]
     }
-
-    override async afterFailure() {
-        await super.afterFailure();
-
-        // When an opposed test fails, the original test documents targeted actor effects can be applied
-        const against = this.against;
-        const actor = this.actor;
-        if (against === undefined && !this.opposing) return;
-        if (actor === undefined) return;
-
-        await this.effects.createTargetActorEffects(actor);
-    }
 }

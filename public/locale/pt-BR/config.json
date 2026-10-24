@@ -34,6 +34,11 @@
         "InitiativeModeUpdateStrategyDescription": "Como a iniciativa e atualizada ao trocar o modo de iniciativa em combate",
         "InitiativeModeUpdateStrategyDeltaDice": "Diferenca de dados",
         "InitiativeModeUpdateStrategyReroll": "Nova rolagem completa",
+        "FlowAutoApplyName": "Aplicar resultados de testes automaticamente",
+        "FlowAutoApplyDescription": "O que os testes aplicam aos seus alvos sem clicar nos botões de aplicar da mensagem de chat. Só vale para atores do usuário que rolou; os demais mantêm o botão de aplicar.",
+        "FlowAutoApplyNone": "Nada",
+        "FlowAutoApplyEffects": "Apenas efeitos",
+        "FlowAutoApplyAll": "Efeitos e dano",
         "ImportIconFolderDescription": "A pasta onde o importador pode encontrar arquivos de ícone. Localização padrão: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "Pasta de Ícones do Importador",
         "MarkImportsDescription": "Demarcar itens recém-importados nas fichas de ator para destacar que eles devem ser revisados",
@@ -1968,6 +1973,14 @@
             "SpriteCompilationFailure": "Sprite fugiu!",
             "SpriteCompilationSuccess": "Sprite compilado!",
             "Success": "Sucesso!"
+        },
+        "Flow": {
+            "Pending": "Aguardando",
+            "Done": "Concluído",
+            "Skipped": "Ignorado",
+            "ApplyDamage": "Aplicar dano",
+            "ApplyEffects": "Aplicar efeitos",
+            "Applied": "Aplicado"
         },
         "Tests": {
             "AttributeOnlyTest": "Teste Apenas de Atributo",

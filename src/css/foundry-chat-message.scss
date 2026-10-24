@@ -955,6 +955,24 @@
             gap: 0.35rem;
         }
 
+        .sr5-flow-step {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 0.35rem;
+
+            .sr5-flow-step__subject {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .sr5-flow-step__status {
+                opacity: 0.8;
+                font-size: var(--font-size-12);
+            }
+        }
+
         .card-header--targets {
             margin: 0.2rem 0.45rem 0.45rem;
             border: 1px solid var(--sr5-card-border-soft);

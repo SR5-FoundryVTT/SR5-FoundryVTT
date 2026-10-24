@@ -57,6 +57,7 @@ import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetect
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
 import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
+import type { FlowState } from "./flows/FlowStep";
 
 /**
  * TODO: fvtt-types v14 - Update global module declarations to match updated types in fvtt-types.
@@ -200,6 +201,7 @@ declare module "fvtt-types/configuration" {
         ChatMessage: {
             shadowrun5e: {
                 TestData?: any;
+                FlowState?: FlowState;
                 MatrixNetworkMarkInvite: {actorUuid: string, targetUuid: string};
             }
         };
@@ -254,6 +256,7 @@ declare module "fvtt-types/configuration" {
             sr5_testPrepareBaseValues: any;
             sr5_testProcessResults: any;
             sr5_afterTestComplete: any;
+            sr5_resolveFlowPlan: any;
             sr5_processTagifyElements: any;
             // Fired on all clients on global data storage changes, with the changed keys.
             'sr5e.storageChanged': (changedKeys: string[]) => void;
@@ -283,6 +286,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.showSkillsWithDetails": boolean;
         "shadowrun5e.onlyAutoRollNPCInCombat": boolean;
         "shadowrun5e.InitiativeModeUpdateStrategy": 'delta_dice' | 'reroll';
+        "shadowrun5e.flowAutoApply": 'none' | 'effects' | 'all';
         "shadowrun5e.tokenHealthBars": boolean;
         "shadowrun5e.HideGMOnlyChatContent": boolean;
         "shadowrun5e.MustConsumeRessourcesOnTest": boolean;

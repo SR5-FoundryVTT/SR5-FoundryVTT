@@ -151,8 +151,12 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         // Inject a flag to mark the effect as applied by a test.
         // This is necessary so we can differentiate between effects created and applied.
+        // Durations of the copies start when they're applied, not when the source effect was created.
+        const start = (CONFIG.ActiveEffect.documentClass as unknown as { getEffectStart(): object }).getEffectStart();
         for (const effectData of effectsData) {
             effectData['system.appliedByTest'] = true;
+            foundry.utils.setProperty(effectData, 'start', start);
+            foundry.utils.setProperty(effectData, 'duration.expired', false);
         }
 
         if (!game.user?.isGM) {

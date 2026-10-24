@@ -1,0 +1,20 @@
+<div class="card-buttons card-buttons--actions sr5-flow-steps">
+    {{#each rows}}
+    <div class="sr5-flow-step">
+        <a class="sr5-flow-step__subject chat-document-link" data-uuid="{{this.subjectUuid}}">{{this.name}}</a>
+        {{#if this.isPending}}
+            {{#if this.canExecute}}
+            <div class="button flow-step-action" data-step-id="{{this.stepId}}" data-subject-uuid="{{this.subjectUuid}}">
+                {{localize this.label}}
+            </div>
+            {{else}}
+            <span class="sr5-flow-step__status">{{localize this.label}}: {{localize "SR5.Flow.Pending"}}</span>
+            {{/if}}
+        {{else if this.isDone}}
+        <span class="sr5-flow-step__status">{{localize this.label}}: {{localize "SR5.Flow.Done"}}</span>
+        {{else}}
+        <span class="sr5-flow-step__status">{{localize this.label}}: {{localize "SR5.Flow.Skipped"}}</span>
+        {{/if}}
+    </div>
+    {{/each}}
+</div>

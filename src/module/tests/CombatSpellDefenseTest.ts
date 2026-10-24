@@ -9,6 +9,7 @@ import ModifierTypes = Shadowrun.ModifierTypes;
 import { ActionRollType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 import { Translation } from "../utils/strings";
+import type { FlowStep } from "../types/flows/FlowStep";
 
 export interface CombatSpellDefenseTestData extends DefenseTestData {
     against: SpellCastingTestData
@@ -112,20 +113,14 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
     }
 
     /**
-     * Combat Spell Defense allows a resist test for the defending actor.
+     * Only indirect combat spells allow resisting their damage.
      */
-    override async afterFailure() {
-        await super.afterFailure();
+    override flowAllowsStep(step: FlowStep): boolean {
+        if (step.kind !== 'test') return true;
 
         const spell = this.item?.asType('spell', 'preparation')?.system;
-        if (!spell) return;
-
-        // Only allow a defense test for indirect combat spells.
-        if (CombatSpellRules.allowDamageResist(spell.combat.type)) {
-            const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
-            if (!test) return;
-            await test.execute();
-        }
+        if (!spell) return false;
+        return CombatSpellRules.allowDamageResist(spell.combat.type);
     }
 
     /**

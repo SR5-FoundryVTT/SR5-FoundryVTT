@@ -4,7 +4,8 @@ import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValueLinked, BaseValuePair, ChangeList } from "../template/Base";
 import { TagifyMultiField } from '@/module/types/fields/TagifyMultiField';
 import { INTERVAL_UNITS } from '@/module/utils/timeUnits';
-const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
+import { FlowStepData } from '@/module/types/flows/FlowStep';
+const { SchemaField, NumberField, BooleanField, StringField, ArrayField } = foundry.data.fields;
 
 const ResultActionData = () => ({
     action: new StringField({
@@ -173,6 +174,8 @@ export const ActionRollData = (
         }),
         armor: new BooleanField(),
     }),
+    // Explicit test flow. When empty, the flow is derived from opposed / followed.
+    steps: new ArrayField(new SchemaField(FlowStepData())),
     alt_mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     dice_pool_mod: ChangeList(),
     roll_mode: new StringField({

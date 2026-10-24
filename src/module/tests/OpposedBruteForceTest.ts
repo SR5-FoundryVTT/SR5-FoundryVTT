@@ -1,12 +1,12 @@
 import { DataDefaults } from '../data/DataDefaults';
 import { Translation } from '../utils/strings';
 import { BruteForceTest } from './BruteForceTest';
-import { TestCreator } from './TestCreator';
 import { MarkPlacementFlow } from './flows/MarkPlacementFlow';
 import { OpposedMatrixTestData } from './MatrixTest';
 import { DamageType } from '@/module/types/item/Action';
 import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
 import { ModifiableValue } from '../mods/ModifiableValue';
+import type { FlowStep } from '@/module/types/flows/FlowStep';
 
 type OpposedBruteForceTestData = OpposedMatrixTestData & {
     incomingDamage: DamageType;
@@ -63,15 +63,10 @@ export class OpposedBruteForceTest extends OpposedMatrixTest<OpposedBruteForceTe
     }
 
     /**
-     * Allow users to resist against possible matrix damage taken.
+     * Nothing to resist or apply without damage.
      */
-    override async afterFailure() {
-        await super.afterFailure();
-
-        // Don't resist if no damage was taken.
-        if (this.data.damage.value === 0) return;
-        const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
-        if (!test) return;
-        await test.execute();
+    override flowAllowsStep(step: FlowStep): boolean {
+        if (step.kind === 'test' || step.kind === 'applyDamage') return this.data.damage.value !== 0;
+        return true;
     }
 }

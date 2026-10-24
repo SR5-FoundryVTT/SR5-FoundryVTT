@@ -40,6 +40,11 @@
         "InitiativeModeUpdateStrategyDescription": "How initiative is updated when switching initiative mode in combat",
         "InitiativeModeUpdateStrategyDeltaDice": "Delta Dice (roll difference)",
         "InitiativeModeUpdateStrategyReroll": "Full Reroll",
+        "FlowAutoApplyName": "Auto Apply Test Results",
+        "FlowAutoApplyDescription": "What tests apply to their targets without clicking the apply buttons on the chat message. Only applies to actors the rolling user owns; others keep their apply button.",
+        "FlowAutoApplyNone": "Nothing",
+        "FlowAutoApplyEffects": "Effects only",
+        "FlowAutoApplyAll": "Effects and damage",
         "IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
         "ImportIconFolderDescription": "The folder where the importer can find icon files. Default location: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "Importer Icon Folder",
@@ -3179,6 +3184,14 @@
             "SpriteCompilationFailure": "Sprite fled!",
             "SpriteCompilationSuccess": "Sprite compiled!",
             "Success": "Success!"
+        },
+        "Flow": {
+            "Pending": "Waiting",
+            "Done": "Done",
+            "Skipped": "Skipped",
+            "ApplyDamage": "Apply damage",
+            "ApplyEffects": "Apply effects",
+            "Applied": "Applied"
         },
         "Tests": {
             "AttributeOnlyTest": "Attribute-Only Test",

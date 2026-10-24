@@ -2,7 +2,6 @@ import {ModifiableValue} from "../mods/ModifiableValue";
 import {CombatRules} from "../rules/CombatRules";
 import {MeleeRules} from "../rules/MeleeRules";
 import {MeleeAttackData} from "./MeleeAttackTest";
-import {TestCreator} from "./TestCreator";
 import {DefenseTest, DefenseTestData} from "./DefenseTest";
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { Translation } from '../utils/strings';
@@ -12,6 +11,7 @@ import { TestOptions } from "./SuccessTest";
 import { MinimalActionType } from "../types/item/Action";
 import { CombatSpellRules } from "../rules/CombatSpellRules";
 import { SpellCastingTestData } from "./SpellCastingTest";
+import type { FlowStep } from "../types/flows/FlowStep";
 import { AlchemyRules } from "../rules/AlchemyRules";
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
@@ -246,17 +246,12 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         await super.processFailure();
     }
 
-    override async afterFailure() {
-        await super.afterFailure();
-
-        // If attack hits but does no damage, don't perform the follow-up physical resist test
-        if(this.getNoDamageCondition()) {
-            return;
-        }
-
-        const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
-        if (!test) return;
-        await test.execute();
+    /**
+     * An attack hitting without doing damage has nothing to resist or apply.
+     */
+    override flowAllowsStep(step: FlowStep): boolean {
+        if (step.kind === 'test' || step.kind === 'applyDamage') return !this.getNoDamageCondition();
+        return true;
     }
 
     /**

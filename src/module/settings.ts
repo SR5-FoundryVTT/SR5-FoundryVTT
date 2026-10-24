@@ -144,6 +144,23 @@ export const registerSystemSettings = () => {
         default: 'delta_dice',
     });
 
+    /**
+     * What test flows apply to their targets on their own, without clicking the apply buttons.
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.FlowAutoApply, {
+        name: 'SETTINGS.FlowAutoApplyName',
+        hint: 'SETTINGS.FlowAutoApplyDescription',
+        scope: 'world',
+        config: true,
+        type: String,
+        choices: {
+            none: 'SETTINGS.FlowAutoApplyNone',
+            effects: 'SETTINGS.FlowAutoApplyEffects',
+            all: 'SETTINGS.FlowAutoApplyAll',
+        },
+        default: 'effects',
+    });
+
     game.settings.register(SYSTEM_NAME, FLAGS.TokenHealthBars, {
         name: 'SETTINGS.TokenHealthBars',
         hint: 'SETTINGS.TokenHealthBarsDescription',

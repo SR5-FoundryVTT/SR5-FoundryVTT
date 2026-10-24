@@ -109,9 +109,9 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
     /**
      * Notify summoners about incomplete summoning. To avoid pre mature drain tests.
      */
-    override async executeFollowUpTest() {
+    override async executeFollowUpTest(testClsName?: string) {
         if (!this.data.drainReady) ui.notifications?.warn('SR5.Warnings.SummoningNotConcluded', {localize: true});
-        await super.executeFollowUpTest();
+        await super.executeFollowUpTest(testClsName);
     }
 
     /**

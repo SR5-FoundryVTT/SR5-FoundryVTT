@@ -27,6 +27,8 @@ import { activateOnKey } from '../utils/dom';
 import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType, ResultActionType } from '../types/item/Action';
 import { ValueFieldType } from '../types/template/Base';
 import { DeepPartial } from "fvtt-types/utils";
+import type { FlowStep } from '../types/flows/FlowStep';
+import { FlowRunner } from '../flows/FlowRunner';
 export interface TestDocuments {
     // Legacy field that used be the source document.
     actor?: SR5Actor
@@ -1652,14 +1654,21 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async afterTestComplete() {
         console.debug(`Shadowrun5e | Test ${this.constructor.name} completed.`, this);
 
+        // Record before any followup runs, as those look up this tests flow state.
+        const flowState = await FlowRunner.recordTest(this);
+
         if (this.success) {
             await this.afterSuccess();
         } else {
             await this.afterFailure();
         }
 
-        if (this.autoExecuteFollowupTest) {
-            await this.executeFollowUpTest();
+        // Tests outside any flow still apply their effects and execute their configured follow up test.
+        if (flowState) {
+            await FlowRunner.runNext(this, flowState);
+        } else {
+            await this.applyTargetedEffectsOutsideFlow();
+            if (this.autoExecuteFollowupTest) await this.executeFollowUpTest();
         }
 
         // Managed tests are continued by their record. Preserve auto-chaining for in-progress
@@ -1675,13 +1684,21 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Allow subclasses to override followup behavior after a successful test result
      * @override
      */
-    async afterSuccess() {
-        
-        // When an unopposed test succeeds, the test documents targeted effects can be applied
-        if (this.opposing) return;
-        if (this.opposed) return;
+    async afterSuccess() { }
 
-        // taM check this
+    /**
+     * Apply targeted actor effects for tests outside any flow.
+     *
+     * Unopposed tests apply them to their targets on success, opposing tests to their own actor on failure.
+     */
+    async applyTargetedEffectsOutsideFlow() {
+        if (this.opposing) {
+            if (this.success || !this.actor) return;
+            await this.effects.createTargetActorEffects(this.actor);
+            return;
+        }
+
+        if (!this.success || this.opposed) return;
         for (const target of this.targets as TokenDocument[]) {
             if (target.actor === null) continue;
             await this.effects.createTargetActorEffects(target.actor);
@@ -1705,10 +1722,21 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
-     * Depending on the action configuration execute a followup test.
+     * Allow a test to veto a flow step directly following it, based on its own results.
+     *
+     * @param step The step that would follow this test.
      */
-    async executeFollowUpTest() {
-        const test = await TestCreator.fromFollowupTest(this, this.data.options);
+    flowAllowsStep(step: FlowStep): boolean {
+        return true;
+    }
+
+    /**
+     * Depending on the action configuration execute a followup test.
+     *
+     * @param testClsName The follow up test to use instead of the one configured on the action.
+     */
+    async executeFollowUpTest(testClsName?: string) {
+        const test = await TestCreator.fromFollowupTest(this, this.data.options, testClsName);
         if (!test) return;
         await test.execute();
     }

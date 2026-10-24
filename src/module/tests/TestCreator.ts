@@ -262,13 +262,15 @@ export const TestCreator = {
      *
      * @param opposed The opposed test to create a resist test with.
      * @param options See TestOptions documentation.
+     * @param testClsName The resist test to use instead of the one configured on the original action.
      */
     // oxlint-disable-next-line typescript/require-await -- Public Promise based factory, callers await it.
-    fromOpposedTestResistTest: async function(opposed: OpposedTest, options: Partial<TestOptions> = {}): Promise<SuccessTest | undefined> {
+    fromOpposedTestResistTest: async function(opposed: OpposedTest, options: Partial<TestOptions> = {}, testClsName?: string): Promise<SuccessTest | undefined> {
         // Don't change the data's source.
         const opposedData = foundry.utils.duplicate(opposed.data) as OpposedTestData;
+        const resistTestName = testClsName || opposedData?.against?.opposed?.resist?.test;
 
-        if (!opposedData?.against?.opposed?.resist?.test) {
+        if (!resistTestName) {
             console.error(`Shadowrun 5e | Given test doesn't define an opposed resist test`, opposed);
             return undefined;
         }
@@ -278,7 +280,7 @@ export const TestCreator = {
             return undefined;
         }
 
-        const resistTestCls = TestCreator._getTestClass(opposedData.against.opposed.resist.test);
+        const resistTestCls = TestCreator._getTestClass(resistTestName);
         if (!resistTestCls) return undefined;
 
         const data = TestCreator._getOpposedResistTestData(resistTestCls, opposedData, opposed.source, opposed.data.messageUuid);
@@ -298,10 +300,12 @@ export const TestCreator = {
      *
      * @param test Any test implementation with an action providing a follow up test.
      * @param options See TestOptions documentation.
+     * @param testClsName The follow up test to use instead of the one configured on the action.
      */
     // oxlint-disable-next-line typescript/require-await -- Public Promise based factory, callers await it.
-    fromFollowupTest: async function(test: SuccessTest, options: Partial<TestOptions> = {}): Promise<SuccessTest | undefined> {
-        if (!test?.data?.action?.followed?.test) return;
+    fromFollowupTest: async function(test: SuccessTest, options: Partial<TestOptions> = {}, testClsName?: string): Promise<SuccessTest | undefined> {
+        const followupTestName = testClsName || test?.data?.action?.followed?.test;
+        if (!followupTestName) return;
         if (!test.item) {
             console.error(`Shadowrun 5e | Test doesn't have a populated item document`);
             return;
@@ -311,7 +315,7 @@ export const TestCreator = {
             return;
         }
 
-        const testCls = TestCreator._getTestClass(test.data.action.followed.test);
+        const testCls = TestCreator._getTestClass(followupTestName);
         if (!testCls) {
             console.error(`Shadowrun 5e | A ${test.constructor.name} has a unregistered follow up test configured`, this);
             return;

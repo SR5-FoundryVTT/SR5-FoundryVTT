@@ -10,7 +10,6 @@ import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
 import { SuccessTest, TestOptions } from './SuccessTest';
 import { DeepPartial } from "fvtt-types/utils";
 import { MatrixResistTest } from './MatrixResistTest';
-import { TestCreator } from './TestCreator';
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { MinimalActionType } from '../types/item/Action';
 
@@ -130,14 +129,6 @@ export class MatrixDefenseTest<T extends MatrixDefenseTestData = MatrixDefenseTe
             MatrixRules.modifyDamageAfterHit(this.against.hits.value, this.hits.value, this.data.incomingDamage);
 
         await super.processFailure();
-    }
-
-    override async afterFailure() {
-        await super.afterFailure();
-
-        const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
-        if (!test) return;
-        await test.execute();
     }
 
     override async populateDocuments() {
