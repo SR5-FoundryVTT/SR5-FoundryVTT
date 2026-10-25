@@ -119,7 +119,7 @@ The standalone project README is the source of truth for citation tooling setup 
 # System Architecture
 A broad overview of the different areas of the shadowrun5e system. For more explanations around system specific concepts see `System Concepts`.
 ## Folder structure
-Everything needed to execute the system within foundry is generated under
+The generated application code and assets needed to execute the system are under
 * `/dist`
 FoundryVTT compendium packs are loaded from the root, outside of `/dist`, as declared in `system.json`:
 - `/packs`
