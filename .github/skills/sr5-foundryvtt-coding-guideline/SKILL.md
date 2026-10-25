@@ -65,8 +65,8 @@ flow. Do not write a separate resolver in a sheet, template, or data preparation
 
 ### How the pipeline works
 
-- **Entry points.** `SR5Actor.getRollData` and `SR5Item.getRollData` start from a copy of `system` and delegate to
-  `ActorRollDataFlow.getRollData` and `ItemRollDataFlow.getRollData`.
+- **Entry points.** `SR5Actor.getRollData` and `SR5Item.getRollData` use a copy of `system` when `copySystem: true`; otherwise they use Foundry's default roll data, then delegate to
+  `ActorRollDataFlow.getRollData` and `ItemRollDataFlow.getRollData`. 
 - **Dispatch.** `ActorRollDataFlow.injectVehicleDriverRollData` injects driver values into a vehicle. `ItemRollDataFlow`
   dispatches by action category; `matrix` goes to `matrixTestRollDataFlow`, which handles PAN slaves and owned devices.
 - **Copy and merge.** Rules do the injection: `RiggingRules.modifyRollDataForDriver`, `AttributeRules.injectAttributes`,
