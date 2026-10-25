@@ -14,7 +14,7 @@ argument-hint: 'Describe the code change (feature, rule, flow, test, or sheet)'
 The rules for changing code in the Shadowrun 5e FoundryVTT system. Stack: TypeScript, esbuild, Sass, Handlebars, Gulp,
 npm. The repository custom instructions (naming, formatting, async style) still apply.
 
-This skill is the single source of these rules. The [code review skill](../sr5-foundryvtt-code-review/SKILL.md) links
+This skill is the single source of these rules. The [code review skill](../code-review/SKILL.md) links
 here instead of repeating them.
 
 How to use it: read the sections for every layer your change touches, follow the rules there, then run

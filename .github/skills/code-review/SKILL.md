@@ -1,5 +1,5 @@
 ---
-name: sr5-foundryvtt-code-review
+name: code-review
 description:
     'Use when: reviewing a change, diff, or pull request in the SR5-FoundryVTT Shadowrun 5e system; checking layer
     boundaries (app / sheet, data prep, flow, rules, tests); checking SuccessTest, TestCreator, and modifier usage;

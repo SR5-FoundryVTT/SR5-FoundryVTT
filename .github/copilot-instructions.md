@@ -7,7 +7,7 @@ FoundryVTT system for Shadowrun 5th edition, written in TypeScript, SCSS, and Ha
 Load the matching skill before acting. The skills hold the detailed rules.
 
 - Writing or changing code: `sr5-foundryvtt-coding-guideline`.
-- Reviewing a diff or pull request: `sr5-foundryvtt-code-review`.
+- Reviewing a diff or pull request: `code-review`.
 - Changing locale keys: `locale-structure-sync`.
 - Sourcebook citations such as `SR5#140`: `sourcebook-citation-resolution` and
   `sourcebook-citation-implementation-review`.
