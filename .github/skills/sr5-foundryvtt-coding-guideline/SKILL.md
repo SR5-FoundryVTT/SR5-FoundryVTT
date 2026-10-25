@@ -22,8 +22,8 @@ How to use it: read the sections for every layer your change touches, follow the
 
 ## Layers
 
-Paths are relative to `src/module/`. Documents (`SR5Actor`, `SR5Item`, `SR5Combat`, and others) are the main API surface
-and orchestrate calls into flows and rules. Extend existing flows and rules instead of adding parallel abstractions.
+Paths are relative to `src/module/`. Documents are the main API surface and orchestrate calls into flows and rules.
+Extend existing flows and rules instead of adding parallel abstractions.
 
 | Layer          | Location                                                       | Rules                                                                                                                                                                                                                                                                       |
 | -------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -128,9 +128,11 @@ Rules:
 
 ## Quench unit tests
 
-- Specs live in `src/unittests/` as `*.spec.ts`. Register each new spec in `src/unittests/quench.ts`, or it never runs.
-  Batch keys follow `shadowrun5e.<area>.<name>`.
+- Specs live in `src/unittests/` as `*.spec.ts` and run inside Foundry. Run them with the CLI in
+  [Running Quench](#running-quench), not a standalone Mocha runner. Register each new spec in `src/unittests/quench.ts`,
+  or it never runs. Batch keys are dotted (`shadowrun5e.<area>.<name>`).
 - Rule changes need specs. Flows should have them where practical. Application code does not need them.
+- Run the batch that covers your change before reporting it done. A failing batch is not done.
 - Quench is dev-only: `hooks.ts` imports `hooks-dev` only when `process.env.ENV === 'dev'`. Never import
   `src/unittests/` or `hooks-dev` from production code.
 - Clean up documents a spec creates in the world.
@@ -179,7 +181,7 @@ Change-specific checks:
 
 | Change                    | Command                                                                               |
 | ------------------------- | ------------------------------------------------------------------------------------- |
-| Rule or flow behaviour    | `npm run quench` against a dev world (below)                                          |
+| Rule or flow behaviour    | `npm run quench -- <batch>` against a dev world ([Running Quench](#running-quench))   |
 | Sheet, template, or style | Check the running world with the `foundry-ui-debugging` instructions after rebuilding |
 | Locale keys               | `npm run locale:check`                                                                |
 
@@ -188,11 +190,42 @@ separate from behaviour changes.
 
 ### Running Quench
 
-1. Build for development: `npm run watch:dev` (rebuilds on change) or `npm run build:dev`.
-2. Start Foundry with a world that uses the development system and has Quench installed. Install the browser once with
-   `npx playwright install chromium`.
-3. Run `npm run quench`. Filter with `npm run quench -- shadowrun5e.rules.**`; show the browser with `-- --headed`.
+The CLI (`scripts/quench.mjs`, npm script `quench`) joins a running world through Playwright, runs the Quench batches
+matching a pattern, and prints each result. Quench is not one of the CI gates, so run it locally. CI cannot run it: the
+Foundry world only runs in a local session.
 
-Environment variables (also read from the git-ignored `.env.local`): `FOUNDRY_URL` (default `http://localhost:30000`),
-`FOUNDRY_USER` (default `Gamemaster`), `FOUNDRY_PASSWORD`, `QUENCH_PATTERN`, `QUENCH_RUN_TIMEOUT`, `QUENCH_PAGE_LOGS=1`,
-`FOUNDRY_BROWSER_CHANNEL`. The runner prints `✓`, `✗`, or `○` per test and exits `1` on any failure.
+Setup, once per machine and then per session:
+
+1. Install the browser: `npx playwright install chromium`.
+2. Build the development bundle: `npm run build:dev`, or keep `npm run watch:dev` running. Quench batches load only in
+   this build (`hooks-dev`).
+3. Start Foundry on `http://localhost:30000` with a world that uses the development system and has Quench installed.
+
+Commands (quote patterns that contain `*` so the shell does not expand them):
+
+```bash
+npm run quench -- shadowrun5e.rules.ranged_weapon   # one batch
+npm run quench -- 'shadowrun5e.flow.**'             # a family of batches
+npm run quench                                      # full suite (default pattern shadowrun5e.**)
+npm run quench -- 'shadowrun5e.rules.**' --headed   # watch the browser
+```
+
+- Batch keys are registered in `src/unittests/quench.ts`. Use the narrowest key or prefix that covers the change.
+- Pattern precedence: `--pattern <p>` (or `--pattern=<p>`), then `QUENCH_PATTERN`, then the positional argument, then
+  `shadowrun5e.**`.
+- Output: `✓` passed, `✗` failed, `○` neither passed nor failed. Failure stacks are mapped back to `src/` through source
+  maps.
+- Exit code: `0` when all tests pass, `1` on any failure or fatal error.
+- Run the full suite before finishing a change to rules or flows that other batches exercise.
+
+Environment variables, also read from the git-ignored `.env.local` (existing variables win):
+
+| Variable                  | Default                  | Purpose                                                        |
+| ------------------------- | ------------------------ | -------------------------------------------------------------- |
+| `FOUNDRY_URL`             | `http://localhost:30000` | World URL                                                      |
+| `FOUNDRY_USER`            | `Gamemaster`             | User to join as                                                |
+| `FOUNDRY_PASSWORD`        | none                     | Password, if the user has one                                  |
+| `QUENCH_PATTERN`          | `shadowrun5e.**`         | Default batch pattern                                          |
+| `QUENCH_RUN_TIMEOUT`      | 600000 (ms)              | Watchdog for the whole run; per-test timeouts stay in the spec |
+| `QUENCH_PAGE_LOGS`        | off (`1` enables)        | Forward browser console output                                 |
+| `FOUNDRY_BROWSER_CHANNEL` | Playwright Chromium      | Browser channel, for example to use an installed Chrome        |
