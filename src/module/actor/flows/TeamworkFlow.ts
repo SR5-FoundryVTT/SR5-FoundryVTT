@@ -8,7 +8,11 @@ export interface TeamworkMessageData {
     skill: string,
     additionalDice: number,
     additionalLimit: number,
-    criticalGlitch: boolean
+    criticalGlitch: boolean,
+    // Actor uuids of everyone who assisted.
+    participantUuids?: string[],
+    // The item the leader rolls, instead of a skill. See SR5Actor.rollTeamworkItem.
+    itemUuid?: string
 }
  
 export class TeamworkTest {
@@ -77,6 +81,8 @@ export class TeamworkTest {
             teamworkData.criticalGlitch = true;
         }
 
+        if (actor.uuid) teamworkData.participantUuids = [...(teamworkData.participantUuids ?? []), actor.uuid];
+
         participantsRoot.appendChild(participant)
 
         if(game.user?.isGM) {
@@ -96,7 +102,11 @@ export class TeamworkTest {
     static rollTeamworkTest(message: ChatMessage) {
         const teamworkData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as TeamworkMessageData
         const actor = game.actors?.get(message.speaker.actor!) as SR5Actor;
-        
+
+        if (teamworkData.itemUuid) {
+            void actor?.rollTeamworkItem(teamworkData);
+            return;
+        }
         void actor?.rollTeamworkTest(teamworkData.skill, teamworkData)
     }
 

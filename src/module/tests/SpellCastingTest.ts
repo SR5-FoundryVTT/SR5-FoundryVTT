@@ -24,6 +24,9 @@ export interface SpellCastingTestData extends SuccessTestData {
  * Spellcasting tests as described on SR5#281 in the spellcasting chapter.
  */
 export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
+    // Tests new action nodes below this test default to. See FlowNodeEditorFlow.
+    static override flowDefaults: Record<string, string> = { followed: 'DrainTest' };
+
     // A preparation carries the same spell fields a spell item does, and PreparationTriggerTest
     // runs this flow with one.
     public override item: SR5Item<'spell' | 'preparation'> | undefined = undefined;

@@ -257,6 +257,11 @@ declare module "fvtt-types/configuration" {
             sr5_testProcessResults: any;
             sr5_afterTestComplete: any;
             sr5_resolveFlowPlan: any;
+            // A test ran a feature stage: (test, stage).
+            sr5_testStage: (test: any, stage: string) => void;
+            // A flow step is about to run, or has run: (step, context).
+            sr5_flowStepStart: (step: any, context: any) => void;
+            sr5_flowStepComplete: (step: any, context: any) => void;
             sr5_processTagifyElements: any;
             // Fired on all clients on global data storage changes, with the changed keys.
             'sr5e.storageChanged': (changedKeys: string[]) => void;

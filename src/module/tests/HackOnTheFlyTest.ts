@@ -1,7 +1,6 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { MatrixTest } from "./MatrixTest";
-import { TestOptions } from "./SuccessTest";
-import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
+import { MatrixPlacementData } from "./flows/MarkPlacementFlow";
 
 /**
  * Hack on the Fly tests implement the Hack on the Fly action on SR5#240
@@ -11,10 +10,8 @@ import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlo
 export class HackOnTheFlyTest extends MatrixTest<MatrixPlacementData> {
     declare actor: SR5Actor;
 
-    override _prepareData(data: MatrixPlacementData, options: Partial<TestOptions>): MatrixPlacementData {
-        const prepared = super._prepareData(data, options);
-        return MarkPlacementFlow._prepareData(prepared);
-    }
+    // Mark placement prepares the data, adds the dice cost of extra marks and validates them.
+    static override features = ['markPlacement'];
 
     /**
      * Brute Force is a matrix action.
@@ -23,24 +20,4 @@ export class HackOnTheFlyTest extends MatrixTest<MatrixPlacementData> {
         return ['matrix', 'hack_on_the_fly'];
     }
 
-    /**
-     * Any matrix action gets the noise modifier.
-     */
-    override get testModifiers(): Shadowrun.ModifierTypes[] {
-        const modifiers = super.testModifiers;
-        modifiers.push('noise');
-        return modifiers;
-    }
-
-    override prepareTestModifiers() {
-        super.prepareTestModifiers();
-
-        MarkPlacementFlow.prepareTestModifiers(this);
-    }
-
-    override validateBaseValues() {
-        super.validateBaseValues();
-
-        MarkPlacementFlow.validateBaseValues(this);
-    }
 }

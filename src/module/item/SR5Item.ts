@@ -34,6 +34,7 @@ import { RollDataOptions } from './Types';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
+import { FlowNodeRules } from '@/module/types/flows/FlowNodeField';
 import { ModifiableValueType } from '../types/template/Base';
 import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
 import { allApplicableDocumentEffects } from '../effects';
@@ -270,10 +271,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             // before re-applying, so repeated passes don't double them.
             const source = ModifiableValue.effectSource(effect);
             for (const change of changes) {
-                const altered = { ...change } as unknown as ActiveEffect.ChangeData;
-                SR5ActiveEffect.alterChange(this, altered);
-                const value = SR5ActiveEffect.getModifiableValue(this, altered.key ?? '');
-                if (value) ModifiableValue.removeFromSource(value, source);
+                for (const key of FlowNodeRules.expandRelationKey(this, change.key ?? '')) {
+                    const altered = { ...change, key } as unknown as ActiveEffect.ChangeData;
+                    SR5ActiveEffect.alterChange(this, altered);
+                    const value = SR5ActiveEffect.getModifiableValue(this, altered.key ?? '');
+                    if (value) ModifiableValue.removeFromSource(value, source);
+                }
             }
 
             if (effect.disabled || effect.isSuppressed) continue;
@@ -318,14 +321,27 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         dontRollTest = !this.hasRoll;
 
-        if (dontRollTest) return this.postItemCard();
-
         if (!actor) {
             actor = this.actor ?? undefined;
         }
 
+        if (dontRollTest) {
+            // Using an item without a roll can still start a chain, like a drug applying its effects.
+            // Avoid a module cycle: the flow runner imports the test creator, which imports items.
+            const { FlowRunner } = await import('../flows/FlowRunner');
+            if (actor && FlowRunner.startsRolllessChain(this)) return FlowRunner.startChain(this, actor);
+            return this.postItemCard();
+        }
+
         // A preparation rolls on its own Force and Potency, it doesn't need an actor. SR5#306.
         if (!actor && !this.isType('preparation')) return;
+
+        // An action with assistants starts a teamwork test, the leader rolls once they have. SR5#49.
+        const action = this.getAction();
+        const assist = action?.assist as { test?: string, skill?: string } | null | undefined;
+        if (actor && (assist?.test || assist?.skill)) {
+            return actor.startTeamworkTest(assist.skill || action?.skill || '', undefined, { itemUuid: this.uuid ?? undefined });
+        }
 
         const showDialog = !TestCreator.shouldHideDialog(event);
         const test = await TestCreator.fromItem(this, actor, { showDialog });

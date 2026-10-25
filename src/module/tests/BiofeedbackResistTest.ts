@@ -25,6 +25,9 @@ export type BiofeedbackResistTestData = ResistTestData<ResistTestData> & {
  * - if you want specifically stun or physical, pass in the data wit that type
  */
 export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData> {
+    // Resisted for the icons or targets of what was resisted before. See FlowSubjects.
+    static override subjects = 'resistTargets';
+
     // icon of the target
     declare icon: SR5Actor | SR5Item;
     // The target icon, if it's representing a device.
@@ -158,10 +161,7 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
      * This can be used to trigger resist tests.
      */
     static override async executeMessageAction(againstData: ResistTestData, messageId: string, options: Partial<TestOptions>) {
-        // Determine documents to roll test with.
-        const documents = againstData.action.test === 'MatrixResistTest'
-                                            ? await Helpers.getMatrixTestTargetDocuments(againstData as any)
-                                            : await Helpers.getTestTargetDocuments(againstData)
+        const documents = await this.messageActionSubjects(againstData);
         await ResistTestDataFlow.executeMessageAction(this as typeof SuccessTest, againstData, messageId, documents as (SR5Actor | SR5Item)[], options);
     }
 }

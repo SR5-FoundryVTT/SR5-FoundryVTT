@@ -53,6 +53,13 @@ import { PhysicalResistTest } from "./tests/PhysicalResistTest";
 import { FlowConditions } from "./flows/FlowPlan";
 import { FlowRunner } from "./flows/FlowRunner";
 import { FlowChatFlow } from "./flows/FlowChatFlow";
+import { FlowSubjects } from "./flows/FlowSubjects";
+import { FlowContributors } from "./flows/FlowContributors";
+import { FlowGates } from "./flows/FlowGates";
+import { FlowRelations } from "./types/flows/FlowNodeField";
+import { TestFeatures } from "./tests/features/TestFeature";
+import { registerFlowFeatures } from "./tests/features/FlowFeatures";
+import { registerMatrixFeatures } from "./tests/features/MatrixFeatures";
 import { MeleeAttackTest } from "./tests/MeleeAttackTest";
 import { SpellCastingTest } from "./tests/SpellCastingTest";
 import { DrainTest } from "./tests/DrainTest";
@@ -78,6 +85,7 @@ import { OpposedHackOnTheFlyTest } from './tests/OpposedHackOnTheFlyTest';
 import { MatrixDefenseTest } from './tests/MatrixDefenseTest';
 import { MatrixTest } from './tests/MatrixTest';
 import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
+import { ToxinResistTest } from './tests/ToxinResistTest';
 import { CheckOverwatchScoreTest } from '@/module/tests/CheckOverwatchScoreTest';
 import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
 
@@ -165,6 +173,8 @@ export class HooksManager {
 
         Hooks.once('init', () => {
             HooksManager.init();
+            registerFlowFeatures();
+            registerMatrixFeatures();
 
             // Custom Module Integrations
             // See src/module/integrations for more information.
@@ -300,6 +310,7 @@ ___________________
                 OpposedHackOnTheFlyTest,
                 MatrixResistTest,
                 BiofeedbackResistTest,
+                ToxinResistTest,
                 CheckOverwatchScoreTest,
                 OpposedCheckOverwatchScoreTest,
                 OpposedMatrixTest
@@ -367,7 +378,8 @@ ___________________
             resistTests: {
                 PhysicalResistTest,
                 MatrixResistTest,
-                BiofeedbackResistTest
+                BiofeedbackResistTest,
+                ToxinResistTest
             },
             /**
              * Subset of tests meant to follow a main active test
@@ -383,6 +395,14 @@ ___________________
              */
             flow: {
                 conditions: FlowConditions,
+                // Relation keys of the action node tree, see FlowRelations.
+                relations: FlowRelations,
+                // Who rolls a test cast from another tests message, see FlowSubjects.
+                subjects: FlowSubjects,
+                // Reusable test behavior, see TestFeature.
+                features: TestFeatures,
+                // Rules adding nodes to action node trees, see FlowContributors.
+                contributors: FlowContributors,
             },
 
             /**
@@ -738,6 +758,7 @@ ___________________
             [FLAGS.ApplyExtendedTestRoll]: [ExtendedTestFlow._handleApplyRollSocketMessage.bind(ExtendedTestFlow)],
             [FLAGS.FlowStepDone]: [FlowRunner._handleStepDoneSocketMessage.bind(FlowRunner)],
             [FLAGS.FlowApplyDone]: [FlowRunner._handleApplyDoneSocketMessage.bind(FlowRunner)],
+            [FLAGS.FlowGate]: [FlowGates._handleSocketMessage.bind(FlowGates)],
         } as const;
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData, senderId?: string) => {

@@ -242,6 +242,24 @@
             },
             "RemoveCondition": "Remover Condição",
             "RemoveTarget": "Remover Alvo",
+            "DurationFormula": {
+                "label": "Fórmula da duração",
+                "hint": "Quando uma ação aplica este efeito, calcula o valor da duração uma vez, nas unidades acima. Como max(1, 6 - @actor.attributes.body.value) ou 10 * 1d6."
+            },
+            "Stacking": {
+                "label": "Acúmulo",
+                "hint": "Quando uma ação aplica este efeito novamente ao mesmo ator.",
+                "Stack": "Adicionar outro",
+                "Replace": "Substituir o anterior",
+                "Highest": "Manter o mais forte"
+            },
+            "AppliesAs": {
+                "label": "Aplica ao destinatário como",
+                "hint": "O que este alvo altera no ator ao qual uma ação aplica o efeito: seus dados, os testes que ele faz, ou um modificador.",
+                "Actor": "Dados do ator",
+                "Tests": "Seus testes",
+                "Modifier": "Modificador"
+            },
             "SelectionModes": {
                 "Exclude": "Excluir",
                 "Include": "Incluir"
@@ -629,6 +647,7 @@
             "Acid": "Ácido",
             "Cold": "Frio",
             "Electricity": "Elétrico",
+            "Electrified": "Eletrocutado",
             "Fire": "Fogo",
             "Pollutant": "Pollutant",
             "Radiation": "Radiação",
@@ -843,6 +862,58 @@
         "FireMode": "Modo de Tiro",
         "Force": "Força",
         "FullDefense": "Defesa Total",
+        "Chemical": {
+            "Label": "Químico",
+            "None": "Nenhum",
+            "Kind": "Tipo",
+            "KindHint": "Uma toxina é resistida ao ser aplicada, uma droga aplica seus efeitos em quem a usa, um BTL é usado como uma droga (SR5 p.408-413).",
+            "Vector": "Vetores",
+            "Kinds": {
+                "Toxin": "Toxina",
+                "Drug": "Droga",
+                "Btl": "BTL"
+            },
+            "Vectors": {
+                "Contact": "Contato",
+                "Ingestion": "Ingestão",
+                "Inhalation": "Inalação",
+                "Injection": "Injeção"
+            },
+            "Speed": "Velocidade",
+            "SpeedHint": "Quando faz efeito. Em combate, mesmo Imediato faz efeito no fim do Turno de Combate (SR5 p.408).",
+            "SpeedUnits": {
+                "Immediate": "Imediato",
+                "Turns": "Turnos de Combate",
+                "Seconds": "Segundos",
+                "Minutes": "Minutos",
+                "Hours": "Horas",
+                "Days": "Dias"
+            },
+            "Power": "Poder",
+            "PowerHint": "O VD da toxina, reduzido pelos acertos do teste de resistência. Os efeitos leem o que sobra como @payload.power.",
+            "Penetration": "Penetração",
+            "PenetrationHint": "Reduz o índice de equipamentos de proteção, como PA faz com armadura.",
+            "DamageTypes": {
+                "Physical": "Físico",
+                "Stun": "Atordoamento",
+                "None": "Sem dano"
+            },
+            "Duration": "Duração",
+            "DurationHint": "Quanto tempo os efeitos duram, calculado uma vez ao usar. Pode ler quem usa, como max(1, 6 - @actor.attributes.body.value).",
+            "Addiction": "Vício",
+            "AddictionHint": "Usar enquanto já está sob efeito dela, ou de outra que compartilha um efeito, é uma overdose: dano de Atordoamento da soma dos Índices de Vício (SR5 p.415).",
+            "AddictionTypes": {
+                "Physiological": "Fisiológico",
+                "Psychological": "Psicológico",
+                "Both": "Ambos"
+            },
+            "AddictionRating": "Índice",
+            "AddictionThreshold": "Limiar"
+        },
+        "Toxin": {
+            "Resisted": "Resistido",
+            "TakesEffect": "Faz efeito"
+        },
         "FullDefenseAttribute": "Atributo de Defesa Total",
         "GMRequest": {
             "General": "Seu/Sua GM quer que você faça um",
@@ -1980,7 +2051,73 @@
             "Skipped": "Ignorado",
             "ApplyDamage": "Aplicar dano",
             "ApplyEffects": "Aplicar efeitos",
-            "Applied": "Aplicado"
+            "Applied": "Aplicado",
+            "Options": {
+                "accept": "Aceitar",
+                "resist": "Resistir"
+            },
+            "Waiting": "Aguardando",
+            "Choice": "Aceitar ou resistir",
+            "TouchOnly": "Ataque apenas de toque",
+            "ForceReboot": "Reiniciar",
+            "NoDefense": "Sem defesa",
+            "NoDefenseHint": "Não defender: o ataque é tratado como um teste de sucesso, todos os sucessos dele são sucessos líquidos (SR5 p.190).",
+            "PickTarget": "Token alvejado",
+            "PickTargetFirst": "Primeiro alveje o token para quem é este teste.",
+            "Node": {
+                "Test": "Teste",
+                "PoolFormula": "Fórmula da parada",
+                "PoolFormulaHint": "Substitui perícia e atributos por um valor, como @item.force * 2 para a defesa de um espírito. Deixe vazio para usar perícia e atributos.",
+                "Formula": "Fórmula",
+                "DamageFormula": "Fórmula do dano",
+                "DamageFormulaHint": "Substitui o valor base do dano, como @item.rating para um item cujo Nível é o seu VD. Deixe vazio para usar o valor acima.",
+                "ArmorHint": "Adiciona a armadura do ator à parada.",
+                "Actor": "Rolado por",
+                "ActorHint": "De quem é este teste, em relação ao teste que ele segue. Vazio usa o padrão para este tipo de teste.",
+                "Mode": "Inicia",
+                "ModeHint": "Executar imediatamente, ou mostrar um botão na mensagem de chat.",
+                "Preset": "Padrão",
+                "Remove": "Remover este teste e tudo depois dele",
+                "Warnings": {
+                    "NoTest": "Sem um teste isto não faz nada.",
+                    "NoRelease": "Nada aqui libera o teste que vem depois, então esse teste nunca acontece. Defina o que o libera em um teste dentro deste.",
+                    "NoIncomingDamage": "Nada antes disto causa dano, então não há o que resistir.",
+                    "NoAllies": "Aliados são os assistentes da ação. Adicione um teste de assistência para que existam.",
+                    "RunsOnClick": "Acontece ao clicar: sem limiar ou teste resistido, qualquer sucesso é um sucesso."
+                },
+                "Relation": {
+                    "opposed": "Teste de Oposição",
+                    "resist": "Teste de Resistência",
+                    "followed": "Teste Seguinte",
+                    "before": "Antes do Teste",
+                    "option": "Opção",
+                    "assist": "Teste de Auxílio"
+                },
+                "Add": {
+                    "opposed": "Adicionar Teste de Oposição",
+                    "resist": "Adicionar Teste de Resistência",
+                    "followed": "Adicionar Teste Seguinte",
+                    "before": "Adicionar Teste Antes",
+                    "option": "Adicionar Opção",
+                    "assist": "Adicionar Teste de Auxílio"
+                },
+                "Actors": {
+                    "same": "Mesmo ator",
+                    "other": "Outro lado",
+                    "allies": "Aliados",
+                    "self": "Conjurador",
+                    "target": "Alvos",
+                    "owner": "Controlador do dono",
+                    "none": "Ninguém (fórmula)",
+                    "participants": "Conjurador e auxiliares",
+                    "pick": "Atores escolhidos",
+                    "occupants": "Veículo e passageiros"
+                },
+                "Modes": {
+                    "auto": "Imediatamente",
+                    "prompt": "Pelo botão"
+                }
+            }
         },
         "Tests": {
             "AttributeOnlyTest": "Teste Apenas de Atributo",
@@ -2013,7 +2150,8 @@
             "SuccessTest": "Teste de Sucesso",
             "SummonSpiritTest": "Invocar Espírito",
             "SuppressionDefenseTest": "Defesa de Supressão",
-            "ThrownAttackTest": "Ataque de Arma Lançada"
+            "ThrownAttackTest": "Ataque de Arma Lançada",
+            "ToxinResistTest": "Teste de Resistência a Toxina"
         },
         "Threshold": "Limiar",
         "TimeControl": {
@@ -2297,6 +2435,8 @@
             "CantSecondChanceAGlitch": "Não pode ter uma segunda chance neste teste. O resultado do teste é falho.",
             "CantSecondChanceWithoutNoneHits": "Não pode ter uma segunda chance neste teste. Só restam dados de acerto.",
             "CantSpendMulitplePointsOfEdge": "Não pode gastar vários pontos de trunfo em um teste ou ação",
+            "CantUseEdgeOnThisTest": "Não é possível usar trunfo neste teste",
+            "NoDosesLeft": "Não há doses restantes",
             "CantCombineBuyHitsWithEdge": "Comprar Acertos não pode ser combinado com Segunda Chance.",
             "CompilationNotConcluded": "Compilação incompleta. Aguarde o sprite se opor à compilação para determinar o enfraquecimento.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Pontos de trunfo não podem ser gastos em testes sem atores",

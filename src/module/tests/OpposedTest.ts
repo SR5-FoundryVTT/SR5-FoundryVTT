@@ -136,7 +136,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         // Allow the OpposedTest to overwrite action data using its class default action.
         action = TestCreator._mergeMinimalActionDataInOrder(action,
             // Use action data from the original action at first.
-            againstData.opposed,
+            TestCreator._nodeActionData(againstData.opposed),
             // Overwrite with the OpposedTest class default action, if any.
             this._getDefaultTestAction()
         );

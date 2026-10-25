@@ -22,41 +22,10 @@ interface OpposedSummonSpiritTestData extends OpposedTestData {
  * The summoner is the active actor and the spirit is the opposed actor.
  */
 export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTestData> {
+    // The opposition has no actor of its own, the caster rolls it. See FlowSubjects.caster.
+    static override subjects = 'caster';
+
     declare against: SummonSpiritTest;
-
-    static async _resolveOpposedBootstrapDocument(
-        againstData: SuccessTestData
-    ): Promise<SR5Actor | SR5Item | null> {
-        const sourceUuid = againstData.sourceActorUuid || againstData.sourceUuid || '';
-
-        let document: unknown = sourceUuid ? await fromUuid(sourceUuid) : null;
-        if (document instanceof TokenDocument)
-            document = document.actor ?? null;
-
-        if (document instanceof SR5Actor || document instanceof SR5Item)
-            return document;
-
-        return null;
-    }
-
-    static override async executeMessageAction(
-        againstData: SuccessTestData,
-        messageId: string,
-        options: TestOptions
-    ): Promise<void> {
-        const bootstrapDocument = await this._resolveOpposedBootstrapDocument(againstData);
-        if (!bootstrapDocument) {
-            ui.notifications?.error('SR5.Errors.NoAvailableActorFound', { localize: true });
-            return;
-        }
-
-        const data = await this._getOpposedActionTestData(againstData, bootstrapDocument, messageId);
-        if (!data) return;
-
-        const documents = { source: bootstrapDocument };
-        const test = new this(data, documents, options);
-        await test.execute();
-    }
 
     constructor(data: DeepPartial<OpposedSummonSpiritTestData>, documents?: TestDocuments, options?: Partial<TestOptions>) {
         // Due to summoning, the active actor for this test will be created during execution.

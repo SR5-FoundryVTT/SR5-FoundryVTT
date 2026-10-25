@@ -2,6 +2,7 @@ import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import { DeepPartial } from "fvtt-types/utils";
 import { TestOptions } from "./SuccessTest";
 import {DataDefaults} from "../data/DataDefaults";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import { Translation } from '../utils/strings';
 import { DamageType } from "../types/item/Action";
 import { SYSTEM_NAME, FLAGS } from "../constants";
@@ -60,6 +61,68 @@ export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends Op
     override calculateBaseValues() {
         super.calculateBaseValues();
         this.applyIniModFromActiveDefense();
+    }
+
+    override prepareBaseValues() {
+        super.prepareBaseValues();
+        this.applyOngoingFullDefense();
+    }
+
+    /**
+     * Full Defense lasts the whole Combat Turn. SR5#191.
+     *
+     * Physical and matrix defenses go on Full Defense separately.
+     */
+    get fullDefenseKind(): 'physical' | 'matrix' {
+        return this.hasTestCategory('matrix') ? 'matrix' : 'physical';
+    }
+
+    /**
+     * The Full Defense the defender is on this Combat Turn, if any.
+     */
+    get ongoingFullDefense(): { kind: string, value: number } | undefined {
+        for (const effect of this.actor?.effects ?? []) {
+            if (effect.disabled || effect.isSuppressed || effect.duration?.expired) continue;
+            const fullDefense = foundry.utils.getProperty(effect.flags, `${SYSTEM_NAME}.${FLAGS.FullDefense}`) as { kind: string, value: number } | undefined;
+            if (fullDefense?.kind === this.fullDefenseKind) return fullDefense;
+        }
+        return undefined;
+    }
+
+    /**
+     * Keep the Full Defense bonus for every defense of the Combat Turn, without paying for it again.
+     * It stacks with other active defenses, like Dodge. SR5#191.
+     */
+    applyOngoingFullDefense() {
+        const ongoing = this.ongoingFullDefense;
+        if (!ongoing) return;
+
+        delete this.data.activeDefenses.full_defense;
+        if (this.data.activeDefense === 'full_defense') this.data.activeDefense = '';
+        ModifiableValue.setUnique(this.data.pool, 'SR5.FullDefense', ongoing.value);
+    }
+
+    /**
+     * Going on Full Defense during combat keeps the defender on it until the end of the Combat Turn.
+     */
+    async startFullDefense() {
+        if (!this.actor || this.data.activeDefense !== 'full_defense') return;
+        if (this.ongoingFullDefense) return;
+        if (!game.combat?.started || !game.combat.getActorCombatant(this.actor)) return;
+
+        const value = this.data.activeDefenses.full_defense?.value ?? 0;
+        await this.actor.createEmbeddedDocuments('ActiveEffect', [{
+            name: game.i18n.localize('SR5.FullDefense'),
+            img: 'icons/svg/shield.svg',
+            duration: { value: 1, units: 'rounds', expiry: 'roundEnd' },
+            flags: { [SYSTEM_NAME]: { [FLAGS.FullDefense]: { kind: this.fullDefenseKind, value } } },
+            system: { targets: [], changes: [] },
+        } as unknown as ActiveEffect.CreateData]);
+    }
+
+    override async afterTestComplete() {
+        await this.startFullDefense();
+        await super.afterTestComplete();
     }
 
     /**

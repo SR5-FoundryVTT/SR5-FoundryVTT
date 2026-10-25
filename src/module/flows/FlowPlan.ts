@@ -1,8 +1,10 @@
 import type { SR5Actor } from "@/module/actor/SR5Actor";
 import type { SuccessTest } from "@/module/tests/SuccessTest";
-import { LegacyStepMapper } from "@/module/tests/flows/LegacyStepMapper";
 import type { FlowStep } from "@/module/types/flows/FlowStep";
 import type { DamageType } from "@/module/types/item/Action";
+import { FLOW_LEGACY_STEPS, FlowNodeData, FlowTree } from "./FlowTree";
+import { FlowContributors } from "./FlowContributors";
+import { ElementalRules } from "@/module/rules/ElementalRules";
 
 /**
  * What a step condition is evaluated against.
@@ -15,6 +17,8 @@ export interface FlowConditionContext {
     test?: SuccessTest;
     actor?: SR5Actor;
     damage?: DamageType;
+    // Outcomes of a parent step resolved without a test, like a skipped defense.
+    outcome?: string[];
 }
 
 export type FlowCondition = (context: FlowConditionContext) => boolean;
@@ -26,6 +30,13 @@ export type FlowCondition = (context: FlowConditionContext) => boolean;
  */
 export const FlowConditions: Record<string, FlowCondition> = {
     takesBiofeedback: ({ actor, damage }) => !!actor && !!damage && actor.takesBiofeedbackDamageFrom(damage),
+    hasElementalEffect: ({ damage }) => ElementalRules.hasSecondaryEffects(damage),
+    // Injection darts need a net hit against an unarmored target, three against an armored one. SR5#434.
+    dartPenetrates: ({ test, actor }) => {
+        const netHits = (test?.data as { values?: { againstNetHits?: { value: number } } } | undefined)?.values?.againstNetHits?.value ?? 0;
+        const armored = (actor?.getArmor().rating.value ?? 0) > 0;
+        return netHits >= (armored ? 3 : 1);
+    },
 };
 
 /**
@@ -33,15 +44,17 @@ export const FlowConditions: Record<string, FlowCondition> = {
  */
 export const FlowPlan = {
     /**
-     * Resolve all steps following the given root test.
-     *
-     * Explicit action steps win over steps derived from legacy action data.
+     * Resolve all steps following the given root test, from its action node tree.
      */
     resolve(root: SuccessTest): FlowStep[] {
-        const explicit = root.data.action?.steps ?? [];
-        const steps: FlowStep[] = explicit.length
-            ? foundry.utils.deepClone(explicit) as FlowStep[]
-            : LegacyStepMapper.map(root);
+        const action = root.data.action as FlowNodeData | undefined;
+        if (!action) return [];
+
+        // Contributors change a copy of the tree, never the item data.
+        const tree = foundry.utils.deepClone(action);
+        for (const contributor of Object.values(FlowContributors)) contributor(root, tree);
+
+        const steps = FlowTree.flatten(root, tree);
 
         Hooks.callAll('sr5_resolveFlowPlan', root, steps);
 
@@ -56,30 +69,53 @@ export const FlowPlan = {
     },
 
     /**
-     * Find a step by id.
+     * Find a step by id. Step ids of flows before action nodes are resolved to their node path.
      */
     step(plan: FlowStep[], stepId: string): FlowStep | undefined {
-        return plan.find(step => step.id === stepId);
+        const step = plan.find(step => step.id === stepId);
+        if (step) return step;
+
+        for (const path of FLOW_LEGACY_STEPS[stepId] ?? []) {
+            const legacy = plan.find(step => step.id === path);
+            if (legacy) return legacy;
+        }
+        return undefined;
     },
 
     /**
-     * Check a step's `when` against the result of its parent test.
+     * The outcomes a test results in, as steps following it can wait for them.
      *
-     * Without a parent test (the parent wasn't a test, e.g. applying damage), only 'always' matches.
+     * Opposing tests are read from the attackers point of view: a failed defense is a hit, a successful
+     * one a miss. A tie is a successful defense, but still makes contact. SR5#173 'Grazing Hit'.
      */
-    matchesWhen(step: FlowStep, test?: SuccessTest): boolean {
-        if (step.when === 'always') return true;
-        if (!test) return false;
+    outcomes(test: SuccessTest): string[] {
+        const outcomes: string[] = ['always'];
+        if (test.success) outcomes.push('success', 'miss');
+        if (test.failure) outcomes.push('failure', 'hit');
+        if (test.opposing && FlowPlan.tied(test)) outcomes.push('tie');
+        return outcomes;
+    },
 
-        switch (step.when) {
-            case 'success':
-            case 'miss':
-                return test.success;
-            case 'failure':
-            case 'hit':
-                return test.failure;
-        }
-        return false;
+    /**
+     * Did an opposing test score as many hits as the test it opposes?
+     */
+    tied(test: SuccessTest): boolean {
+        const against = (test as unknown as { against?: SuccessTest }).against;
+        if (!against) return false;
+        return against.hits.value > 0 && against.hits.value === test.hits.value;
+    },
+
+    /**
+     * Check a step's `when` against the outcomes of its parent.
+     *
+     * Without a parent test (the parent wasn't a test, e.g. applying damage), only 'always' matches,
+     * unless the parent step recorded an outcome of its own.
+     */
+    matchesWhen(step: FlowStep, test?: SuccessTest, outcome?: string[]): boolean {
+        if (!step.when.length || step.when.includes('always')) return true;
+
+        const outcomes = outcome ?? (test ? FlowPlan.outcomes(test) : ['always']);
+        return step.when.some(when => outcomes.includes(when));
     },
 
     /**
@@ -101,8 +137,8 @@ export const FlowPlan = {
      * Check if a step should run, given the result of its parent.
      */
     allows(context: FlowConditionContext): boolean {
-        const { step, test } = context;
-        if (!FlowPlan.matchesWhen(step, test)) return false;
+        const { step, test, outcome } = context;
+        if (!FlowPlan.matchesWhen(step, outcome ? undefined : test, outcome)) return false;
         if (!FlowPlan.matchesCondition(context)) return false;
         if (test && !test.flowAllowsStep(step)) return false;
         return true;

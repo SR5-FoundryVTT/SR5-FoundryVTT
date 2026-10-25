@@ -1,6 +1,7 @@
 import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import type { SR5ItemSheet } from "@/module/item/SR5ItemSheet";
+import { FlowNodeEditorFlow } from "@/module/item/flows/FlowNodeEditorFlow";
 
 export const shadowrunSR5Item = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -38,6 +39,87 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             await ordinarySheet.render({ force: true });
             assert.isNull(ordinarySheet.element.querySelector('[name="system.action.category.matrix.marks"]'));
             await ordinarySheet.close();
+        });
+
+        it('edits the action node tree from Details', async () => {
+            const item = await factory.createItem({ type: 'action', system: { action: { opposed: { test: 'OpposedTest' } } } });
+            const sheet = item.sheet as unknown as ItemSheetFixture;
+            sheet._mode = 'edit';
+            await sheet.render({ force: true });
+
+            // The always present nodes render, the optional ones offer to be added.
+            assert.isNotNull(sheet.element.querySelector('.sr5-flow-node[data-path="system.action.opposed"]'));
+            assert.isNotNull(sheet.element.querySelector('.sr5-flow-node[data-path="system.action.opposed.resist"]'));
+            assert.isNotNull(sheet.element.querySelector('.sr5-flow-node[data-path="system.action.followed"]'));
+            const add = sheet.element.querySelector<HTMLElement>('[data-action="addFlowNode"][data-path="system.action.opposed.followed"]');
+            if (!add) return assert.fail('No control to add a follow-up test below the opposed test');
+
+            add.click();
+            await new Promise(resolve => setTimeout(resolve, 200));
+            assert.isObject(foundry.utils.getProperty(item._source, 'system.action.opposed.followed'));
+
+            await sheet.render({ force: true });
+            const skill = sheet.element.querySelector<HTMLSelectElement>('[name="system.action.opposed.followed.test"]');
+            if (!skill) return assert.fail('The added node does not render its test');
+            skill.value = 'SuccessTest';
+            await sheet.submit();
+            assert.strictEqual(foundry.utils.getProperty(item._source, 'system.action.opposed.followed.test'), 'SuccessTest');
+
+            await sheet.render({ force: true });
+            const remove = sheet.element.querySelector<HTMLElement>('[data-action="removeFlowNode"][data-path="system.action.opposed.followed"]');
+            if (!remove) return assert.fail('No control to remove the added node');
+            remove.click();
+            await new Promise(resolve => setTimeout(resolve, 200));
+            assert.isNull(foundry.utils.getProperty(item._source, 'system.action.opposed.followed'));
+            await sheet.close();
+        });
+
+        it('warns about action nodes that never run as meant', async () => {
+            const item = await factory.createItem({
+                type: 'action',
+                system: { action: { test: 'SuccessTest', resist: { test: 'PhysicalResistTest' }, followed: { test: 'SuccessTest', actor: 'allies' } } } as never,
+            });
+            const { nodes } = FlowNodeEditorFlow.tree(item);
+            const warnings = (path: string) => nodes.find(node => node.path === path)?.warnings ?? [];
+
+            // Without damage, a threshold or an opposed test, the resist has nothing to resist and runs on any hit.
+            assert.includeMembers(warnings('system.action.resist'), ['SR5.Flow.Node.Warnings.NoIncomingDamage', 'SR5.Flow.Node.Warnings.RunsOnClick']);
+            assert.include(warnings('system.action.followed'), 'SR5.Flow.Node.Warnings.NoAllies');
+
+            await item.update({ 'system.action.before': { kind: 'choice' } } as Item.UpdateData);
+            const before = FlowNodeEditorFlow.tree(item).nodes.find(node => node.path === 'system.action.before');
+            assert.include(before?.warnings ?? [], 'SR5.Flow.Node.Warnings.NoRelease');
+        });
+
+        it('edits a chemical on equipment and a loaded dose on ammo from Details', async () => {
+            const equipment = await factory.createItem({ type: 'equipment' });
+            const sheet = equipment.sheet as unknown as ItemSheetFixture;
+            sheet._mode = 'edit';
+            await sheet.render({ force: true });
+
+            // Only the kind shows until the item is a chemical.
+            const kind = sheet.element.querySelector<HTMLSelectElement>('[name="system.chemical.kind"]');
+            if (!kind) return assert.fail('No chemical kind on equipment');
+            assert.isNull(sheet.element.querySelector('[name="system.chemical.power"]'));
+            kind.value = 'toxin';
+            await sheet.submit();
+            await sheet.render({ force: true });
+
+            const power = sheet.element.querySelector<HTMLInputElement>('[name="system.chemical.power"]');
+            if (!power) return assert.fail('No Power for a toxin');
+            power.value = '8';
+            await sheet.submit();
+            assert.strictEqual(foundry.utils.getProperty(equipment._source, 'system.chemical.power'), 8);
+            // A toxin has no duration or addiction, a drug has no Power.
+            assert.isNull(sheet.element.querySelector('[name="system.chemical.duration.formula"]'));
+            await sheet.close();
+
+            const ammo = await factory.createItem({ type: 'ammo' });
+            const ammoSheet = ammo.sheet as unknown as ItemSheetFixture;
+            ammoSheet._mode = 'edit';
+            await ammoSheet.render({ force: true });
+            assert.isNotNull(ammoSheet.element.querySelector('[name="system.payload.kind"]'));
+            await ammoSheet.close();
         });
 
         it('create a naked item of any type', async () => {

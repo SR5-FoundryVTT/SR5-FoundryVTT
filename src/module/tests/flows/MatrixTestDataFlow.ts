@@ -461,46 +461,4 @@ export const MatrixTestDataFlow = {
         test.data.iconUuid = document.uuid;
         await test.populateDocuments();
     },
-
-    /**
-     * Handle target selection flow for matrix mark placement actions.
-     *
-     * NOTE: This method is bound to the calling class and should be called after .bind(s.this) by the caller.
-     */
-    async executeMessageAction(testCls: typeof SuccessTest, againstData: MatrixTestData, messageId: string, options: Partial<TestOptions>): Promise<void> {
-        let document: SR5Actor | SR5Item | null = null;
-        const caster = againstData.sourceActorUuid
-            ? await fromUuid<SR5Actor>(againstData.sourceActorUuid)
-            : null;
-
-        // CASE A) Resolve targeted document by targeted icon.
-        if (againstData.iconUuid) {
-            document = await fromUuid(againstData.iconUuid);
-        }
-
-        // CASE B) Resolve targeted document by creation one on the fly.
-        if (!document && !againstData.iconUuid) {
-            document = await MatrixOpposedTargetFlow.createTemporaryDocument(caster ?? undefined);
-            if (document) againstData.iconUuid = document.uuid ?? undefined;
-        }
-
-        // CASE C) Resolve targeted document by whatever is selected.
-        if (!document) {
-            const actor = Helpers.getSelectedActorsOrCharacter()[0];
-            document = actor;
-            againstData.iconUuid = actor?.uuid ?? undefined;
-        }
-        if (!document) {
-            document = game.user.character;
-            againstData.iconUuid = game.user.character?.uuid ?? undefined;
-        }
-        if (!document) return;
-
-        const data = await testCls._getOpposedActionTestData(againstData, document, messageId);
-        if (!data) return;
-
-        const test = new testCls(data, { source: document }, options);
-
-        await test.execute();
-    },
 }

@@ -11,24 +11,23 @@ import { ModifiableValue } from "../mods/ModifiableValue";
 import { DataDefaults } from "../data/DataDefaults";
 import { ActionFlow } from "../item/flows/ActionFlow";
 import { CORE_NAME, FLAGS, SYSTEM_NAME } from "../constants";
-import { SheetFlow } from "../flows/SheetFlow";
-import { DamageApplicationFlow } from '../actor/flows/DamageApplicationFlow';
 import { TestDialog, TestDialogListener } from "../apps/dialogs/TestDialog";
 
 import ModifierTypes = Shadowrun.ModifierTypes;
 
-import { ActionResultFlow } from "../item/flows/ActionResultFlow";
 import { SuccessTestEffectsFlow } from '../effect/flows/SuccessTestEffectsFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
-import { LinksHelpers } from '../utils/links';
-import { activateOnKey } from '../utils/dom';
 import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType, ResultActionType } from '../types/item/Action';
 import { ValueFieldType } from '../types/template/Base';
 import { DeepPartial } from "fvtt-types/utils";
 import type { FlowStep } from '../types/flows/FlowStep';
 import { FlowRunner } from '../flows/FlowRunner';
+import { ChatMessageContextOption, TestChatFlow, ValueModifierTooltipOptions } from './flows/TestChatFlow';
+import { TestFeature, TestFeatureOutcome, TestFeatureRules } from './features/TestFeature';
+import { FlowSubjectDocument, FlowSubjects } from '../flows/FlowSubjects';
+import { TestMode, TestModes, TestPipelineStage } from './TestMode';
 export interface TestDocuments {
     // Legacy field that used be the source document.
     actor?: SR5Actor
@@ -57,10 +56,6 @@ export interface SuccessTestCodeTerm {
     text: string;
     valueText?: string;
     tooltipSource?: string;
-}
-
-interface ValueModifierTooltipOptions {
-    card?: boolean;
 }
 
 /**
@@ -124,6 +119,15 @@ export interface TestData {
     // Options the test was created with.
     options: TestOptions
 
+    // Feature changes for this single test, prefixed with + to add or - to remove. See TestFeature.
+    features?: string[]
+
+    // The root of a chain started without rolling, like using a drug. See FlowRunner.startChain.
+    rollless?: boolean
+
+    // Actor uuids that assisted this test, like teamwork assistants or ritual participants.
+    participantUuids?: string[]
+
     // Has this test been cast before
     evaluated: boolean
 }
@@ -134,14 +138,6 @@ export interface SuccessTestData extends TestData {
     // Scene Token Ids marked as targets of this test.
     targetActorsUuid: string[]
     targetUuids: string[]
-}
-
-/** Entry of the chat message context menu, using the name based format Foundry hooks still provide. */
-interface ChatMessageContextOption {
-    name: string
-    callback: (li: unknown) => unknown
-    condition: boolean | ((li: unknown) => boolean)
-    icon: string
 }
 
 export interface TestOptions {
@@ -213,6 +209,26 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     // Stands in for a failure label when the test can't name an outcome, as extended tests can't.
     static readonly NO_VERDICT_LABEL: Translation = 'SR5.TestResults.Results';
 
+    /**
+     * Ids of the features this test kind uses. See TestFeature.
+     */
+    static features: string[] = [];
+
+    /**
+     * Default tests of action nodes added below a node using this test, by relation key.
+     * Like a defense test below an attack, or drain below a spell.
+     */
+    static flowDefaults: Record<string, string> = {};
+
+    /**
+     * Relation keys this test can be used for in action nodes, besides those its registry gives.
+     * See FlowNodeEditorFlow.tests.
+     */
+    static flowRoles: string[] = [];
+
+    // Which feature ran in which stage, for debugging. Not stored.
+    public featureTrace: { stage: string, feature: string }[] = [];
+
     // Allow this.constructor to not reference Function.
     declare ['constructor']: typeof SuccessTest;
 
@@ -259,6 +275,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.targets = [];
 
         this.data = this._prepareData(data, options);
+        for (const feature of this.features) feature.prepareData?.(this);
 
         this.effects = new SuccessTestEffectsFlow<this>(this);
         this.ignoreUserPermission = false;
@@ -594,10 +611,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Re-apply document modifiers first, as those might have changed in between calculations.
         this.prepareDocumentModifiers();
         this.prepareTestModifiers();
+        for (const feature of this.features) feature.prepareTestModifiers?.(this);
 
         // Only then apply values and collected modifiers.
         this.applyPushTheLimit();
         this.applyPoolModifiers();
+
+        this.runFeatureValues();
 
         Hooks.call('sr5_testPrepareBaseValues', this);
     }
@@ -657,6 +677,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Allow implementations to validate values before execution.
      */
     validateBaseValues() { }
+
+    /**
+     * Validate values before execution, by the test kind and then its features.
+     */
+    validateValues() {
+        this.validateBaseValues();
+        for (const feature of this.features) feature.validate?.(this);
+    }
 
     /**
      * Helper method to evaluate the internal SR5Roll and SuccessTest values.
@@ -1112,6 +1140,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @returns true on a successful test
      */
     get success(): boolean {
+        const decided = this.featureOutcome('success');
+        if (decided !== undefined) return decided;
+
         // Extended tests use the sum of all extended hits.
         const hits = this.extended ? this.extendedHits : this.hits;
         return TestRules.success(hits.value, this.threshold.value);
@@ -1135,6 +1166,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Use this method for subclasses which can't reasonably be successful.
      */
     get canSucceed(): boolean {
+        const decided = this.featureOutcome('canSucceed');
+        if (decided !== undefined) return decided;
+
         // Not extended tests can succeed normally.
         if (!this.extended) return true;
 
@@ -1146,6 +1180,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Use this method for subclasses which can't reasonably fail.
      */
     get canFail(): boolean {
+        const decided = this.featureOutcome('canFail');
+        if (decided !== undefined) return decided;
+
         return true;
     }
 
@@ -1269,6 +1306,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * SR5#56.
      */
     get canSecondChance(): boolean {
+        if (this.features.some(feature => feature.edge?.secondChance === false)) {
+            ui.notifications?.warn('SR5.Warnings.CantUseEdgeOnThisTest', { localize: true });
+            return false;
+        }
+
         if (this.hasBuyHits) {
             ui.notifications?.warn('SR5.Warnings.CantCombineBuyHitsWithEdge', { localize: true });
             return false;
@@ -1300,6 +1342,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * SR5#56.
      */
     get canPushTheLimit(): boolean {
+        if (this.features.some(feature => feature.edge?.pushTheLimit === false)) {
+            ui.notifications?.warn('SR5.Warnings.CantUseEdgeOnThisTest', { localize: true });
+            return false;
+        }
+
         if (this.hasPushTheLimit || this.hasSecondChance) {
             ui.notifications?.warn('SR5.Warnings.CantSpendMulitplePointsOfEdge', { localize: true });
             return false;
@@ -1433,7 +1480,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             if (!this.canConsumeDocumentResources()) return false;
         }
 
-        return this.consumeDocumentRessources();
+        if (!await this.consumeDocumentRessources()) return false;
+        return this.runFeatureConsume();
     }
 
     /**
@@ -1476,11 +1524,68 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.effects.applyAllEffects();
 
         await this.prepareDocumentData();
+        await this.runFeatureStage('prepareDocuments');
 
         // Initial base value preparation will show default result without any user input.
         this.prepareBaseValues();
         this.calculateBaseValues();
-        this.validateBaseValues();
+        this.validateValues();
+    }
+
+    /**
+     * The features this test uses: those of its kind, changed by the features given in its data.
+     */
+    get features(): TestFeature[] {
+        return TestFeatureRules.resolve(TestFeatureRules.resolveIds(this.constructor.features, this.data.features));
+    }
+
+    /**
+     * Run an asynchronous stage of all features of this test, in order.
+     */
+    async runFeatureStage(stage: 'prepareDocuments' | 'process') {
+        for (const feature of this.features) {
+            const handler = feature[stage];
+            if (!handler) continue;
+            this.featureTrace.push({ stage, feature: feature.id });
+            await handler.call(feature, this);
+        }
+    }
+
+    /**
+     * Let all features add their value parts.
+     */
+    runFeatureValues() {
+        for (const feature of this.features) {
+            if (!feature.prepareValues) continue;
+            this.featureTrace.push({ stage: 'prepareValues', feature: feature.id });
+            feature.prepareValues(this);
+        }
+    }
+
+    /**
+     * Let all features consume their resources. Stops at the first feature that can't.
+     *
+     * @returns true when all features could consume.
+     */
+    async runFeatureConsume(): Promise<boolean> {
+        for (const feature of this.features) {
+            if (!feature.consume) continue;
+            this.featureTrace.push({ stage: 'consume', feature: feature.id });
+            if (!await feature.consume(this)) return false;
+        }
+        return true;
+    }
+
+    /**
+     * The outcome value decided by the last feature deciding it, if any.
+     */
+    featureOutcome(key: keyof TestFeatureOutcome): boolean | undefined {
+        let decided: boolean | undefined;
+        for (const feature of this.features) {
+            const value = feature.outcome?.(this)[key];
+            if (value !== undefined) decided = value;
+        }
+        return decided;
     }
 
     /**
@@ -1496,32 +1601,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * When execute methods promise resolves this test and its chain is completed.
      *
-     * NOTE: Currently none of these methods trigger Foundry hooks.
+     * Each stage of the execution fires the sr5_testStage hook, see run().
      */
     async execute(): Promise<this> {
-        await this._prepareExecution();
-
-        if (!this.userCanExecute()) {
-            ui.notifications?.error(game.i18n.localize('SR5.Errors.CantExecuteTest'));
-            return this;
-        }
-
-        // Allow user to change details.
-        const userConsented = await this.showDialog();
-        if (!userConsented) return this;
-
-        // Check if actor has all needed resources to even test.
-        const actorConsumedResources = await this.consumeDocumentRessoucesWhenNeeded();
-        if (!actorConsumedResources) return this;
-
-        this.createRoll();
-
-        await this.evaluate();
-        await this.processResults();
-        await this.toMessage();
-        await this.afterTestComplete();
-
-        return this;
+        return this.run(TestModes.normal);
     }
 
     /**
@@ -1531,42 +1614,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     async executeWithSecondChance(): Promise<this> {
         console.debug(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
-
-        if (!this.canSecondChance) return this;
-
-        // Fetch documents.
-        await this.populateDocuments();
-
-        if (!this.userCanExecute()) {
-            ui.notifications?.error(game.i18n.localize('SR5.Errors.CantExecuteTest'));
-            return this;
-        }
-
-        if (!this.actor) {
-            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
-            return this;
-        }
-
-        //  Trigger edge consumption.
-        this.data.secondChance = true;
-        this.applySecondChance();
-
-        // Can't use normal #execute as not all general testing flow are needed.        
-        this.calculateBaseValues();
-        this.validateBaseValues();
-
-        const actorConsumedResources = await this.consumeDocumentRessoucesWhenNeeded();
-        if (!actorConsumedResources) return this;
-
-        // Remove second chance to avoid edge consumption on any kind of re-rolls.
-        this.data.secondChance = false;
-
-        await this.evaluate();
-        await this.processResults();
-        await this.toMessage();
-        await this.afterTestComplete();
-
-        return this;
+        return this.run(TestModes.secondChance);
     }
 
     /**
@@ -1574,45 +1622,64 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     async executeWithPushTheLimit(): Promise<this> {
         console.debug(`Shadowrun 5e | ${this.constructor.name} will push the limit rules`);
+        return this.run(TestModes.pushTheLimit);
+    }
 
-        if (!this.canPushTheLimit) return this;
+    /**
+     * Execute this test through all pipeline stages, as the given mode configures them.
+     *
+     * Each stage fires the sr5_testStage hook with its name once done. A stage stopping the
+     * execution, like a canceled dialog, stops all stages after it.
+     */
+    async run(mode: TestMode): Promise<this> {
+        if (mode.allowed && !mode.allowed(this)) return this;
 
-        // Fetch documents.
-        await this.populateDocuments();
+        await mode.prepare(this);
+        this.pipelineStage('prepare');
 
         if (!this.userCanExecute()) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.CantExecuteTest'));
             return this;
         }
-
-        if (!this.actor) {
+        if (mode.requiresActor && !this.actor) {
             ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
             return this;
         }
+        this.pipelineStage('check');
 
-        this.data.pushTheLimit = true;
-        this.applyPushTheLimit();
+        mode.beforeDialog?.(this);
+        // Allow user to change details.
+        if (mode.dialog && !await this.showDialog()) return this;
+        this.pipelineStage('dialog');
 
-        // Can't use normal #execute as not all general testing flow are needed.        
-        this.calculateBaseValues();
-        this.validateBaseValues();
+        // Check if actor has all needed resources to even test.
+        if (!await this.consumeDocumentRessoucesWhenNeeded()) return this;
+        mode.afterConsume?.(this);
+        this.pipelineStage('consume');
 
-        const actorConsumedResources = await this.consumeDocumentRessoucesWhenNeeded();
-        if (!actorConsumedResources) return this;
-
-        // Keep push the limit active, to have remove limit during derived value calculation.
+        if (mode.createRoll) this.createRoll();
         await this.evaluate();
-        await this.processResults();
+        this.pipelineStage('roll');
 
-        // Remove push the limit to avoid edge consumption on any kind of re-rolls.
-        this.data.pushTheLimit = false;
+        await this.processResults();
+        mode.afterProcess?.(this);
+        this.pipelineStage('process');
 
         await this.toMessage();
+        this.pipelineStage('message');
+
         await this.afterTestComplete();
+        this.pipelineStage('complete');
 
         return this;
     }
 
+    /**
+     * Announce a finished pipeline stage of this test.
+     */
+    pipelineStage(stage: TestPipelineStage) {
+        Hooks.call('sr5_testStage', this, stage);
+    }
 
     /**
      * Allow subclasses to override behavior after a test has finished.
@@ -1625,6 +1692,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         } else {
             await this.processFailure();
         }
+
+        await this.runFeatureStage('process');
 
         Hooks.call('sr5_testProcessResults', this);
     }
@@ -1734,10 +1803,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Depending on the action configuration execute a followup test.
      *
      * @param testClsName The follow up test to use instead of the one configured on the action.
+     * @param features Feature changes for the follow up test. See TestFeature.
      */
-    async executeFollowUpTest(testClsName?: string) {
+    async executeFollowUpTest(testClsName?: string, features: string[] = []) {
         const test = await TestCreator.fromFollowupTest(this, this.data.options, testClsName);
         if (!test) return;
+        if (features.length) test.data.features = [...(test.data.features ?? []), ...features];
         await test.execute();
     }
 
@@ -1808,66 +1879,17 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
-     * DiceSoNice must be implemented locally to avoid showing dice on gmOnlyContent throws while also using
-     * FoundryVTT ChatMessage of type roll for their content visibility behavior.
-     * 
-     * https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/Integration
+     * Show the dice of this tests last roll with Dice So Nice. See TestChatFlow.rollDiceSoNice.
      */
     rollDiceSoNice() {
-        const dice3d = game.dice3d;
-        if (!dice3d) return;
-
-        // Only roll the last dice rolled.
-        // This necessary when a test has been recast with second chance,
-        // and should only the re-rolled dice instead of all.
-        const roll = this.rolls[this.rolls.length - 1];
-
-        // Limit users to show dice to...
-        let whisper: User[] | null = null;
-
-        // ...for gmOnlyContent check permissions
-        if (this.actor && GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor)) {
-            whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER') === true);
-        }
-
-        const rollMode = this.data.options?.rollMode;
-
-        // ...for rollMode include GM when GM roll
-        if (rollMode === 'gm' || rollMode === "blind") {
-            whisper = [...game.users.filter(user => user.isGM), ...(whisper || [])];
-        }
-
-        // Don't show dice to a user casting blind.
-        const blind = rollMode === 'blind';
-        const synchronize = rollMode === 'public' || rollMode === 'ic';
-
-        void dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
+        TestChatFlow.rollDiceSoNice(this);
     }
 
     /**
      * Post this success test as a message to the chat log.
      */
     async toMessage(): Promise<ChatMessage | undefined> {
-        if (!this.data.options?.showMessage) return;
-
-        // Prepare message content.
-        const templateData = await this._prepareMessageTemplateData();
-        const content = await foundry.applications.handlebars.renderTemplate(this._chatMessageTemplate, templateData);
-        // Prepare the actual message.
-        const messageData = await this._prepareMessageData(content);
-
-        // Let Foundry apply the message visibility mode, instead of applying whisper ids manually.
-        const message = await ChatMessage.create(messageData, { messageMode: this._rollMode });
-
-        if (!message) return;
-
-        // Store message id for future use.
-        this.data.messageUuid = message.uuid;
-        await this.saveToMessage();
-
-        this.rollDiceSoNice();
-
-        return message;
+        return TestChatFlow.toMessage(this);
     }
 
     /**
@@ -1908,7 +1930,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             applyGmOnlyContent: GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor),
             
             // Effects that should be shown in this tests message for manual drag & drop application.
-            effects: [] as SR5ActiveEffect[]
+            effects: [] as SR5ActiveEffect[],
+
+            // Message parts of the features this test uses.
+            featurePartials: this.features.flatMap(feature => feature.chat ? [feature.chat.partial] : []),
         }
     }
 
@@ -2027,51 +2052,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param content Pre rendered template content.
      */
     async _prepareMessageData(content: string) {
-        // Either get the linked token by collection or synthetic actor.
-        // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
-        const linkedTokens = this.actor?.getActiveTokens(true) || [];
-        const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
-
-        const actor = this.actor?.id;
-        const alias = game.user?.name;
-
-        const formula = `0ds`;
-        const roll = new SR5Roll(formula);
-        // evaluation is necessary for Roll DataModel validation.
-        await roll.evaluate();
-
-        const messageData = {
-            user: game.user?.id,
-            // Use type roll, for Foundry built in content visibility.
-            speaker: {
-                actor,
-                alias,
-                token
-            },
-            roll,
-            content,
-            // Manually build flag data to give renderChatMessage hook flag access.
-            // This test data is needed for all subsequent testing based on this chat messages.
-            flags: {
-                // Add test data to message to allow ChatMessage hooks to access it.
-                [SYSTEM_NAME]: {[FLAGS.Test]: this.toJSON()},
-                'core.canPopout': true
-            },
-            sound: CONFIG.sounds.dice,
-        }
-
-        return messageData;
+        return TestChatFlow.prepareMessageData(this, content);
     }
 
     /**
      * Save this test to the given message uuid
      */
     async saveToMessage(uuid: string | undefined = this.data.messageUuid) {
-        if (!uuid) return;
-
-        const message = await fromUuid(uuid) as ChatMessage;
-
-        await message?.setFlag(SYSTEM_NAME, FLAGS.Test, this.toJSON());
+        await TestChatFlow.saveToMessage(this, uuid);
     }
 
     /**
@@ -2080,372 +2068,22 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * This listener needs to be registered to the 'renderChatMessage' FoundryVTT hook.
      */
     static async chatMessageListeners(message: ChatMessage, html) {
-        await this._hydrateValueModifierTooltips(message, html);
-
-        $(html).find('.test-parameter').on('click', this._chatToggleParameterDetails.bind(this));
-        $(html).find('.modifier-source-link').on('click', this._chatOpenModifierSource.bind(this));
-        for (const element of $(html).find<HTMLElement>('.test-parameter, .modifier-source-link').toArray())
-            activateOnKey(element);
-
-        $(html).find('.show-roll').on('click', this._chatToggleCardRolls.bind(this));
-        $(html).find('.show-description').on('click', this._chatToggleCardDescription.bind(this));
-        $(html).find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet.bind(Helpers));
-        $(html).find('.result-action').on('click', this._castResultAction.bind(this));
-        $(html).find('.chat-select-link').on('click', this._selectSceneToken.bind(this));
-        $(html).find('.test-action').on('click', this._castTestAction.bind(this));
-
-        DamageApplicationFlow.handleRenderChatMessage(message, html);
-
-        await GmOnlyMessageContentFlow.chatMessageListeners(message, html);
+        await TestChatFlow.chatMessageListeners(message, html);
     }
 
-    static async _hydrateValueModifierTooltips(message: ChatMessage, html: HTMLElement | JQuery) {
-        if (!message.id) return;
-
-        const test = await TestCreator.fromMessage(message.id);
-        if (!test) return;
-
-        await this.hydrateValueModifierTooltipsForTest(test, html, { card: true });
-    }
-
-    static async hydrateValueModifierTooltipsForTest(
-        test: SuccessTest,
-        html: HTMLElement | JQuery,
-        options: ValueModifierTooltipOptions = {}
-    ) {
-        const valuesBySource = this._valueModifierSourcesForTest(test);
-        const tooltipsBySource = await this._buildValueModifierTooltipsBySource(test, options);
-
-        const valueModifiers = $(html).find<HTMLElement>('[data-tooltip-source]').toArray();
-
-        for (const valueMod of valueModifiers) {
-            const source = valueMod.dataset.tooltipSource;
-            if (!source) continue;
-
-            if (valueMod.classList.contains('test-parameter')) {
-                await this._prepareParameterDetail(
-                    valueMod, test, valuesBySource[source], source, tooltipsBySource, options);
-                continue;
-            }
-
-            this._applyValueModifierTooltip(valueMod, tooltipsBySource[source]);
-        }
-    }
-
-    private static _applyValueModifierTooltip(element: HTMLElement, tooltipHtml?: string) {
-        if (!tooltipHtml) return;
-
-        element.dataset.tooltipHtml = tooltipHtml;
-        element.dataset.tooltipClass = 'sr5v2';
-    }
-
-    /** Remove button semantics when hydration finds no breakdown. */
-    private static _disableParameter(parameter: HTMLElement) {
-        parameter.removeAttribute('role');
-        parameter.removeAttribute('tabindex');
-        parameter.removeAttribute('aria-expanded');
-    }
-
-    private static async _prepareParameterDetail(
-        parameter: HTMLElement,
-        test: SuccessTest,
-        value: ValueFieldType | undefined,
-        source: string,
-        tooltipsBySource: Record<string, string | undefined>,
-        options: ValueModifierTooltipOptions = {}
-    ) {
-        const container = parameter.closest('.card-content--parameters')
-            ?.querySelector<HTMLElement>('.test-parameter-details');
-        if (!value || !container) return this._disableParameter(parameter);
-
-        const traceSources = value.changes.map(change => test.traceSourceForChange(change));
-
-        const html = await this._buildValueModifierPanelHtml(value, options, traceSources);
-        if (!html) return this._disableParameter(parameter);
-
-        // Rehydration replaces the previous panel.
-        container.querySelector(`.test-parameter-detail[data-source="${source}"]`)?.remove();
-
-        const detail = container.ownerDocument.createElement('div');
-        detail.classList.add('test-parameter-detail');
-        detail.dataset.source = source;
-        detail.hidden = true;
-        detail.innerHTML = html;
-
-        for (const row of detail.querySelectorAll<HTMLElement>('[data-tooltip-source]'))
-            this._applyValueModifierTooltip(row, tooltipsBySource[row.dataset.tooltipSource ?? '']);
-
-        container.append(detail);
-    }
-
-    private static _valueModifierSourcesForTest(test: SuccessTest): Record<string, ValueFieldType | undefined> {
-        const tooltipValues: Record<string, ValueFieldType | undefined> = { hits: test.outcomeHits };
-
-        for (const parameter of test.cardParameters)
-            tooltipValues[parameter.source] = parameter.value;
-
-        const traces = test.data.codeTermTraces ?? [];
-        for (const trace of traces)
-            tooltipValues[trace.tooltipSource] = trace.valueField;
-
-        return tooltipValues;
-    }
-
-    private static async _buildValueModifierTooltipsBySource(
-        test: SuccessTest,
-        options: ValueModifierTooltipOptions = {}
-    ): Promise<Record<string, string | undefined>> {
-        const tooltipValues = this._valueModifierSourcesForTest(test);
-
-        const entries = await Promise.all(Object.entries(tooltipValues).map(async ([source, value]) => {
-            return [source, value ? await this._buildValueModifierTooltipHtml(value, options) : undefined] as const;
-        }));
-
-        return Object.fromEntries(entries);
-    }
-
-    static async _buildValueModifierTooltipHtml(
-        value: ValueFieldType,
-        options: ValueModifierTooltipOptions = {}
-    ): Promise<string | undefined> {
-        return this._renderValueModifiers('common/modifiers-tooltip', value, options);
-    }
-
-    static async _buildValueModifierPanelHtml(
-        value: ValueFieldType,
-        options: ValueModifierTooltipOptions = {},
-        traceSources: (string | undefined)[] = []
-    ): Promise<string | undefined> {
-        return this._renderValueModifiers('common/value-modifiers-panel', value, options, traceSources);
-    }
-
-    /** Render shared modifier rows, or return nothing for an empty breakdown. */
-    private static async _renderValueModifiers(
-        template: string,
-        value: ValueFieldType,
-        options: ValueModifierTooltipOptions = {},
-        traceSources: (string | undefined)[] = []
-    ): Promise<string | undefined> {
-        const html = await foundry.applications.handlebars.renderTemplate(
-            SheetFlow.templateBase(template),
-            { value, card: options.card, traceSources }
-        );
-
-        const content = html.trim();
-        // The wrapper always renders; only a row carries a name.
-        if (!content.includes('value-modifier-name')) return undefined;
-
-        return content;
-    }
-
-
-    /** 
-     * Select a Token on the current scene based on the link id.
-     * @params event Any user PointerEvent
-    */
-    static _selectSceneToken(event: Event | JQuery.ClickEvent) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (!game?.ready || !canvas?.ready) return;
-
-        const selectLink = $(event.currentTarget as HTMLElement);
-        const tokenId = selectLink.data('tokenId');
-        const token = canvas.tokens?.get(tokenId);
-
-        if (token instanceof foundry.canvas.placeables.Token) {
-            token.control();
-        } else {
-            ui.notifications?.warn(game.i18n.localize('SR5.NoSelectableToken'))
-        }
-    }
-
-    /**
-     * Cast a item action from a chat message.
-     * 
-     * @param event Any pointer event
-     */
-    static async _castTestAction(event: JQuery.TriggeredEvent) {
-        event.preventDefault();
-
-        const element = $(event.currentTarget as HTMLElement);
-        // Grab item uuid or fallback to empty string for foundry
-        const uuid = element.data('uuid') ?? '';
-        const item = await fromUuid(uuid) as SR5Item | undefined;
-
-        if (!item) return console.error("Shadowrun 5e | Item doesn't exist for uuid", uuid);
-
-        void item.castAction(event as unknown as Event);
+    static async hydrateValueModifierTooltipsForTest(test: SuccessTest, html: HTMLElement | JQuery, options: ValueModifierTooltipOptions = {}) {
+        await TestChatFlow.hydrateValueModifierTooltipsForTest(test, html, options);
     }
 
     /**
      * Foundry ChatMessage context options (right click) used for all test types.
-     * @param app The ChatLog application. 
-     * @param options The list of options to be shown in the context menu.
      */
     static chatMessageContextOptions(app, options: ChatMessageContextOption[]) {
-        const pushTheLimit = async (li) => {
-            const messageId = $(li).data().messageId;
-            const test = await TestCreator.fromMessage(messageId);
-            if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
-
-            await test.executeWithPushTheLimit();
-        }
-
-        const secondChance = async (li) => {
-            const messageId = $(li).data().messageId;
-            const test = await TestCreator.fromMessage(messageId);
-            if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
-
-            await test.executeWithSecondChance();
-        };
-
-        const extendTest = async (li) => {
-            const messageId = $(li).data().messageId;
-            const test = await TestCreator.fromMessage(messageId);
-            if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
-
-            if (!test.canBeExtended) {
-                return ui.notifications?.warn('SR5.Warnings.CantExtendTest', { localize: true });
-            }
-
-            // Managed extended tests roll through their record, keeping its state current.
-            if (test.data.extendedManagedId) {
-                // Avoid a module cycle: ExtendedTestFlow already imports SuccessTest.
-                const { ExtendedTestFlow } = await import('../flows/ExtendedTestFlow');
-                await ExtendedTestFlow.roll(test.data.extendedManagedId);
-                return;
-            }
-
-            // Keep legacy auto-chain behavior for extended tests from before managed records.
-            await test.executeAsExtended();
-        };
-
-        // Keep Foundry delete option at the context menus bottom.
-        const deleteOption = options.pop() as ChatMessageContextOption;
-
-        options.push({
-            name: game.i18n.localize('SR5.PushTheLimit'),
-            callback: pushTheLimit,
-            condition: true,
-            icon: '<i class="fas fa-meteor"></i>'
-        })
-
-        options.push({
-            name: game.i18n.localize('SR5.SecondChance'),
-            callback: secondChance,
-            condition: true,
-            icon: '<i class="fas fa-meteor"></i>'
-        });
-
-        options.push({
-            name: game.i18n.localize('SR5.Extend'),
-            callback: extendTest,
-            condition: true,
-            icon: '<i class="fas fa-clock"></i>'
-        })
-
-        // Reinsert Foundry delete option last.
-        options.push(deleteOption);
-
-        return options;
+        return TestChatFlow.chatMessageContextOptions(app, options);
     }
 
     static _chatToggleParameterDetails(event: Event | JQuery.ClickEvent) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const parameter = event.currentTarget as HTMLElement;
-        const line = parameter.closest<HTMLElement>('.card-content--parameters');
-        const container = line?.querySelector<HTMLElement>('.test-parameter-details');
-        const source = parameter.dataset.tooltipSource;
-        if (!line || !container || !source) return;
-
-        const detail = container.querySelector<HTMLElement>(`.test-parameter-detail[data-source="${source}"]`);
-        if (!detail) return;
-
-        const expand = detail.hidden;
-
-        for (const open of container.querySelectorAll<HTMLElement>('.test-parameter-detail')) open.hidden = true;
-        for (const other of line.querySelectorAll<HTMLElement>('.test-parameter'))
-            other.setAttribute('aria-expanded', 'false');
-
-        detail.hidden = !expand;
-        parameter.setAttribute('aria-expanded', String(expand));
-    }
-
-    static async _chatOpenModifierSource(event: Event | JQuery.ClickEvent) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const source = (event.currentTarget as HTMLElement).dataset.source;
-        await LinksHelpers.openSource(source);
-    }
-
-    static _chatToggleCardRolls(event: Event | JQuery.ClickEvent) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const currentTarget = event.currentTarget as HTMLElement;
-        const card = $(currentTarget).closest('.chat-card');
-        const cardRolls = card.find('.card-rolls').first();
-
-        if (cardRolls.length > 0) {
-            const hasRollContent = cardRolls.find('.dice-rolls, .dice-roll-content').length > 0;
-            if (!hasRollContent) return;
-
-            if (cardRolls.is(':visible')) {
-                cardRolls.slideUp(200);
-            } else {
-                const diceRolls = cardRolls.find('.dice-rolls');
-                if (diceRolls.length > 0) {
-                    diceRolls.css('display', 'flex');
-                }
-                cardRolls.stop(true, true).hide().css('display', 'block').slideDown(200);
-            }
-
-            return;
-        }
-
-        const legacyRolls = card.find('.dice-rolls');
-        if (legacyRolls.is(':visible')) legacyRolls.slideUp(200);
-        else legacyRolls.css('display', 'flex').hide().slideDown(200);
-    }
-
-    /**
-     * By default, item descriptions are hidden in a chat card.
-     *
-     * This will hide / show them, when called with a card event.
-     */
-    static _chatToggleCardDescription(event: Event | JQuery.ClickEvent) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const currentTarget = event.currentTarget as HTMLElement;
-        const target = $(currentTarget);
-        const containingCard = target.closest('.sr5.chat-card');
-        const card = containingCard.length
-            ? containingCard
-            : target.closest('.chat-message').find('.sr5-chat-card--merged').first();
-        const element = card.find('.card-description');
-        if (element.is(':visible')) element.slideUp(200);
-        else element.slideDown(200);
-    }
-
-    /**
-     * A test message initiated an action for a test result, extract information from message and execute action.
-     *
-     * @param event A PointerEvent by user-interaction
-     */
-    static async _castResultAction(event: JQuery.TriggeredEvent) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const element = $(event.currentTarget as HTMLElement)
-        const messageId = element.closest('.chat-message').data('messageId');
-        const resultAction = element.data('action');
-
-        await ActionResultFlow.executeResult(resultAction, {event: event as unknown as Event, element, messageId});
+        TestChatFlow._chatToggleParameterDetails(event);
     }
 
     /**
@@ -2454,13 +2092,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * This can be used to trigger opposing tests.
      */
     static async executeMessageAction(againstData: SuccessTestData, messageId: string, options: Partial<TestOptions>) {
-        // Determine actors to roll test with.
-        // build documents based on the category, matrix can target individual icons
-        const documents = await Helpers.getOpposedTestTargets(againstData);
-        // if the test had matrix data, push in the matrix test targets to the front
-        if (againstData.categories.includes('matrix')) {
-            documents.unshift(...await Helpers.getMatrixTestTargetDocuments(againstData as any));
-        }
+        const documents = await this.messageActionSubjects(againstData);
 
         // Inform user about tokens with deleted sidebar actors.
         // This can both happen for linked tokens immediately and unlinked tokens after reloading.
@@ -2470,14 +2102,19 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             return;
         }
 
-        // Fallback to player character.
-        if (documents.length === 0 && game.user?.character) {
-            documents.push(game.user.character);
+        if (documents.length === 0) {
+            // Tests rolled by the caster for an opposition without actor have nobody else to fall back to.
+            if (this.subjects === 'caster') {
+                ui.notifications?.error('SR5.Errors.NoAvailableActorFound', { localize: true });
+                return;
+            }
+            // Fallback to player character.
+            if (game.user?.character) documents.push(game.user.character);
         }
 
         console.log('Shadowrun 5e | Casting an opposed test using these actors', documents, againstData);
 
-        for (const document of documents) {
+        for (const document of documents as FlowSubjectDocument[]) {
             const source = document instanceof TokenDocument ? document.actor! : document;
 
             const data = await this._getOpposedActionTestData(againstData, source, messageId);
@@ -2488,6 +2125,19 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             // Await test chain resolution for each actor, to avoid dialog spam.
             await test.execute();
         }
+    }
+
+    /**
+     * Who rolls this test when cast from the message of the test it follows. See FlowSubjects.
+     */
+    static subjects = 'targets';
+
+    /**
+     * The documents to roll this test with, when cast from the message of the test it follows.
+     */
+    static async messageActionSubjects(againstData: SuccessTestData) {
+        const resolver = FlowSubjects[this.subjects] ?? FlowSubjects.targets;
+        return resolver(againstData);
     }
 
     /**

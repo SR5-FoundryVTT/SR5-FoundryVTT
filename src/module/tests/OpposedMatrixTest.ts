@@ -12,6 +12,9 @@ import { DeepPartial } from "fvtt-types/utils";
  * - provides support for targeting non-existent matrix icons
  */
 export class OpposedMatrixTest<T extends OpposedMatrixTestData = OpposedMatrixTestData> extends OpposedTest<T> {
+    // Matrix defenses are rolled for the targeted icon. See FlowSubjects.matrixIcon.
+    static override subjects = 'matrixIcon';
+
     declare against: MatrixTest;
     declare icon: SR5Actor | SR5Item;
     declare device: SR5Item;
@@ -24,9 +27,5 @@ export class OpposedMatrixTest<T extends OpposedMatrixTestData = OpposedMatrixTe
 
     override async populateDocuments() {
         await MatrixTestDataFlow.populateOpposedDocuments(this);
-    }
-
-    static override async executeMessageAction(againstData: MatrixTestData, messageId: string, options: Partial<TestOptions>): Promise<void> {
-        await MatrixTestDataFlow.executeMessageAction(this as typeof SuccessTest, againstData, messageId, options);
     }
 }

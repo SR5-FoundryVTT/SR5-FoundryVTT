@@ -2,6 +2,7 @@ import { BlastData } from "./Weapon";
 import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyPartData } from "../template/Technology";
+import { ChemicalData } from "../template/Chemical";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const AmmoData = () => ({
@@ -24,7 +25,14 @@ export const AmmoData = () => ({
     replaceAP: new BooleanField(),
     blast: new SchemaField(BlastData()),
     accuracy: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    normal_weapon: new BooleanField({ initial: true })
+    normal_weapon: new BooleanField({ initial: true }),
+    // A toxin or drug delivered by a hit, like injection darts or capsule rounds. A copy of the
+    // chemical when loaded, it doesn't change with the item it came from.
+    payload: new SchemaField({
+        ...ChemicalData(),
+        // Informational only, the payload never reads it back.
+        sourceUuid: new StringField({ required: true, blank: true }),
+    }),
 });
 
 export class Ammo extends ItemBase<ReturnType<typeof AmmoData>> {

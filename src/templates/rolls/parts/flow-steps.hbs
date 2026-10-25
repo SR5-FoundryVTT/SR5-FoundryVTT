@@ -2,11 +2,33 @@
     {{#each rows}}
     <div class="sr5-flow-step">
         <a class="sr5-flow-step__subject chat-document-link" data-uuid="{{this.subjectUuid}}">{{this.name}}</a>
-        {{#if this.isPending}}
+        {{#if this.isChoice}}
+            {{#if this.isPending}}
+                {{#if this.canExecute}}
+                    {{#each this.options as |option|}}
+                    <div class="button flow-step-choice" data-step-id="{{../stepId}}" data-subject-uuid="{{../subjectUuid}}" data-option="{{option.value}}">
+                        {{localize option.label}}
+                    </div>
+                    {{/each}}
+                {{else}}
+                <span class="sr5-flow-step__status">{{localize this.label}}: {{localize "SR5.Flow.Pending"}}</span>
+                {{/if}}
+            {{else}}
+            <span class="sr5-flow-step__status">{{localize this.label}}: {{localize this.chosen}}</span>
+            {{/if}}
+        {{else if this.isGated}}
+        <span class="sr5-flow-step__status">{{localize this.label}}: {{localize "SR5.Flow.Waiting"}}</span>
+        {{else if this.isPending}}
             {{#if this.canExecute}}
             <div class="button flow-step-action" data-step-id="{{this.stepId}}" data-subject-uuid="{{this.subjectUuid}}">
                 {{localize this.label}}
             </div>
+            {{#if this.canSkipDefense}}
+            <div class="button flow-step-nodefense" data-step-id="{{this.stepId}}" data-subject-uuid="{{this.subjectUuid}}"
+                 data-tooltip="SR5.Flow.NoDefenseHint">
+                {{localize "SR5.Flow.NoDefense"}}
+            </div>
+            {{/if}}
             {{else}}
             <span class="sr5-flow-step__status">{{localize this.label}}: {{localize "SR5.Flow.Pending"}}</span>
             {{/if}}

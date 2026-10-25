@@ -43,6 +43,9 @@ import { Quench, QuenchRegisterBatchFunction, QuenchRegisterBatchOptions } from 
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
 import { shadowrunMatrixDamageResist } from '@/unittests/sr5.MatrixDamageResist.spec';
 import { shadowrunFlowTesting } from '@/unittests/sr5.Flow.spec';
+import { shadowrunFlowNodeField } from '@/unittests/sr5.FlowNodeField.spec';
+import { shadowrunTestFeatures } from '@/unittests/sr5.TestFeature.spec';
+import { shadowrunFlowNodes } from '@/unittests/sr5.FlowNodes.spec';
 
 const QUENCH_TIMEOUT_MS = 5000;
 
@@ -116,6 +119,9 @@ export const quenchRegister = (quench: Quench) => {
     registerBatch(quench, 'shadowrun5e.data.storage', shadowrunDataStorage, {
         displayName: 'SHADOWRUN5e: DataStorage Test',
     });
+    registerBatch(quench, 'shadowrun5e.data.flow_node', shadowrunFlowNodeField, {
+        displayName: 'SHADOWRUN5e: FlowNodeField Test',
+    });
     registerBatch(quench, 'shadowrun5e.data_prep.character', shadowrunSR5CharacterDataPrep, {
         displayName: 'SHADOWRUN5e: SR5CharacterDataPreparation Test',
     });
@@ -147,11 +153,13 @@ export const quenchRegister = (quench: Quench) => {
         displayName: 'SHADOWRUN5e: Rigger Flow Testing',
     });
     registerBatch(quench, 'shadowrun5e.flow.tests', shadowrunTesting, { displayName: 'SHADOWRUN5e: SuccessTest Test' });
+    registerBatch(quench, 'shadowrun5e.flow.test_features', shadowrunTestFeatures, { displayName: 'SHADOWRUN5e: Test Features' });
     registerBatch(quench, 'shadowrun5e.flow.tests_attack', shadowrunAttackTesting, {
         displayName: 'SHADOWRUN5e: Attack Test',
     });
     registerBatch(quench, 'shadowrun5e.flow.test_value_resolution', shadowrunTestValueResolution, { displayName: 'SHADOWRUN5e: Test Value Resolution' });
     registerBatch(quench, 'shadowrun5e.flow.tests_matrix', shadowrunMatrixTesting, { displayName: 'SHADOWRUN5e: Matrix Test' });
+    registerBatch(quench, 'shadowrun5e.flow.nodes', shadowrunFlowNodes, { displayName: 'SHADOWRUN5e: Flow Nodes' });
     registerBatch(quench, 'shadowrun5e.flow.pipeline', shadowrunFlowTesting, {
         displayName: 'SHADOWRUN5e: Test Flow Pipeline',
     });

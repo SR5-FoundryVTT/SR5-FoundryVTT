@@ -15,6 +15,8 @@ const TargetData = () => ({
     applyTo:    new StringField({ required: true, initial: 'actor', choices: SR5.effectApplyTo }),
     conditions: new ArrayField(new SchemaField(FilterConditionData())),
     onlyForItemTest: new BooleanField(),
+    // What a targeted actor target becomes on the copy applied to the recipient. Empty: changes to its data.
+    appliesAs: new StringField({ required: true, blank: true, initial: '', choices: SR5.effectAppliesAs }),
 });
 
 const ActiveEffectData = (baseChanges: foundry.data.ActiveEffectTypeDataModel.ChangeSchema) => ({
@@ -22,6 +24,18 @@ const ActiveEffectData = (baseChanges: foundry.data.ActiveEffectTypeDataModel.Ch
     onlyForEquipped: new BooleanField(),
     onlyForWireless: new BooleanField(),
     expiryAction:    new StringField({ required: true, initial: 'default', choices: ['default', 'delete', 'update'] }),
+    // How a copy applied by an action treats copies of the same effect already on the recipient.
+    stacking:        new StringField({ required: true, initial: 'stack', choices: SR5.effectStacking }),
+    // A duration value resolved once when an action applies a copy, like (6 - Body) hours. See FlowContext.
+    durationFormula: new StringField({ required: true, blank: true, initial: '' }),
+    // Where a copy applied by an action came from.
+    source: new SchemaField({
+        effectUuid:  new StringField({ required: true, blank: true, initial: '' }),
+        itemUuid:    new StringField({ required: true, blank: true, initial: '' }),
+        casterUuid:  new StringField({ required: true, blank: true, initial: '' }),
+        chainId:     new StringField({ required: true, blank: true, initial: '' }),
+        messageUuid: new StringField({ required: true, blank: true, initial: '' }),
+    }),
     targets: new ArrayField(new SchemaField(TargetData())),
     changes: new ArrayField(new SchemaField({
         // SchemaField owns its children, so spreading baseChanges would reuse already-parented fields.

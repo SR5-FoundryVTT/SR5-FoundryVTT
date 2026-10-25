@@ -26,44 +26,10 @@ interface OpposedPreparationForceTestData extends OpposedTestData {
  * creation test; only a failure of the force produces an actual preparation.
  */
 export class OpposedPreparationForceTest extends OpposedTest<OpposedPreparationForceTestData> {
+    // The opposition has no actor of its own, the caster rolls it. See FlowSubjects.caster.
+    static override subjects = 'caster';
+
     declare against: PreparationCreationTest;
-
-    /**
-     * There is no opposing actor, so bootstrap from the alchemist instead of a target selection.
-     */
-    static async _resolveOpposedBootstrapDocument(
-        againstData: SuccessTestData
-    ): Promise<SR5Actor | SR5Item | null> {
-        const sourceUuid = againstData.sourceActorUuid || againstData.sourceUuid || '';
-
-        let document: unknown = sourceUuid ? await fromUuid(sourceUuid) : null;
-        if (document instanceof TokenDocument)
-            document = document.actor ?? null;
-
-        if (document instanceof SR5Actor || document instanceof SR5Item)
-            return document;
-
-        return null;
-    }
-
-    static override async executeMessageAction(
-        againstData: SuccessTestData,
-        messageId: string,
-        options: TestOptions
-    ): Promise<void> {
-        const bootstrapDocument = await this._resolveOpposedBootstrapDocument(againstData);
-        if (!bootstrapDocument) {
-            ui.notifications?.error('SR5.Errors.NoAvailableActorFound', { localize: true });
-            return;
-        }
-
-        const data = await this._getOpposedActionTestData(againstData, bootstrapDocument, messageId);
-        if (!data) return;
-
-        const documents = { source: bootstrapDocument };
-        const test = new this(data, documents, options);
-        await test.execute();
-    }
 
     /**
      * The spell's opposed selectors describe how a target resists the spell once the preparation

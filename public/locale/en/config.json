@@ -279,6 +279,24 @@
             "New": "New Effect",
             "RemoveCondition": "Remove Condition",
             "RemoveTarget": "Remove Target",
+            "DurationFormula": {
+                "label": "Duration formula",
+                "hint": "When an action applies this effect, resolve the duration value once, in the units above. Like max(1, 6 - @actor.attributes.body.value) or 10 * 1d6."
+            },
+            "Stacking": {
+                "label": "Stacking",
+                "hint": "When an action applies this effect again to the same actor.",
+                "Stack": "Add another",
+                "Replace": "Replace the earlier one",
+                "Highest": "Keep the stronger one"
+            },
+            "AppliesAs": {
+                "label": "Applies to the recipient as",
+                "hint": "What this target changes on the actor an action applies the effect to: its data, the tests it makes, or a modifier.",
+                "Actor": "Actor data",
+                "Tests": "Its tests",
+                "Modifier": "Modifier"
+            },
             "SelectionModes": {
                 "Exclude": "Exclude",
                 "Include": "Include"
@@ -1203,6 +1221,7 @@
             "Acid": "Acid",
             "Cold": "Cold",
             "Electricity": "Electricity",
+            "Electrified": "Electrified",
             "Fire": "Fire",
             "Pollutant": "Pollutant",
             "Radiation": "Radiation",
@@ -1423,6 +1442,58 @@
         "FireMode": "Fire Mode",
         "Force": "Force",
         "FullDefense": "Full Defense",
+        "Chemical": {
+            "Label": "Chemical",
+            "None": "None",
+            "Kind": "Kind",
+            "KindHint": "A toxin is resisted when delivered, a drug applies its effects to its user, a BTL is used like a drug (SR5 p.408-413).",
+            "Vector": "Vectors",
+            "Kinds": {
+                "Toxin": "Toxin",
+                "Drug": "Drug",
+                "Btl": "BTL"
+            },
+            "Vectors": {
+                "Contact": "Contact",
+                "Ingestion": "Ingestion",
+                "Inhalation": "Inhalation",
+                "Injection": "Injection"
+            },
+            "Speed": "Speed",
+            "SpeedHint": "When it takes effect. In combat, even Immediate takes effect at the end of the Combat Turn (SR5 p.408).",
+            "SpeedUnits": {
+                "Immediate": "Immediate",
+                "Turns": "Combat Turns",
+                "Seconds": "Seconds",
+                "Minutes": "Minutes",
+                "Hours": "Hours",
+                "Days": "Days"
+            },
+            "Power": "Power",
+            "PowerHint": "The DV of the toxin, lowered by the hits of its resistance test. Effects read what's left as @payload.power.",
+            "Penetration": "Penetration",
+            "PenetrationHint": "Lowers the rating of protective gear, like AP does for armor.",
+            "DamageTypes": {
+                "Physical": "Physical",
+                "Stun": "Stun",
+                "None": "No damage"
+            },
+            "Duration": "Duration",
+            "DurationHint": "How long the effects last, resolved once when taken. Can read the user, like max(1, 6 - @actor.attributes.body.value).",
+            "Addiction": "Addiction",
+            "AddictionHint": "Taking it while already on it, or on one sharing an effect, is an overdose: Stun damage of the sum of the Addiction Ratings (SR5 p.415).",
+            "AddictionTypes": {
+                "Physiological": "Physiological",
+                "Psychological": "Psychological",
+                "Both": "Both"
+            },
+            "AddictionRating": "Rating",
+            "AddictionThreshold": "Threshold"
+        },
+        "Toxin": {
+            "Resisted": "Resisted",
+            "TakesEffect": "Takes effect"
+        },
         "FullDefenseAttribute": "Full Defense Attribute",
         "FullMatrixDefense": "Full Matrix Defense",
         "GMRequest": {
@@ -3191,11 +3262,78 @@
             "Skipped": "Skipped",
             "ApplyDamage": "Apply damage",
             "ApplyEffects": "Apply effects",
-            "Applied": "Applied"
+            "Applied": "Applied",
+            "Options": {
+                "accept": "Accept",
+                "resist": "Resist"
+            },
+            "Waiting": "Waiting",
+            "Choice": "Accept or resist",
+            "TouchOnly": "Touch-only attack",
+            "ForceReboot": "Reboot",
+            "NoDefense": "No defense",
+            "NoDefenseHint": "Don't defend: the attack is treated as a success test, all its hits are net hits (SR5 p.190).",
+            "PickTarget": "Targeted token",
+            "PickTargetFirst": "Target the token this test is for first.",
+            "Node": {
+                "Test": "Test",
+                "PoolFormula": "Pool formula",
+                "PoolFormulaHint": "Replaces skill and attributes with a value, like @item.force * 2 for a spirit's defense. Leave empty to use skill and attributes.",
+                "Formula": "Formula",
+                "DamageFormula": "Damage formula",
+                "DamageFormulaHint": "Replaces the base damage value, like @item.rating for an item whose Rating is its DV. Leave empty to use the value above.",
+                "ArmorHint": "Add the actor's armor to the pool.",
+                "Actor": "Rolled by",
+                "ActorHint": "Whose test this is, relative to the test it follows. Empty uses the default for this kind of test.",
+                "Mode": "Starts",
+                "ModeHint": "Run right away, or show a button on the chat message.",
+                "Preset": "Default",
+                "Remove": "Remove this test and everything after it",
+                "Warnings": {
+                    "NoTest": "Without a test this does nothing.",
+                    "NoRelease": "Nothing here releases the test it comes before, so that test never runs. Set what releases it on a test within.",
+                    "NoIncomingDamage": "Nothing before this deals damage, so there's nothing to resist.",
+                    "NoAllies": "Allies are the assistants of the action. Add an assisting test for there to be any.",
+                    "RunsOnClick": "Runs when clicked: without a threshold or an opposed test, any hit is a success."
+                },
+                "Relation": {
+                    "opposed": "Opposed Test",
+                    "resist": "Resist Test",
+                    "followed": "Follow-up Test",
+                    "before": "Before the Test",
+                    "option": "Option",
+                    "assist": "Assisting Test"
+                },
+                "Add": {
+                    "opposed": "Add Opposed Test",
+                    "resist": "Add Resist Test",
+                    "followed": "Add Follow-up Test",
+                    "before": "Add Test Before",
+                    "option": "Add Option",
+                    "assist": "Add Assisting Test"
+                },
+                "Actors": {
+                    "same": "Same actor",
+                    "other": "Other side",
+                    "allies": "Allies",
+                    "self": "Caster",
+                    "target": "Targets",
+                    "owner": "Owner's controller",
+                    "none": "Nobody (formula)",
+                    "participants": "Caster and assistants",
+                    "pick": "Picked actors",
+                    "occupants": "Vehicle and passengers"
+                },
+                "Modes": {
+                    "auto": "Right away",
+                    "prompt": "On button"
+                }
+            }
         },
         "Tests": {
             "AttributeOnlyTest": "Attribute-Only Test",
             "BiofeedbackResistTest": "Biofeedback Resist",
+            "ToxinResistTest": "Toxin Resist Test",
             "BruteForceTest": "Brute Force",
             "CheckOverwatchScoreTest": "Check Overwatch Score",
             "CombatSpellDefenseTest": "Combat Spell Defense",
@@ -3517,6 +3655,8 @@
             "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched.",
             "CantSecondChanceWithoutNoneHits": "Can't second chance this test. Only hit-dice left.",
             "CantSpendMulitplePointsOfEdge": "Can't spend multiple points of edge on one test or action",
+            "CantUseEdgeOnThisTest": "Edge can't be used on this test",
+            "NoDosesLeft": "No doses left",
             "CantCombineBuyHitsWithEdge": "Buy Hits can't be combined with Second Chance.",
             "CompilationNotConcluded": "Compilation incomplete. Wait for sprite to oppose compilation to determine fade.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge points can't be spent on tests without actors",

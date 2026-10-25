@@ -30,6 +30,7 @@ import { OverflowTrackType, TrackType } from '../types/template/ConditionMonitor
 import { ActorArmorType } from '../types/template/Armor';
 import { InventoryType } from '../types/actor/Common';
 import { SkillRollOptions } from '../types/rolls/ActorRolls';
+import type { TestOptions } from '../tests/SuccessTest';
 import { FireModeType } from '../types/flags/ItemFlags';
 import { Migrator } from '../migrator/Migrator';
 import { OverwatchStorage } from '../storage/OverwatchStorage';
@@ -1014,7 +1015,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const action = this.skillActionData(name, options);
         if (!action) return;
         if (options.threshold) {
-            action.threshold = options.threshold
+            action.threshold = { ...action.threshold, ...options.threshold };
         }
 
         const showDialog = this.tests.shouldShowDialog(options.event);
@@ -1104,12 +1105,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-    async startTeamworkTest(skillId: string, options?: ChatMessage.Database.CreateOperation) {
+    async startTeamworkTest(skillId: string, options?: ChatMessage.Database.CreateOperation, teamworkData: Partial<TeamworkMessageData> = {}) {
         console.info(`Shadowrun5e | Starting teamwork test for ${skillId}`);
 
         // Prepare message content.
+        const item = teamworkData.itemUuid ? fromUuidSync(teamworkData.itemUuid) as SR5Item | null : null;
         const templateData = {
-            title: "Teamwork " + Helpers.getSkillTranslation(skillId),
+            title: "Teamwork " + (item?.name ?? Helpers.getSkillTranslation(skillId)),
             // Note: While ChatData uses ids, this uses full documents.
             speaker: {
                 actor: this,
@@ -1131,7 +1133,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             // This test data is needed for all subsequent testing based on this chat messages.
             flags: {
                 // Add test data to message to allow ChatMessage hooks to access it.
-                [SYSTEM_NAME]: { [FLAGS.Test]: { skill: skillId } },
+                [SYSTEM_NAME]: { [FLAGS.Test]: { ...teamworkData, skill: skillId } },
                 'core.canPopout': true
             },
             sound: CONFIG.sounds.dice,
@@ -1172,6 +1174,32 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         if (!test) return;
 
         return test.execute();
+    }
+
+    /**
+     * Roll the action of an item as the leader of a teamwork test, with the dice and limit the
+     * assistants added. The assistants become the participants of the tests chain. SR5#49.
+     */
+    async rollTeamworkItem(teamworkData: TeamworkMessageData, options: SkillRollOptions = {}) {
+        const showDialog = this.tests.shouldShowDialog(options.event);
+        const test = await this.teamworkItemTest(teamworkData, { showDialog });
+        return test?.execute();
+    }
+
+    /**
+     * The test of the leader of a teamwork test rolling an item. See SR5Actor.rollTeamworkItem.
+     */
+    async teamworkItemTest(teamworkData: TeamworkMessageData, options: Partial<TestOptions> = {}) {
+        const item = teamworkData.itemUuid ? await fromUuid(teamworkData.itemUuid) as SR5Item | null : null;
+        if (!item) return undefined;
+
+        const test = await this.tests.fromItem(item, this, options);
+        if (!test) return undefined;
+
+        if (!teamworkData.criticalGlitch) ModifiableValue.addBase(test.data.limit, 'Teamwork', teamworkData.additionalLimit ?? 0);
+        ModifiableValue.addUnique(test.data.pool, 'Teamwork', teamworkData.additionalDice ?? 0);
+        test.data.participantUuids = [...(teamworkData.participantUuids ?? [])];
+        return test;
     }
 
     /**

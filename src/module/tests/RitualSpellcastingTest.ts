@@ -28,6 +28,9 @@ interface RitualSpellcastingTestData extends SuccessTestData {
  * Ritual Spellcasting uses the default Success Test, Opposed Test and Followup Flow.
  */
 export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestData> {
+    // Tests new action nodes below this test default to. See FlowNodeEditorFlow.
+    static override flowDefaults: Record<string, string> = { opposed: 'OpposedRitualTest', followed: 'DrainTest' };
+
 
     override _prepareData(data: DeepPartial<RitualSpellcastingTestData>, options: Partial<TestOptions>): RitualSpellcastingTestData {
         const prepared = super._prepareData(data, options);
@@ -105,11 +108,11 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
     /**
      * Notify caster about incomplete ritual. To avoid pre mature drain tests.
      */
-    override async executeFollowUpTest(testClsName?: string) {
+    override async executeFollowUpTest(testClsName?: string, features: string[] = []) {
         if (!this.data.drainReady) {
             ui.notifications?.warn('SR5.Warnings.RitualNotConcluded', {localize: true});
         }
-        await super.executeFollowUpTest(testClsName);
+        await super.executeFollowUpTest(testClsName, features);
     }
 
     /**

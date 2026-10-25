@@ -56,6 +56,13 @@ export const FLAGS = {
     CreateTargetedEffects: 'CreateTargetedEffects',
     FlowStepDone: 'FlowStepDone',
     FlowApplyDone: 'FlowApplyDone',
+    FlowGate: 'FlowGate',
+    // The bonus of a Full Defense lasting the Combat Turn, on its effect.
+    FullDefense: 'fullDefense',
+    // The element of a secondary effect of elemental damage, on its effect.
+    Elemental: 'elemental',
+    // The drug an effect was applied by, for overdoses. See FlowChemicals.
+    Chemical: 'chemical',
     FlowAutoApply: 'flowAutoApply',
     DefaultOpposedTestActorSelection: 'DefaultOpposedTestActorSelection',
     TeamworkTestFlow: 'TeamworkTestFlow',

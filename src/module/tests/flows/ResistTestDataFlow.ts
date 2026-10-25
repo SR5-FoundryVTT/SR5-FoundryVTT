@@ -105,7 +105,7 @@ export const ResistTestDataFlow = {
         // Allow the OpposedTest to overwrite action data using its class default action.
         action = TestCreator._mergeMinimalActionDataInOrder(action,
             // Use action data from the original action at first.
-            opposedData.against.opposed.resist,
+            TestCreator._nodeActionData(opposedData.against.opposed.resist),
             // Overwrite with the OpposedTest class default action, if any.
             testCls._getDefaultTestAction()
         );

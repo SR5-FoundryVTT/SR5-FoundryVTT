@@ -25,6 +25,8 @@ import { Translation } from '../utils/strings';
 import { SkillSelectionFlow } from '../flows/SkillSelectionFlow';
 import { WorldTimeFlow } from '../flows/WorldTimeFlow';
 import { PreparationTimeDialog } from '../apps/dialogs/PreparationTimeDialog';
+import { FlowNodeEditorFlow } from './flows/FlowNodeEditorFlow';
+import { chemicalOptions } from '../types/template/Chemical';
 
 const { fromUuid, fromUuidSync } = foundry.utils;
 
@@ -59,6 +61,9 @@ export interface SR5BaseItemSheetData extends ItemSheet.RenderContext, SR5Applic
     opposedTests: typeof game.shadowrun5e.opposedTests;
     activeTests: typeof game.shadowrun5e.activeTests;
     resistTests: typeof game.shadowrun5e.resistTests;
+    flowNodes: ReturnType<typeof FlowNodeEditorFlow.tree>;
+    flowNodeOptions: ReturnType<typeof FlowNodeEditorFlow.options>;
+    chemicalOptions: ReturnType<typeof chemicalOptions>;
 
     // Description
     descriptionHTML?: string;
@@ -166,8 +171,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             removeImprovisedDevices: SR5ItemSheet.#removeImprovisedDevices,
 
             toggleActionArmor: SR5ItemSheet.#toggleActionArmor,
-            toggleOpposedArmor: SR5ItemSheet.#toggleOpposedArmor,
-            toggleResistArmor: SR5ItemSheet.#toggleResistArmor,
+            addFlowNode: SR5ItemSheet.#addFlowNode,
+            removeFlowNode: SR5ItemSheet.#removeFlowNode,
 
             modifyConditionMonitor: SR5ItemSheet.#modifyConditionMonitor,
             clearConditionMonitor: SR5ItemSheet.#clearConditionMonitor,
@@ -442,6 +447,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data.opposedTests = game.shadowrun5e.opposedTests;
         data.activeTests = game.shadowrun5e.activeTests;
         data.resistTests = game.shadowrun5e.resistTests;
+        data.flowNodes = FlowNodeEditorFlow.tree(this.item);
+        data.flowNodeOptions = FlowNodeEditorFlow.options();
+        data.chemicalOptions = chemicalOptions();
 
         if (this.item.system.description)
             data.descriptionHTML = await this.enrichEditorFieldToHTML(this.item.system.description.value);
@@ -1132,18 +1140,29 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
-    static async #toggleOpposedArmor(this: SR5ItemSheet) {
-        const action = this.item.getAction();
-        if (action) {
-            await this.item.update({ system: { action: { opposed: { armor: !action.opposed.armor } } } });
-        }
+    /**
+     * Add an action node at the path of the clicked control. An empty node takes all defaults.
+     */
+    static async #addFlowNode(this: SR5ItemSheet, event: PointerEvent, target: HTMLElement) {
+        event.preventDefault();
+        const path = target.dataset.path;
+        if (!path?.startsWith('system.action.')) return;
+        const test = target.dataset.test;
+        await this.item.update({ [path]: test ? { test } : {} });
     }
 
-    static async #toggleResistArmor(this: SR5ItemSheet) {
-        const action = this.item.getAction();
-        if (action) {
-            await this.item.update({ system: { action: { opposed: { resist: { armor: !action.opposed.resist.armor } } } } });
-        }
+    /**
+     * Remove the action node at the path of the clicked control, with all nodes below it.
+     */
+    static async #removeFlowNode(this: SR5ItemSheet, event: PointerEvent, target: HTMLElement) {
+        event.preventDefault();
+        const path = target.dataset.path;
+        if (!path?.startsWith('system.action.')) return;
+
+        // Entries of a map, like choice options, are deleted. Single nodes are emptied.
+        const parentPath = path.split('.').slice(0, -1).join('.');
+        const isMapEntry = parentPath.endsWith('.option');
+        await this.item.update({ [path]: isMapEntry ? new foundry.data.operators.ForcedDeletion() : null });
     }
 
     /**

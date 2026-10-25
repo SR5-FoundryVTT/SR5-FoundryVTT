@@ -21,6 +21,16 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/ammo.hbs"}}
             {{/if}}
 
+            {{#if systemFields.chemical}}
+                {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/chemical.hbs"
+                    fields=systemFields.chemical.fields source=source.system.chemical path="system.chemical"}}
+            {{/if}}
+
+            {{#if systemFields.payload}}
+                {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/chemical.hbs"
+                    fields=systemFields.payload.fields source=source.system.payload path="system.payload"}}
+            {{/if}}
+
             {{#if (isType item 'host')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/host.hbs"}}
             {{/if}}

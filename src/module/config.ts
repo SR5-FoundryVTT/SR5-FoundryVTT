@@ -1380,6 +1380,24 @@ export const SR5 = {
         'modifier': 'SR5.Modifier'
     },
 
+    /**
+     * What a targeted actor effect target becomes on the copy an action applies.
+     */
+    effectAppliesAs: {
+        '': 'SR5.ActiveEffect.AppliesAs.Actor',
+        'test_all': 'SR5.ActiveEffect.AppliesAs.Tests',
+        'modifier': 'SR5.ActiveEffect.AppliesAs.Modifier',
+    },
+
+    /**
+     * How a copy applied by an action treats earlier copies of the same effect on the recipient.
+     */
+    effectStacking: {
+        'stack': 'SR5.ActiveEffect.Stacking.Stack',
+        'replace': 'SR5.ActiveEffect.Stacking.Replace',
+        'highest': 'SR5.ActiveEffect.Stacking.Highest',
+    },
+
     effectSelectionModes: {
         'include': 'SR5.ActiveEffect.SelectionModes.Include',
         'exclude': 'SR5.ActiveEffect.SelectionModes.Exclude',

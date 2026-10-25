@@ -14,8 +14,10 @@ export class ModifiableFieldPrep {
         for (const [fieldName, value] of Object.entries(source)) {
             const field = resolveField(fieldName);
 
-            if (field instanceof ModifiableField)
-                func(value as ModifiableValueType);
+            if (field instanceof ModifiableField) {
+                // Nullable modifiable values, like the damage of action nodes, are empty until set.
+                if (value) func(value as ModifiableValueType);
+            }
             else if (field instanceof SchemaField)
                 this.traverseFields(value, (subKey) => field.fields[subKey] as foundry.data.fields.DataField.Any, func);
             else if (field instanceof TypedObjectField || field instanceof ArrayField)

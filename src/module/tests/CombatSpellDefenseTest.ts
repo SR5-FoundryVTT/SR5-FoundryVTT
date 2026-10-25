@@ -9,13 +9,16 @@ import ModifierTypes = Shadowrun.ModifierTypes;
 import { ActionRollType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 import { Translation } from "../utils/strings";
-import type { FlowStep } from "../types/flows/FlowStep";
+import { handlesIncomingDamage, type FlowStep } from "../types/flows/FlowStep";
 
 export interface CombatSpellDefenseTestData extends DefenseTestData {
     against: SpellCastingTestData
 }
 
 export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestData> {
+    // Tests new action nodes below this test default to. See FlowNodeEditorFlow.
+    static override flowDefaults: Record<string, string> = { resist: 'PhysicalResistTest' };
+
     declare against: SpellCastingTest;
 
     override get successLabel(): Translation {
@@ -116,7 +119,7 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
      * Only indirect combat spells allow resisting their damage.
      */
     override flowAllowsStep(step: FlowStep): boolean {
-        if (step.kind !== 'test') return true;
+        if (step.kind !== 'test' || !handlesIncomingDamage(step)) return true;
 
         const spell = this.item?.asType('spell', 'preparation')?.system;
         if (!spell) return false;

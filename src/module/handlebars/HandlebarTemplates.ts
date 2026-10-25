@@ -34,6 +34,8 @@ export const preloadHandlebarsTemplates = async () => {
             'item/footer/preparation',
             'item/footer/skill',
             'item/tabs/details/action',
+            'item/tabs/details/flow-node',
+            'item/tabs/details/chemical',
             'item/tabs/details/adept_power',
             'item/tabs/details/ammo',
             'item/tabs/details/armor',

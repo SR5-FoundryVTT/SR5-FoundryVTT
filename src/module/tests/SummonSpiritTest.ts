@@ -36,6 +36,9 @@ interface SummonSpiritTestData extends SuccessTestData {
  * Summoning uses the default Success Test, Opposed Test and Followup Flow.
  */
 export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
+    // Tests new action nodes below this test default to. See FlowNodeEditorFlow.
+    static override flowDefaults: Record<string, string> = { opposed: 'OpposedSummonSpiritTest', followed: 'DrainTest' };
+
 
     override _prepareData(data: DeepPartial<SummonSpiritTestData>, options: Partial<TestOptions>): SummonSpiritTestData {
         const prepared = super._prepareData(data, options);
@@ -109,9 +112,9 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
     /**
      * Notify summoners about incomplete summoning. To avoid pre mature drain tests.
      */
-    override async executeFollowUpTest(testClsName?: string) {
+    override async executeFollowUpTest(testClsName?: string, features: string[] = []) {
         if (!this.data.drainReady) ui.notifications?.warn('SR5.Warnings.SummoningNotConcluded', {localize: true});
-        await super.executeFollowUpTest(testClsName);
+        await super.executeFollowUpTest(testClsName, features);
     }
 
     /**

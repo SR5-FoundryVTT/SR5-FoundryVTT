@@ -7,6 +7,7 @@ import { DataDefaults } from "../data/DataDefaults";
 import { ModifiableValueType } from "../types/template/Base";
 import { ModifiableValue } from "../mods/ModifiableValue";
 import { DynamicValue, DynamicValueEvaluator } from "./DynamicValueEvaluator";
+import { FlowNodeRules } from "../types/flows/FlowNodeField";
 import DataModel = foundry.abstract.DataModel;
 
 /**
@@ -71,7 +72,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Effects predating targets, or built without them, keep behaving like plain actor effects.
      */
     static get defaultTarget(): SR5ActiveEffect['system']['targets'][number] {
-        return { id: 'actor', name: game.i18n.localize('SR5.ActiveEffect.Target'), applyTo: 'actor', conditions: [], onlyForItemTest: false };
+        return { id: 'actor', name: game.i18n.localize('SR5.ActiveEffect.Target'), applyTo: 'actor', conditions: [], onlyForItemTest: false, appliesAs: '' };
     }
 
     /**
@@ -347,6 +348,14 @@ export class SR5ActiveEffect extends ActiveEffect {
         change: ActiveEffect.ChangeData,
         options: ActiveEffect.ApplyChangeOptions = {}
     ): Record<string, unknown> {
+        // A key naming a relation changes every node of it, like `system.action[resist].mod`.
+        const keys = FlowNodeRules.expandRelationKey(targetDoc, change.key ?? '');
+        if (keys.length !== 1 || keys[0] !== (change.key ?? '')) {
+            const changes = {};
+            for (const key of keys) Object.assign(changes, SR5ActiveEffect.applyChange(targetDoc, { ...change, key }, options));
+            return changes;
+        }
+
         // Foundry core iterates every change of an applicable effect when applying to actor data.
         // Only apply changes whose target is actor-bound. Both 'actor' and 'targeted_actor' targets
         // apply to actor data (targeted_actor effects are only collected onto an actor when they

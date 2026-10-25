@@ -2,6 +2,7 @@ import {SR} from "../constants";
 import { ModifiableValue } from "../mods/ModifiableValue";
 import {Helpers} from "../helpers";
 import {SoakRules} from "./SoakRules";
+import { DamageRules } from "./DamageRules";
 import {SR5Actor} from "../actor/SR5Actor";
 import { DamageType } from "../types/item/Action";
 import { ValueFieldType } from "../types/template/Base";
@@ -135,7 +136,7 @@ export class CombatRules {
      * @param actor The active defender
      */
     static doesNoPhysicalDamageToVehicle(incomingDamage: DamageType, actor: SR5Actor): boolean {
-        return actor.isType('vehicle') && incomingDamage.type.value === 'stun' && incomingDamage.element.value !== "electricity";
+        return actor.isType('vehicle') && incomingDamage.type.value === 'stun' && !DamageRules.hasElement(incomingDamage, 'electricity');
     }
 
     /**
@@ -172,6 +173,7 @@ export class CombatRules {
         // If attack hits but deals no damage, keep the element of the attack for any side effects.
         if(!isHitWithNoDamage) {
             modifiedDamage.element.value = '';
+            modifiedDamage.elements = [];
         }
 
         return modifiedDamage;
@@ -224,7 +226,7 @@ export class CombatRules {
         // Careful, order of damage conversion is very important
         // Electricity stun damage is considered physical for vehicles
         let updatedDamage = foundry.utils.duplicate(damage) as DamageType;
-        if (actor.isType('vehicle') && updatedDamage.element.value === 'electricity' && updatedDamage.type.value === 'stun') {
+        if (actor.isType('vehicle') && DamageRules.hasElement(updatedDamage, 'electricity') && updatedDamage.type.value === 'stun') {
             updatedDamage.type.value = 'physical';
         }
 

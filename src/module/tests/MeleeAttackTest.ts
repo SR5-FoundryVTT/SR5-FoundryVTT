@@ -9,6 +9,9 @@ export interface MeleeAttackData extends SuccessTestData {
 }
 
 export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
+    // Tests new action nodes below this test default to. See FlowNodeEditorFlow.
+    static override flowDefaults: Record<string, string> = { opposed: 'PhysicalDefenseTest' };
+
 
     override _prepareData(data: DeepPartial<MeleeAttackData>, options: Partial<TestOptions>): MeleeAttackData {
         const prepared = super._prepareData(data, options);
@@ -38,10 +41,11 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
     }
 
     override async prepareDocumentData() {
-        if (!this.item?.isMeleeWeapon()) return;
-
-        this.data.reach = this.item.getReach();
-        this.data.reach += this.actor && 'reach' in this.actor.system.modifiers ? this.actor?.system.modifiers.reach : 0;
+        // An unarmed attack made through another item, like touching with a spell, has no weapon reach.
+        if (this.item?.isMeleeWeapon()) {
+            this.data.reach = this.item.getReach();
+            this.data.reach += this.actor && 'reach' in this.actor.system.modifiers ? this.actor?.system.modifiers.reach : 0;
+        }
 
         await super.prepareDocumentData();
     }

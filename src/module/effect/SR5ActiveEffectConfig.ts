@@ -35,6 +35,8 @@ type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
     filterOptionsByType: Record<string, Record<string, Translation>>;
 
     applyToOptions: { label: Translation, value: string }[];
+    appliesAsOptions: Record<string, string>;
+    stackingOptions: Record<string, string>;
     changeTargetOptions: { label: string, value: string }[];
     targetApplyToById: Record<string, string>;
     changeTypes: Record<string, string>;
@@ -228,6 +230,8 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             limits: data.selection_limit_options,
         };
         data.applyToOptions = this.prepareApplyToOptions();
+        data.appliesAsOptions = SR5.effectAppliesAs;
+        data.stackingOptions = SR5.effectStacking;
         data.changeTargetOptions = this.prepareChangeTargetOptions();
         data.targetApplyToById = this.prepareTargetApplyToById();
         data.changeTypes = this.prepareChangeTypes();

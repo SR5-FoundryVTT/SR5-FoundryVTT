@@ -17,6 +17,9 @@ export interface ComplexFormTestData extends SuccessTestData {
  * Handles threading complex forms as described on SR5#251.
  */
 export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
+    // Tests new action nodes below this test default to. See FlowNodeEditorFlow.
+    static override flowDefaults: Record<string, string> = { opposed: 'OpposedTest', followed: 'FadeTest' };
+
 
     override _prepareData(data: DeepPartial<ComplexFormTestData>, options: Partial<TestOptions>): ComplexFormTestData {
         const prepared = super._prepareData(data, options);

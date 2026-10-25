@@ -34,6 +34,9 @@ export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDa
 
 
 export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
+    // Tests new action nodes below this test default to. See FlowNodeEditorFlow.
+    static override flowDefaults: Record<string, string> = { opposed: 'PhysicalDefenseTest' };
+
     declare item: SR5Item;
     public rangeOverlayFlow = new WeaponRangeOverlayFlow(this);
     public suppressiveFireTemplateFlow = new SuppressiveFireTemplateFlow(this);

@@ -35,6 +35,16 @@
         {{#ife target.applyTo "test_target"}}
             {{> "systems/shadowrun5e/dist/templates/effect/active-effect-target-conditions.hbs" target=target ti=ti}}
         {{/ife}}
+        {{#ife target.applyTo "targeted_actor"}}
+            <div class="form-group">
+                <label>{{localize "SR5.ActiveEffect.AppliesAs.label"}}</label>
+                <div class="form-fields">
+                    <select name="{{concat "system.targets." ti ".appliesAs"}}" data-tooltip="{{localize "SR5.ActiveEffect.AppliesAs.hint"}}">
+                        {{selectOptions @root.appliesAsOptions selected=target.appliesAs localize=true}}
+                    </select>
+                </div>
+            </div>
+        {{/ife}}
         {{#ife target.applyTo "modifier"}}
             {{formGroup (lookup @root.systemFields.targets.element.fields "onlyForItemTest")
                 name=(concat "system.targets." ti ".onlyForItemTest")

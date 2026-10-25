@@ -30,6 +30,9 @@ export type PhysicalResistSuccessCondition = {
  * Physical resist specifically handles physical damage dealt by ranged, melee and physical spell attacks.
  */
 export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
+    // Resisted with the selected tokens. See FlowSubjects.
+    static override subjects = 'selected';
+
 
     override _prepareData(data: PhysicalResistTestData, options: Partial<TestOptions>): PhysicalResistTestData {
         let prepared = super._prepareData(data, options);
@@ -207,8 +210,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
      * This can be used to trigger resist tests.
      */
     static override async executeMessageAction(againstData: PhysicalDefenseTestData, messageId: string, options: Partial<TestOptions>) {
-        // Roll resist tests with the currently selected token actor(s).
-        const documents = Helpers.getSelectedActorsOrCharacter();
-        await ResistTestDataFlow.executeMessageAction(this as typeof SuccessTest, againstData, messageId, documents, options);
+        const documents = await this.messageActionSubjects(againstData);
+        await ResistTestDataFlow.executeMessageAction(this as typeof SuccessTest, againstData, messageId, documents as (SR5Actor | SR5Item)[], options);
     }
 }

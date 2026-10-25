@@ -4,7 +4,7 @@ import { TestCreator } from '../module/tests/TestCreator';
 import { SuccessTest } from '../module/tests/SuccessTest';
 import { RangedAttackTest } from '../module/tests/RangedAttackTest';
 import { FlowSnapshot } from '../module/tests/flows/FlowSnapshot';
-import { LEGACY_STEP, LegacyStepMapper } from '../module/tests/flows/LegacyStepMapper';
+import { FlowTree } from '../module/flows/FlowTree';
 import { FlowPlan } from '../module/flows/FlowPlan';
 import { FlowRunner } from '../module/flows/FlowRunner';
 import { FlowChatFlow } from '../module/flows/FlowChatFlow';
@@ -13,12 +13,27 @@ import { FLAGS, SYSTEM_NAME } from '../module/constants';
 import { SR5Actor } from '../module/actor/SR5Actor';
 import { createFlowStep, FLOW_ROOT_STEP, FlowState, FlowStep } from '../module/types/flows/FlowStep';
 
+// Step ids are node paths within the action.
+const STEP = {
+    defense: 'opposed',
+    resist: 'opposed.resist',
+    damage: 'opposed.resist.damage',
+    hitDamage: 'opposed.damage',
+    effects: 'opposed.effects',
+    followup: 'followed',
+    drain: 'followed.damage',
+} as const;
+
 export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
     const { describe, it, before, after } = context;
     const assert: Chai.AssertStatic = context.assert;
 
-    after(async () => { await factory.destroy(); });
+    after(async function () {
+        // Deleting all actors created here takes longer than a single test may.
+        this.timeout(30000);
+        await factory.destroy();
+    });
 
     const stepById = (steps: FlowStep[], id: string) => steps.find(step => step.id === id);
 
@@ -77,27 +92,28 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
         });
     });
 
-    describe('LegacyStepMapper', () => {
+    describe('FlowTree', () => {
         it('maps a weapon attack to defense, resist and damage', async () => {
             const test = await createWeaponTest({
                 test: 'MeleeAttackTest',
                 opposed: { test: 'PhysicalDefenseTest', resist: { test: 'PhysicalResistTest' } },
             });
 
-            const steps = LegacyStepMapper.map(test);
+            const steps = FlowTree.flatten(test);
 
-            assert.deepEqual(steps.map(step => step.id), [LEGACY_STEP.defense, LEGACY_STEP.resist, LEGACY_STEP.damage]);
-            assert.strictEqual(stepById(steps, LEGACY_STEP.defense)?.test, 'PhysicalDefenseTest');
-            assert.strictEqual(stepById(steps, LEGACY_STEP.defense)?.after, FLOW_ROOT_STEP);
+            // Secondary effects of elemental damage follow the damage, see ElementalRules.
+            assert.deepEqual(steps.map(step => step.id), [STEP.defense, STEP.resist, STEP.damage, `${STEP.damage}.elemental`]);
+            assert.strictEqual(stepById(steps, STEP.defense)?.test, 'PhysicalDefenseTest');
+            assert.strictEqual(stepById(steps, STEP.defense)?.after, FLOW_ROOT_STEP);
 
-            const resist = stepById(steps, LEGACY_STEP.resist);
-            assert.strictEqual(resist?.after, LEGACY_STEP.defense);
-            assert.strictEqual(resist?.when, 'hit');
+            const resist = stepById(steps, STEP.resist);
+            assert.strictEqual(resist?.after, STEP.defense);
+            assert.deepEqual(resist?.when, ['hit']);
             assert.strictEqual(resist?.mode, 'auto');
 
-            const damage = stepById(steps, LEGACY_STEP.damage);
+            const damage = stepById(steps, STEP.damage);
             assert.strictEqual(damage?.kind, 'applyDamage');
-            assert.strictEqual(damage?.after, LEGACY_STEP.resist);
+            assert.strictEqual(damage?.after, STEP.resist);
         });
 
         it('reads a defense test configured as resist test as physical resist', async () => {
@@ -106,9 +122,9 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
                 opposed: { test: 'PhysicalDefenseTest', resist: { test: 'PhysicalDefenseTest' } },
             });
 
-            const steps = LegacyStepMapper.map(test);
+            const steps = FlowTree.flatten(test);
 
-            assert.strictEqual(stepById(steps, LEGACY_STEP.resist)?.test, 'PhysicalResistTest');
+            assert.strictEqual(stepById(steps, STEP.resist)?.test, 'PhysicalResistTest');
         });
 
         it('uses the suppression defense test for suppressive fire', async () => {
@@ -119,9 +135,9 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
             assert.instanceOf(test, RangedAttackTest);
             (test as RangedAttackTest).data.fireMode = { ...(test as RangedAttackTest).data.fireMode, suppression: true };
 
-            const steps = LegacyStepMapper.map(test);
+            const steps = FlowTree.flatten(test);
 
-            assert.strictEqual(stepById(steps, LEGACY_STEP.defense)?.test, 'SuppressionDefenseTest');
+            assert.strictEqual(stepById(steps, STEP.defense)?.test, 'SuppressionDefenseTest');
         });
 
         it('applies damage after the defense when there is no resist test', async () => {
@@ -131,30 +147,30 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
             });
             test.data.damage.value = 6;
 
-            const steps = LegacyStepMapper.map(test);
-            const damage = stepById(steps, LEGACY_STEP.damage);
+            const steps = FlowTree.flatten(test);
+            const damage = stepById(steps, STEP.hitDamage);
 
-            assert.isUndefined(stepById(steps, LEGACY_STEP.resist));
-            assert.strictEqual(damage?.after, LEGACY_STEP.defense);
-            assert.strictEqual(damage?.when, 'hit');
+            assert.isUndefined(stepById(steps, STEP.resist));
+            assert.strictEqual(damage?.after, STEP.defense);
+            assert.deepEqual(damage?.when, ['hit']);
         });
 
         it('maps a followed test to a followup and drain step for the casting actor', async () => {
             const test = await createActionTest({ test: 'SuccessTest', opposed: { test: '' }, followed: { test: 'DrainTest' } });
 
-            const steps = LegacyStepMapper.map(test);
-            const followup = stepById(steps, LEGACY_STEP.followup);
+            const steps = FlowTree.flatten(test);
+            const followup = stepById(steps, STEP.followup);
 
-            assert.deepEqual(steps.map(step => step.id), [LEGACY_STEP.followup, LEGACY_STEP.drain]);
+            assert.deepEqual(steps.map(step => step.id), [STEP.followup, STEP.drain, `${STEP.drain}.elemental`]);
             assert.strictEqual(followup?.test, 'DrainTest');
             assert.strictEqual(followup?.actor, 'self');
             assert.strictEqual(followup?.mode, 'auto');
-            assert.strictEqual(stepById(steps, LEGACY_STEP.drain)?.actor, 'self');
+            assert.strictEqual(stepById(steps, STEP.drain)?.actor, 'self');
         });
 
         it('maps nothing for a test without opposed or followed test', async () => {
             const test = TestCreator.fromPool({ pool: 5 }, { showDialog: false, showMessage: false });
-            assert.deepEqual(LegacyStepMapper.map(test), []);
+            assert.deepEqual(FlowTree.flatten(test), []);
         });
     });
 
@@ -166,7 +182,8 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
             hookId = Hooks.on('createChatMessage', (message: ChatMessage) => { createdMessageIds.push(message.id!); });
         });
 
-        after(async () => {
+        after(async function () {
+            this.timeout(30000);
             Hooks.off('createChatMessage', hookId);
             const ids = createdMessageIds.filter(id => game.messages?.has(id));
             if (ids.length) await ChatMessage.deleteDocuments(ids);
@@ -220,7 +237,7 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(state.stepId, FLOW_ROOT_STEP);
             assert.strictEqual(state.rootMessageUuid, attack.data.messageUuid);
             assert.deepEqual(state.targets, [defender.uuid]);
-            assert.deepEqual(state.next, [{ stepId: LEGACY_STEP.defense, subjectUuid: defender.uuid, status: 'pending' }]);
+            assert.deepEqual(state.next, [{ stepId: STEP.defense, subjectUuid: defender.uuid, branchUuid: defender.uuid, status: 'pending' }]);
         });
 
         const executeDefense = async (attackHits: boolean, attackOptions: { damage?: number, effect?: boolean } = {}) => {
@@ -245,11 +262,11 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
             const state = flowState(defense.data.messageUuid);
             if (!state) return assert.fail('Defense message has no flow state');
 
-            assert.strictEqual(state.stepId, LEGACY_STEP.defense);
+            assert.strictEqual(state.stepId, STEP.defense);
             assert.strictEqual(state.chainId, rootState.chainId);
             assert.strictEqual(state.parentMessageUuid, attack.data.messageUuid);
             assert.strictEqual(state.subjectUuid, defender.uuid);
-            assert.deepEqual(state.next, [{ stepId: LEGACY_STEP.resist, subjectUuid: defender.uuid, status: 'skipped' }]);
+            assert.deepEqual(state.next, [{ stepId: STEP.resist, subjectUuid: defender.uuid, branchUuid: defender.uuid, status: 'skipped' }]);
         });
 
         it('records the resist test following a failed defense', async () => {
@@ -258,19 +275,20 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
             // A failed defense auto executes the resist test, which follows the defense message.
             const resistMessage = game.messages!.contents.findLast(message => {
                 const resistState = message.getFlag(SYSTEM_NAME, FLAGS.Flow) as FlowState | undefined;
-                return resistState?.chainId === rootState.chainId && resistState.stepId === LEGACY_STEP.resist;
+                return resistState?.chainId === rootState.chainId && resistState.stepId === STEP.resist;
             });
             const resistState = resistMessage?.getFlag(SYSTEM_NAME, FLAGS.Flow) as FlowState | undefined;
             if (!resistState) return assert.fail('Resist message has no flow state');
 
             assert.strictEqual(resistState.parentMessageUuid, defense.data.messageUuid);
             assert.strictEqual(resistState.subjectUuid, defender.uuid);
-            assert.deepEqual(resistState.next, [{ stepId: LEGACY_STEP.damage, subjectUuid: defender.uuid, status: 'pending' }]);
+            assert.deepEqual(resistState.next, [{ stepId: STEP.damage, subjectUuid: defender.uuid, branchUuid: defender.uuid, status: 'pending' }]);
 
             const state = flowState(defense.data.messageUuid);
             assert.deepEqual(state?.next, [{
-                stepId: LEGACY_STEP.resist,
+                stepId: STEP.resist,
                 subjectUuid: defender.uuid,
+                branchUuid: defender.uuid,
                 status: 'done',
                 messageUuid: resistMessage!.uuid,
             }]);
@@ -305,7 +323,7 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
                 if (!effect) return assert.fail('Targeted effect was not applied');
                 assert.strictEqual(effect.start?.time, game.time.worldTime);
 
-                const effectsEntry = flowState(defense.data.messageUuid)?.next.find(entry => entry.stepId === LEGACY_STEP.effects);
+                const effectsEntry = flowState(defense.data.messageUuid)?.next.find(entry => entry.stepId === STEP.effects);
                 assert.strictEqual(effectsEntry?.status, 'done');
             });
         });
@@ -314,7 +332,7 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
             await withAutoApply('all', async () => {
                 const { defender, rootState } = await executeDefense(true, { damage: 30 });
 
-                const resistState = findChainMessage(rootState.chainId, LEGACY_STEP.resist)?.getFlag(SYSTEM_NAME, FLAGS.Flow) as FlowState | undefined;
+                const resistState = findChainMessage(rootState.chainId, STEP.resist)?.getFlag(SYSTEM_NAME, FLAGS.Flow) as FlowState | undefined;
                 assert.strictEqual(resistState?.next[0]?.status, 'done');
                 assert.isAbove(takenDamage(defender), 0);
             });
@@ -323,7 +341,7 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
         it('waits for the apply button without auto applying damage', async () => {
             await withAutoApply('none', async () => {
                 const { defender, rootState } = await executeDefense(true, { damage: 30 });
-                const resistMessage = findChainMessage(rootState.chainId, LEGACY_STEP.resist);
+                const resistMessage = findChainMessage(rootState.chainId, STEP.resist);
                 if (!resistMessage) return assert.fail('Resist message missing');
 
                 assert.strictEqual(takenDamage(defender), 0);
@@ -331,7 +349,7 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
                 assert.strictEqual(row?.subjectUuid, defender.uuid);
                 assert.isTrue(row?.isPending);
 
-                await FlowRunner.applyPromptEntry(resistMessage, LEGACY_STEP.damage, defender.uuid);
+                await FlowRunner.applyPromptEntry(resistMessage, STEP.damage, defender.uuid);
 
                 assert.isAbove(takenDamage(defender), 0);
                 const [appliedRow] = FlowChatFlow.applyRows(resistMessage);
@@ -399,7 +417,7 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
             assert.isTrue(row?.isPending);
             assert.isTrue(row?.canExecute);
 
-            const types = await completedTests(() => FlowRunner.executePromptStep(rootMessage, LEGACY_STEP.defense, defender.uuid, false));
+            const types = await completedTests(() => FlowRunner.executePromptStep(rootMessage, STEP.defense, defender.uuid, false));
 
             assert.strictEqual(types.at(-1), 'PhysicalDefenseTest');
             const [doneRow] = FlowChatFlow.rows(rootMessage);
@@ -418,11 +436,11 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
             await defense.execute();
 
             const state = flowState(defense.data.messageUuid);
-            assert.strictEqual(state?.stepId, LEGACY_STEP.defense);
+            assert.strictEqual(state?.stepId, STEP.defense);
             assert.strictEqual(state?.subjectUuid, bystander.uuid);
 
             const rootNext = flowState(attack.data.messageUuid)?.next ?? [];
-            assert.deepInclude(rootNext, { stepId: LEGACY_STEP.defense, subjectUuid: bystander.uuid, status: 'done', messageUuid: defense.data.messageUuid });
+            assert.deepInclude(rootNext, { stepId: STEP.defense, subjectUuid: bystander.uuid, status: 'done', messageUuid: defense.data.messageUuid });
         });
 
         it('executes the drain of a spell after casting it', async () => {
@@ -468,18 +486,49 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
     });
 
     describe('FlowPlan', () => {
-        it('prefers explicit action steps over legacy action data', async () => {
+        it('flattens nested nodes below the legacy nodes, attaching after the damage their parent applies', async () => {
             const test = await createWeaponTest({
                 test: 'MeleeAttackTest',
-                opposed: { test: 'PhysicalDefenseTest', resist: { test: 'PhysicalResistTest' } },
-                steps: [{ id: 'custom', kind: 'test', test: 'SuccessTest' }],
+                opposed: {
+                    test: 'PhysicalDefenseTest',
+                    resist: { test: 'PhysicalResistTest', followed: { test: 'SuccessTest' } },
+                    followed: { test: 'PhysicalResistTest', actor: 'other', when: ['hit'], damage: { base: 4, value: 4, type: { base: 'stun', value: 'stun' } } },
+                },
             });
 
             const plan = FlowPlan.resolve(test);
+            const ids = plan.map(step => step.id);
 
-            assert.deepEqual(plan.map(step => step.id), ['custom']);
-            assert.strictEqual(plan[0].actor, 'target');
-            assert.strictEqual(plan[0].after, FLOW_ROOT_STEP);
+            assert.includeMembers(ids, ['opposed', 'opposed.resist', 'opposed.resist.damage', 'opposed.resist.damage', 'opposed.resist.followed', 'opposed.followed']);
+            // The resist test of the defender is followed by a test of the defender, after the damage is applied.
+            assert.strictEqual(stepById(plan, 'opposed.resist.followed')?.after, 'opposed.resist.damage');
+            assert.strictEqual(stepById(plan, 'opposed.resist.followed')?.actor, 'target');
+            // A node of the other actor below the defense is the attacker again.
+            assert.strictEqual(stepById(plan, 'opposed.followed')?.actor, 'self');
+            assert.deepEqual(stepById(plan, 'opposed.followed')?.when, ['hit']);
+        });
+
+        it('resolves steps by their legacy ids', async () => {
+            const test = await createWeaponTest({
+                test: 'MeleeAttackTest',
+                opposed: { test: 'PhysicalDefenseTest', resist: { test: 'PhysicalResistTest' } },
+            });
+            const plan = FlowPlan.resolve(test);
+
+            assert.strictEqual(FlowPlan.step(plan, 'defense')?.id, 'opposed');
+            assert.strictEqual(FlowPlan.step(plan, 'damage')?.id, 'opposed.resist.damage');
+        });
+
+        it('takes defaults from the relation preset', async () => {
+            const test = await createActionTest({ test: 'SuccessTest', resist: { test: 'PhysicalResistTest' } });
+            const plan = FlowPlan.resolve(test);
+
+            // A resist directly below the root is rolled by each target on success.
+            const resist = stepById(plan, 'resist');
+            assert.strictEqual(resist?.actor, 'target');
+            assert.deepEqual(resist?.when, ['success']);
+            assert.strictEqual(resist?.mode, 'auto');
+            assert.strictEqual(stepById(plan, 'resist.damage')?.after, 'resist');
         });
 
         it('selects direct children of a step', () => {
@@ -496,11 +545,16 @@ export const shadowrunFlowTesting = (context: QuenchBatchContext) => {
             const succeeded = { success: true, failure: false } as SuccessTest;
             const failed = { success: false, failure: true } as SuccessTest;
 
-            assert.isTrue(FlowPlan.matchesWhen(createFlowStep({ id: 's', when: 'hit' }), failed));
-            assert.isFalse(FlowPlan.matchesWhen(createFlowStep({ id: 's', when: 'hit' }), succeeded));
-            assert.isTrue(FlowPlan.matchesWhen(createFlowStep({ id: 's', when: 'success' }), succeeded));
-            assert.isTrue(FlowPlan.matchesWhen(createFlowStep({ id: 's', when: 'always' })));
-            assert.isFalse(FlowPlan.matchesWhen(createFlowStep({ id: 's', when: 'success' })));
+            assert.isTrue(FlowPlan.matchesWhen(createFlowStep({ id: 's', when: ['hit'] }), failed));
+            assert.isFalse(FlowPlan.matchesWhen(createFlowStep({ id: 's', when: ['hit'] }), succeeded));
+            assert.isTrue(FlowPlan.matchesWhen(createFlowStep({ id: 's', when: ['success'] }), succeeded));
+            assert.isTrue(FlowPlan.matchesWhen(createFlowStep({ id: 's', when: ['always'] })));
+            assert.isTrue(FlowPlan.matchesWhen(createFlowStep({ id: 's' })));
+            assert.isFalse(FlowPlan.matchesWhen(createFlowStep({ id: 's', when: ['success'] })));
+            // Any of the listed outcomes allows the step.
+            assert.isTrue(FlowPlan.matchesWhen(createFlowStep({ id: 's', when: ['tie', 'hit'] }), failed));
+            // A recorded outcome replaces reading the test.
+            assert.isTrue(FlowPlan.matchesWhen(createFlowStep({ id: 's', when: ['hit'] }), undefined, ['hit']));
         });
 
         it('does not allow steps with unknown conditions', () => {

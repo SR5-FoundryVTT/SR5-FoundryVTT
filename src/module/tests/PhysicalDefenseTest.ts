@@ -11,7 +11,7 @@ import { TestOptions } from "./SuccessTest";
 import { MinimalActionType } from "../types/item/Action";
 import { CombatSpellRules } from "../rules/CombatSpellRules";
 import { SpellCastingTestData } from "./SpellCastingTest";
-import type { FlowStep } from "../types/flows/FlowStep";
+import { handlesIncomingDamage, type FlowStep } from "../types/flows/FlowStep";
 import { AlchemyRules } from "../rules/AlchemyRules";
 
 export interface PhysicalDefenseTestData extends DefenseTestData {
@@ -28,6 +28,9 @@ export type PhysicalDefenseNoDamageCondition = {
 }
 
 export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDefenseTestData> extends DefenseTest<T> {
+    // Tests new action nodes below this test default to. See FlowNodeEditorFlow.
+    static override flowDefaults: Record<string, string> = { resist: 'PhysicalResistTest' };
+
 
     override _prepareData(data: DeepPartial<T>, options?: Partial<TestOptions>): T {
         const prepared = super._prepareData(data, options);
@@ -250,7 +253,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
      * An attack hitting without doing damage has nothing to resist or apply.
      */
     override flowAllowsStep(step: FlowStep): boolean {
-        if (step.kind === 'test' || step.kind === 'applyDamage') return !this.getNoDamageCondition();
+        if (handlesIncomingDamage(step)) return !this.getNoDamageCondition();
         return true;
     }
 

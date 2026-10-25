@@ -2,6 +2,8 @@ import { SR5Item } from './../../SR5Item';
 import { ModifiableValue } from '../../../mods/ModifiableValue';
 import { ActionRollType } from 'src/module/types/item/Action';
 import { DataDefaults } from '@/module/data/DataDefaults';
+import { FlowNodeRules } from '@/module/types/flows/FlowNodeField';
+import { ModifiableValueType } from '@/module/types/template/Base';
 /**
  * Item data preparation around the 'action' template.json item template.
  */
@@ -130,5 +132,16 @@ export const ActionPrep = {
         ModifiableValue.calcTotal(action.damage);
         ModifiableValue.calcTotal(action.damage.ap);
         ModifiableValue.calcTotal(action.limit);
+
+        // Nodes carry their own limits and damage.
+        for (const { node } of FlowNodeRules.nodes(action)) {
+            const limit = node.limit as ModifiableValueType | undefined;
+            if (limit) ModifiableValue.calcTotal(limit);
+            const damage = node.damage as (ModifiableValueType & { ap: ModifiableValueType }) | null | undefined;
+            if (damage) {
+                ModifiableValue.calcTotal(damage);
+                ModifiableValue.calcTotal(damage.ap);
+            }
+        }
     }
 }

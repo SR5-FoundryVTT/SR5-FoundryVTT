@@ -26,6 +26,12 @@ export type MatrixDefenseNoDamageCondition = {
  * - Matrix Defense Test allows picking an active defense for the attack
  */
 export class MatrixDefenseTest<T extends MatrixDefenseTestData = MatrixDefenseTestData> extends DefenseTest<T> {
+    // Tests new action nodes below this test default to. See FlowNodeEditorFlow.
+    static override flowDefaults: Record<string, string> = { resist: 'MatrixResistTest' };
+
+    // Matrix defenses are rolled for the targeted icon. See FlowSubjects.matrixIcon.
+    static override subjects = 'matrixIcon';
+
     declare against: MatrixTest;
     declare resist: MatrixResistTest;
     // The target icon to place a mark on.
@@ -134,9 +140,5 @@ export class MatrixDefenseTest<T extends MatrixDefenseTestData = MatrixDefenseTe
     override async populateDocuments() {
         await super.populateDocuments();
         await MatrixTestDataFlow.populateOpposedDocuments(this);
-    }
-
-    static override async executeMessageAction(againstData: MatrixTestData, messageId: string, options: Partial<TestOptions>): Promise<void> {
-        await MatrixTestDataFlow.executeMessageAction(this as typeof SuccessTest, againstData, messageId, options);
     }
 }

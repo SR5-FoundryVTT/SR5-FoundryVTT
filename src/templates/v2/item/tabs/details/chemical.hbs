@@ -1,0 +1,84 @@
+{{!--
+    A toxin, drug or BTL, carried by an item or loaded as a dose. See ChemicalData.
+
+    Expects:
+    - fields: the ChemicalData SchemaField fields
+    - source: the source data of that field
+    - path: the form name prefix, like system.chemical
+--}}
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{localize "SR5.Chemical.Label"}}</label>
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="SR5.Chemical.KindHint">{{localize "SR5.Chemical.Kind"}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput fields.kind value=source.kind name=(concat path ".kind") choices=@root.chemicalOptions.kinds localize=true
+                    blank="SR5.Chemical.None" classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+{{#if source.kind}}
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label>{{localize "SR5.Chemical.Vector"}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput fields.vectors value=source.vectors name=(concat path ".vectors") choices=@root.chemicalOptions.vectors localize=true
+                        type="checkboxes" rootId=@root.rootId disabled=@root.isPlayMode}}
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label data-tooltip="SR5.Chemical.SpeedHint">{{localize "SR5.Chemical.Speed"}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput fields.speed.fields.value value=source.speed.value name=(concat path ".speed.value")
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formInput fields.speed.fields.unit value=source.speed.unit name=(concat path ".speed.unit") choices=@root.chemicalOptions.speedUnits localize=true
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        </div>
+    </div>
+    {{#unless (eq source.kind "drug")}}
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="SR5.Chemical.PowerHint">{{localize "SR5.Chemical.Power"}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput fields.power value=source.power name=(concat path ".power") classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                <label data-tooltip="SR5.Chemical.PenetrationHint">{{localize "SR5.Chemical.Penetration"}}</label>
+                {{formInput fields.penetration value=source.penetration name=(concat path ".penetration") classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formInput fields.damageType value=source.damageType name=(concat path ".damageType") choices=@root.chemicalOptions.damageTypes localize=true
+                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+    {{/unless}}
+    {{#if (eq source.kind "drug")}}
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="SR5.Chemical.DurationHint">{{localize "SR5.Chemical.Duration"}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput fields.duration.fields.formula value=source.duration.formula name=(concat path ".duration.formula")
+                            placeholder="max(1, 6 - @actor.attributes.body.value)" rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formInput fields.duration.fields.unit value=source.duration.unit name=(concat path ".duration.unit") choices=@root.chemicalOptions.durationUnits localize=true
+                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="SR5.Chemical.AddictionHint">{{localize "SR5.Chemical.Addiction"}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput fields.addiction.fields.type value=source.addiction.type name=(concat path ".addiction.type") choices=@root.chemicalOptions.addictionTypes localize=true
+                            blank="" classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                <label>{{localize "SR5.Chemical.AddictionRating"}}</label>
+                {{formInput fields.addiction.fields.rating value=source.addiction.rating name=(concat path ".addiction.rating") classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                <label>{{localize "SR5.Chemical.AddictionThreshold"}}</label>
+                {{formInput fields.addiction.fields.threshold value=source.addiction.threshold name=(concat path ".addiction.threshold") classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+    {{/if}}
+{{/if}}

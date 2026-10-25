@@ -10,16 +10,16 @@ import {
 } from "./SuccessTest";
 import {DataDefaults} from "../data/DataDefaults";
 import {ModifiableValue} from "../mods/ModifiableValue";
-import {SkillRules} from "../rules/SkillRules";
 import {FLAGS, SYSTEM_NAME} from "../constants";
 import {SR5Roll} from "../rolls/SR5Roll";
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
-import {SR5} from "../config";
-import {ActionFlow} from "../item/flows/ActionFlow";
 import { ActionRollType, DamageType, MinimalActionType } from "../types/item/Action";
 import { ValueFieldType } from "../types/template/Base";
 import { DeepPartial } from "fvtt-types/utils";
 import { PackItemFlow } from "../item/flows/PackItemFlow";
+import { ActionTestData } from "./ActionTestData";
+import { FlowContext } from "../flows/FlowContext";
+import type { FlowStep } from "../types/flows/FlowStep";
 
 /**
  * Any test implementation can either be created by calling it's constructor directly or by using the TestCreator.
@@ -327,9 +327,10 @@ export const TestCreator = {
             against: test.data,
         });
 
-        // Allow different elements of this to override action data.
+        // The followed node settings come first, then document and test class defaults fill what's left.
+        const followed = test.data.action?.followed ? TestCreator._nodeActionData(test.data.action.followed) : {};
         const action = TestCreator._mergeMinimalActionDataInOrder(
-            DataDefaults.createData('action_roll', {test: testCls.name}),
+            DataDefaults.createData('action_roll', {...followed, test: testCls.name}),
             testCls._getDocumentTestAction(test.item, test.actor),
             testCls._getDefaultTestAction());
 
@@ -339,6 +340,53 @@ export const TestCreator = {
         const documents = {source: test.source, item: test.item, actor: test.actor};
 
         return new testCls(testData, documents, options);
+    },
+
+    /**
+     * Create the test of a flow step, following the given test.
+     *
+     * The test takes the settings of the steps action node, filled in by the defaults of its test
+     * class and the item. It follows the given test like a follow up test does.
+     *
+     * @param parent The test the step follows.
+     * @param step The step to create the test for.
+     * @param subject Who rolls the test.
+     * @param options See TestOptions documentation.
+     */
+    // oxlint-disable-next-line typescript/require-await -- Public Promise based factory, callers await it.
+    fromStep: async function(parent: SuccessTest, step: FlowStep, subject: SR5Actor, options: Partial<TestOptions> = {}): Promise<SuccessTest | undefined> {
+        const testCls = TestCreator._getTestClass(step.test);
+        if (!testCls) return undefined;
+
+        const data = Object.assign(TestCreator._minimalTestData(), {
+            title: testCls.label,
+            previousMessageId: parent.data.messageUuid,
+            following: parent.data,
+            sourceItemUuid: parent.data.sourceItemUuid,
+            // Make sure to give NO target actors. Otherwise, user selection will be used.
+            targetActorsUuid: [] as string[],
+        });
+
+        const item = parent.data.sourceItemUuid ? fromUuidSync(parent.data.sourceItemUuid) : null;
+        const action = TestCreator._mergeMinimalActionDataInOrder(
+            DataDefaults.createData('action_roll', { ...TestCreator._nodeActionData(step.settings), test: testCls.name }),
+            item instanceof SR5Item ? testCls._getDocumentTestAction(item, subject) : {},
+            testCls._getDefaultTestAction());
+
+        // Resist and follow up tests work with the damage the step hands them, like resist tests after a defense do.
+        const damage = FlowContext.stepDamage(step, parent, FlowContext.fromMessage(parent.data.messageUuid));
+        if (damage) {
+            data.following = { ...parent.data, modifiedDamage: damage } as SuccessTestData;
+            (data as unknown as { incomingDamage: DamageType }).incomingDamage = damage;
+        }
+
+        // A chemical the step delivers, like a toxin resisted. See ToxinResistTest.
+        if (step.config.payload) (data as unknown as { payload: unknown }).payload = foundry.utils.deepClone(step.config.payload);
+
+        const testData = testCls._prepareActionTestData(action, subject, data);
+        testData.features = [...step.features];
+
+        return new testCls(testData, { source: subject, actor: subject }, options);
     },
 
     /*
@@ -380,6 +428,8 @@ export const TestCreator = {
     _getTestDataFromItemAction: async function(testCls: typeof SuccessTest, item: SR5Item, actor: SR5Actor): Promise<TestData> {
         // Prepare general data structure with labeling.
         const data = TestCreator._minimalTestData();
+        // Action formulas read values of the item.
+        data.sourceItemUuid = item.uuid ?? undefined;
 
         // Get user defined action configuration.
         let action = item.getAction() as ActionRollType;
@@ -448,9 +498,7 @@ export const TestCreator = {
         });
 
         // Setup the original item actions minimal action resist configuration as a complete item action.
-        let action = DataDefaults.createData('action_roll', {
-            ...opposedData.against.opposed.resist
-        });
+        let action = DataDefaults.createData('action_roll', TestCreator._nodeActionData(opposedData.against.opposed.resist));
 
         // Allow the resist test to overwrite action data dynamically based on the source item.
         let documentAction: DeepPartial<MinimalActionType> = {};
@@ -473,226 +521,29 @@ export const TestCreator = {
     },
 
     /**
-     * Prepare test data with source values based on action data.
-     *
-     * @param action Action data to prepare test data with.
-     * @param actor Actor to use for retrieving source values and execute test with.
-     * @param data Any test implementations resulting basic test data.
+     * Prepare test data with source values based on action data. See ActionTestData.
      */
     _prepareTestDataWithAction: function(action: ActionRollType, document: SR5Actor|SR5Item, data: SuccessTestData, againstData?: SuccessTestData): SuccessTestData {
-        // allow rule specific parts of the system to change the data that we pass in
-        // - this can be used to change the test skills or attributes before building a dice pool
-        // - one example is Gunnery, which should use Logic instead of Agility when remotely fired SR5 pg #183
-        // this is done before preparing the test data to ensure Active Effects get applied through Test Resolution correctly
-        Hooks.call('sr5_beforePrepareTestDataWithAction', action, document, againstData);
-
-        data.codeTermTraces = [];
-
-        // Store ActionRollData on TestData to allow for re-creation of the test during it's lifetime.
-        data.action = action;
-
-        if (document instanceof SR5Actor) TestCreator._prepareTestDataWithActionForActor(action, document, data, againstData);
-        if (document instanceof SR5Item) TestCreator._prepareTestDataWithActionForItem(action, document, data, againstData);
-
-        // Allow rule specific parts of the system to further extend some tests under non-general circumstances.
-        Hooks.call('sr5_afterPrepareTestDataWithAction', data, action, document, againstData);
-
-        return data;
+        return ActionTestData._prepareTestDataWithAction(action, document, data, againstData);
     },
 
-    /**
-     * Prepare test data with SR5Actor source document for rollData
-     * 
-     * @param action The source action to base test data on
-     * @param actor The source document to use values defined within the action from
-     * @param data The resulting test data object to write those values into
-     * @param againstData Optional testData to use for additional context. This is data from a previous test.
-     * 
-     * @returns resulting TestData
-     */
     _prepareTestDataWithActionForActor: function(action: ActionRollType, actor: SR5Actor, data: SuccessTestData, againstData?: SuccessTestData) {
-        // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
-        const rollData = actor.getRollData({againstData: againstData ?? data.following?.against, copySystem: true});
-
-        const pool = new ModifiableValue(data.pool);
-
-        // Prepare pool values.
-        if (action.skill) {
-            // Grab the skill by its id (default skills), or its label (custom skills).
-            const skill = actor.getSkill(action.skill, { rollData }) ?? actor.getSkill(action.skill, {byLabel: true, rollData });
-
-            // Notify user about their sins.
-            if (skill && !SkillRules.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
-            if (skill && !SkillRules.hasRequirements(actor, skill)) ui.notifications?.warn('SR5.Warnings.ActorMissingRequirements', {localize: true});
-
-            // Add skill values to pool.
-            if (skill) {
-                pool.addBase(skill.label, SkillRules.level(skill));
-                TestCreator.addCodeTermTrace(data, skill);
-            }
-            if (action.spec) pool.addUnique('SR5.Specialization', SkillRules.SpecializationModifier);
-        }
-
-        // The first attribute is either used for skill or attribute only tests.
-        if (action.attribute) {
-            const attribute = actor.getAttribute(action.attribute, { rollData });
-            // Don't use addUniquePart as one attribute might be used twice.
-            if (attribute) {
-                pool.addBase(attribute.label, attribute.value);
-                TestCreator.addCodeTermTrace(data, attribute);
-            }
-        }
-
-        // The second attribute is only used for attribute only tests.
-        if (!action.skill && action.attribute2) {
-            const attribute = actor.getAttribute(action.attribute2, { rollData });
-            // Don't use addUniquePart as one attribute might be used twice.
-            if (attribute) {
-                pool.addBase(attribute.label, attribute.value);
-                TestCreator.addCodeTermTrace(data, attribute);
-            }
-        }
-
-        // Include pool modifiers for opposed and resist tests.
-        if (action.mod) {
-            ModifiableValue.addUnique(data.pool, 'SR5.DicePoolModifier', action.mod);
-        }
-
-        // Include pool modifiers that have been collected on the action item.
-        // These can come from nested items and more.
-        if(action.dice_pool_mod) {
-            action.dice_pool_mod.forEach(mod => ModifiableValue.addUnique(data.pool, mod.name, mod.value));
-        }
-
-        // Add the armor value as a pool modifier, since 'armor' is part of the test description.
-        if (action.armor) {
-            const armor = actor.getArmor();
-            ModifiableValue.addUniqueBase(data.pool, 'SR5.Armor.label', armor.rating.value);
-            TestCreator.addCodeTermTrace(data, { ...armor.rating, label: 'SR5.Armor.label' });
-            if (armor.hardened.value) {
-                ModifiableValue.addUniqueBase(data.pool, 'SR5.HardenedArmor', armor.hardened.value);
-                TestCreator.addCodeTermTrace(data, { ...armor.hardened, label: 'SR5.HardenedArmor' });
-            }
-        }
-
-        // Prepare limit values...
-        if (action.limit.base) {
-            data.limit.base = Number(action.limit.base);
-        }
-
-        //...add limit modifiers
-        if (action.limit.changes) {
-            action.limit.changes.forEach(change =>
-                ModifiableValue.addUnique(data.limit, change.name, change.value, { type: change.type, priority: change.priority })
-            );
-        }
-
-        //...add limit attribute value based on actor.
-        if (action.limit.attribute) {
-            // Get the limit connected to the defined attribute.
-            // NOTE: This might differ from the USED attribute...
-            const limit = actor.getLimit(action.limit.attribute);
-            if (limit) {
-                ModifiableValue.addUniqueBase(data.limit, limit.label, limit.value);
-                TestCreator.addCodeTermTrace(data, limit);
-            }
-        }
-
-        // Prepare threshold values...
-        if (action.threshold.base) {
-            data.threshold.base = Number(action.threshold.base);
-        }
-
-        // Prepare general damage values...
-        // ...a test without damage, shouldn't contain any damage information.
-        if (ActionFlow.hasDamage(action.damage)) {
-            data.damage = foundry.utils.duplicate(action.damage) as DamageType;
-        }
-
-        // Prepare opposed and resist tests...
-        if (action.opposed.test) {
-            data.opposed = action.opposed;
-        }
-
-        // Prepare test modifiers and possible applicable selections
-        const modifiers: Partial<Record<Shadowrun.ModifierTypes, string[]>> = {};
-        for (const modifier of data.action.modifiers) {
-            // A modifier with an applicable selection is found.
-            if (modifier.includes('.')) {
-                // Assert correct action modifier segment structure.
-                const segments = modifier.split('.');
-                if (segments.length > 2) console.error('Shadowrun 5e | Action contained a partial modifier with more than two segments', modifier, data.action);
-
-                // Record the modifier category with it's single applicable.
-                const [category, applicable] = segments as [Shadowrun.ModifierTypes, string];
-                modifiers[category] = modifiers[category] ?? [];
-                modifiers[category].push(applicable);
-
-            // No applicable found yet, just collect the modifier
-            } else {
-                modifiers[modifier] = modifiers[modifier] ?? [];
-            }
-        }
-
-        // Apply applicable selections and collect modifiers.
-        for (const [name, applicable] of Object.entries(modifiers)) {
-            // Setup the resulting modifier value.
-            const label = SR5.modifierTypes[name];
-            const options = {applicable};
-            const value = actor.modifiers.totalFor(name, options);
-            ModifiableValue.setUnique(data.pool, label, value);
-        }
-
-        // Mark test as extended and pre-fill the action interval for the dialog.
-        data.extended = action.extended.value > 0;
-        if (data.extended && !data.extendedInterval?.value) {
-            data.extendedInterval = { value: action.extended.value, unit: action.extended.unit };
-        }
-
-        return data;
+        return ActionTestData._prepareTestDataWithActionForActor(action, actor, data, againstData);
     },
 
-    /**
-     * Prepare Test Data with SR5Item source document for rollData
-     * 
-     * @param action The base action to configure test data with.
-     * @param item The source document to pull values from.
-     * @param data The test data to write values into.
-     * @param againstData Optional testData to use for additional context. This is data from a previous test.
-     * @returns TestData that's ready to be used to construct a new test instance.
-     */
     _prepareTestDataWithActionForItem: function(action: ActionRollType, item: SR5Item, data: SuccessTestData, againstData?: SuccessTestData): SuccessTestData {
-        // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
-        const rollData = item.getRollData({action, testData: data, againstData: againstData ?? data.following?.against});
-
-        const pool = new ModifiableValue(data.pool);
-
-        if (action.attribute) {
-            const attribute = item.getAttribute(action.attribute, {rollData});
-            if (attribute) {
-                pool.addUniqueBase(attribute.label, attribute.value);
-                TestCreator.addCodeTermTrace(data, attribute);
-            }
-        }
-
-        if (action.attribute2) {
-            const attribute = item.getAttribute(action.attribute2, {rollData});
-            if (attribute) {
-                pool.addUniqueBase(attribute.label, attribute.value);
-                TestCreator.addCodeTermTrace(data, attribute);
-            }
-        }
-
-        return data;
+        return ActionTestData._prepareTestDataWithActionForItem(action, item, data, againstData);
     },
 
     addCodeTermTrace(data: SuccessTestData, valueField: ValueFieldType) {
-        const traces = (data.codeTermTraces ??= []);
+        ActionTestData.addCodeTermTrace(data, valueField);
+    },
 
-        traces.push({ 
-            valueField: DataDefaults.createData('value_field', valueField), 
-            tooltipSource: `code-${traces.length}` 
-        });
+    /**
+     * The test settings of an action node as a partial action. See ActionTestData.
+     */
+    _nodeActionData(node: object): DeepPartial<ActionRollType> {
+        return ActionTestData._nodeActionData(node);
     },
 
     /**
@@ -703,94 +554,18 @@ export const TestCreator = {
     },
 
     /**
-     * Merge multiple MinimalActionData objects into one action object. This will only look at keys within a minimal action,
-     * not all action keys.
-     *
-     * A value of a minimal action will only overwrite the main action value if that is not set.
-     * 
-     * For example:
-     * A: action.skill == '' will be overwritten by minimalAction.skill == 'Spellcasting'
-     * B: action.skill == 'ritual_spellcasting' won't be overwritten by minimalAction.skill == 'Spellcasting'
-     * C: action.armor == true will be overwritten by minimalAction.armor == false
-     *
-     * @param sourceAction Main action, as defined by user input.
-     * @param defaultActions List of partial actions, as defined by test implementations.
-     * @returns A copy of the main action with all minimalActions properties applied in order of arguments.
+     * Merge partial default actions into an action, keeping values set by the user. See ActionTestData.
      */
     _mergeMinimalActionDataInOrder: function(sourceAction: ActionRollType, ...defaultActions: DeepPartial<MinimalActionType>[]): ActionRollType {
-        // This action might be taken from ItemData, causing changes to be reflected upstream.
-        const resultAction = foundry.utils.duplicate(sourceAction) as ActionRollType;
-
-        // Check if overwriting default 
-        for (const defaultAction of defaultActions) {
-            if (Object.keys(defaultAction).length === 0) continue;
-
-            // Iterate over complete MinimalActionData to avoid tests providing other ActionRollData fields they're not
-            // supposed to override.
-            for (const key of Object.keys(defaultAction)) {
-                if (TestCreator._keepItemActionValue(sourceAction, defaultAction, key)) continue;
-
-                // @ts-expect-error defaultActions are DeepPartial<MinimalActionType>, so keys might not be present.
-                resultAction[key] = defaultAction[key];
-            }
-        }
-
-        return resultAction;
+        return ActionTestData._mergeMinimalActionDataInOrder(sourceAction, ...defaultActions);
     },
 
-    /**
-     * Should an action value be kept even if a default action defines another value?
-     * 
-     * This comparison checks either a simple value against defaults OR checks values grouped as a 
-     * logical unit (skill+attribute/2)
-     * 
-     * @param action The original action data.
-     * @param defaultAction A partial action that may provide values to apply to the main action.
-     * @param key The action key to take the value from
-     * @returns true for when the original action value should be kept, false if it's to be overwritten.
-     */
     _keepItemActionValue(action: ActionRollType, defaultAction: DeepPartial<MinimalActionType>, key: string): boolean {
-        if (!Object.hasOwn(defaultAction, key)) return true;
-
-        // Avoid user confusion. A user might change one value of a logical value grouping (skill+attribute)
-        // and get a default value for the other. 
-        // Instead check some values as a section and only use default values when not one value of that
-        // section has been changed by user input.
-        const skillSection = ['skill', 'attribute', 'attribute2', 'armor'];
-        if (skillSection.includes(key)) {
-            const noneDefault = skillSection.some(sectionKey => TestCreator._actionHasNoneDefaultValue(action, sectionKey));
-            return noneDefault;
-        }
-    
-        // Fallback to basic value checking.
-        return TestCreator._actionHasNoneDefaultValue(action, key);
+        return ActionTestData._keepItemActionValue(action, defaultAction, key);
     },
 
-    /**
-     * Determine if the field value behind the action property 'key' is of a none-default value.
-     * 
-     * This can be used to determine if a user / automated change has been made.
-     * 
-     * @param action Any action configuration.
-     * @param key A key of action configuration within action parameter
-     * @returns false, when the value behind key is a default value. true, when it's a custom value.
-     */
     _actionHasNoneDefaultValue(action: ActionRollType, key: string): boolean {
-        if (!Object.hasOwn(action, key)) return false;
-        // NOTE: A more complete comparison would take a default ActionRollData object and compare the sub-key against it.
-        const value = action[key];
-        const type = foundry.utils.getType(value);
-
-        // A value name should only be overwritten when no value has been user selected.
-        // This would affect .skill and .attribute like fields.
-        if (type === 'string') return value.length > 0;
-        // A list of value names should only be overwritten when not one has been user selected.
-        // This would affect .modifiers like fields.
-        if (type === 'Array') return value.length > 0;
-        // Booleans don't have a intrinsic default value on ActionRollData.
-        if (type === 'boolean' && key === 'armor') return action[key]; // default is false
-
-        return false;
+        return ActionTestData._actionHasNoneDefaultValue(action, key);
     },
 
     /**

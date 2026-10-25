@@ -90,6 +90,21 @@
                     </select>
                 </div>
             </div>
+            <div class="duration-control">
+                <label for="{{rootId}}-duration-formula" data-tooltip="{{localize "SR5.ActiveEffect.DurationFormula.hint"}}">{{localize "SR5.ActiveEffect.DurationFormula.label"}}</label>
+                <div class="duration-control-fields">
+                    <input id="{{rootId}}-duration-formula" type="text" name="system.durationFormula" value="{{source.system.durationFormula}}"
+                           placeholder="max(1, 6 - @actor.attributes.body.value)">
+                </div>
+            </div>
+            <div class="duration-control">
+                <label for="{{rootId}}-stacking" data-tooltip="{{localize "SR5.ActiveEffect.Stacking.hint"}}">{{localize "SR5.ActiveEffect.Stacking.label"}}</label>
+                <div class="duration-control-fields">
+                    <select id="{{rootId}}-stacking" name="system.stacking" data-dtype="String">
+                        {{selectOptions @root.stackingOptions selected=source.system.stacking localize=true}}
+                    </select>
+                </div>
+            </div>
         </fieldset>
 
         <fieldset class="duration-panel duration-status-panel duration-status-panel--{{durationStatus.state}}">

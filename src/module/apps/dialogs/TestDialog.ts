@@ -349,7 +349,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
 
         this.test.prepareBaseValues();
         this.test.calculateBaseValues();
-        this.test.validateBaseValues();
+        this.test.validateValues();
 
         return true;
     }
@@ -404,6 +404,6 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
 
         this.test.prepareBaseValues();
         this.test.calculateBaseValues();
-        this.test.validateBaseValues();
+        this.test.validateValues();
     }
 }

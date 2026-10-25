@@ -466,6 +466,70 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
     });
 
     describe('ActionRollData preparation', () => {
+        it('fills the opposed, resist and followed nodes with the item type defaults', async () => {
+            const weapon = await factory.createItem({ type: 'weapon' });
+            assert.strictEqual(weapon.system.action.opposed.test, 'PhysicalDefenseTest');
+            assert.strictEqual(weapon.system.action.opposed.resist.test, 'PhysicalResistTest');
+            assert.strictEqual(weapon.system.action.opposed.resist.mod, 0);
+
+            const spell = await factory.createItem({ type: 'spell' });
+            assert.strictEqual(spell.system.action.followed.test, 'DrainTest');
+            assert.strictEqual(spell.system.action.opposed.test, '');
+
+            const complexForm = await factory.createItem({ type: 'complex_form' });
+            assert.strictEqual(complexForm.system.action.opposed.test, 'OpposedTest');
+            assert.strictEqual(complexForm.system.action.followed.test, 'FadeTest');
+        });
+
+        it('applies item effects to the nested opposed, resist and followed nodes', async () => {
+            const spell = await factory.createItem({
+                type: 'spell',
+                system: { action: { opposed: { mod: 1, resist: { mod: 1 } }, followed: { mod: 1 } } },
+            });
+            await spell.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Node modifier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.action.opposed.mod', value: '2', type: 'add', target: 'item' },
+                        { key: 'system.action.opposed.resist.mod', value: '3', type: 'add', target: 'item' },
+                        { key: 'system.action.opposed.resist.skill', value: 'unarmed_combat', type: 'override', target: 'item' },
+                        { key: 'system.action.followed.mod', value: '4', type: 'add', target: 'item' },
+                    ],
+                },
+            }]);
+
+            // Plain fields aren't cleared between prepareData calls, so prepare from source once.
+            spell.reset();
+            assert.strictEqual(spell.system.action.opposed.mod, 3);
+            assert.strictEqual(spell.system.action.opposed.resist.mod, 4);
+            assert.strictEqual(spell.system.action.opposed.resist.skill, 'unarmed_combat');
+            assert.strictEqual(spell.system.action.followed.mod, 5);
+            // Changes apply to prepared data only.
+            assert.strictEqual(foundry.utils.getProperty(spell._source, 'system.action.opposed.resist.mod'), 1);
+        });
+
+        it('applies a change keyed by relation to every node of it', async () => {
+            const weapon = await factory.createItem({
+                type: 'weapon',
+                system: { action: { opposed: { followed: { test: 'SuccessTest', resist: { test: 'PhysicalResistTest', mod: 1 } } } } } as never,
+            });
+            await weapon.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Every resist',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [{ key: 'system.action[resist].mod', value: '2', type: 'add', target: 'item' }],
+                },
+            }]);
+
+            weapon.reset();
+            assert.strictEqual(weapon.system.action.opposed.resist.mod, 2);
+            assert.strictEqual(foundry.utils.getProperty(weapon.system, 'action.opposed.followed.resist.mod'), 3);
+            // Other relations keep their values.
+            assert.strictEqual(weapon.system.action.opposed.mod, 0);
+            assert.strictEqual(weapon.system.action.followed.mod, 0);
+        });
+
         it('Check for damage base_formula_operator migration', async () => {
             const action = await factory.createItem({type: 'action' });
             action.system.action.damage.base_formula_operator = 'add';

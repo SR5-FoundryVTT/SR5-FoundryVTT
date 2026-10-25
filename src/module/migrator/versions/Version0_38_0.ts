@@ -15,6 +15,32 @@ export class Version0_38_0 extends VersionMigration {
 
     override migrateItem(item: any): void {
         this.migrateItemSheetRework(item);
+        this.migrateActionNodes(item);
+    }
+
+    /**
+     * Action nodes: weapons and imported matrix actions stored a defense test as resist test, and placing marks moved
+     * from the action items result into the actions results.
+     */
+    private migrateActionNodes(item: any): void {
+        const action = item.system?.action;
+        if (!action) return;
+
+        // A defense can't be the resist test of itself. Weapons used to default it that way.
+        if (item.type === 'weapon' && action.opposed?.resist?.test === 'PhysicalDefenseTest') {
+            action.opposed.resist.test = 'PhysicalResistTest';
+        }
+        // Imported matrix actions did the same with the matrix defense.
+        if (action.opposed?.resist?.test === 'MatrixDefenseTest') {
+            action.opposed.resist.test = 'MatrixResistTest';
+        }
+
+        if (item.system.result?.success?.matrix?.placeMarks) {
+            action.results ??= [];
+            if (!action.results.some((result: { action?: string }) => result.action === 'placeMarks')) {
+                action.results.push({ action: 'placeMarks', label: '', value: '' });
+            }
+        }
     }
 
     private migrateVehicleAvailability(actor: any): void {

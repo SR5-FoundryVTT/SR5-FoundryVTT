@@ -10,6 +10,7 @@ import { Translation } from "../../utils/strings";
 import { DamageType } from "src/module/types/item/Action";
 import { ModifiableValueLinkedType } from "src/module/types/template/Base";
 import { SkillNamingFlow } from "@/module/flows/SkillNamingFlow";
+import { FlowContext } from "@/module/flows/FlowContext";
 
 export class ActionFlow {
     /**
@@ -27,6 +28,11 @@ export class ActionFlow {
 
         if (item)
             damage.source = ActionFlow._damageSource(actor, item);
+
+        // A damage formula gives the base value, like the item Rating for a grenade. #1216
+        const formula = (damage as DamageType & { formula?: string }).formula;
+        const base = FlowContext.resolve(formula, { item: FlowContext.item(item), actor: actor.getRollData() });
+        if (base !== undefined) damage.base = base;
 
         this._applyModifiableValue(damage, actor);
         damage.value = ModifiableValue.calcTotal(damage, { min: 0 });

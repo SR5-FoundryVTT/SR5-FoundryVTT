@@ -6,7 +6,7 @@ import { OpposedMatrixTestData } from './MatrixTest';
 import { DamageType } from '@/module/types/item/Action';
 import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
 import { ModifiableValue } from '../mods/ModifiableValue';
-import type { FlowStep } from '@/module/types/flows/FlowStep';
+import { handlesIncomingDamage, type FlowStep } from '@/module/types/flows/FlowStep';
 
 type OpposedBruteForceTestData = OpposedMatrixTestData & {
     incomingDamage: DamageType;
@@ -66,7 +66,7 @@ export class OpposedBruteForceTest extends OpposedMatrixTest<OpposedBruteForceTe
      * Nothing to resist or apply without damage.
      */
     override flowAllowsStep(step: FlowStep): boolean {
-        if (step.kind === 'test' || step.kind === 'applyDamage') return this.data.damage.value !== 0;
+        if (handlesIncomingDamage(step)) return this.data.damage.value !== 0;
         return true;
     }
 }

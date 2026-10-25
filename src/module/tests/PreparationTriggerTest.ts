@@ -64,16 +64,8 @@ export class PreparationTriggerTest extends SpellCastingTest {
         return [];
     }
 
-    /**
-     * No Edge may be spent on a preparation's spellcasting. SR5#306.
-     */
-    override get canSecondChance(): boolean {
-        return false;
-    }
-
-    override get canPushTheLimit(): boolean {
-        return false;
-    }
+    // No Edge may be spent on a preparation's spellcasting. SR5#306.
+    static override features = ['noEdge'];
 
     /**
      * Force and potency both come from the preparation, never from user input.

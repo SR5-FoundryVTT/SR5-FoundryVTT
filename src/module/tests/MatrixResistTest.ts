@@ -24,6 +24,9 @@ export type MatrixResistTestData = ResistTestData<MatrixDefenseTestData> & {
  * - Brute Force and other Matrix Attacks will trigger this test through their Opposed or Defense test.
  */
 export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
+    // Resisted for the targeted icons. See FlowSubjects.
+    static override subjects = 'matrixTargets';
+
     // icon of the target
     declare icon: SR5Actor | SR5Item;
     // The target icon, if it's representing a device.
@@ -133,8 +136,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
      * This can be used to trigger resist tests.
      */
     static override async executeMessageAction(againstData: MatrixDefenseTestData, messageId: string, options: Partial<TestOptions>) {
-        // Determine documents to roll test with.
-        const documents = await Helpers.getMatrixTestTargetDocuments(againstData)
+        const documents = await this.messageActionSubjects(againstData);
         await ResistTestDataFlow.executeMessageAction(this as typeof SuccessTest, againstData, messageId, documents as (SR5Actor | SR5Item)[], options);
     }
 }

@@ -3,7 +3,32 @@ import { SuccessTest } from "../../tests/SuccessTest";
 import { SR5Actor } from "../../actor/SR5Actor";
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from "../../effects";
 import { SocketMessage } from "../../sockets";
-import { FLAGS } from "../../constants";
+import { FLAGS, SYSTEM_NAME } from "../../constants";
+import { FlowContext, FlowContextData } from "../../flows/FlowContext";
+import type { SR5Item } from "../../item/SR5Item";
+
+/**
+ * How an action applies item effects to an actor.
+ * - select / ids: which effects. Empty select applies all targeted actor effects, 'ids' only the listed ones.
+ * - ctx: the flow value context duration formulas read.
+ * - chainId / messageUuid: where the copies come from.
+ */
+export interface TargetActorEffectsOptions {
+    select?: string;
+    ids?: string[];
+    // The item holding the effects, when not the item of the test. Like the ammo delivering a toxin.
+    itemUuid?: string;
+    // Conditions of single effects by effect id, read against the value context. See ChemicalData.effects.
+    conditions?: Record<string, string>;
+    // A duration for copies without a formula of their own, like the duration of a drug.
+    durationFormula?: string;
+    durationUnit?: string;
+    // What a copy of a taken chemical records, for overdoses. See FlowChemicals.
+    chemical?: { itemUuid: string, addictionRating: number };
+    ctx?: FlowContextData;
+    chainId?: string;
+    messageUuid?: string;
+}
 
 /**
  * Handle the SR5ActiveEffects flow for a SuccessTest.
@@ -145,8 +170,8 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * 
      * @param actor The actor to create the effects on.
      */
-    async createTargetActorEffects(actor: SR5Actor) {
-        const effectsData = this._collectTargetActorEffectsData(actor);
+    async createTargetActorEffects(actor: SR5Actor, options: TargetActorEffectsOptions = {}) {
+        const effectsData = this._collectTargetActorEffectsData(actor, options);
         if (!effectsData || effectsData.length === 0) return;
 
         // Inject a flag to mark the effect as applied by a test.
@@ -157,6 +182,19 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             effectData['system.appliedByTest'] = true;
             foundry.utils.setProperty(effectData, 'start', start);
             foundry.utils.setProperty(effectData, 'duration.expired', false);
+            if (options.durationFormula && !foundry.utils.getProperty(effectData, 'system.durationFormula')) {
+                foundry.utils.setProperty(effectData, 'system.durationFormula', options.durationFormula);
+                if (options.durationUnit) foundry.utils.setProperty(effectData, 'duration.units', options.durationUnit);
+            }
+            this._applyDurationFormula(effectData, actor, options.ctx);
+            if (options.chemical) foundry.utils.setProperty(effectData, `flags.${SYSTEM_NAME}.${FLAGS.Chemical}`, options.chemical);
+            foundry.utils.setProperty(effectData, 'system.source', {
+                ...foundry.utils.getProperty(effectData, 'system.source') as object,
+                itemUuid: this.test.item?.uuid ?? '',
+                casterUuid: this.test.actor?.uuid ?? '',
+                chainId: options.chainId ?? '',
+                messageUuid: options.messageUuid ?? this.test.data.messageUuid ?? '',
+            });
         }
 
         if (!game.user?.isGM) {
@@ -166,20 +204,43 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         }
     }
 
-    _collectTargetActorEffectsData(targetActor: SR5Actor) {
-        if (this.test.actor === undefined || this.test.item === undefined) return;
+    /**
+     * Resolve the duration formula of a copy once, from the value context and the recipient. The
+     * value is in the copies duration units. Like (6 - Body) hours for a drug, SR5#411.
+     */
+    _applyDurationFormula(effectData: SR5ActiveEffect, actor: SR5Actor, ctx: FlowContextData = {}) {
+        const formula = foundry.utils.getProperty(effectData, 'system.durationFormula') as string | undefined;
+        if (!formula) return;
 
+        const value = FlowContext.resolve(formula, { ...ctx, actor: actor.getRollData(), test: FlowContext.values(this.test) });
+        if (value === undefined) return;
+        foundry.utils.setProperty(effectData, 'duration.value', Math.max(0, value));
+    }
+
+    _collectTargetActorEffectsData(targetActor: SR5Actor, options: TargetActorEffectsOptions = {}) {
+        const item = options.itemUuid ? fromUuidSync(options.itemUuid) as SR5Item | null : this.test.item;
+        if (this.test.actor === undefined || !item) return;
+        if (options.select === 'none') return [];
+
+        const source = { ...options.ctx, actor: targetActor.getRollData() };
         const effectsData: SR5ActiveEffect[] = [];
         const collect = (effect: SR5ActiveEffect) => {
+            // An action can apply only some of the items effects.
+            if (options.select === 'ids' && !options.ids?.includes(effect.id ?? '')) return;
+            // Some only under a condition, like nausea incapacitating when Power is above Willpower. SR5#409.
+            const condition = options.conditions?.[effect.id ?? ''];
+            if (condition && !FlowContext.resolve(condition, source)) return;
             const trimmed = this._trimToTargetedActorEffectData(effect, targetActor);
-            if (trimmed) effectsData.push(trimmed);
+            if (!trimmed) return;
+            foundry.utils.setProperty(trimmed, 'system.source.effectUuid', effect.uuid);
+            effectsData.push(trimmed);
         };
 
-        for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
+        for (const effect of allApplicableDocumentEffects(item, { applyTo: ['targeted_actor'] })) {
             collect(effect);
         }
 
-        for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['targeted_actor'], nestedItems: false })) {
+        for (const effect of allApplicableItemsEffects(item, { applyTo: ['targeted_actor'], nestedItems: false })) {
             collect(effect);
         }
 
@@ -205,7 +266,10 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         const effectData = effect.toObject() as unknown as SR5ActiveEffect;
 
-        effectData.system.targets = effectData.system.targets.filter(target => targetedIds.has(target.id));
+        // A target applying as something else changes the recipients tests or modifiers instead of its data.
+        effectData.system.targets = effectData.system.targets
+            .filter(target => targetedIds.has(target.id))
+            .map(target => target.appliesAs ? { ...target, applyTo: target.appliesAs as typeof target.applyTo, appliesAs: '' } : target);
         effectData.system.changes = effectData.system.changes
             .filter(change => targetedIds.has(change.target))
             .map(change => {
@@ -226,7 +290,8 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         const linkedTokens = actor.getActiveTokens(true) || [];
         const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
 
-        const effects = await actor.createEmbeddedDocuments('ActiveEffect', effectsData as unknown as ActiveEffect.CreateData[]) as SR5ActiveEffect[];
+        const toCreate = await SuccessTestEffectsFlow._resolveStacking(actor, effectsData);
+        const effects = await actor.createEmbeddedDocuments('ActiveEffect', toCreate as unknown as ActiveEffect.CreateData[]) as SR5ActiveEffect[];
 
         const templateData = {
             effects,
@@ -245,6 +310,40 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         await ChatMessage.create(messageData);
 
         return effects;
+    }
+
+    /**
+     * Apply the stacking rule of each copy against copies of the same source effect already on the actor.
+     *
+     * - stack: add the copy, keep the others.
+     * - replace: remove the others, add the copy.
+     * - highest: keep whichever has the higher sum of change values, the copy when it ties.
+     *
+     * @returns The copies left to create.
+     */
+    static async _resolveStacking(actor: SR5Actor, effectsData: SR5ActiveEffect[]): Promise<SR5ActiveEffect[]> {
+        const toCreate: SR5ActiveEffect[] = [];
+        const toDelete: string[] = [];
+        const changeTotal = (effect: { system: { changes: { value: unknown }[] } }) =>
+            effect.system.changes.reduce((total, change) => total + (Number(change.value) || 0), 0);
+
+        for (const effectData of effectsData) {
+            const stacking = foundry.utils.getProperty(effectData, 'system.stacking') as string | undefined;
+            const sourceUuid = foundry.utils.getProperty(effectData, 'system.source.effectUuid') as string | undefined;
+            if (!sourceUuid || !stacking || stacking === 'stack') {
+                toCreate.push(effectData);
+                continue;
+            }
+
+            const existing = actor.effects.filter(effect => (effect as SR5ActiveEffect).system.source?.effectUuid === sourceUuid) as SR5ActiveEffect[];
+            if (stacking === 'highest' && existing.some(effect => changeTotal(effect) > changeTotal(effectData))) continue;
+
+            toDelete.push(...existing.map(effect => effect.id!));
+            toCreate.push(effectData);
+        }
+
+        if (toDelete.length) await actor.deleteEmbeddedDocuments('ActiveEffect', toDelete);
+        return toCreate;
     }
 
     /**

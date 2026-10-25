@@ -93,7 +93,8 @@ export class ActionParser extends Parser<'action'> {
             action.damage.type.base = "matrix";
             action.damage.attribute = "attack";
 
-            action.opposed.resist.test = "MatrixDefenseTest";
+            // The defender soaks the damage of a hit with Device Rating + Firewall.
+            action.opposed.resist.test = "MatrixResistTest";
 
             if (bonusstring.toLowerCase().includes("biofeedback")) {
                 action.opposed.resist.test = "BiofeedbackResistTest";

@@ -28,6 +28,9 @@ interface CompileSpriteTestData extends SuccessTestData {
  * defined within
  */
 export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
+    // Tests new action nodes below this test default to. See FlowNodeEditorFlow.
+    static override flowDefaults: Record<string, string> = { opposed: 'OpposedCompileSpriteTest', followed: 'FadeTest' };
+
 
     override _prepareData(data: DeepPartial<CompileSpriteTestData>, options: Partial<TestOptions>): CompileSpriteTestData {
         const prepared = super._prepareData(data, options);
@@ -107,9 +110,9 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
     /**
      * Notify mancers about incomplete compilation. To avoid pre mature fade tests.
      */
-    override async executeFollowUpTest(testClsName?: string) {
+    override async executeFollowUpTest(testClsName?: string, features: string[] = []) {
         if (!this.data.fadeReady) ui.notifications?.warn('SR5.Warnings.CompilationNotConcluded', {localize: true});
-        await super.executeFollowUpTest(testClsName);
+        await super.executeFollowUpTest(testClsName, features);
     }
 
     /**

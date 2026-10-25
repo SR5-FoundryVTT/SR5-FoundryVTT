@@ -13,6 +13,9 @@ export interface ThrownAttackTestData extends SuccessTestData, WeaponRangeTestDa
  * Test implementation for attack tests using weapon of category thrown.
  */
 export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
+    // Tests new action nodes below this test default to. See FlowNodeEditorFlow.
+    static override flowDefaults: Record<string, string> = { opposed: 'PhysicalDefenseTest' };
+
     declare item: SR5Item;
     public rangeOverlayFlow = new WeaponRangeOverlayFlow(this);
     public blastTemplateFlow = new BlastTemplateFlow(this, {

@@ -1,5 +1,4 @@
-import { TestOptions } from './SuccessTest';
-import { MarkPlacementFlow, MatrixPlacementData } from './flows/MarkPlacementFlow';
+import { MatrixPlacementData } from './flows/MarkPlacementFlow';
 import { MatrixTest } from './MatrixTest';
 
 /**
@@ -8,27 +7,13 @@ import { MatrixTest } from './MatrixTest';
  * See MarkPlacementFlow for more details on the test flow.
  */
 export class BruteForceTest extends MatrixTest<MatrixPlacementData> {
-    override _prepareData(data: MatrixPlacementData, options: Partial<TestOptions> = {}): MatrixPlacementData {
-        const prepared = super._prepareData(data, options);
-        return MarkPlacementFlow._prepareData(prepared);
-    }
+    // Mark placement prepares the data, adds the dice cost of extra marks and validates them.
+    static override features = ['markPlacement'];
 
     /**
      * Brute Force is a matrix action.
      */
     override get testCategories(): Shadowrun.ActionCategories[] {
         return ['matrix', 'brute_force'];
-    }
-
-    override prepareTestModifiers() {
-        super.prepareTestModifiers();
-
-        MarkPlacementFlow.prepareTestModifiers(this);
-    }
-
-    override validateBaseValues() {
-        super.validateBaseValues();
-
-        MarkPlacementFlow.validateBaseValues(this);
     }
 }
