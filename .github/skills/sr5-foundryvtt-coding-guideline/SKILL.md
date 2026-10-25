@@ -2,10 +2,10 @@
 name: sr5-foundryvtt-coding-guideline
 description:
     'Use when: writing or changing code in the SR5-FoundryVTT Shadowrun 5e system (TypeScript, Handlebars, SCSS);
-    deciding which layer (rules, flows, application, tests) code belongs in; implementing or changing SuccessTest tests,
-    actions, categories, or modifiers; resolving values that come from another document (roll data, vehicle drivers, PAN
-    masters, rigging); writing world data as a player (GM-only writes, sockets); adding Quench unit tests; editing
-    compendium pack sources or translations; choosing which npm check to run before finishing.'
+    deciding which layer (app / sheet, data prep, flow, rules, tests) code belongs in; implementing or changing
+    SuccessTest tests, actions, categories, or modifiers; resolving values that come from another document (roll data,
+    vehicle drivers, PAN masters, rigging); writing world data as a player (GM-only writes, sockets); adding Quench unit
+    tests; editing compendium pack sources or translations; choosing which npm check to run before finishing.'
 argument-hint: 'Describe the code change (feature, rule, flow, test, or sheet)'
 ---
 
@@ -25,12 +25,13 @@ How to use it: read the sections for every layer your change touches, follow the
 Paths are relative to `src/module/`. Documents are the main API surface and orchestrate calls into flows and rules.
 Extend existing flows and rules instead of adding parallel abstractions.
 
-| Layer          | Location                                                       | Rules                                                                                                                                                                                                                                                                       |
-| -------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Rules          | `rules/`                                                       | Shadowrun logic on system types and plain data. Do not add `game`, `ui`, `canvas`, or `ChatMessage` usage. `WeaponRangeRules` and `DocumentSituationModifiers` already do; do not copy them. Prefer not to add `foundry.utils` calls. Cover rule changes with Quench specs. |
-| Flows          | `actor/flows/`, `item/flows/`, `tests/flows/`, `effect/flows/` | Order of operations: connect rules to Foundry documents, aggregate data, collect output. Flows may use Foundry APIs. Call rules for calculations; do not reimplement them. Add Quench specs where practical.                                                                |
-| Application    | `*/sheets/`, `apps/`, dialogs, chat messages, templates        | Interface only. Do not make Shadowrun decisions here (for example computing a test pool in a sheet handler).                                                                                                                                                                |
-| Gameplay tests | `tests/`                                                       | `SuccessTest` subclasses. See [Gameplay tests](#gameplay-tests-successtest).                                                                                                                                                                                                |
+| Layer          | Location                                                       | Rules                                                                                                                                                                                                                                                                                                                                                                                                        |
+| -------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| App / sheet    | `*/sheets/`, `apps/`, dialogs, chat messages, templates        | Foundry logic: windows, dialogs, rendering, chat messages. Interface only. Do not make Shadowrun decisions here (for example computing a test pool in a sheet handler).                                                                                                                                                                                                                                      |
+| Data prep      | `actor/prep/`, `item/prep/`                                    | Document data derived from system data and rules, run by `prepareBaseData` and `prepareDerivedData` on `SR5Actor` and `SR5Item`. Derive values from the document's own data and embedded items, and call rules for the math. Do not write documents, use `ui.*`, or create `ChatMessage`s. Do not pull values from other documents; see [Cross-document value resolution](#cross-document-value-resolution). |
+| Flow           | `actor/flows/`, `item/flows/`, `tests/flows/`, `effect/flows/` | Connecting logic: order of operations between rules and Foundry documents, aggregating data, collecting output. Flows may use Foundry APIs. Call rules for calculations; do not reimplement them. Add Quench specs where practical.                                                                                                                                                                          |
+| Rules          | `rules/`                                                       | System rule abstractions: Shadowrun logic on system types and plain data. Do not add `game`, `ui`, `canvas`, or `ChatMessage` usage. `WeaponRangeRules` and `DocumentSituationModifiers` already do; do not copy them. Prefer not to add `foundry.utils` calls. Cover rule changes with Quench specs.                                                                                                        |
+| Gameplay tests | `tests/`                                                       | `SuccessTest` subclasses. See [Gameplay tests](#gameplay-tests-successtest).                                                                                                                                                                                                                                                                                                                                 |
 
 ## Gameplay tests (SuccessTest)
 
@@ -206,17 +207,21 @@ Commands (quote patterns that contain `*` so the shell does not expand them):
 ```bash
 npm run quench -- shadowrun5e.rules.ranged_weapon   # one batch
 npm run quench -- 'shadowrun5e.flow.**'             # a family of batches
-npm run quench                                      # full suite (default pattern shadowrun5e.**)
+npm run quench                                      # full suite, pull request preparation only
 npm run quench -- 'shadowrun5e.rules.**' --headed   # watch the browser
 ```
 
-- Batch keys are registered in `src/unittests/quench.ts`. Use the narrowest key or prefix that covers the change.
+- Batch keys are the `registerBatch` keys in `src/unittests/quench.ts`. The pattern matches these keys, so it selects
+  which batches run.
+- Agent runs: run only the batches connected to the feature being worked on, using the narrowest key or prefix that
+  covers it. Do not run the full suite during development.
 - Pattern precedence: `--pattern <p>` (or `--pattern=<p>`), then `QUENCH_PATTERN`, then the positional argument, then
   `shadowrun5e.**`.
 - Output: `✓` passed, `✗` failed, `○` neither passed nor failed. Failure stacks are mapped back to `src/` through source
   maps.
 - Exit code: `0` when all tests pass, `1` on any failure or fatal error.
-- Run the full suite before finishing a change to rules or flows that other batches exercise.
+- Full suite (`npm run quench` with no pattern): run it only once the work is complete and a pull request is being
+  prepared.
 
 Environment variables, also read from the git-ignored `.env.local` (existing variables win):
 

@@ -139,10 +139,11 @@ To include translation changes to `/public` language files in the system, create
 ## Separation
 More and more parts of the system move to separate modules organized into these broad layers:
 All following folder reference are relative to src\module\*
+* App / sheet layer. Handle interface operations. Dialogs. Application windows. Chat Message creation and so forth. Sheets and templates live in `*\sheets\` and `apps\`.
+* Data prep layer. Derives document data from system data and rules in `prepareBaseData` and `prepareDerivedData` of `SR5Actor` and `SR5Item`. These live in `actor\prep\` and `item\prep\`. Do not write documents or use UI APIs here.
+* Flow layer. Should use the rules modules to introduce an order of operations for them and collect and output information. This will contain Foundry objects. These live in item\flows, actor\flows, tests\flows and effect\flows.
 * Rules layer. Should avoid direct Foundry objects. System document types (like SR5Actor or SR5Item) and system objects (like a PartsList) are preferred. Some rules still use `foundry.utils` helpers, so keep new Foundry dependencies to a minimum.
   These live in the rules\ folder
-* Flow layer. Should use the rules modules to introduce an order of operations for them and collect and output information. This will contain Foundry objects. These live in item\flows, actor\flows, tests\flows and effect\flows.
-* Application layer. Handle interface operations. Dialogs. Application windows. Chat Message creation and so forth.
 * Tests layer. Whenever any Shadowrun test is implemented it should extend the SuccessTest class. All tests live in the tests\ folder. See `Test Implementation` for more details.
 
 Additional separations are made for
