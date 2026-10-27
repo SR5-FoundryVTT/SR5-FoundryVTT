@@ -1,4 +1,5 @@
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
+import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
 
 export class SpellParser extends Parser<'spell'> {
     protected readonly parseType = 'spell';
@@ -31,6 +32,13 @@ export class SpellParser extends Parser<'spell'> {
 
         // Chummer tracks the alchemical variant of a spell as a separate known spell. SR5#304.
         system.alchemical = itemData.alchemy === 'True';
+
+        // Exports from Chummer versions without spell elements keep the compendium's element.
+        if (itemData.elements_english !== undefined) {
+            const element = IH.parseElements(itemData.elements_english);
+            system.action.damage.element.base = element;
+            system.action.damage.element.value = element;
+        }
     }
 
     private parseDuration(system: BlankItem<'spell'>['system'], itemData: ExtractItemType<'spells', 'spell'>) {

@@ -59,7 +59,7 @@ export class WeaponParser extends Parser<'weapon'> {
         let base_formula_operator: AttributeFormulaOperator = 'add';
         let parsed = false;
 
-        const attributeDamage = /^(?:\((.+)\)|(.+?))([PSM])?(?:\(([a-zA-Z]+)\))?$/i.exec(damageCode);
+        const attributeDamage = /^(?:\((.+)\)|(.+?))([PSM])?(?:\s*\(([a-zA-Z]+)\))?$/i.exec(damageCode);
         if (attributeDamage) {
             const formulaText = attributeDamage[1] ?? attributeDamage[2];
             if (formulaText.includes('{')) {
@@ -76,7 +76,7 @@ export class WeaponParser extends Parser<'weapon'> {
         }
 
         if (!parsed) {
-            const simpleDamage = /^(\d+)([PSM])?(?:\(([a-zA-Z]+)\))?$/i.exec(damageCode);
+            const simpleDamage = /^(\d+)([PSM])?(?:\s*\(([a-zA-Z]+)\))?$/i.exec(damageCode);
             if (!simpleDamage) return null;
 
             damage = Number(simpleDamage[1]) || 0;
@@ -153,12 +153,12 @@ export class WeaponParser extends Parser<'weapon'> {
         }
     }
 
+    /** Chummer's '(f)' marks flechette damage, which has no element. */
     private parseDamageElement(parsedElement?: string): DamageElement {
         switch (parsedElement?.toLowerCase()) {
             case 'e':
             case 'electricity':
                 return 'electricity';
-            case 'f':
             case 'fire':
                 return 'fire';
             case 'cold':

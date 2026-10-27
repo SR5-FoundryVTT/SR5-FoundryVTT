@@ -40,13 +40,13 @@ export interface Quality {
     naturalweapons?: {
         naturalweapon: OneOrMany<{
             accuracy: { _TEXT: "Physical"; };
-            ap: { _TEXT: IntegerString; };
+            ap: { _TEXT: IntegerString | "-"; };
             damage: { _TEXT: "({STR}+1)P" | "({STR}+2)P" | "({STR}+3)P"; };
             name: { _TEXT: string; };
             page?: { _TEXT: IntegerString; };
             reach: { _TEXT: IntegerString; };
             source?: { _TEXT: "FA" | "HS" | "RF"; };
-            useskill: { _TEXT: "Throwing Weapons" | "Unarmed Combat"; };
+            useskill: { _TEXT: "Exotic Melee Weapon" | "Throwing Weapons" | "Unarmed Combat"; };
         }>;
     };
     nolevels?: Empty;

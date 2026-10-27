@@ -63,6 +63,7 @@ export class Constants {
         Device:         this.MAP_COMPENDIUM_CONFIG.Gear,
         Program:        this.MAP_COMPENDIUM_CONFIG.Gear,
         Gear:           this.MAP_COMPENDIUM_CONFIG.Gear,
+        Lifestyle:      this.MAP_COMPENDIUM_CONFIG.Gear,
         Weapon:         this.MAP_COMPENDIUM_CONFIG.Weapon,
 
         // --- Modifications ---

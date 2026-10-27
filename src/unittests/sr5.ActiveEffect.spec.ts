@@ -1549,6 +1549,37 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.equal(test.data.damage.value, 3);
         });
 
+        it('TEST modify damage and AP of unarmed MeleeAttackTest only', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const unarmed = await factory.createItem({ type: 'weapon', system: { category: 'melee', action: { skill: 'unarmed_combat' } } });
+            const blade = await factory.createItem({ type: 'weapon', system: { category: 'melee', action: { skill: 'blades' } } });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: {
+                    targets: [{ id: 't', applyTo: 'test_all', conditions: [
+                        { type: 'skills', mode: 'include', values: ['unarmed_combat'] },
+                        { type: 'categories', mode: 'include', values: ['attack_melee'] },
+                    ] }],
+                    changes: [
+                        { key: 'data.damage', value: '1', type: 'add', target: 't' },
+                        { key: 'data.damage.ap', value: '-2', type: 'add', target: 't' },
+                    ],
+                }
+            }]);
+
+            const unarmedTest = (await TestCreator.fromItem(unarmed, actor, { showDialog: false, showMessage: false }))!;
+            await unarmedTest.execute();
+            ModifiableValue.calcTotal(unarmedTest.data.damage);
+            assert.equal(unarmedTest.data.damage.value, 1);
+            assert.equal(unarmedTest.data.damage.ap.value, -2);
+
+            const bladeTest = (await TestCreator.fromItem(blade, actor, { showDialog: false, showMessage: false }))!;
+            await bladeTest.execute();
+            ModifiableValue.calcTotal(bladeTest.data.damage);
+            assert.equal(bladeTest.data.damage.value, 0);
+            assert.equal(bladeTest.data.damage.ap.value, 0);
+        });
+
         it('TEST modify attribute and limit on SkillTest', async () => {
             const actor = await factory.createActor({ type: 'character' });
             await actor.createEmbeddedDocuments('ActiveEffect', [{

@@ -14,7 +14,7 @@ export interface Accessory {
         gearcategory: Many<{ _TEXT: "Autosofts" | "Commlinks" | "Custom" | "Vision Enhancements"; }>;
     };
     ammobonus?: { _TEXT: IntegerString | "50 * Rating"; };
-    ammoreplace?: { _TEXT: IntegerString | "100(belt)" | "24(d)" | "2500(belt)" | "32(d)" | "40(c)" | "External Source"; };
+    ammoreplace?: { _TEXT: IntegerString | "100(belt)" | "200(belt)" | "24(d)" | "2500(belt)" | "32(d)" | "40(c)" | "External Source"; };
     ammoslots?: { _TEXT: IntegerString; };
     ap?: { _TEXT: IntegerString; };
     avail: { _TEXT: string; };

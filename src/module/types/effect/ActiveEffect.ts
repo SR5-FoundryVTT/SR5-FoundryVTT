@@ -22,6 +22,7 @@ const ActiveEffectData = (baseChanges: foundry.data.ActiveEffectTypeDataModel.Ch
     onlyForEquipped: new BooleanField(),
     onlyForWireless: new BooleanField(),
     expiryAction:    new StringField({ required: true, initial: 'default', choices: ['default', 'delete', 'update'] }),
+    rating:          new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
     targets: new ArrayField(new SchemaField(TargetData())),
     changes: new ArrayField(new SchemaField({
         // SchemaField owns its children, so spreading baseChanges would reuse already-parented fields.
