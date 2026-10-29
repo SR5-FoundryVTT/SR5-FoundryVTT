@@ -2292,7 +2292,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     const id = SheetFlow.closestItemId(target);
                     const item = this.actor.items.get(id);
                     if (!item) return false;
-                    return item.isType('equipment', 'weapon', 'ammo', 'modification', 'armor', 'bioware', 'cyberware', 'device');
+                    return item.isType('equipment', 'chemical', 'weapon', 'ammo', 'modification', 'armor', 'bioware', 'cyberware', 'device');
                 },
                 callback: async (target: HTMLElement) => {
                     await this._moveItemToInventory(target);

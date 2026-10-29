@@ -126,6 +126,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             'cyberware',
             'device',
             'equipment',
+            'chemical',
             'modification'
         ];
     }

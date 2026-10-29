@@ -35,6 +35,12 @@ export interface TargetActorEffectsOptions {
  * 
  * The flow pattern follows the composite pattern.
  */
+/**
+ * Targets of a chemical's effects copied onto whoever takes a dose: their data, their tests and
+ * their modifiers, as for the actor carrying any other item.
+ */
+const CHEMICAL_EFFECT_APPLY_TO: string[] = ['actor', 'test_all', 'test_target', 'modifier'];
+
 export class SuccessTestEffectsFlow<T extends SuccessTest> {
     // The test this flow is applied to.
     test: T;
@@ -224,17 +230,29 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         const source = { ...options.ctx, actor: targetActor.getRollData() };
         const effectsData: SR5ActiveEffect[] = [];
-        const collect = (effect: SR5ActiveEffect) => {
+        const collectTrimmed = (effect: SR5ActiveEffect, trimmed: SR5ActiveEffect) => {
             // An action can apply only some of the items effects.
             if (options.select === 'ids' && !options.ids?.includes(effect.id ?? '')) return;
             // Some only under a condition, like nausea incapacitating when Power is above Willpower. SR5#409.
             const condition = options.conditions?.[effect.id ?? ''];
             if (condition && !FlowContext.resolve(condition, source)) return;
-            const trimmed = this._trimToTargetedActorEffectData(effect, targetActor);
-            if (!trimmed) return;
             foundry.utils.setProperty(trimmed, 'system.source.effectUuid', effect.uuid);
             effectsData.push(trimmed);
         };
+        const collect = (effect: SR5ActiveEffect) => {
+            const trimmed = this._trimToTargetedActorEffectData(effect, targetActor);
+            if (trimmed) collectTrimmed(effect, trimmed);
+        };
+
+        // A chemical's effects are for whoever takes a dose, as authored. Other items hold the
+        // effects for the targets of their action as targeted actor effects.
+        if (item.isType('chemical')) {
+            for (const effect of allApplicableDocumentEffects(item, { applyTo: CHEMICAL_EFFECT_APPLY_TO })) {
+                const trimmed = this._trimToAppliedEffectData(effect, targetActor, CHEMICAL_EFFECT_APPLY_TO);
+                if (trimmed) collectTrimmed(effect, trimmed);
+            }
+            return effectsData;
+        }
 
         for (const effect of allApplicableDocumentEffects(item, { applyTo: ['targeted_actor'] })) {
             collect(effect);
@@ -247,6 +265,34 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         console.debug(`Shadowrun5e | To be created effects on target actor ${targetActor.name}`, effectsData);
 
         return effectsData;
+    }
+
+    /**
+     * Build a copy of an effect containing only the targets of the given kinds, and the changes
+     * assigned to them, resolving dynamic change values from the current test context. The targets
+     * keep their kind, so the copy changes the recipient's data, tests or modifiers as authored.
+     *
+     * @param effect The source effect, like one of a chemical.
+     * @param targetActor The actor the effect will be copied onto.
+     * @param applyTo The kinds of targets to copy.
+     * @returns Trimmed effect data, or undefined when there's nothing to copy.
+     */
+    _trimToAppliedEffectData(effect: SR5ActiveEffect, targetActor: SR5Actor, applyTo: readonly string[]) {
+        // Effects and changes without a target of their own resolve to one, as when applied in place.
+        const targets = effect.effectiveTargets.filter(target => applyTo.includes(target.applyTo));
+        if (targets.length === 0) return undefined;
+        const ids = new Set(targets.map(target => target.id));
+
+        const effectData = effect.toObject() as unknown as SR5ActiveEffect;
+        effectData.system.targets = foundry.utils.deepClone(targets);
+        effectData.system.changes = effectData.system.changes
+            .map(change => ({ ...change, target: effect.targetForChange(change)?.id ?? '' }))
+            .filter(change => ids.has(change.target))
+            .map(change => {
+                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as unknown as ActiveEffect.ChangeData, targetActor, effect);
+                return change;
+            });
+        return effectData;
     }
 
     /**

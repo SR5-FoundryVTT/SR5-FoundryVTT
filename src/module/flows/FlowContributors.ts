@@ -174,7 +174,7 @@ export const FlowContributors: Record<string, FlowContributor> = {
         if (!root.data.rollless || tree.followed && (tree.followed as FlowNodeData).test) return;
         const item = root.item;
         const actor = root.actor;
-        const chemical = (item?.system as { chemical?: ChemicalType } | undefined)?.chemical;
+        const chemical = item?.asType('chemical')?.system as ChemicalType | undefined;
         if (!item || !actor || chemical?.kind !== 'drug') return;
 
         const use: FlowNodeData = {

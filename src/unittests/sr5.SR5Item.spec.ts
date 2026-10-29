@@ -171,28 +171,34 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             assert.include(before?.warnings ?? [], 'SR5.Flow.Node.Warnings.NoRelease');
         });
 
-        it('edits a chemical on equipment and a loaded dose on ammo from Details', async () => {
-            const equipment = await factory.createItem({ type: 'equipment' });
-            const sheet = equipment.sheet as unknown as ItemSheetFixture;
+        it('edits a chemical item and a loaded dose on ammo from Details', async () => {
+            const chemical = await factory.createItem({ type: 'chemical' });
+            const sheet = chemical.sheet as unknown as ItemSheetFixture;
             sheet._mode = 'edit';
             await sheet.render({ force: true });
 
-            // Only the kind shows until the item is a chemical.
-            const kind = sheet.element.querySelector<HTMLSelectElement>('[name="system.chemical.kind"]');
-            if (!kind) return assert.fail('No chemical kind on equipment');
-            assert.isNull(sheet.element.querySelector('[name="system.chemical.power"]'));
+            // Only the kind shows until it's set.
+            const kind = sheet.element.querySelector<HTMLSelectElement>('[name="system.kind"]');
+            if (!kind) return assert.fail('No kind on a chemical');
+            assert.isNull(sheet.element.querySelector('[name="system.power"]'));
+            // Using a chemical is set by its kind, it has no action of its own to edit.
+            assert.isNull(sheet.element.querySelector('.sr5-flow-nodes'));
             kind.value = 'toxin';
             await sheet.submit();
             await sheet.render({ force: true });
 
-            const power = sheet.element.querySelector<HTMLInputElement>('[name="system.chemical.power"]');
+            const power = sheet.element.querySelector<HTMLInputElement>('[name="system.power"]');
             if (!power) return assert.fail('No Power for a toxin');
             power.value = '8';
             await sheet.submit();
-            assert.strictEqual(foundry.utils.getProperty(equipment._source, 'system.chemical.power'), 8);
+            assert.strictEqual(foundry.utils.getProperty(chemical._source, 'system.power'), 8);
             // A toxin has no duration or addiction, a drug has no Power.
-            assert.isNull(sheet.element.querySelector('[name="system.chemical.duration.formula"]'));
+            assert.isNull(sheet.element.querySelector('[name="system.duration.formula"]'));
             await sheet.close();
+
+            // Equipment no longer carries chemicals.
+            const equipment = await factory.createItem({ type: 'equipment' });
+            assert.notProperty(equipment._source.system, 'chemical');
 
             const ammo = await factory.createItem({ type: 'ammo' });
             const ammoSheet = ammo.sheet as unknown as ItemSheetFixture;

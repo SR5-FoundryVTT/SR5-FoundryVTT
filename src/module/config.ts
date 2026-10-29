@@ -34,6 +34,7 @@ export const SR5 = {
         ammo: 'SR5.ItemTypes.Ammo',
         armor: 'SR5.ItemTypes.Armor',
         bioware: 'SR5.ItemTypes.Bioware',
+        chemical: 'SR5.ItemTypes.Chemical',
         complex_form: 'SR5.ItemTypes.ComplexForm',
         contact: 'SR5.ItemTypes.Contact',
         critter_power: 'SR5.ItemTypes.CritterPower',
@@ -1425,6 +1426,7 @@ export const SR5 = {
     itemCategoryIconOverrides: {
         action: {},
         adept_power: {},
+        chemical: 'equipment/chemicals',
         ammo: {
             'ammo': '',
             'arrow': '',

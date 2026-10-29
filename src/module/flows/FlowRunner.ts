@@ -233,8 +233,7 @@ export const FlowRunner = {
      * Should using an item without a test start a chain, as using a drug does?
      */
     startsRolllessChain(item: SR5Item): boolean {
-        const chemical = (item.system as { chemical?: { kind?: string } }).chemical;
-        if (chemical?.kind === 'drug') return true;
+        if (item.asType('chemical')?.system.kind === 'drug') return true;
         const action = item.getAction();
         return !!action && (!!action.effects?.select || !!action.results?.length);
     },
@@ -247,9 +246,9 @@ export const FlowRunner = {
      * @returns The item card, now the root message of the chain.
      */
     async startChain(item: SR5Item, actor: SR5Actor): Promise<ChatMessage | undefined> {
-        const chemical = (item.system as { chemical?: { kind?: string } }).chemical;
-        if (chemical?.kind === 'drug') {
-            const quantity = Number((item.system as { technology?: { quantity?: number } }).technology?.quantity ?? 0);
+        const chemical = item.asType('chemical');
+        if (chemical?.system.kind === 'drug') {
+            const quantity = Number(chemical.system.technology.quantity ?? 0);
             if (quantity <= 0) {
                 ui.notifications?.warn('SR5.Warnings.NoDosesLeft', { localize: true });
                 return undefined;

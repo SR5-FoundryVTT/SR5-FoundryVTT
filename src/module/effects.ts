@@ -74,6 +74,9 @@ export function *allApplicableItemsEffects(document: SR5Actor|SR5Item, options: 
     const nestedItems = options.nestedItems ?? true;
 
     for (const item of document.items) {
+        // A chemical's effects are for whoever takes a dose, not for the actor carrying it.
+        if (item.isType('chemical')) continue;
+
         for (const effect of item.effects) {
             if (applyTo.length > 0 && !effect.appliesToAnyOf(applyTo)) continue ;
             yield effect;

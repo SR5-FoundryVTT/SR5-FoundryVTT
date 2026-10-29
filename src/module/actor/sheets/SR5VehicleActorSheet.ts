@@ -65,6 +65,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             'cyberware',
             'device',
             'equipment',
+            'chemical',
             'modification'
         ];
     }

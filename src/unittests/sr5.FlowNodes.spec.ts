@@ -554,23 +554,32 @@ export const shadowrunFlowNodes = (context: QuenchBatchContext) => {
         const drug = async (quantity: number) => {
             const actor = await factory.createActor({ type: 'character' });
             const [item] = await actor.createEmbeddedDocuments('Item', [{
-                name: 'Jazz', type: 'equipment',
+                name: 'Jazz', type: 'chemical',
                 system: {
                     technology: { quantity },
-                    chemical: { kind: 'drug', vectors: ['inhalation'], duration: { formula: '2', unit: 'hours' }, addiction: { type: 'both', rating: 8, threshold: 3 } },
+                    kind: 'drug', vectors: ['inhalation'], duration: { formula: '2', unit: 'hours' }, addiction: { type: 'both', rating: 8, threshold: 3 },
                 },
             }]);
+            // What the drug does to whoever takes it, authored like any effect on its actor.
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Jazz High',
                 system: {
-                    targets: [{ id: 't', applyTo: 'targeted_actor' }],
-                    changes: [{ key: 'system.attributes.reaction.mod', value: '1', type: 'add', target: 't' }],
+                    targets: [{ id: 't', applyTo: 'actor' }],
+                    changes: [{ key: 'system.attributes.reaction', value: '1', type: 'add', phase: 'initial', target: 't' }],
                 },
             }]);
             return { actor, item };
         };
 
         const highs = (actor: SR5Actor) => actor.effects.filter(effect => effect.name === 'Jazz High');
+
+        it('does nothing to the actor carrying it', async () => {
+            const { actor, item } = await drug(2);
+            const carried = actor.getAttribute('reaction')?.value;
+            await item.delete();
+            assert.strictEqual(actor.getAttribute('reaction')?.value, carried, 'Carrying the drug changes no attribute');
+            assert.lengthOf(highs(actor), 0);
+        });
 
         it('uses up a dose and applies the drugs effects to its user, without a roll (SR5#410)', async () => {
             const { actor, item } = await drug(2);
@@ -593,7 +602,7 @@ export const shadowrunFlowNodes = (context: QuenchBatchContext) => {
 
         it('overdoses when taken while already on it (SR5#415)', async () => {
             const { actor, item } = await drug(2);
-            const chemical = (item.system as unknown as { chemical: never }).chemical;
+            const chemical = item.system as unknown as never;
             assert.strictEqual(FlowChemicals.overdosePower(actor, item, chemical), 0);
 
             await FlowRunner.startChain(item, actor);

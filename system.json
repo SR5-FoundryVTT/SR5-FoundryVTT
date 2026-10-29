@@ -64,6 +64,9 @@
             "call_in_action": {
                 "htmlFields": ["description.value"]
             },
+            "chemical": {
+                "htmlFields": ["description.value"]
+            },
             "complex_form": {
                 "htmlFields": ["description.value"]
             },

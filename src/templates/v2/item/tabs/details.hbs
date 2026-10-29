@@ -21,9 +21,9 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/ammo.hbs"}}
             {{/if}}
 
-            {{#if systemFields.chemical}}
+            {{#if (isType item 'chemical')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/chemical.hbs"
-                    fields=systemFields.chemical.fields source=source.system.chemical path="system.chemical"}}
+                    fields=systemFields source=source.system path="system"}}
             {{/if}}
 
             {{#if systemFields.payload}}
@@ -103,7 +103,8 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/armor.hbs"}}
             {{/if}}
 
-            {{#if systemFields.action}}
+            {{!-- Using a chemical is its own chain, set by its kind. See FlowContributors.drug. --}}
+            {{#if (and systemFields.action (not (isType item 'chemical')))}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/action.hbs"}}
             {{/if}}
 

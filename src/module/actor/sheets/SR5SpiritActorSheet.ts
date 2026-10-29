@@ -40,6 +40,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet<SpiritActorSheetData>
             'ammo',
             'armor',
             'equipment',
+            'chemical',
             'modification',
         ];
     }

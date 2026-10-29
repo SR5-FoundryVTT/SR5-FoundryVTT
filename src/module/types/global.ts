@@ -35,6 +35,7 @@ import { Cyberware } from './item/Cyberware';
 import { Device } from './item/Device';
 import { Echo } from './item/Echo';
 import { Equipment } from './item/Equipment';
+import { Chemical } from './item/Chemical';
 import { Grid } from "./item/Grid";
 import { Host } from './item/Host';
 import { Lifestyle } from './item/Lifestyle';
@@ -168,6 +169,7 @@ declare module "fvtt-types/configuration" {
             armor: typeof Armor;
             bioware: typeof Bioware;
             call_in_action: typeof CallInAction;
+            chemical: typeof Chemical;
             complex_form:  typeof ComplexForm;
             contact: typeof Contact;
             critter_power: typeof CritterPower;

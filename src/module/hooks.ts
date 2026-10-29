@@ -135,6 +135,7 @@ import { Cyberware } from './types/item/Cyberware';
 import { Device } from './types/item/Device';
 import { Echo } from './types/item/Echo';
 import { Equipment } from './types/item/Equipment';
+import { Chemical } from './types/item/Chemical';
 import { Grid } from './types/item/Grid';
 import { Host } from './types/item/Host';
 import { Lifestyle } from './types/item/Lifestyle';
@@ -484,6 +485,7 @@ ___________________
         CONFIG.Item.dataModels["adept_power"] = AdeptPower;
         CONFIG.Item.dataModels["bioware"] = Bioware;
         CONFIG.Item.dataModels["call_in_action"] = CallInAction;
+        CONFIG.Item.dataModels["chemical"] = Chemical;
         CONFIG.Item.dataModels["complex_form"] = ComplexForm;
         CONFIG.Item.dataModels["contact"] = Contact;
         CONFIG.Item.dataModels["critter_power"] = CritterPower;

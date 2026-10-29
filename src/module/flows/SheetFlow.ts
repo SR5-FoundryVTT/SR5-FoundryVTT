@@ -58,6 +58,8 @@ export const SheetFlow = {
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Device' });
             case 'equipment':
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Equipment' });
+            case 'chemical':
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Chemical' });
             case 'cyberware':
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Cyberware' });
             case 'bioware':
