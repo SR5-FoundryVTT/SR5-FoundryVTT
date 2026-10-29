@@ -1,0 +1,13 @@
+{{!--
+    Warnings about an action node, shown next to the editor section they concern. See FlowNodeEditorFlow.warnings.
+
+    Expects:
+    - warnings: Translation[]
+--}}
+{{#if @root.isEditMode}}
+    {{#each warnings as |warning|}}
+        <div class="list-item sr5-flow-node__warning">
+            <div class="list-item-col hint"><i class="fas fa-triangle-exclamation"></i> {{localize warning}}</div>
+        </div>
+    {{/each}}
+{{/if}}

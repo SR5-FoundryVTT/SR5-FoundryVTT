@@ -7,7 +7,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
     const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
-    type ItemSheetFixture = Pick<SR5ItemSheet, 'render' | 'element' | 'submit' | 'close'> & { _mode: 'play' | 'edit' };
+    type ItemSheetFixture = Pick<SR5ItemSheet, 'render' | 'element' | 'submit' | 'close' | 'expandedFlowNodes'> & { _mode: 'play' | 'edit' };
 
     after(async () => { await factory.destroy(); });
 
@@ -71,6 +71,86 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             remove.click();
             await new Promise(resolve => setTimeout(resolve, 200));
             assert.isNull(foundry.utils.getProperty(item._source, 'system.action.opposed.followed'));
+            await sheet.close();
+        });
+
+        it('sums up action nodes on their header and opens them on click', async () => {
+            const item = await factory.createItem({ type: 'action', system: { action: { opposed: { test: 'PhysicalDefenseTest' } } } });
+            const sheet = item.sheet as unknown as ItemSheetFixture;
+            sheet._mode = 'edit';
+            await sheet.render({ force: true });
+
+            const node = sheet.element.querySelector<HTMLElement>('.sr5-flow-node[data-path="system.action.opposed"]');
+            const header = node?.querySelector<HTMLElement>(':scope > .sr5-flow-node__header');
+            if (!node || !header) return assert.fail('No opposed node header');
+
+            // The preset actor and mode show as dimmed chips, the test by its label.
+            assert.include(header.querySelector('.sr5-flow-node__test')?.textContent ?? '', game.i18n.localize('SR5.Tests.PhysicalDefenseTest'));
+            assert.isAtLeast(header.querySelectorAll('.sr5-flow-chip.preset').length, 2);
+
+            assert.isFalse(node.classList.contains('expanded'));
+            header.click();
+            assert.isTrue(node.classList.contains('expanded'));
+            assert.isTrue(sheet.expandedFlowNodes.has('system.action.opposed'));
+
+            // Opened nodes stay open when the sheet renders again.
+            await sheet.render({ force: true });
+            assert.isTrue(sheet.element.querySelector('.sr5-flow-node[data-path="system.action.opposed"]')?.classList.contains('expanded'));
+            await sheet.close();
+        });
+
+        it('names choice options and toggles armor on nested action nodes', async () => {
+            const item = await factory.createItem({
+                type: 'action',
+                system: { action: { test: 'SpellCastingTest', before: { kind: 'choice' } } } as never,
+            });
+            const sheet = item.sheet as unknown as ItemSheetFixture;
+            sheet._mode = 'edit';
+            await sheet.render({ force: true });
+
+            const accept = sheet.element.querySelector<HTMLElement>('[data-action="addFlowOption"][data-path="system.action.before.option"][data-option="accept"]');
+            if (!accept) return assert.fail('No control to add the accept option');
+            accept.click();
+            await new Promise(resolve => setTimeout(resolve, 200));
+            assert.isObject(foundry.utils.getProperty(item._source, 'system.action.before.option.accept'));
+
+            // A typed name becomes the option key.
+            await sheet.render({ force: true });
+            const name = sheet.element.querySelector<HTMLInputElement>('.sr5-flow-node__add-option input[data-option-name]');
+            const named = name?.parentElement?.querySelector<HTMLElement>('[data-action="addFlowOption"]:not([data-option])');
+            if (!name || !named) return assert.fail('No control to add a named option');
+            name.value = 'Hold Breath';
+            named.click();
+            await new Promise(resolve => setTimeout(resolve, 200));
+            assert.isObject(foundry.utils.getProperty(item._source, 'system.action.before.option.holdBreath'));
+
+            await item.update({ 'system.action.before.option.accept': { test: 'MeleeAttackTest' } } as Item.UpdateData);
+            await sheet.render({ force: true });
+            const armor = sheet.element.querySelector<HTMLElement>('[data-action="toggleFlowNodeArmor"][data-path="system.action.before.option.accept"]');
+            if (!armor) return assert.fail('No armor toggle on the option node');
+            armor.click();
+            await new Promise(resolve => setTimeout(resolve, 200));
+            assert.isTrue(foundry.utils.getProperty(item._source, 'system.action.before.option.accept.armor'));
+            await sheet.close();
+        });
+
+        it('gives action nodes damage of their own and removes it', async () => {
+            const item = await factory.createItem({ type: 'action', system: { action: { opposed: { test: 'PhysicalDefenseTest' } } } });
+            const sheet = item.sheet as unknown as ItemSheetFixture;
+            sheet._mode = 'edit';
+            await sheet.render({ force: true });
+
+            const add = sheet.element.querySelector<HTMLElement>('[data-action="addFlowNodeDamage"][data-path="system.action.opposed"]');
+            if (!add) return assert.fail('No control to add damage');
+            add.click();
+            await new Promise(resolve => setTimeout(resolve, 200));
+            assert.isObject(foundry.utils.getProperty(item._source, 'system.action.opposed.damage'));
+
+            await sheet.render({ force: true });
+            assert.isNotNull(sheet.element.querySelector('[name="system.action.opposed.damage.base"]'));
+            sheet.element.querySelector<HTMLElement>('[data-action="removeFlowNodeDamage"][data-path="system.action.opposed"]')?.click();
+            await new Promise(resolve => setTimeout(resolve, 200));
+            assert.isNull(foundry.utils.getProperty(item._source, 'system.action.opposed.damage'));
             await sheet.close();
         });
 

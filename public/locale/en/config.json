@@ -3294,6 +3294,94 @@
                 "ModeHint": "Run right away, or show a button on the chat message.",
                 "Preset": "Default",
                 "Remove": "Remove this test and everything after it",
+                "TreeTitle": "Tests and outcomes",
+                "TreeHint": "The tests before and after this action, who rolls them and what they lead to. Click a test to open its settings.",
+                "Kind": "Kind",
+                "KindHint": "A test, or a choice the other side makes, like accepting a touch spell or resisting it.",
+                "ChoiceHint": "The options below are what the choice offers. Each option runs the tests within it.",
+                "When": "Runs on",
+                "WhenHint": "Outcomes of the test above that let this run. Any of them is enough. Empty uses the default.",
+                "Condition": "Only if",
+                "ConditionHint": "A rule that must hold for this to run, like the target taking biofeedback.",
+                "Primary": "Primary",
+                "PrimaryHint": "Formulas reading @primary take their values from this test. Defaults to the action itself.",
+                "Roller": "Rolled by",
+                "RollerHint": "Who rolls a test that no actor makes, like a spirit's Force.",
+                "Releases": "Releases on",
+                "ReleasesHint": "Outcomes of this test that let the test it comes before go ahead.",
+                "NoDefenseAllowed": "Can skip",
+                "NoDefenseAllowedHint": "The defender may choose not to defend.",
+                "NoDefenseCondition": "Never defends if",
+                "NoDefenseConditionHint": "A rule under which the defender gets no defense at all, like being unaware of the attack.",
+                "Damage": "Damage",
+                "DealsDamage": "Damage",
+                "AddDamage": "Own damage",
+                "AddDamageHint": "Give this test damage of its own, like retaliation or a toxin's Power.",
+                "RemoveDamage": "Remove its own damage",
+                "DamageMode": "Works with",
+                "DamageModeHint": "Which damage this test deals with: its own, what the test above passes on, or the boxes actually taken.",
+                "DamageScaleHint": "Multiply the damage, then round. Like half the boxes a jumped-in vehicle took.",
+                "Unresisted": "Unresisted",
+                "UnresistedHint": "Damage this applies can't be resisted.",
+                "Effects": "Applies",
+                "EffectsHint": "Which of the item's effects this applies to whoever it runs for.",
+                "EffectSelectDefault": "Default: targeted effects",
+                "NoTargetedEffects": "This item has no effects applying to targeted actors.",
+                "Result": "Result",
+                "ResultValue": "Value",
+                "ResultLabel": "Label",
+                "AddResult": "Add result",
+                "AddResultHint": "Something this test does when done, like changing initiative.",
+                "RemoveResult": "Remove result",
+                "OptionName": "Option name",
+                "AddOptionNamed": "Add an option with this name",
+                "OptionExists": "This choice already has an option with that name.",
+                "Sections": {
+                    "when": "When it runs",
+                    "damage": "Damage",
+                    "effects": "Effects and results"
+                },
+                "Kinds": {
+                    "test": "Test",
+                    "choice": "Choice"
+                },
+                "Outcomes": {
+                    "always": "Always",
+                    "success": "Success",
+                    "failure": "Failure",
+                    "hit": "Hit",
+                    "miss": "Miss",
+                    "tie": "Tie"
+                },
+                "Rollers": {
+                    "gm": "GM",
+                    "auto": "Automatically"
+                },
+                "DamageModes": {
+                    "own": "Its own",
+                    "incoming": "Incoming",
+                    "taken": "Boxes taken",
+                    "none": "None"
+                },
+                "Round": {
+                    "up": "Round up",
+                    "down": "Round down"
+                },
+                "EffectSelect": {
+                    "all": "All targeted effects",
+                    "ids": "Chosen effects",
+                    "none": "None"
+                },
+                "ResultActions": {
+                    "modifyCombatantInit": "Change initiative",
+                    "forceReboot": "Force reboot",
+                    "placeMarks": "Place marks"
+                },
+                "Conditions": {
+                    "takesBiofeedback": "Takes biofeedback",
+                    "hasElementalEffect": "Has an elemental effect",
+                    "dartPenetrates": "Dart penetrates"
+                },
                 "Warnings": {
                     "NoTest": "Without a test this does nothing.",
                     "NoRelease": "Nothing here releases the test it comes before, so that test never runs. Set what releases it on a test within.",

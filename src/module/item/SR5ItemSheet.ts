@@ -123,6 +123,9 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
  * Extend the basic ItemSheet with some very simple modifications
  */
 export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> extends SR5ApplicationMixin(ItemSheet)<T> {
+    // Paths of the action nodes shown open in the node editor, for as long as the sheet lives.
+    readonly expandedFlowNodes = new Set<string>();
+
     static override DEFAULT_OPTIONS = {
         classes: ['item', 'named-sheet'],
         position: {
@@ -172,7 +175,14 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
             toggleActionArmor: SR5ItemSheet.#toggleActionArmor,
             addFlowNode: SR5ItemSheet.#addFlowNode,
+            addFlowOption: SR5ItemSheet.#addFlowOption,
             removeFlowNode: SR5ItemSheet.#removeFlowNode,
+            toggleFlowNode: SR5ItemSheet.#toggleFlowNode,
+            toggleFlowNodeArmor: SR5ItemSheet.#toggleFlowNodeArmor,
+            addFlowNodeDamage: SR5ItemSheet.#addFlowNodeDamage,
+            removeFlowNodeDamage: SR5ItemSheet.#removeFlowNodeDamage,
+            addFlowNodeResult: SR5ItemSheet.#addFlowNodeResult,
+            removeFlowNodeResult: SR5ItemSheet.#removeFlowNodeResult,
 
             modifyConditionMonitor: SR5ItemSheet.#modifyConditionMonitor,
             clearConditionMonitor: SR5ItemSheet.#clearConditionMonitor,
@@ -447,8 +457,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data.opposedTests = game.shadowrun5e.opposedTests;
         data.activeTests = game.shadowrun5e.activeTests;
         data.resistTests = game.shadowrun5e.resistTests;
-        data.flowNodes = FlowNodeEditorFlow.tree(this.item);
-        data.flowNodeOptions = FlowNodeEditorFlow.options();
+        data.flowNodes = FlowNodeEditorFlow.tree(this.item, this.expandedFlowNodes);
+        data.flowNodeOptions = FlowNodeEditorFlow.options(this.item);
         data.chemicalOptions = chemicalOptions();
 
         if (this.item.system.description)
@@ -1137,7 +1147,95 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const path = target.dataset.path;
         if (!path?.startsWith('system.action.')) return;
         const test = target.dataset.test;
+        // A new node opens, to be filled in.
+        this.expandedFlowNodes.add(path);
         await this.item.update({ [path]: test ? { test } : {} });
+    }
+
+    /**
+     * Add an option to the choice at the path of the clicked control, named by a known option
+     * or by the name typed next to it.
+     */
+    static async #addFlowOption(this: SR5ItemSheet, event: PointerEvent, target: HTMLElement) {
+        event.preventDefault();
+        const path = target.dataset.path;
+        if (!path?.startsWith('system.action.')) return;
+
+        const input = target.closest('.sr5-flow-node__add-option')?.querySelector<HTMLInputElement>('input[data-option-name]');
+        const key = FlowNodeEditorFlow.optionKey(target.dataset.option ?? input?.value ?? '');
+        if (!key) return;
+        if (foundry.utils.getProperty(this.item._source, `${path}.${key}`)) {
+            ui.notifications?.warn('SR5.Flow.Node.OptionExists', { localize: true });
+            return;
+        }
+
+        this.expandedFlowNodes.add(`${path}.${key}`);
+        await this.item.update({ [`${path}.${key}`]: {} });
+    }
+
+    /**
+     * Show or hide the body of an action node. Only the view changes, the sheet doesn't render again.
+     */
+    static #toggleFlowNode(this: SR5ItemSheet, event: PointerEvent, target: HTMLElement) {
+        // Controls within the header, like remove, act on their own.
+        if ((event.target as HTMLElement).closest('[data-action]') !== target) return;
+        const node = target.closest<HTMLElement>('.sr5-flow-node');
+        const path = node?.dataset.path;
+        if (!node || !path) return;
+
+        const expanded = !this.expandedFlowNodes.delete(path);
+        if (expanded) this.expandedFlowNodes.add(path);
+        node.classList.toggle('expanded', expanded);
+        target.setAttribute('aria-expanded', String(expanded));
+    }
+
+    /**
+     * Toggle adding armor to the pool of the action node at the path of the clicked control.
+     */
+    static async #toggleFlowNodeArmor(this: SR5ItemSheet, event: PointerEvent, target: HTMLElement) {
+        event.preventDefault();
+        const path = target.dataset.path;
+        if (!path?.startsWith('system.action.')) return;
+        const armor = !!foundry.utils.getProperty(this.item._source, `${path}.armor`);
+        await this.item.update({ [`${path}.armor`]: !armor });
+    }
+
+    /**
+     * Give the action node at the path of the clicked control damage of its own. An empty value takes all defaults.
+     */
+    static async #addFlowNodeDamage(this: SR5ItemSheet, event: PointerEvent, target: HTMLElement) {
+        event.preventDefault();
+        const path = target.dataset.path;
+        if (!path?.startsWith('system.action.')) return;
+        await this.item.update({ [`${path}.damage`]: {} });
+    }
+
+    static async #removeFlowNodeDamage(this: SR5ItemSheet, event: PointerEvent, target: HTMLElement) {
+        event.preventDefault();
+        const path = target.dataset.path;
+        if (!path?.startsWith('system.action.')) return;
+        await this.item.update({ [`${path}.damage`]: null });
+    }
+
+    /**
+     * Add an empty result to the action node at the path of the clicked control.
+     */
+    static async #addFlowNodeResult(this: SR5ItemSheet, event: PointerEvent, target: HTMLElement) {
+        event.preventDefault();
+        const path = target.dataset.path;
+        if (!path?.startsWith('system.action.')) return;
+        const results = (foundry.utils.getProperty(this.item._source, `${path}.results`) ?? []) as object[];
+        await this.item.update({ [`${path}.results`]: [...results, { action: '', label: '', value: '' }] });
+    }
+
+    static async #removeFlowNodeResult(this: SR5ItemSheet, event: PointerEvent, target: HTMLElement) {
+        event.preventDefault();
+        const path = target.dataset.path;
+        const index = Number(target.dataset.index);
+        if (!path?.startsWith('system.action.') || !Number.isInteger(index)) return;
+        const results = [...(foundry.utils.getProperty(this.item._source, `${path}.results`) ?? []) as object[]];
+        results.splice(index, 1);
+        await this.item.update({ [`${path}.results`]: results });
     }
 
     /**

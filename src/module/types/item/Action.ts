@@ -195,24 +195,28 @@ Object.assign(FlowRelations, {
         // An opposed node below one is someone else defending against the same test, like on a miss.
         children: ['resist', 'followed', 'before', 'opposed'],
         preset: { actor: 'other', when: ['always'], mode: 'prompt', damage: 'incoming' },
+        icon: 'fa-shield-halved',
     },
     // Soaking incoming damage. Under opposed it's the defender, directly under the root each target.
     resist: {
         fields: NodeFields,
         children: ['followed'],
         preset: { actor: 'same', rootActor: 'other', when: ['hit'], rootWhen: ['success'], mode: 'auto', damage: 'incoming' },
+        icon: 'fa-heart-pulse',
     },
     // Tests following the parent for the same actor: drain, fading, biofeedback.
     followed: {
         fields: NodeFields,
         children: ['resist'],
         preset: { actor: 'same', when: ['always'], mode: 'auto', damage: 'own' },
+        icon: 'fa-arrow-turn-down',
     },
     // Runs before its parent, which waits until a node within releases it. Touch, pool splits.
     before: {
         fields: NodeFields,
         children: ['option', 'opposed', 'followed', 'before'],
         preset: { actor: 'same', when: ['always'], mode: 'prompt', damage: 'none', timing: 'before' },
+        icon: 'fa-hourglass-start',
     },
     // The options of a choice, keyed by option name. A node runs when its option is chosen.
     option: {
@@ -220,12 +224,14 @@ Object.assign(FlowRelations, {
         children: ['opposed', 'resist', 'followed'],
         map: true,
         preset: { actor: 'other', when: [], mode: 'prompt', damage: 'none' },
+        icon: 'fa-code-branch',
     },
     // Teamwork assistants, rolling before the leader. SR5#49.
     assist: {
         fields: NodeFields,
         children: ['followed'],
         preset: { actor: 'allies', when: ['always'], mode: 'prompt', damage: 'none', timing: 'before' },
+        icon: 'fa-people-group',
     },
 } satisfies Record<string, FlowRelation>);
 

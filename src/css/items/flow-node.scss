@@ -1,0 +1,208 @@
+// The action node tree editor on the item sheet details tab. See templates/v2/item/tabs/details/flow-node.hbs.
+.sr5v2.item {
+    .sr5-flow-nodes {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 0.25rem;
+        padding: 0.25rem 0;
+    }
+
+    .sr5-flow-node {
+        --flow-node-accent: var(--sr5-theme-label);
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 0.125rem;
+        border-left: 3px solid var(--flow-node-accent);
+        border-radius: 3px;
+        background: var(--sr5-theme-surface-subtle);
+
+        &[data-relation='resist'],
+        &[data-relation='followed'] {
+            --flow-node-accent: var(--sr5-theme-text-secondary);
+        }
+
+        &[data-relation='before'],
+        &[data-relation='option'] {
+            --flow-node-accent: var(--sr5-theme-glitch-a);
+        }
+
+        &[data-relation='assist'] {
+            --flow-node-accent: var(--sr5-theme-success);
+        }
+
+        // Optional nodes without a test do nothing yet.
+        &.inactive > .sr5-flow-node__header {
+            opacity: 0.65;
+        }
+    }
+
+    .sr5-flow-node__header {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        gap: 0.4rem;
+        min-height: 1.75rem;
+        padding: 0.125rem 0.5rem;
+        cursor: pointer;
+        user-select: none;
+
+        &:hover,
+        &:focus-visible {
+            background: var(--sr5-theme-surface-elevated);
+        }
+
+        .sr5-flow-node__caret {
+            flex: 0 0 auto;
+            width: 0.75rem;
+            font-size: var(--font-size-10);
+            color: var(--sr5-theme-text-muted);
+            transition: transform 120ms ease;
+        }
+
+        .sr5-flow-node__icon {
+            flex: 0 0 auto;
+            color: var(--flow-node-accent);
+        }
+
+        .sr5-flow-node__label {
+            flex: 0 0 auto;
+            font-weight: bold;
+            color: var(--sr5-theme-text-primary);
+        }
+
+        .sr5-flow-node__test {
+            flex: 0 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--sr5-theme-text-secondary);
+        }
+
+        .sr5-flow-node__chips {
+            display: flex;
+            flex: 1 1 auto;
+            flex-flow: row wrap;
+            justify-content: flex-end;
+            gap: 0.25rem;
+            min-width: 0;
+        }
+
+        .sr5-flow-node__warning-badge {
+            flex: 0 0 auto;
+            color: var(--sr5-theme-failure);
+            font-size: var(--font-size-12);
+            white-space: nowrap;
+        }
+
+        .item-control {
+            flex: 0 0 auto;
+        }
+    }
+
+    .sr5-flow-chip {
+        padding: 0 0.4rem;
+        border: 1px solid var(--sr5-theme-border);
+        border-radius: 0.75rem;
+        font-size: var(--font-size-11);
+        line-height: 1.25rem;
+        white-space: nowrap;
+        color: var(--sr5-theme-text-primary);
+
+        // Values a node takes from the preset of its relation.
+        &.preset {
+            border-style: dashed;
+            color: var(--sr5-theme-text-muted);
+        }
+    }
+
+    .sr5-flow-node__body {
+        display: none;
+        padding: 0.125rem 0.5rem 0.375rem 1.5rem;
+    }
+
+    .sr5-flow-node.expanded {
+        > .sr5-flow-node__header .sr5-flow-node__caret {
+            transform: rotate(90deg);
+        }
+
+        > .sr5-flow-node__body {
+            display: block;
+        }
+    }
+
+    .sr5-flow-node__section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.375rem;
+        padding-bottom: 0.125rem;
+        border-bottom: 1px solid var(--sr5-theme-border);
+        font-size: var(--font-size-11);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--sr5-theme-text-muted);
+
+        .item-control {
+            margin-left: auto;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+    }
+
+    .sr5-flow-node__checkboxes multi-checkbox {
+        display: flex;
+        flex-flow: row wrap;
+        gap: 0.125rem 0.75rem;
+    }
+
+    .sr5-flow-node__warning .hint {
+        color: var(--sr5-theme-failure);
+    }
+
+    input.sr5-formula {
+        font-family: var(--font-monospace, monospace);
+    }
+
+    // Child nodes hang below their parent, connected by a line in the parent's colour.
+    .sr5-flow-node__children {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 0.25rem;
+        margin-left: 1rem;
+        padding: 0 0 0.25rem 0.5rem;
+        border-left: 1px dashed var(--flow-node-accent);
+
+        &:empty {
+            display: none;
+        }
+    }
+
+    .sr5-flow-node__add {
+        display: flex;
+        flex-flow: row wrap;
+        align-items: center;
+        gap: 0.25rem 0.75rem;
+        padding: 0.125rem 0.25rem;
+        font-size: var(--font-size-12);
+
+        .item-control {
+            color: var(--sr5-theme-text-secondary);
+
+            &:hover {
+                color: var(--sr5-theme-text-primary);
+            }
+        }
+    }
+
+    .sr5-flow-node__add-option {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+
+        input[data-option-name] {
+            width: 8rem;
+            height: 1.5rem;
+        }
+    }
+}

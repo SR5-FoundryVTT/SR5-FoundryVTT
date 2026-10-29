@@ -68,6 +68,8 @@ export interface FlowRelation {
     /** Child nodes of this relation are stored as a map of nodes keyed by name, instead of a single node. */
     map?: boolean;
     preset?: FlowRelationPreset;
+    /** A Font Awesome icon class for the node editor, like `fa-shield-halved`. */
+    icon?: string;
 }
 
 /**

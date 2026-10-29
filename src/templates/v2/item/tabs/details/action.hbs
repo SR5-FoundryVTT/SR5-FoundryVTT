@@ -268,21 +268,16 @@
     {{/unless}}
 {{/if}}
 {{!-- The node tree of tests following and preceding this action. See FlowNodeEditorFlow. --}}
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label data-tooltip="SR5.Flow.Node.TreeHint">{{localize "SR5.Flow.Node.TreeTitle"}}</label>
+    </div>
+</div>
 <div class="sr5-flow-nodes">
     {{#each flowNodes.nodes as |node|}}
         {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/flow-node.hbs" node=node}}
     {{/each}}
     {{#if @root.isEditMode}}
-        {{#if flowNodes.addable.length}}
-            <div class="list-item sr5-flow-node__add">
-                <div class="list-item-col">
-                    {{#each flowNodes.addable as |add|}}
-                        <a class="item-control" data-action="addFlowNode" data-path="{{add.path}}" data-test="{{add.test}}">
-                            <i class="fas fa-plus"></i> {{localize add.label}}
-                        </a>
-                    {{/each}}
-                </div>
-            </div>
-        {{/if}}
+        {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/flow-node-add.hbs" addable=flowNodes.addable}}
     {{/if}}
 </div>

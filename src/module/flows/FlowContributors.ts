@@ -219,10 +219,6 @@ export const FlowContributors: Record<string, FlowContributor> = {
     },
 
     /**
-     * Spells and critter powers of touch range need contact with an unwilling target first. The
-     * spell is cast, then each target accepts or has to be touched before defending against it.
-     */
-    /**
      * Everyone taking part in a ritual takes its drain, the leader and each participant. SR5#296.
      */
     ritualParticipants(root, tree) {
@@ -232,6 +228,10 @@ export const FlowContributors: Record<string, FlowContributor> = {
         followed.actor = 'participants';
     },
 
+    /**
+     * Spells and critter powers of touch range need contact with an unwilling target first. The
+     * spell is cast, then each target accepts or has to be touched before defending against it.
+     */
     touch(root, tree) {
         // Tests created from data have their item once their documents are populated.
         const item = root.item ?? (root.data.sourceItemUuid ? fromUuidSync(root.data.sourceItemUuid) as SR5Item | null : null);

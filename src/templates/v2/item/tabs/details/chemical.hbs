@@ -25,9 +25,11 @@
         <div class="list-item-start skinny">
             <label>{{localize "SR5.Chemical.Vector"}}</label>
         </div>
-        <div class="list-item-col">
-            {{formInput fields.vectors value=source.vectors name=(concat path ".vectors") choices=@root.chemicalOptions.vectors localize=true
-                        type="checkboxes" rootId=@root.rootId disabled=@root.isPlayMode}}
+        <div class="list-item-col sr5-flow-node__checkboxes">
+            {{!-- ArrayField has no form input of its own. --}}
+            <multi-checkbox name="{{path}}.vectors"{{#if @root.isPlayMode}} disabled{{/if}}>
+                {{selectOptions @root.chemicalOptions.vectors selected=source.vectors localize=true}}
+            </multi-checkbox>
         </div>
     </div>
     <div class="list-item">

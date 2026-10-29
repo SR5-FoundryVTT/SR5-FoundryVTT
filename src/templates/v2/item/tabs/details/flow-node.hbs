@@ -1,140 +1,335 @@
 {{!--
     One node of an actions node tree, with its children. See FlowNodeEditorFlow.
 
+    The header sums the node up and opens its body. Child nodes show below the body, open or not.
+
     Expects:
     - node: FlowNodeView
 --}}
-<div class="sr5-flow-node" data-path="{{node.path}}" data-relation="{{node.relation}}" style="--flow-node-depth: {{node.depth}}">
-    <div class="list-item list-item-header">
-        <div class="list-item-start skinny">
-            <label>{{localize node.label}}{{#unless (eq node.key node.relation)}} ({{node.key}}){{/unless}}</label>
-        </div>
+<div class="sr5-flow-node{{#if node.expanded}} expanded{{/if}}{{#unless node.active}} inactive{{/unless}}"
+     data-path="{{node.path}}" data-relation="{{node.relation}}" style="--flow-node-depth: {{node.depth}}">
+    <div class="sr5-flow-node__header" data-action="toggleFlowNode" role="button" tabindex="0" aria-expanded="{{#if node.expanded}}true{{else}}false{{/if}}">
+        <i class="fas fa-chevron-right sr5-flow-node__caret"></i>
+        <i class="fas {{node.icon}} sr5-flow-node__icon"></i>
+        <span class="sr5-flow-node__label">{{localize node.label}}</span>
+        {{#if node.testLabel}}<span class="sr5-flow-node__test">{{node.testLabel}}</span>{{/if}}
+        <span class="sr5-flow-node__chips">
+            {{#each node.chips as |chip|}}
+                <span class="sr5-flow-chip{{#if chip.preset}} preset{{/if}}" data-tooltip="{{localize chip.tooltip}}">{{chip.label}}</span>
+            {{/each}}
+        </span>
+        {{#if (and node.warnings.length @root.isEditMode)}}
+            <span class="sr5-flow-node__warning-badge" data-tooltip="{{node.warningText}}">
+                <i class="fas fa-triangle-exclamation"></i> {{node.warnings.length}}
+            </span>
+        {{/if}}
         {{#if (and node.removable @root.isEditMode)}}
-            <div class="list-item-end">
-                <a class="item-control" data-action="removeFlowNode" data-path="{{node.path}}"
-                   data-tooltip="SR5.Flow.Node.Remove"><i class="fas fa-trash"></i></a>
-            </div>
+            <a class="item-control" data-action="removeFlowNode" data-path="{{node.path}}"
+               data-tooltip="SR5.Flow.Node.Remove"><i class="fas fa-trash"></i></a>
         {{/if}}
     </div>
 
-    {{#if @root.isEditMode}}
-        {{#each node.warnings as |warning|}}
-            <div class="list-item sr5-flow-node__warning">
-                <div class="list-item-col hint"><i class="fas fa-triangle-exclamation"></i> {{localize warning}}</div>
-            </div>
-        {{/each}}
-    {{/if}}
-
-    <div class="list-item">
-        <div class="list-item-start skinny">
-            <label>{{localize "SR5.Flow.Node.Test"}}</label>
-        </div>
-        <div class="list-item-col">
-            {{formInput node.field.fields.test value=node.source.test name=(concat node.path ".test")
-                        options=(tests2Array node.tests) blank="" classes="short" rootId=@root.rootId
-                        disabled=(or @root.isPlayMode node.lockTest)}}
-        </div>
-    </div>
-
-    {{#if (or node.source.test node.source.kind)}}
-        <div class="list-item">
-            <div class="list-item-start skinny">
-                <label>{{localize "SR5.Roll"}}</label>
-            </div>
-            <div class="list-item-col">
-                {{#unless (and node.source.attribute2 (not node.source.skill))}}
-                    {{formInput node.field.fields.skill value=node.source.skill name=(concat node.path ".skill")
-                                options=(config2Array @root.activeSkills) localize=true blank=""
+    <div class="sr5-flow-node__body">
+        {{!-- Roll --}}
+        {{#if node.canBeChoice}}
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label data-tooltip="SR5.Flow.Node.KindHint">{{localize "SR5.Flow.Node.Kind"}}</label>
+                </div>
+                <div class="list-item-col">
+                    {{formInput node.field.fields.kind value=node.source.kind name=(concat node.path ".kind")
+                                options=@root.flowNodeOptions.kind localize=true blank="SR5.Flow.Node.Kinds.test"
                                 classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                    <label>+</label>
-                {{/unless}}
-                {{formInput node.field.fields.attribute value=node.source.attribute name=(concat node.path ".attribute")
-                            options=(config2Array @root.attributes) localize=true blank=""
-                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                {{#unless node.source.skill}}
-                    <label>+</label>
-                    {{formInput node.field.fields.attribute2 value=node.source.attribute2 name=(concat node.path ".attribute2")
+                </div>
+            </div>
+        {{/if}}
+
+        {{#if node.isChoice}}
+            <div class="list-item">
+                <div class="list-item-col hint">{{localize "SR5.Flow.Node.ChoiceHint"}}</div>
+            </div>
+        {{else}}
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label>{{localize "SR5.Flow.Node.Test"}}</label>
+                </div>
+                <div class="list-item-col">
+                    {{formInput node.field.fields.test value=node.source.test name=(concat node.path ".test")
+                                options=(tests2Array node.tests) blank="" classes="short" rootId=@root.rootId
+                                disabled=(or @root.isPlayMode node.lockTest)}}
+                </div>
+            </div>
+        {{/if}}
+        {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/flow-node-warnings.hbs" warnings=node.sectionWarnings.roll}}
+
+        {{#if (and node.source.test (not node.isChoice))}}
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label>{{localize "SR5.Roll"}}</label>
+                </div>
+                <div class="list-item-col">
+                    {{#unless (and node.source.attribute2 (not node.source.skill))}}
+                        {{formInput node.field.fields.skill value=node.source.skill name=(concat node.path ".skill")
+                                    options=(config2Array @root.activeSkills) localize=true blank=""
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        <label>+</label>
+                    {{/unless}}
+                    {{formInput node.field.fields.attribute value=node.source.attribute name=(concat node.path ".attribute")
                                 options=(config2Array @root.attributes) localize=true blank=""
                                 classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                {{/unless}}
-                <label>+</label>
-                {{formInput node.field.fields.mod value=node.source.mod name=(concat node.path ".mod")
-                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                <label data-tooltip="SR5.Flow.Node.ArmorHint">{{localize "SR5.Armor.label"}}</label>
-                {{formInput node.field.fields.armor value=node.source.armor name=(concat node.path ".armor")
+                    {{#unless node.source.skill}}
+                        <label>+</label>
+                        {{formInput node.field.fields.attribute2 value=node.source.attribute2 name=(concat node.path ".attribute2")
+                                    options=(config2Array @root.attributes) localize=true blank=""
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{/unless}}
+                    <label>+</label>
+                    {{formInput node.field.fields.mod value=node.source.mod name=(concat node.path ".mod")
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    <label>+</label>
+                    <a class="action-roll-icon" data-tooltip="SR5.Flow.Node.ArmorHint" data-path="{{node.path}}"
+                        {{#if @root.isEditMode}} data-action="toggleFlowNodeArmor" {{else}} disabled {{/if}}>
+                        <i class="{{#if node.source.armor}}fas{{else}}far{{/if}} fa-shield"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label data-tooltip="SR5.Flow.Node.PoolFormulaHint">{{localize "SR5.Flow.Node.PoolFormula"}}</label>
+                </div>
+                <div class="list-item-col">
+                    {{formInput node.field.fields.pool.fields.formula value=node.source.pool.formula name=(concat node.path ".pool.formula")
+                                placeholder="@item.force * 2" classes="sr5-formula" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </div>
+            </div>
+
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label>{{localize "SR5.Limit"}}</label>
+                </div>
+                <div class="list-item-col">
+                    {{formInput node.field.fields.limit.fields.attribute value=node.source.limit.attribute name=(concat node.path ".limit.attribute")
+                                options=(config2Array @root.limits) localize=true blank=""
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    <label>+</label>
+                    {{formInput node.field.fields.limit.fields.base value=node.source.limit.base name=(concat node.path ".limit.base")
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formInput node.field.fields.limit.fields.formula value=node.source.limit.formula name=(concat node.path ".limit.formula")
+                                placeholder=(localize "SR5.Flow.Node.Formula") classes="sr5-formula" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </div>
+            </div>
+
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label>{{localize "SR5.Threshold"}}</label>
+                </div>
+                <div class="list-item-col">
+                    {{formInput node.field.fields.threshold.fields.base value=node.source.threshold.base name=(concat node.path ".threshold.base")
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formInput node.field.fields.threshold.fields.formula value=node.source.threshold.formula name=(concat node.path ".threshold.formula")
+                                placeholder=(localize "SR5.Flow.Node.Formula") classes="sr5-formula" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </div>
+            </div>
+        {{/if}}
+
+        {{!-- When it runs --}}
+        <div class="sr5-flow-node__section-title">{{localize "SR5.Flow.Node.Sections.when"}}</div>
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="SR5.Flow.Node.ActorHint">{{localize "SR5.Flow.Node.Actor"}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput node.field.fields.actor value=node.source.actor name=(concat node.path ".actor")
+                            options=@root.flowNodeOptions.actor localize=true blank=node.presetLabels.actor classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{#if (eq node.effective.actor "none")}}
+                    <label data-tooltip="SR5.Flow.Node.RollerHint">{{localize "SR5.Flow.Node.Roller"}}</label>
+                    {{formInput node.field.fields.roller value=node.source.roller name=(concat node.path ".roller")
+                                options=@root.flowNodeOptions.roller localize=true blank="" classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{/if}}
+                <label data-tooltip="SR5.Flow.Node.ModeHint">{{localize "SR5.Flow.Node.Mode"}}</label>
+                {{formInput node.field.fields.mode value=node.source.mode name=(concat node.path ".mode")
+                            options=@root.flowNodeOptions.mode localize=true blank=node.presetLabels.mode classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+        {{#unless (eq node.relation "option")}}
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label data-tooltip="SR5.Flow.Node.WhenHint">{{localize "SR5.Flow.Node.When"}}</label>
+                </div>
+                <div class="list-item-col sr5-flow-node__checkboxes">
+                    {{!-- ArrayField has no form input of its own. --}}
+                    <multi-checkbox name="{{node.path}}.when"{{#if @root.isPlayMode}} disabled{{/if}}>
+                        {{selectOptions @root.flowNodeOptions.outcomes selected=node.source.when localize=true}}
+                    </multi-checkbox>
+                    {{#unless node.source.when.length}}<span class="hint">{{node.presetLabels.when}}</span>{{/unless}}
+                </div>
+            </div>
+        {{/unless}}
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="SR5.Flow.Node.ConditionHint">{{localize "SR5.Flow.Node.Condition"}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput node.field.fields.condition value=node.source.condition name=(concat node.path ".condition")
+                            options=@root.flowNodeOptions.conditions blank="" classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                <label data-tooltip="SR5.Flow.Node.PrimaryHint">{{localize "SR5.Flow.Node.Primary"}}</label>
+                {{formInput node.field.fields.primary value=node.source.primary name=(concat node.path ".primary")
                             rootId=@root.rootId disabled=@root.isPlayMode}}
             </div>
         </div>
+        {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/flow-node-warnings.hbs" warnings=node.sectionWarnings.when}}
 
-        <div class="list-item">
-            <div class="list-item-start skinny">
-                <label data-tooltip="SR5.Flow.Node.PoolFormulaHint">{{localize "SR5.Flow.Node.PoolFormula"}}</label>
-            </div>
-            <div class="list-item-col">
-                {{formInput node.field.fields.pool.fields.formula value=node.source.pool.formula name=(concat node.path ".pool.formula")
-                            placeholder="@item.force * 2" rootId=@root.rootId disabled=@root.isPlayMode}}
-            </div>
-        </div>
-
-        <div class="list-item">
-            <div class="list-item-start skinny">
-                <label>{{localize "SR5.Limit"}}</label>
-            </div>
-            <div class="list-item-col">
-                {{formInput node.field.fields.limit.fields.attribute value=node.source.limit.attribute name=(concat node.path ".limit.attribute")
-                            options=(config2Array @root.limits) localize=true blank=""
-                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                <label>+</label>
-                {{formInput node.field.fields.limit.fields.base value=node.source.limit.base name=(concat node.path ".limit.base")
-                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                {{formInput node.field.fields.limit.fields.formula value=node.source.limit.formula name=(concat node.path ".limit.formula")
-                            placeholder=(localize "SR5.Flow.Node.Formula") rootId=@root.rootId disabled=@root.isPlayMode}}
-            </div>
-        </div>
-
-        <div class="list-item">
-            <div class="list-item-start skinny">
-                <label>{{localize "SR5.Threshold"}}</label>
-            </div>
-            <div class="list-item-col">
-                {{formInput node.field.fields.threshold.fields.base value=node.source.threshold.base name=(concat node.path ".threshold.base")
-                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                {{formInput node.field.fields.threshold.fields.formula value=node.source.threshold.formula name=(concat node.path ".threshold.formula")
-                            placeholder=(localize "SR5.Flow.Node.Formula") rootId=@root.rootId disabled=@root.isPlayMode}}
-            </div>
-        </div>
-
-        {{#if @root.isEditMode}}
+        {{#if node.insideBefore}}
             <div class="list-item">
                 <div class="list-item-start skinny">
-                    <label data-tooltip="SR5.Flow.Node.ActorHint">{{localize "SR5.Flow.Node.Actor"}}</label>
+                    <label data-tooltip="SR5.Flow.Node.ReleasesHint">{{localize "SR5.Flow.Node.Releases"}}</label>
                 </div>
-                <div class="list-item-col">
-                    {{formInput node.field.fields.actor value=node.source.actor name=(concat node.path ".actor")
-                                options=@root.flowNodeOptions.actor localize=true blank="SR5.Flow.Node.Preset" classes="short" rootId=@root.rootId}}
-                    <label data-tooltip="SR5.Flow.Node.ModeHint">{{localize "SR5.Flow.Node.Mode"}}</label>
-                    {{formInput node.field.fields.mode value=node.source.mode name=(concat node.path ".mode")
-                                options=@root.flowNodeOptions.mode localize=true blank="SR5.Flow.Node.Preset" classes="short" rootId=@root.rootId}}
+                <div class="list-item-col sr5-flow-node__checkboxes">
+                    <multi-checkbox name="{{node.path}}.releases"{{#if @root.isPlayMode}} disabled{{/if}}>
+                        {{selectOptions @root.flowNodeOptions.outcomes selected=node.source.releases localize=true}}
+                    </multi-checkbox>
                 </div>
             </div>
         {{/if}}
-    {{/if}}
+        {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/flow-node-warnings.hbs" warnings=node.sectionWarnings.releases}}
 
-    {{#each node.children as |child|}}
-        {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/flow-node.hbs" node=child}}
-    {{/each}}
-
-    {{#if @root.isEditMode}}
-        {{#if node.addable.length}}
-            <div class="list-item sr5-flow-node__add">
+        {{#if node.isOpposed}}
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label data-tooltip="SR5.Flow.NoDefenseHint">{{localize "SR5.Flow.NoDefense"}}</label>
+                </div>
                 <div class="list-item-col">
-                    {{#each node.addable as |add|}}
-                        <a class="item-control" data-action="addFlowNode" data-path="{{add.path}}" data-test="{{add.test}}">
-                            <i class="fas fa-plus"></i> {{localize add.label}}
-                        </a>
-                    {{/each}}
+                    <label data-tooltip="SR5.Flow.Node.NoDefenseAllowedHint">{{localize "SR5.Flow.Node.NoDefenseAllowed"}}</label>
+                    {{formInput node.field.fields.noDefense.fields.allowed value=node.source.noDefense.allowed name=(concat node.path ".noDefense.allowed")
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                    <label data-tooltip="SR5.Flow.Node.NoDefenseConditionHint">{{localize "SR5.Flow.Node.NoDefenseCondition"}}</label>
+                    {{formInput node.field.fields.noDefense.fields.condition value=node.source.noDefense.condition name=(concat node.path ".noDefense.condition")
+                                options=@root.flowNodeOptions.conditions blank="" classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                 </div>
             </div>
         {{/if}}
-    {{/if}}
+
+        {{!-- Damage --}}
+        <div class="sr5-flow-node__section-title">
+            {{localize "SR5.Flow.Node.Sections.damage"}}
+            {{#if @root.isEditMode}}
+                {{#if node.hasDamage}}
+                    <a class="item-control" data-action="removeFlowNodeDamage" data-path="{{node.path}}" data-tooltip="SR5.Flow.Node.RemoveDamage"><i class="fas fa-minus"></i></a>
+                {{else}}
+                    <a class="item-control" data-action="addFlowNodeDamage" data-path="{{node.path}}" data-tooltip="SR5.Flow.Node.AddDamageHint"><i class="fas fa-plus"></i> {{localize "SR5.Flow.Node.AddDamage"}}</a>
+                {{/if}}
+            {{/if}}
+        </div>
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="SR5.Flow.Node.DamageModeHint">{{localize "SR5.Flow.Node.DamageMode"}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput node.field.fields.damageMode value=node.source.damageMode name=(concat node.path ".damageMode")
+                            options=@root.flowNodeOptions.damageMode localize=true blank=node.presetLabels.damage classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                <label data-tooltip="SR5.Flow.Node.DamageScaleHint">×</label>
+                {{formInput node.field.fields.damageScale.fields.factor value=node.source.damageScale.factor name=(concat node.path ".damageScale.factor")
+                            step=0.5 classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formInput node.field.fields.damageScale.fields.round value=node.source.damageScale.round name=(concat node.path ".damageScale.round")
+                            options=@root.flowNodeOptions.round localize=true classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                <label data-tooltip="SR5.Flow.Node.UnresistedHint">{{localize "SR5.Flow.Node.Unresisted"}}</label>
+                {{formInput node.field.fields.unresisted value=node.source.unresisted name=(concat node.path ".unresisted")
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+        {{#if node.hasDamage}}
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label>{{localize "SR5.Flow.Node.Damage"}}</label>
+                </div>
+                <div class="list-item-col">
+                    {{formInput node.field.fields.damage.fields.base value=node.source.damage.base name=(concat node.path ".damage.base")
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formInput node.field.fields.damage.fields.type.fields.base value=node.source.damage.type.base name=(concat node.path ".damage.type.base")
+                                localize=true classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    <label>{{localize "SR5.AP"}}</label>
+                    {{formInput node.field.fields.damage.fields.ap.fields.base value=node.source.damage.ap.base name=(concat node.path ".damage.ap.base")
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formInput node.field.fields.damage.fields.element.fields.base value=node.source.damage.element.base name=(concat node.path ".damage.element.base")
+                                localize=true classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </div>
+            </div>
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label data-tooltip="SR5.Flow.Node.DamageFormulaHint">{{localize "SR5.Flow.Node.DamageFormula"}}</label>
+                </div>
+                <div class="list-item-col">
+                    {{formInput node.field.fields.damage.fields.formula value=node.source.damage.formula name=(concat node.path ".damage.formula")
+                                placeholder="@parent.netHits" classes="sr5-formula" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </div>
+            </div>
+        {{/if}}
+        {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/flow-node-warnings.hbs" warnings=node.sectionWarnings.damage}}
+
+        {{!-- Effects and results --}}
+        <div class="sr5-flow-node__section-title">{{localize "SR5.Flow.Node.Sections.effects"}}</div>
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="SR5.Flow.Node.EffectsHint">{{localize "SR5.Flow.Node.Effects"}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput node.field.fields.effects.fields.select value=node.source.effects.select name=(concat node.path ".effects.select")
+                            options=@root.flowNodeOptions.effectSelect localize=true blank="SR5.Flow.Node.EffectSelectDefault" classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+        {{#if (eq node.source.effects.select "ids")}}
+            <div class="list-item">
+                <div class="list-item-start skinny"></div>
+                <div class="list-item-col sr5-flow-node__checkboxes">
+                    {{#if @root.flowNodeOptions.effects.length}}
+                        <multi-checkbox name="{{node.path}}.effects.ids"{{#if @root.isPlayMode}} disabled{{/if}}>
+                            {{selectOptions @root.flowNodeOptions.effects selected=node.source.effects.ids}}
+                        </multi-checkbox>
+                    {{else}}
+                        <span class="hint">{{localize "SR5.Flow.Node.NoTargetedEffects"}}</span>
+                    {{/if}}
+                </div>
+            </div>
+        {{/if}}
+
+        {{#each node.source.results as |result index|}}
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label>{{localize "SR5.Flow.Node.Result"}}</label>
+                </div>
+                <div class="list-item-col">
+                    {{formInput ../node.field.fields.results.element.fields.action value=result.action name=(concat ../node.path ".results." index ".action")
+                                options=@root.flowNodeOptions.resultAction localize=true blank="" classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formInput ../node.field.fields.results.element.fields.value value=result.value name=(concat ../node.path ".results." index ".value")
+                                placeholder=(localize "SR5.Flow.Node.ResultValue") classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formInput ../node.field.fields.results.element.fields.label value=result.label name=(concat ../node.path ".results." index ".label")
+                                placeholder=(localize "SR5.Flow.Node.ResultLabel") rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{#if @root.isEditMode}}
+                        <a class="item-control" data-action="removeFlowNodeResult" data-path="{{../node.path}}" data-index="{{index}}"
+                           data-tooltip="SR5.Flow.Node.RemoveResult"><i class="fas fa-trash"></i></a>
+                    {{/if}}
+                </div>
+            </div>
+        {{/each}}
+        {{#if @root.isEditMode}}
+            <div class="list-item">
+                <div class="list-item-col">
+                    <a class="item-control" data-action="addFlowNodeResult" data-path="{{node.path}}" data-tooltip="SR5.Flow.Node.AddResultHint">
+                        <i class="fas fa-plus"></i> {{localize "SR5.Flow.Node.AddResult"}}
+                    </a>
+                </div>
+            </div>
+        {{/if}}
+    </div>
+
+    <div class="sr5-flow-node__children">
+        {{#each node.children as |child|}}
+            {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/flow-node.hbs" node=child}}
+        {{/each}}
+
+        {{#if @root.isEditMode}}
+            {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/flow-node-add.hbs" addable=node.addable}}
+        {{/if}}
+    </div>
 </div>

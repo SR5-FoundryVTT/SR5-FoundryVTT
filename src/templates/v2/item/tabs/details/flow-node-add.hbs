@@ -1,0 +1,30 @@
+{{!--
+    Controls adding nodes below an action node: one per relation key not set yet, and named choice options.
+
+    Expects:
+    - addable: FlowNodeAddable[]
+--}}
+{{#if addable.length}}
+    <div class="sr5-flow-node__add">
+        {{#each addable as |add|}}
+            {{#if add.map}}
+                <span class="sr5-flow-node__add-option">
+                    <i class="fas {{add.icon}}"></i>
+                    {{#each @root.flowNodeOptions.knownOptions as |option|}}
+                        <a class="item-control" data-action="addFlowOption" data-path="{{add.path}}" data-option="{{option.value}}">
+                            <i class="fas fa-plus"></i> {{option.label}}
+                        </a>
+                    {{/each}}
+                    <input type="text" data-option-name placeholder="{{localize "SR5.Flow.Node.OptionName"}}" aria-label="{{localize "SR5.Flow.Node.OptionName"}}">
+                    <a class="item-control" data-action="addFlowOption" data-path="{{add.path}}" data-tooltip="SR5.Flow.Node.AddOptionNamed">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                </span>
+            {{else}}
+                <a class="item-control sr5-flow-node__add-button" data-action="addFlowNode" data-path="{{add.path}}" data-test="{{add.test}}" data-relation="{{add.relation}}">
+                    <i class="fas fa-plus"></i> <i class="fas {{add.icon}}"></i> {{localize add.label}}
+                </a>
+            {{/if}}
+        {{/each}}
+    </div>
+{{/if}}

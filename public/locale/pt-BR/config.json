@@ -2083,6 +2083,94 @@
                 "ModeHint": "Executar imediatamente, ou mostrar um botão na mensagem de chat.",
                 "Preset": "Padrão",
                 "Remove": "Remover este teste e tudo depois dele",
+                "TreeTitle": "Testes e resultados",
+                "TreeHint": "Os testes antes e depois desta ação, quem os rola e no que resultam. Clique em um teste para abrir suas configurações.",
+                "Kind": "Tipo",
+                "KindHint": "Um teste, ou uma escolha que o outro lado faz, como aceitar um feitiço de toque ou resistir a ele.",
+                "ChoiceHint": "As opções abaixo são o que a escolha oferece. Cada opção executa os testes dentro dela.",
+                "When": "Acontece em",
+                "WhenHint": "Resultados do teste acima que permitem que isto aconteça. Qualquer um deles basta. Vazio usa o padrão.",
+                "Condition": "Somente se",
+                "ConditionHint": "Uma regra que precisa valer para isto acontecer, como o alvo sofrer biofeedback.",
+                "Primary": "Principal",
+                "PrimaryHint": "Fórmulas que leem @primary pegam seus valores deste teste. O padrão é a própria ação.",
+                "Roller": "Rolado por",
+                "RollerHint": "Quem rola um teste que nenhum ator faz, como a Força de um espírito.",
+                "Releases": "Libera em",
+                "ReleasesHint": "Resultados deste teste que deixam o teste que vem depois prosseguir.",
+                "NoDefenseAllowed": "Pode dispensar",
+                "NoDefenseAllowedHint": "O defensor pode escolher não se defender.",
+                "NoDefenseCondition": "Nunca defende se",
+                "NoDefenseConditionHint": "Uma regra sob a qual o defensor não tem defesa alguma, como não perceber o ataque.",
+                "Damage": "Dano",
+                "DealsDamage": "Dano",
+                "AddDamage": "Dano próprio",
+                "AddDamageHint": "Dá a este teste um dano próprio, como uma retaliação ou a Potência de uma toxina.",
+                "RemoveDamage": "Remover o dano próprio",
+                "DamageMode": "Trabalha com",
+                "DamageModeHint": "Com qual dano este teste lida: o próprio, o que o teste acima repassa, ou os quadrados de fato sofridos.",
+                "DamageScaleHint": "Multiplica o dano e arredonda. Como metade dos quadrados que um veículo conectado sofreu.",
+                "Unresisted": "Sem resistência",
+                "UnresistedHint": "O dano que isto aplica não pode ser resistido.",
+                "Effects": "Aplica",
+                "EffectsHint": "Quais efeitos do item isto aplica a quem ele atinge.",
+                "EffectSelectDefault": "Padrão: efeitos em alvos",
+                "NoTargetedEffects": "Este item não tem efeitos que se aplicam a atores alvejados.",
+                "Result": "Resultado",
+                "ResultValue": "Valor",
+                "ResultLabel": "Rótulo",
+                "AddResult": "Adicionar resultado",
+                "AddResultHint": "Algo que este teste faz ao terminar, como alterar a iniciativa.",
+                "RemoveResult": "Remover resultado",
+                "OptionName": "Nome da opção",
+                "AddOptionNamed": "Adicionar uma opção com este nome",
+                "OptionExists": "Esta escolha já tem uma opção com esse nome.",
+                "Sections": {
+                    "when": "Quando acontece",
+                    "damage": "Dano",
+                    "effects": "Efeitos e resultados"
+                },
+                "Kinds": {
+                    "test": "Teste",
+                    "choice": "Escolha"
+                },
+                "Outcomes": {
+                    "always": "Sempre",
+                    "success": "Sucesso",
+                    "failure": "Falha",
+                    "hit": "Acerto",
+                    "miss": "Erro",
+                    "tie": "Empate"
+                },
+                "Rollers": {
+                    "gm": "Mestre",
+                    "auto": "Automaticamente"
+                },
+                "DamageModes": {
+                    "own": "O próprio",
+                    "incoming": "Recebido",
+                    "taken": "Quadrados sofridos",
+                    "none": "Nenhum"
+                },
+                "Round": {
+                    "up": "Arredondar para cima",
+                    "down": "Arredondar para baixo"
+                },
+                "EffectSelect": {
+                    "all": "Todos os efeitos em alvos",
+                    "ids": "Efeitos escolhidos",
+                    "none": "Nenhum"
+                },
+                "ResultActions": {
+                    "modifyCombatantInit": "Alterar iniciativa",
+                    "forceReboot": "Forçar reinicialização",
+                    "placeMarks": "Colocar marcas"
+                },
+                "Conditions": {
+                    "takesBiofeedback": "Sofre biofeedback",
+                    "hasElementalEffect": "Tem efeito elemental",
+                    "dartPenetrates": "Dardo penetra"
+                },
                 "Warnings": {
                     "NoTest": "Sem um teste isto não faz nada.",
                     "NoRelease": "Nada aqui libera o teste que vem depois, então esse teste nunca acontece. Defina o que o libera em um teste dentro deste.",
