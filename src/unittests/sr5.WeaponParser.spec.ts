@@ -169,7 +169,7 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
             }
         });
 
-        it("Parses short fire elemental damage", () => {
+        it("Parses flechette damage without an element", () => {
             const output = mut.parseDamageData("8P(f)", 0);
             assert.deepEqual(output, DataDefaults.createData('damage', {
                 base: 8,
@@ -178,11 +178,21 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
                     base: 'physical',
                     value: 'physical',
                 },
-                element: {
-                    base: 'fire',
-                    value: 'fire',
-                },
             }));
+        });
+
+        it("Parses damage followed by blast dropoff or radius", () => {
+            const fragmentation = mut.parseDamageData("18P(f) (-1/m)", 0);
+            assert.strictEqual(fragmentation.base, 18);
+            assert.strictEqual(fragmentation.element.base, '');
+
+            const flashBang = mut.parseDamageData("10S (10m Radius)", 0);
+            assert.strictEqual(flashBang.base, 10);
+            assert.strictEqual(flashBang.type.base, 'stun');
+
+            const cocktail = mut.parseDamageData("9P (Fire) (10m Radius)", 0);
+            assert.strictEqual(cocktail.base, 9);
+            assert.strictEqual(cocktail.element.base, 'fire');
         });
 
         it("Leaves unsupported complex damage at defaults", () => {
@@ -300,6 +310,17 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(output.type, 'physical');
             assert.strictEqual(output.dropoff, -2);
             assert.strictEqual(output.radius, 8);
+        });
+
+        it("Parses actor imported flechette and spaced elemental blast damage", () => {
+            const flechette = actorWeaponParser.parseChummerDamage("18P(f) (-1/m)", "18P(f) (-1/m)")!;
+            assert.strictEqual(flechette.damage, 18);
+            assert.strictEqual(flechette.element, '');
+
+            const cocktail = actorWeaponParser.parseChummerDamage("9P (Fire) (10m Radius)", "9P (Fire) (10m Radius)")!;
+            assert.strictEqual(cocktail.damage, 9);
+            assert.strictEqual(cocktail.element, 'fire');
+            assert.strictEqual(cocktail.radius, 10);
         });
 
         it("Falls back to damage_english when rawdamage cannot be translated", () => {

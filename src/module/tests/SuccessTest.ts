@@ -293,7 +293,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Any Test should be usable simply by instantiating it with empty TestData
      */
     _prepareData(data: DeepPartial<T>, options: Partial<TestOptions>): T {
-        const prepared = SuccessTest.applyStructuralDefaults(data);
+        const prepared: SuccessTestData = SuccessTest.applyStructuralDefaults(data);
         prepared.type ??= this.type;
 
         // Store the current users targeted token ids for later use.
@@ -322,7 +322,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * The tests roll mode can be given by specific option, action setting or global configuration.
      * @param options The test options for the whole test
      */
-    _prepareRollMode(data: DeepPartial<T>, options: Partial<TestOptions>): ChatMessage.Mode {
+    _prepareRollMode(data: DeepPartial<SuccessTestData>, options: Partial<TestOptions>): ChatMessage.Mode {
         if (options.rollMode != null) return options.rollMode;
         if (data?.action?.roll_mode) return data.action.roll_mode as ChatMessage.Mode;
         else return game.settings.get(CORE_NAME, 'messageMode') as ChatMessage.Mode;

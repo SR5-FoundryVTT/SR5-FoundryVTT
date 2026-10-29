@@ -27,7 +27,7 @@ The main npm commands are:
 Stop Foundry before running `npm run build:db` or `npm run package`. A running Foundry process can lock the LevelDB pack
 directories. Normal application builds do not compile packs and are safe to run independently.
 
-The resulting application used for FoundryVTT will only use contents in `/dist`.
+The resulting application used for FoundryVTT loads its code, styles, templates, and locale files from `/dist`, and its compendium packs from `/packs`.
 
 Development builds include the Quench registration code. Production builds exclude it.
 
@@ -119,11 +119,11 @@ The standalone project README is the source of truth for citation tooling setup 
 # System Architecture
 A broad overview of the different areas of the shadowrun5e system. For more explanations around system specific concepts see `System Concepts`.
 ## Folder structure
-Everything needed to execute the system within foundry must live under 
+The generated application code and assets needed to execute the system are under
 * `/dist`
-FoundryVTT compendium packs are used as is:
+FoundryVTT compendium packs are loaded from the root, outside of `/dist`, as declared in `system.json`:
 - `/packs`
-Data that needs to be copied into `/dist` as is during build:
+Data that is copied into `/dist` as is during build:
 * `/public`
 Source code 
 - `/src`
@@ -139,10 +139,11 @@ To include translation changes to `/public` language files in the system, create
 ## Separation
 More and more parts of the system move to separate modules organized into these broad layers:
 All following folder reference are relative to src\module\*
-* Rules layer. Shouldn't contain any references to Foundry objects. At best system objects should be used (like a PartsList)
+* App / sheet layer. Handle interface operations, dialogs, application windows, chat message creation, and so forth. Sheets live in `*/sheets/`, application code in `apps/`, and templates in `src/templates/`.
+* Data prep layer. Derives document data from system data and rules in `prepareBaseData` and `prepareDerivedData` of `SR5Actor` and `SR5Item`. These live in `actor\prep\` and `item\prep\`. Do not write documents or use UI APIs here.
+* Flow layer. Should use the rules modules to introduce an order of operations for them and collect and output information. This will contain Foundry objects. These live in item\flows, actor\flows, tests\flows and effect\flows.
+* Rules layer. Should avoid direct Foundry objects. System document types (like SR5Actor or SR5Item) and system objects (like a PartsList) are preferred. Some rules still use `foundry.utils` helpers, so keep new Foundry dependencies to a minimum.
   These live in the rules\ folder
-* Flow layer. Should use the rules modules to introduce an order of operations for them and collect and output information. This will contain Foundry objects. These live in item\flows and actor\flows.
-* Application layer. Handle interface operations. Dialogs. Application windows. Chat Message creation and so forth.
 * Tests layer. Whenever any Shadowrun test is implemented it should extend the SuccessTest class. All tests live in the tests\ folder. See `Test Implementation` for more details.
 
 Additional separations are made for
@@ -247,9 +248,11 @@ Everything is based on the `SuccessTest` class, which defines general testing fl
 
 The different Shadowrun 5 test types are created using subclasses:
 - OpposedTest
-- TeamworkTest
+
+`TeamworkTest` is not a `SuccessTest` subclass. It is a standalone class in `actor\flows\TeamworkFlow.ts`.
+
 ### Test flow
-Triggering an active success test through an action will always show a dialog and chat message, both of which are optional.
+Triggering an active success test through an action shows a dialog and chat message by default. Either can be turned off with the `showDialog` and `showMessage` test options.
 
 Should the action define a followup test, it will be initiated immediately for the active user.
 
@@ -286,7 +289,7 @@ The shadowrun5e system has multiple ways of handling modifiers on actors, items 
 - actor local modifiers
 - situational modifiers
   
-To define what modifiers a Shadowrun 5e Test uses an `action` can define a set of modifiers to use. These modifiers will be taken using the actors `ModifiersFlow` handler, sitting in between tests and modifiers applied onto a document.
+To define what modifiers a Shadowrun 5e Test uses an `action` can define a set of modifiers to use. These modifiers will be taken using the actors `ModifierFlow` handler (`actor\flows\ModifierFlow.ts`), sitting in between tests and modifiers applied onto a document.
 ### Actor local modifiers
 The legacy modifiers are flat values for actors, which are taken as is and can be prepared during Document prepareData.
 
@@ -340,8 +343,8 @@ No world documents or live compendiums are updated, and no LevelDB packs are reb
 Stop Foundry before subsequently running `npm run build:db` or `npm run package`.
 The exporter stays separate from normal builds because it requires a running world.
 
-FoundryVTT uses nedb to implement their compendiums, internally called packs. These nedb's are build from scratch on each release and need source document json files to be built from.
+FoundryVTT stores its compendiums, internally called packs, as LevelDB databases. These LevelDB packs are built from scratch on each release and need source document json files to be built from.
 
 If changes are to be made on compendium items, you can either make those directly within their source file underneath `./packs/_source` or using Foundry GUI. To make these changes persistent, extract compendium content to their source using `node ./utils/packs.mjs package unpack`. Since source documents are stored using their name, be careful when changing that and compare their on disk name with expectations. Reserved filesystem basenames are exported with a leading `_` for portability, while the internal Foundry document name in the JSON stays unchanged.
 
-Since nedb packs aren't stored in git, changing pack contents will trigger changes for system compendiums as soon as the next GitHub release workflow is triggered.
+Since LevelDB packs aren't stored in git, changing pack contents will trigger changes for system compendiums as soon as the next GitHub release workflow is triggered.

@@ -58,6 +58,7 @@ export interface Gear {
     modfirewall?: { _TEXT: IntegerString | "{Rating}"; };
     modsleaze?: { _TEXT: IntegerString | "{Rating}"; };
     name: { _TEXT: string; };
+    notes?: { _TEXT: "Holds a separately purchased medkit up to Rating 4."; };
     page?: { _TEXT: IntegerString; };
     programs?: { _TEXT: IntegerString | "Rating" | "{Rating}+2"; };
     rating: { _TEXT: IntegerString | "{Parent Rating}"; };
@@ -79,6 +80,13 @@ export interface Gear {
         userange?: { _TEXT: "Holdouts" | "Light Pistols"; };
     };
     weight?: { _TEXT: IntegerString | "Rating"; };
+    wirelessbonus?: {
+        specificskill: OneOrMany<{
+            bonus: { _TEXT: IntegerString | "Rating"; };
+            condition?: { _TEXT: string; };
+            name: { _TEXT: "First Aid" | "Locksmith" | "Medicine" | "Perception"; };
+        }>;
+    };
     translate?: OneOrMany<{ _TEXT: string; }>;
     altpage?: OneOrMany<{ _TEXT: string; }>;
     altnameonpage?: OneOrMany<Empty>;

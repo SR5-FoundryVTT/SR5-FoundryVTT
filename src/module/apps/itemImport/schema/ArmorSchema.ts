@@ -36,6 +36,7 @@ export interface Armor {
     };
     source?: { _TEXT: IntegerString | "BB" | "CA" | "HAMG" | "HS" | "HT" | "KC" | "NF" | "RF" | "RG" | "SAG" | "SL" | "SR5" | "TCT"; };
     wirelessbonus?: {
+        fatigueresist?: { _TEXT: IntegerString; };
         limitmodifier?: {
             condition: { _TEXT: "LimitCondition_ClimbingTests" | "LimitCondition_IntimidationVisible" | "LimitCondition_Visible"; };
             limit: { _TEXT: "Physical" | "Social"; };
@@ -43,11 +44,13 @@ export interface Armor {
         };
         skillcategory?: {
             bonus: { _TEXT: IntegerString; };
-            name: { _TEXT: "Social" | "Social Active"; };
+            condition?: { _TEXT: "LimitCondition_CalmAtEmergency"; };
+            name: { _TEXT: "Social Active"; };
         };
         specificskill?: {
             bonus: { _TEXT: IntegerString; };
-            name: { _TEXT: "Survival"; };
+            condition?: { _TEXT: string; };
+            name: { _TEXT: "Sneaking" | "Survival" | "Swimming"; };
         };
     };
     translate?: OneOrMany<{ _TEXT: string; }>;
@@ -72,10 +75,15 @@ export interface Mod {
     required?: ConditionsSchema;
     source?: { _TEXT: "BB" | "BTB" | "CA" | "HAMG" | "HT" | "KC" | "RG" | "SL" | "SR5"; };
     wirelessbonus?: {
-        limitmodifier: {
+        limitmodifier?: {
             condition: { _TEXT: "LimitCondition_SkillsActivePerception"; };
             limit: { _TEXT: "Mental"; };
             value: { _TEXT: IntegerString; };
+        };
+        specificskill?: {
+            bonus: { _TEXT: "Rating"; };
+            condition: { _TEXT: "LimitCondition_TestSneakingThermal"; };
+            name: { _TEXT: "Sneaking"; };
         };
     };
     translate?: OneOrMany<{ _TEXT: string; }>;

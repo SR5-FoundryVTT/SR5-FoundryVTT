@@ -24,6 +24,7 @@ const ActiveEffectData = (baseChanges: foundry.data.ActiveEffectTypeDataModel.Ch
     onlyForEquipped: new BooleanField(),
     onlyForWireless: new BooleanField(),
     expiryAction:    new StringField({ required: true, initial: 'default', choices: ['default', 'delete', 'update'] }),
+    rating:          new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
     // How a copy applied by an action treats copies of the same effect already on the recipient.
     stacking:        new StringField({ required: true, initial: 'stack', choices: SR5.effectStacking }),
     // A duration value resolved once when an action applies a copy, like (6 - Body) hours. See FlowContext.
