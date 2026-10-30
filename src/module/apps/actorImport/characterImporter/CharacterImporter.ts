@@ -147,7 +147,7 @@ export class CharacterImporter {
     private static importBasicData(system: BlankCharacter['system'], chummerChar: ActorSchema) {
         if (chummerChar.metatype) {
             // Avoid i18n metatype field issues. Chummer metatype aren't lowercase but foundry system metatypes are.
-            system.metatype = chummerChar.metatype_english.toLowerCase() as any;
+            system.metatype = chummerChar.metatype_english.toLowerCase() as typeof system.metatype;
         }
 
         system.street_cred = Number(chummerChar.calculatedstreetcred) || 0;
@@ -181,7 +181,7 @@ export class CharacterImporter {
 
             const filteredAttr = attr.find((att) => att !== 'willpower');
             if (filteredAttr) {
-                system.magic.attribute = this.parseAttName(filteredAttr) as any;
+                system.magic.attribute = this.parseAttName(filteredAttr) as typeof system.magic.attribute;
             }
 
             const initiationGrades = IH.getArray(chummerChar.initiationgrade?.initiationgrade);

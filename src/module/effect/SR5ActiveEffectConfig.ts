@@ -10,6 +10,13 @@ import { SR5ActiveEffect } from './SR5ActiveEffect';
 import { SR5ActiveEffectValueEditor } from './SR5ActiveEffectValueEditor';
 import { Translation } from '../utils/strings';
 import { EffectDurationStatus, prepareEffectDurationStatus } from './EffectDurationStatus';
+
+interface EffectTargetSource {
+    id?: string;
+    applyTo?: string;
+    name?: string;
+    conditions?: { type?: string; values?: string[] }[];
+}
 import { isElementInstance } from '@/module/utils/dom';
 import { SR5Item } from '../item/SR5Item';
 
@@ -120,7 +127,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     /**
      * Do any final preparations when rendering the sheet
      */
-    protected override async _renderHTML(context, options) {
+    protected override async _renderHTML(context, options: { parts?: string[] }) {
         this._closeValueEditor();
 
         // push footer to the end of parts so it is rendered at the bottom
@@ -128,7 +135,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             const index = options.parts.indexOf("footer");
             options.parts.push(options.parts.splice(index, 1)[0]);
         }
-        return super._renderHTML(context, options);
+        return super._renderHTML(context, options) as Promise<Record<string, HTMLElement>>;
     }
 
     /**
@@ -174,6 +181,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     /**
      * Prepare start details from the working clone so staged restarts are reflected before submit.
      */
+    // oxlint-disable-next-line typescript/require-await -- Overrides a Promise returning Foundry sheet method.
     protected override async _prepareStartContext(): Promise<ActiveEffectConfig.StartContext | null> {
         const start = this.clone.toObject().start;
         if (!start) return null;
@@ -286,7 +294,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         Hooks.call('sr5_processTagifyElements', this.element);
     }
 
-    static #onOpenHelp(this: SR5ActiveEffectConfig, event: PointerEvent, target: HTMLElement) {
+    static #onOpenHelp(this: SR5ActiveEffectConfig, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
         LinksHelpers.openSourceURL(SR5ActiveEffectConfig.HELP_PAGE_URL);
@@ -333,11 +341,11 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         const { targets } = this._syncFormIntoClone();
         if (!targets[targetIndex]) return;
 
-        const usedTypes = new Set<string>((targets[targetIndex].conditions ?? []).map((c: any) => c.type as string));
+        const usedTypes = new Set<string>((targets[targetIndex].conditions ?? []).map(c => c.type as string));
         const availableType = Object.keys(SR5.effectFilterTypes).find(t => !usedTypes.has(t));
         if (!availableType) return;
 
-        targets[targetIndex].conditions.push({ type: availableType });
+        targets[targetIndex].conditions!.push({ type: availableType });
         this.clone.updateSource({ system: { targets } });
         await this.render();
     }
@@ -468,7 +476,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         // Return detached data so callers can safely perform structural edits before updateSource.
         const { targets, changes } = this.clone.system.toObject();
         return {
-            targets: targets as any[],
+            targets: targets as EffectTargetSource[],
             changes: changes as any[],
         };
     }
@@ -556,10 +564,10 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     }
 
     prepareChangePriorityPlaceholders() {
-        return Object.entries(SR5ActiveEffect.CHANGE_TYPES).reduce((placeholders, [type, data]) => {
+        return Object.entries(SR5ActiveEffect.CHANGE_TYPES).reduce<Record<string, string>>((placeholders, [type, data]) => {
             placeholders[type] = String(data?.defaultPriority ?? '');
             return placeholders;
-        }, {} as Record<string, string>);
+        }, {});
     }
 
     prepareSelectionModeOptions() {
@@ -599,7 +607,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
 
         return Object.entries(SR5.effectApplyTo)
             // Skip item-only targets when the parent is an Actor.
-            .filter(([value]) => !(isActor && (value === 'test_item' || value === 'item')))
+            .filter(([value]) => !(isActor && ['test_item', 'item', 'parent_item'].includes(value)))
             // Map the remaining entries to the expected data model format
             .map(([value, label]) => ({ label: game.i18n.localize(label) as Translation, value }));
     }
@@ -610,7 +618,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     _getTestOptions() {
         const options: Record<string, Translation> = {};
 
-        for (const test of Object.values(game.shadowrun5e.tests) as any[]) {
+        for (const test of Object.values(game.shadowrun5e.tests) as { name: string, label: Translation }[]) {
             options[test.name] = test.label;
         }
 
@@ -692,7 +700,6 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         if (isElementInstance(target, HTMLSelectElement) && name === 'duration.expiry') {
             this._syncFormIntoClone();
             void this.render();
-            return;
         }
     }
 

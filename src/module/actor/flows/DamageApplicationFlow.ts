@@ -64,7 +64,7 @@ export class DamageApplicationFlow {
         return updatedDamage;
     }
 
-    static handleRenderChatMessage(app: ChatMessage, html, data) {
+    static handleRenderChatMessage(app: ChatMessage, html) {
         $(html).on('click', '.apply-damage', async event => await DamageApplicationFlow.chatMessageActionApplyDamage(html, event));
     }
 
@@ -74,7 +74,7 @@ export class DamageApplicationFlow {
      * @param event 
      * @returns 
      */
-    static async chatMessageActionApplyDamage(html, event) {
+    static async chatMessageActionApplyDamage(html, event: JQuery.TriggeredEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) {
         event.stopPropagation();
         event.preventDefault();
         const applyDamage = $(event.currentTarget);

@@ -29,6 +29,7 @@ export class Version0_38_0 extends VersionMigration {
     override migrateActor(actor: any): void {
         this.migrateVision(actor);
         this.migrateMagicalType(actor);
+        this.migrateVehicleAvailability(actor);
     }
 
     override migrateActiveEffect(effect: any): void {
@@ -97,6 +98,15 @@ export class Version0_38_0 extends VersionMigration {
         }
     }
 
+    private migrateVehicleAvailability(actor: any): void {
+        if (actor.type !== 'vehicle' || !actor.system) return;
+
+        const availability = actor.system.availability;
+        if (availability && typeof availability === 'object') return;
+
+        actor.system.availability = { ...ItemAvailabilityFlow.parseAvailabilityString(String(availability ?? '')), changes: [] };
+    }
+
     /**
      * ItemSheetRework: ids for flag-stored nested items/effects, technology cost/availability/essence as
      * base/value fields, and legacy "adjusted" rating multipliers as item Active Effects.
@@ -129,7 +139,7 @@ export class Version0_38_0 extends VersionMigration {
 
             const fieldLabel = field === 'cost' ? 'SR5.Cost' : 'SR5.Availability';
             item.effects ??= [];
-            item.effects.push({
+            (item.effects as unknown[]).push({
                 _id: randomID(),
                 name: `${game.i18n.localize('SR5.Rating')} ${game.i18n.localize(fieldLabel)}`,
                 type: 'base',

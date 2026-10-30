@@ -29,7 +29,8 @@ export class WeaponParserBase extends Parser<'weapon'> {
         const result: Item.Source[] = [];
         for (const accessory of accessories) {
             const name = accessory.name._TEXT;
-            const item = itemMap.get(name);
+            // A weapon can list the same accessory twice, which must become separate items.
+            const item = foundry.utils.deepClone(itemMap.get(name));
 
             if (!item) {
                 console.warn(`[Accessory Missing]\nWeapon: ${jsonData.name._TEXT}\nAccessory: ${name}`);
@@ -44,6 +45,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
             if (ratingText)
                 system.technology.rating = Number(ratingText) || 0;
 
+            Parser.includeInParent(item);
             result.push(item);
         }
 
@@ -54,13 +56,13 @@ export class WeaponParserBase extends Parser<'weapon'> {
         if (weaponJson.useskill?._TEXT) {
             const jsonSkill = weaponJson.useskill._TEXT;
             if (Constants.MAP_CATEGORY_TO_SKILL[jsonSkill])
-                return Constants.MAP_CATEGORY_TO_SKILL[jsonSkill];
+                return Constants.MAP_CATEGORY_TO_SKILL[jsonSkill] as string;
 
-            return jsonSkill.replace(/[\s\-]/g, '_').toLowerCase();
+            return jsonSkill.replace(/[\s-]/g, '_').toLowerCase();
         } else {
             const category = weaponJson.category._TEXT;
             if (Constants.MAP_CATEGORY_TO_SKILL[category])
-                return Constants.MAP_CATEGORY_TO_SKILL[category];
+                return Constants.MAP_CATEGORY_TO_SKILL[category] as string;
 
             const type = weaponJson.type._TEXT.toLowerCase();
             return type === 'range' ? 'exotic_ranged_weapon' : 'exotic_melee_weapon';
@@ -113,9 +115,10 @@ export class WeaponParserBase extends Parser<'weapon'> {
 
     public parseDamageData(damageText: string | number, apText: string | number, normalWeapon = false): DamageType {
         const partialDamageData: Partial<DamageType> = { normal_weapon: normalWeapon };
-        const parsedDamageText = String(damageText).trim();
+        // Blast dropoff and radius, like '(-1/m)' or '(10m Radius)', are parsed with the blast.
+        const parsedDamageText = String(damageText).replace(/\s*\((?:-?\d+\/m|\d+m(?:\s+radius)?)\)/gi, '').trim();
 
-        const attributeDamage = /^(?:\((.+)\)|(.+?))([PSM])?(?:\(([a-zA-Z]+)\))?(?:\s+\(-?\d+\/m\))?$/i.exec(parsedDamageText);
+        const attributeDamage = /^(?:\((.+)\)|(.+?))([PSM])?(?:\s*\(([a-zA-Z]+)\))?$/i.exec(parsedDamageText);
         if (attributeDamage) {
             const formulaText = attributeDamage[1] ?? attributeDamage[2];
             if (formulaText.includes('{')) {
@@ -131,11 +134,17 @@ export class WeaponParserBase extends Parser<'weapon'> {
                     partialDamageData.type = { base: damageType, value: damageType };
                     partialDamageData.element = { base: damageElement, value: damageElement };
                 }
+            } else if (/\bRating\b/i.test(formulaText)) {
+                // A rating formula's value is an item effect, but its type and element are fixed.
+                const damageType = this.parseDamageType(attributeDamage[3]);
+                const damageElement = this.parseDamageElement(attributeDamage[4]);
+                partialDamageData.type = { base: damageType, value: damageType };
+                partialDamageData.element = { base: damageElement, value: damageElement };
             }
         }
 
         if (partialDamageData.base === undefined) {
-            const simpleDamage = /^([+-]?\d+(?:\.\d+)?)([PSM])?(?:\(([a-zA-Z]+)\))?(?:\s+\(-?\d+\/m\))?$/i.exec(parsedDamageText);
+            const simpleDamage = /^([+-]?\d+(?:\.\d+)?)([PSM])?(?:\s*\(([a-zA-Z]+)\))?$/i.exec(parsedDamageText);
             if (simpleDamage) {
                 const damageType = this.parseDamageType(simpleDamage[2]);
                 const damageElement = this.parseDamageElement(simpleDamage[3]);
@@ -205,13 +214,12 @@ export class WeaponParserBase extends Parser<'weapon'> {
         }
     }
 
+    /** Chummer's '(f)' marks flechette damage, which has no element. */
     protected parseDamageElement(parsedElement: string | undefined): DamageElement {
         switch(parsedElement?.toLowerCase()) {
             case 'e':
             case '(e)':
                 return 'electricity';
-            case 'f':
-            case '(f)':
             case 'fire':
             case '(fire)':
                 return 'fire';

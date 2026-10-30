@@ -9,7 +9,7 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
  */
 export namespace CompendiumBrowserTypes {
     export type DocType = "Actor" | "Item";
-    export type SelectionCallback = (entry: SearchResult<CompendiumCollection.DocumentName>) => Promise<void>;
+    export type SelectionCallback = (entry: SearchResult<foundry.documents.collections.CompendiumCollection.DocumentName>) => Promise<void>;
     export type Tabs = "Actor" | "Item" | "Settings";
     export type Pack = foundry.documents.collections.CompendiumCollection<DocType>;
     export type FilterEntry = { value: string; id: string; selected: boolean };
@@ -43,7 +43,7 @@ export namespace CompendiumBrowserTypes {
         parts: ("tabs" | "filters" | "results" | "settings")[];
     }
 
-    export interface SearchFilters<DocType extends CompendiumCollection.DocumentName> {
+    export interface SearchFilters<DocType extends foundry.documents.collections.CompendiumCollection.DocumentName> {
         /** An optional string to filter by name. */
         queryName?: string;
         /** Optional fuzzy matching options for queryName matching. */
@@ -57,8 +57,8 @@ export namespace CompendiumBrowserTypes {
     /**
      * Represents a single search result entry, enriched with the source pack name.
      */
-    export type SearchResult<DocType extends CompendiumCollection.DocumentName> = 
-        CompendiumCollection.IndexEntry<DocType> & {
+    export type SearchResult<DocType extends foundry.documents.collections.CompendiumCollection.DocumentName> = 
+        foundry.documents.collections.CompendiumCollection.IndexEntry<DocType> & {
             sourcePack: string;
             score: number;
         };
@@ -142,7 +142,7 @@ export class CompendiumBrowser extends BaseClass {
      * @param filter The search parameters.
      * @returns A promise that resolves to an array of enriched compendium index entries.
      */
-    public static async search<DocType extends CompendiumCollection.DocumentName>(
+    public static async search<DocType extends foundry.documents.collections.CompendiumCollection.DocumentName>(
         docType: DocType,
         filter: CompendiumBrowserTypes.SearchFilters<DocType>,
     ): Promise<CompendiumBrowserTypes.SearchResult<DocType>[]> {
@@ -182,7 +182,7 @@ export class CompendiumBrowser extends BaseClass {
 	 * @returns An object with structured search options.
 	 */
     public static getSearchFilters(): {
-        [K in CompendiumCollection.DocumentName]?: {
+        [K in foundry.documents.collections.CompendiumCollection.DocumentName]?: {
             types: (typeof foundry.documents)[K]["TYPES"][]; packs: string[]
         };
     } {
@@ -192,7 +192,7 @@ export class CompendiumBrowser extends BaseClass {
         for (const [type, packs] of Object.entries(groupedPacks)) {
             searchOptions[type] = {
                 packs: packs!.map(pack => pack.collection),
-                types: foundry.documents[type].TYPES as string[],
+                types: foundry.documents[type].TYPES,
             };
         }
 
@@ -254,7 +254,7 @@ export class CompendiumBrowser extends BaseClass {
     protected override async _preparePartContext(
         ...[partId, context, options]: Parameters<BaseClassType["_preparePartContext"]>
     ) {
-        const typedContext = context as CompendiumBrowserTypes.Context;
+        const typedContext = context;
 
         await super._preparePartContext(partId, typedContext, options);
         if (partId === "filters") {
@@ -421,7 +421,7 @@ export class CompendiumBrowser extends BaseClass {
 
     /** Handles the cancel button in selection mode. */
     private _onCancelSelection() {
-        this.close();
+        void this.close();
     }
 
     /** Handles a change event on a pack or folder checkbox in the settings. */

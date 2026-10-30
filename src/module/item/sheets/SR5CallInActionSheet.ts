@@ -33,8 +33,8 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
         const system = data.system as Item.SystemOfType<'call_in_action'>;
 
         // Allow for prepared actors to be shown on sheet.
-        const spirit = await this.prepareSpirit(system);
-        const sprite = await this.prepareSprite(system)
+        const spirit = this.prepareSpirit(system);
+        const sprite = this.prepareSprite(system)
 
         // Allow sheet to determine it's current creation mode.
         const isForSpirit = system.actor_type === 'spirit';
@@ -60,7 +60,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
      * 
      * @returns null should the configured spirit not exist anymore.
      */
-    async prepareSpirit(system: Item.SystemOfType<'call_in_action'>): Promise<SR5Actor|null> {
+    prepareSpirit(system: Item.SystemOfType<'call_in_action'>): SR5Actor|null {
         if (!system.spirit.uuid)
             return null;
 
@@ -73,7 +73,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
      * 
      * @returns null should the configured sprite not exist anymore.
      */
-    async prepareSprite(system: Item.SystemOfType<'call_in_action'>): Promise<SR5Actor|null> {
+    prepareSprite(system: Item.SystemOfType<'call_in_action'>): SR5Actor|null {
         if (!system.sprite.uuid)
             return null;
 
@@ -83,14 +83,14 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
     /**
      * Handling the removal of a spirit by any sheet action.
      */
-    static async #removeSpirit(this: SR5CallInActionSheet, event: Event) {
+    static async #removeSpirit(this: SR5CallInActionSheet) {
         await this.item.update({ system: { spirit: { uuid: '' } } });
     }
     
     /**
      * User requested removal of the prepared sprite.
      */
-    static async #removeSprite(this: SR5CallInActionSheet, event: Event) {
+    static async #removeSprite(this: SR5CallInActionSheet) {
         await this.item.update({ system: { sprite: { uuid: '' } } });
     }
 

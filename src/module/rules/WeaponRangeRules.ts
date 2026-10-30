@@ -1,4 +1,4 @@
-import { LENGTH_UNIT, SR, SYSTEM_NAME } from '../constants';
+import { LENGTH_UNIT, SR } from '../constants';
 import { Helpers } from '../helpers';
 import { SR5 } from '../config';
 import { RangedWeaponRules } from './RangedWeaponRules';

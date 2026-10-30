@@ -11,7 +11,6 @@ import { MatrixResistTest, MatrixResistTestData } from "../MatrixResistTest";
 import { BiofeedbackResistTest } from "../BiofeedbackResistTest";
 import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
 import { MatrixOpposedTargetFlow } from '@/module/tests/flows/MatrixOpposedTargetFlow';
-import Document = foundry.abstract.Document;
 
 /**
  * Apply Matrix Rules to Success Test Data relating to matrix.
@@ -431,7 +430,7 @@ export const MatrixTestDataFlow = {
      * - Reverse and place mark on main icon again
      * - iconUuid is still set to the device, as the render flow of the TestDialog doesn't clean up the data set by the
      */
-    async setIconUuidBasedOnPlacementSelection(test: MatrixTest) {
+    setIconUuidBasedOnPlacementSelection(test: MatrixTest) {
         // Assure main icon selection is set as the target icon.
         if (test.data.targetMainIcon) test.data.iconUuid = this._getMainIconUuid(test);
         // Document might have changed in between initial preparation and dialog selections.

@@ -6,18 +6,18 @@ import { TestCreator } from "../../tests/TestCreator";
  * This would be triggered from a chat message interaction, with the chat message containing the test to follow up on.
  */
 export const ActionFollowupFlow = {
-    chatMessageListeners: async (message: ChatMessage, html, data) => {
+    chatMessageListeners: (message: ChatMessage, html) => {
         $(html).find('.followup-action').on('click', ActionFollowupFlow.castFollowupAction.bind(this));
     },
 
-    castFollowupAction: async (event) => {
+    castFollowupAction: async (event: JQuery.TriggeredEvent) => {
         event.preventDefault();
 
-        const button = $(event.currentTarget);
+        const button = $(event.currentTarget as HTMLElement);
         const card = button.closest('.chat-message');
         const messageId = card.data('messageId');
 
-        const showDialog = TestCreator.shouldShowDialog(event);
+        const showDialog = TestCreator.shouldShowDialog(event as unknown as Event);
         const test = await TestCreator.fromMessage(messageId, {showDialog});
         if (!test) return;
 

@@ -2,7 +2,7 @@ import { SuccessTest } from './../tests/SuccessTest';
 import { RecoilModifier } from './modifiers/RecoilModifier';
 import { BackgroundCountModifier } from './modifiers/BackgroundCountModifier';
 import { NoiseModifier } from './modifiers/NoiseModifier';
-import { SituationalModifierApplyOptions, } from './modifiers/SituationModifier';
+import { SituationalModifierApplyOptions, SituationModifier } from './modifiers/SituationModifier';
 import { EnvironmentalModifier } from './modifiers/EnvironmentalModifier';
 import { SR5Actor } from "../actor/SR5Actor";
 import {FLAGS, SYSTEM_NAME} from "../constants";
@@ -207,8 +207,8 @@ export class DocumentSituationModifiers {
      * @param category A string matching a situation modifiers category.
      * @param options
      */
-    getTotalFor(category: keyof SituationModifiersSourceData|string, options:DocumentSituationModifiersTotalForOptions={}): number {
-        const modifier = this._modifiers[category];
+    getTotalFor(category: keyof SituationModifiersSourceData | (string & {}), options:DocumentSituationModifiersTotalForOptions={}): number {
+        const modifier = this._modifiers[category] as SituationModifier;
 
         const regionalChanged = this.refreshRegional();
 
@@ -242,7 +242,7 @@ export class DocumentSituationModifiers {
             if (Object.getPrototypeOf(handler).constructor.hasSourceData) {
                 // Befor application, remove invalid selections. 
                 // This happens when a selection has been set with an empty input DOM element.
-                Object.entries(this.source[category].active).forEach(([modifier, value]) => {
+                Object.entries(this.source[category].active as Record<string, unknown>).forEach(([modifier, value]) => {
                     switch (value) {
                         case null:
                         case undefined:

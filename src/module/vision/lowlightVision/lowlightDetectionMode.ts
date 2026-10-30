@@ -4,7 +4,8 @@ import { PhysicalSightDetectionMode } from '@/module/vision/physicalVision/physi
 export default class LowlightVisionDetectionMode extends PhysicalSightDetectionMode {
 
     static override getDetectionFilter() {
-        return this._detectionFilter ??= LowLightVisionFilter.create();
+        this._detectionFilter ??= LowLightVisionFilter.create();
+        return this._detectionFilter;
     }
 
     // PhysicalSightDetectionMode supplies the optical and astral-source restrictions.

@@ -39,7 +39,8 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             'critter_power',
             'call_in_action',
             'sprite_power',
-            'ritual'
+            'ritual',
+            'preparation'
         ];
     }
 
@@ -84,7 +85,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         magic: {
             template: SheetFlow.templateBase('actor/tabs/magic'),
             templates: [
-                ...SheetFlow.templateActorSystemParts( 'spells', 'rituals', 'summonings', 'adept-powers'),
+                ...SheetFlow.templateActorSystemParts( 'spells', 'rituals', 'preparations', 'summonings', 'adept-powers'),
                 ],
             scrollable: ['.scrollable']
         },
@@ -224,17 +225,17 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
 
     static async #openKarmaManager(this: SR5CharacterSheet) {
         const app = new KarmaManager(this.actor);
-        await app.render(true);
+        await app.render({ force: true });
     }
 
     static async #openNuyenManager(this: SR5CharacterSheet) {
         const app = new NuyenManager(this.actor);
-        await app.render(true);
+        await app.render({ force: true });
     }
 
     static async #openReputationManager(this: SR5CharacterSheet) {
         const app = new ReputationManager(this.actor);
-        await app.render(true);
+        await app.render({ force: true });
     }
 
 }

@@ -147,7 +147,7 @@ export class SR5TokenDocument extends TokenDocument {
     static async moveToken(
         token: TokenDocument.Implementation,
         movement: DeepReadonly<TokenDocument.MovementOperation>,
-        operation: Partial<foundry.abstract.types.DatabaseUpdateOperation>,
+        operation: Partial<foundry.abstract.DatabaseBackend.UpdateOperation>,
         user: User.Implementation,
     ): Promise<void> {
         // Perform checks to ensure this logic should run.

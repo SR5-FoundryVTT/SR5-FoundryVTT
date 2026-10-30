@@ -17,7 +17,7 @@ type ScatterMessageData = {
     distance: number
     speaker: {
         source: SuccessTest['actor']
-        token?: Token
+        token?: foundry.canvas.placeables.Token
     }
     item: SuccessTest['item']
 };

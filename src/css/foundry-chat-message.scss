@@ -829,14 +829,32 @@
         }
 
         .test-outcome {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: center;
+            gap: 0.15rem 0.4rem;
+            min-width: 0;
+            max-width: 100%;
+            padding: 0.25rem 0.5rem;
             text-align: center;
 
             .glitch {
-                display: inline;
+                display: block;
+                min-width: 0;
+                max-width: 100%;
+                padding: 0;
+                overflow-wrap: anywhere;
+
+                &::before,
+                &::after {
+                    inset: 0;
+                }
             }
         }
 
         .test-outcome-hits {
+            white-space: nowrap;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             font-size: var(--font-size-13);
@@ -850,10 +868,6 @@
             .test-outcome-hits-value {
                 font-size: var(--font-size-18);
                 color: var(--sr5-card-accent);
-            }
-
-            &:has(+ .glitch)::after {
-                content: ' -';
             }
         }
 

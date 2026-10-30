@@ -9,9 +9,13 @@
         "typescript/no-deprecated": "warn",
         "typescript/await-thenable": "warn",
         "typescript/no-floating-promises": "warn",
-        "typescript/no-misused-promises": "warn",
+        // Async handlers passed to jQuery `.on(...)`, `Hooks.on(...)` and Foundry option callbacks are the
+        // standard pattern here; the caller ignores the returned promise either way. Only the void-return check is disabled.
+        "typescript/no-misused-promises": ["warn", { "checksVoidReturn": false }],
         "typescript/prefer-promise-reject-errors": "warn",
-        "typescript/promise-function-async": "warn",
+        // Conflicts with require-await: a function that returns a promise without awaiting anything can't satisfy both rules.
+        // require-await is kept, so promise-returning functions are not forced to be async.
+        "typescript/promise-function-async": "off",
         "typescript/require-await": "warn",
         "typescript/return-await": "off",
         "typescript/consistent-type-assertions": "warn",
@@ -29,7 +33,9 @@
         "typescript/no-unsafe-assignment": "warn",
         "typescript/no-unsafe-call": "warn",
 
-        "eqeqeq": "warn",
+        // `== null` / `!= null` deliberately cover both null and undefined, which Foundry and legacy data mix constantly.
+        // Strict `=== null` alone would change behavior; the explicit form is longer without being clearer.
+        "eqeqeq": ["warn", "always", { "null": "ignore" }],
         "no-case-declarations": "off",
         "no-empty": "warn",
         "no-fallthrough": "warn",
@@ -71,7 +77,7 @@
         "typescript/explicit-function-return-type": "off",
         "typescript/no-confusing-non-null-assertion": "off",
         "typescript/no-confusing-void-expression": "off",
-        "typescript/no-dynamic-delete": "warn",
+        "typescript/no-dynamic-delete": "off",
         "typescript/no-empty-function": "off",
         "typescript/no-extraneous-class": "off",
         "typescript/no-namespace": "off",
@@ -111,5 +117,49 @@
         "typescript/prefer-regexp-exec": "error",
         "typescript/prefer-string-starts-ends-with": "error",
         "typescript/restrict-plus-operands": "error"
-    }
+    },
+    "overrides": [
+        {
+            // Foundry ApplicationV2 `DEFAULT_OPTIONS.actions` and `handler` maps reference static/private methods
+            // that Foundry invokes with the application instance as `this`. Those methods are typed with an
+            // explicit instance `this` and use it, so `this: void` would break them and the references cannot be bound.
+            "files": [
+                "src/module/actor/sheets/**/*.ts",
+                "src/module/item/sheets/**/*.ts",
+                "src/module/item/SR5ItemSheet.ts",
+                "src/module/apps/**/*.ts",
+                "src/module/handlebars/SR5ApplicationMixin.ts",
+                "src/module/effect/SR5ActiveEffectConfig.ts",
+                "src/module/effect/SR5ActiveEffectValueEditor.ts",
+                "src/module/settings/AbstractCompendiaSettings.ts"
+            ],
+            "rules": {
+                "typescript/unbound-method": "off"
+            }
+        },
+        {
+            // Migrators read and rewrite untyped legacy JSON from older system versions, and unit tests build
+            // partial Foundry documents. Typing these as `unknown` would need runtime guards or extra casts for no gain.
+            "files": [
+                "src/module/migrator/**/*.ts",
+                "src/unittests/**/*.ts"
+            ],
+            "rules": {
+                "typescript/no-explicit-any": "off"
+            }
+        },
+        {
+            // global.ts augments Foundry hook signatures whose parameter types Foundry does not type precisely.
+            // Socket payloads are untyped message bodies by design. Typing them as `unknown` would push casts into every handler.
+            "files": [
+                "src/module/types/global.ts",
+                "src/module/types/Socket.ts",
+                "src/module/sockets.ts",
+                "src/module/flows/SocketMessageFlow.ts"
+            ],
+            "rules": {
+                "typescript/no-explicit-any": "off"
+            }
+        }
+    ]
 }

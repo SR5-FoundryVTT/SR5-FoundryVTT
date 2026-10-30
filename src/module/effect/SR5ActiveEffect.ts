@@ -1,4 +1,3 @@
-import { SR } from '../constants';
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
@@ -119,7 +118,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * target and changes have a concrete destination. Effects created with explicit targets (tests,
      * imports, migration) keep theirs.
      */
-    protected override async _preCreate(...args: Parameters<ActiveEffect['_preCreate']>): Promise<boolean | void> {
+    protected override async _preCreate(...args: Parameters<ActiveEffect['_preCreate']>): Promise<boolean | undefined> {
         const allowed = await super._preCreate(...args);
         if (allowed === false) return false;
 
@@ -293,7 +292,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Re-enable an expired effect, reset its anchor, and re-register it with the expiry registry.
      * Use this to restart a duration that was consumed (e.g. buff renewed for another combat).
      */
-    async restart(): Promise<this | void> {
+    async restart(): Promise<this | undefined> {
         const combat = this.actor?.inCombat ? (game.combat ?? undefined) : undefined;
         return this.update({
             disabled: false,
@@ -359,7 +358,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         }
         if (targetDoc instanceof SR5Item && change.effect instanceof SR5ActiveEffect) {
             const target = change.effect.targetForChange(change as { target?: string });
-            if (target?.applyTo !== 'item') return {};
+            if (target?.applyTo !== 'item' && target?.applyTo !== 'parent_item') return {};
         }
 
         // Skip applying this change if the target key does not exist on the model.
@@ -400,7 +399,7 @@ export class SR5ActiveEffect extends ActiveEffect {
                 delta = SR5ActiveEffect.__castArray(String(change.value), innerType);
             }
             else delta = SR5ActiveEffect.__castDelta(String(change.value), targetType);
-        } catch (err) {
+        } catch {
             console.warn(`Test [${object.constructor.name}] | Unable to parse active effect change for ${change.key}: "${change.value}"`);
             return {};
         }
@@ -428,7 +427,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         try {
             const changes = {};
             SR5ActiveEffect._applyChangeUnguided(object, change, changes);
-            return changes as Record<string, unknown>;
+            return changes;
         } catch (err) {
             console.error(`Test [${object.constructor.name}] | Failed to apply active effect change for ${change.key}: "${change.value}"`, err);
             return {};
@@ -451,18 +450,90 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param source Any object style value, either a Foundry document or a plain object
      * @param change A singular ActiveEffect.ChangeData object
      * @param targetDoc The document being changed, whose field type drives the rendering
+     * @param effect The effect the change belongs to, when change data doesn't carry it
      */
-    static resolveDynamicChangeValue(source: any, change: ActiveEffect.ChangeData, targetDoc?: any) {
+    static resolveDynamicChangeValue(source: any, change: ActiveEffect.ChangeData, targetDoc?: any, effect: unknown = change.effect) {
         // Dynamic value present?
         if (typeof change.value !== 'string') return;
         if (change.value.length === 0) return;
 
         // The evaluator resolves @refs itself (keeping string/boolean types), rather than
         // Roll.replaceFormulaData which substitutes strings unquoted and coerces booleans to 1/0.
-        const value = DynamicValueEvaluator.evaluate(change.value, path => foundry.utils.getProperty(source, path));
+        const value = DynamicValueEvaluator.evaluate(change.value, SR5ActiveEffect.referenceResolver(source, targetDoc, effect));
 
         const rendered = SR5ActiveEffect.renderValueForField(value, change.key ?? '', targetDoc);
         if (rendered !== undefined) change.value = rendered;
+    }
+
+    /**
+     * Resolve `@path` references of a change value.
+     *
+     * A path is read from the source first. When the source has no such value, its first segment can
+     * name a related document instead:
+     * - `@actor`: the owning actor, also for nested items
+     * - `@parent`: the containing item of a nested item, or the owning actor of an item
+     * - `@affected`: the document the change is applied to
+     * - `@effect`: the effect the change belongs to, e.g. `@effect.system.rating`
+     * - `@driver`: the driver of the owning vehicle
+     * - `@summoner`: the summoner of the owning spirit
+     * - `@technomancer`: the technomancer of the owning sprite
+     *
+     * Other documents may still be preparing while a change applies, so prefer their `.base` values.
+     * Changes to a driver, summoner or technomancer don't prepare the owning actor again, so their
+     * values are only current for changes applied to tests.
+     *
+     * @param source The document or object the effect belongs to
+     * @param targetDoc The document being changed
+     * @param effect The effect the change belongs to
+     */
+    static referenceResolver(source: unknown, targetDoc?: unknown, effect?: unknown) {
+        const related = (source ?? {}) as { actor?: object | null; parent?: object | null };
+        const read = (document: object | null | undefined, property: string) =>
+            document ? foundry.utils.getProperty(document, property) : undefined;
+        const owner = () => source instanceof SR5Actor ? source
+            : source instanceof SR5Item ? source.actorOwner : related.actor;
+
+        return (path: string): unknown => {
+            const own = read(related, path);
+            if (own !== undefined) return own;
+
+            const [root, ...rest] = path.split('.');
+            const property = rest.join('.');
+            switch (root) {
+                case 'actor':
+                    return read(owner(), property);
+                case 'driver':
+                case 'summoner':
+                case 'technomancer': {
+                    const actor = owner();
+                    return actor instanceof SR5Actor ? read(SR5ActiveEffect.controllingActor(actor, root), property) : undefined;
+                }
+                case 'parent':
+                    return read(related.parent, property);
+                case 'affected':
+                    return read(targetDoc as object | undefined, property);
+                case 'effect':
+                    return read(effect as object | undefined, property);
+                default:
+                    return undefined;
+            }
+        };
+    }
+
+    /**
+     * The actor controlling a vehicle, spirit or sprite, as the `@driver`, `@summoner` and
+     * `@technomancer` references name it.
+     *
+     * @param actor The controlled actor
+     * @param role The reference root naming the controller
+     */
+    static controllingActor(actor: SR5Actor, role: string): SR5Actor | undefined {
+        switch (role) {
+            case 'driver': return actor.getVehicleDriver();
+            case 'summoner': return actor.getSummoner();
+            case 'technomancer': return actor.getTechnomancer();
+            default: return undefined;
+        }
     }
 
     /**
@@ -527,14 +598,14 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @returns {Array<*>}      The parsed delta cast as a typed array
      */
     private static __castArray(raw: string, type: foundry.utils.DataType) {
-        let delta: any[];
+        let delta: unknown[];
         try {
-            delta = this.__parseOrString(raw);
-            delta = delta instanceof Array ? delta : [delta];
-        } catch (e) {
+            const parsed = this.__parseOrString(raw);
+            delta = parsed instanceof Array ? parsed : [parsed];
+        } catch {
             delta = [raw];
         }
-        return delta.map(d => this.__castDelta(d, type));
+        return delta.map(d => this.__castDelta(d as string, type));
     }
 
     /**
@@ -544,8 +615,8 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param {string} type     The target data type that the raw value should be cast to match
      * @returns {*}             The parsed delta cast to the target data type
      */
-    private static __castDelta(raw: string, type: foundry.utils.DataType) {
-        let delta;
+    private static __castDelta(raw: string, type: foundry.utils.DataType): unknown {
+        let delta: unknown;
         switch (type) {
             case "boolean":
                 delta = Boolean(SR5ActiveEffect.__parseOrString(raw));
@@ -569,10 +640,10 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param {string} raw      A raw serialized string
      * @returns {*}             The parsed value, or the original value if parsing failed
      */
-    private static __parseOrString(raw: string) {
+    private static __parseOrString(raw: string): unknown {
         try {
             return JSON.parse(raw);
-        } catch (err) {
+        } catch {
             return raw;
         }
     }
@@ -583,7 +654,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Overwrite foundry priority handling, as they provide a defaultPriority in CHANGE_TYPES but use
         // priority in their ActiveEffect#prepareBaseData implementation.
         for ( const change of this.system.changes ) {
-          change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type!]?.defaultPriority : change.priority;
+          change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type]?.defaultPriority : change.priority;
         }
     }
 }

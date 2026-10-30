@@ -40,14 +40,14 @@ export class Version0_32_1 extends VersionMigration {
         if (_item.type === 'critter_power' && _item.system) {
             const system = _item.system;
 
-            const range = system.range ?? '';
+            const range = (system.range ?? '') as string;
             system.range = range === 'T'
                 ? 'touch'
                 : range.toLowerCase()
                     .replace(/\s+/g, '_')
                     .replace(/[()]/g, '') as any;
 
-            const duration = (system.duration ?? '').toLowerCase();
+            const duration = ((system.duration ?? '') as string).toLowerCase();
             if (duration === 's')
                 system.duration = 'sustained';
             else if (duration === 'i')

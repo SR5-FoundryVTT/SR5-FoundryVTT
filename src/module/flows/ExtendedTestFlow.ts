@@ -320,7 +320,7 @@ export const ExtendedTestFlow = {
         // Rebuild from the last roll snapshot or from scratch for manually created records.
         const data = record.testData
             ? foundry.utils.deepClone(record.testData)
-            : SuccessTest.applyStructuralDefaults({} as Partial<SuccessTestData>);
+            : SuccessTest.applyStructuralDefaults({});
 
         data.type ??= record.testType;
         data.evaluated = false;

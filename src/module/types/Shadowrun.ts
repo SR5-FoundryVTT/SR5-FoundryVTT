@@ -1,3 +1,4 @@
+// oxlint-disable-next-line typescript/no-unused-vars -- Ambient global declared by the system, only referenced via typeof.
 declare const SR5CONFIG: any;
 
 declare namespace Shadowrun {
@@ -62,7 +63,7 @@ declare namespace Shadowrun {
         | 'drone_pilot_vehicle'
         | 'drone_perception'
         | 'drone_infiltration'
-        | string; // Allow document names to be given...
+        | (string & {}); // Allow document names to be given, while keeping the known names for autocompletion.
 
     /**
      * What kind of action is being performed.
@@ -76,6 +77,7 @@ declare namespace Shadowrun {
         'addiction_mental' | // resisting against mental addiction
         'addiction_physical' | // resisting against physical addiction
         'addiction' | // resisting against addiction in general
+        'alchemy' | // creating an alchemical preparation
         'attack_matrix' | // matrix attacks, like data spike or IC attacks
         'attack_melee' | // attacks made with melee weapons
         'attack_ranged' | // attacks made with ranged weapons

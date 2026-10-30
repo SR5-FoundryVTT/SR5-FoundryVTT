@@ -42,6 +42,7 @@ import { Metamagic } from './item/Metamagic';
 import { Modification } from './item/Modification';
 import { Program } from './item/Program';
 import { Quality } from './item/Quality';
+import { Preparation } from "./item/Preparation";
 import { Ritual } from "./item/Ritual";
 import { Sin } from './item/Sin';
 import { Spell } from './item/Spell';
@@ -61,6 +62,10 @@ import type { AstralBarrierRegionBehavior, AstralWardRegionBehavior } from './re
 import type { EnvironmentalRegionBehavior } from './regionBehavior/Environmental';
 import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
+
+/**
+ * TODO: fvtt-types v14 - Update global module declarations to match updated types in fvtt-types.
+ */
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
@@ -189,6 +194,7 @@ declare module "fvtt-types/configuration" {
             modification: typeof Modification;
             program: typeof Program;
             quality: typeof Quality;
+            preparation: typeof Preparation;
             ritual: typeof Ritual;
             sin: typeof Sin;
             skill: typeof Skill;

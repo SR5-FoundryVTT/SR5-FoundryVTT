@@ -1,39 +1,41 @@
 import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
+import type { SR5ItemSheet } from "@/module/item/SR5ItemSheet";
 
 export const shadowrunSR5Item = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
     const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
+    type ItemSheetFixture = Pick<SR5ItemSheet, 'render' | 'element' | 'submit' | 'close'> & { _mode: 'play' | 'edit' };
 
     after(async () => { await factory.destroy(); });
 
     describe('SR5Items', () => {
         it('edits and saves Matrix action marks and owner from Details', async () => {
             const item = await factory.createItem({ type: 'action', system: { action: { categories: ['matrix'] } } });
-            const sheet = item.sheet as any;
+            const sheet = item.sheet as unknown as ItemSheetFixture;
             sheet._mode = 'edit';
-            await sheet.render(true);
+            await sheet.render({ force: true });
 
             const marks = sheet.element.querySelector('[name="system.action.category.matrix.marks"]') as HTMLInputElement | null;
             const owner = sheet.element.querySelector('[name="system.action.category.matrix.owner"]') as HTMLInputElement | null;
             assert.isNotNull(marks);
             assert.isNotNull(owner);
-            marks!.value = '2';
-            owner!.checked = true;
+            marks.value = '2';
+            owner.checked = true;
             await sheet.submit();
             await sheet.close();
 
-            await sheet.render(true);
+            await sheet.render({ force: true });
             assert.strictEqual(item.system.action.category.matrix.marks, 2);
             assert.isTrue(item.system.action.category.matrix.owner);
-            assert.strictEqual((sheet.element.querySelector('[name="system.action.category.matrix.marks"]') as HTMLInputElement | null)?.value, '2');
+            assert.strictEqual(sheet.element.querySelector<HTMLInputElement>('[name="system.action.category.matrix.marks"]')?.value, '2');
             await sheet.close();
 
             const ordinary = await factory.createItem({ type: 'action' });
-            const ordinarySheet = ordinary.sheet as any;
+            const ordinarySheet = ordinary.sheet as unknown as ItemSheetFixture;
             ordinarySheet._mode = 'edit';
-            await ordinarySheet.render(true);
+            await ordinarySheet.render({ force: true });
             assert.isNull(ordinarySheet.element.querySelector('[name="system.action.category.matrix.marks"]'));
             await ordinarySheet.close();
         });
@@ -47,7 +49,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             assert.notStrictEqual(item.id, null);
 
             // Check foundry item collection integrity
-            const itemFromCollection = game.items.get(item.id!);
+            const itemFromCollection = game.items.get(item.id);
             assert.notStrictEqual(itemFromCollection, null);
             assert.strictEqual(item.id, itemFromCollection?.id);
         });
@@ -71,6 +73,19 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
         });
 
         describe('Testing related data injection', () => {
+            it('Correctly injects tests on creation, not only on update', async () => {
+                // Regression guard: the document is built from a clone of the creation data before
+                // _preCreate runs, so the injection has to reach the document's own source.
+                const item = await factory.createItem({
+                    type: 'spell',
+                    system: { category: 'combat', combat: { type: 'indirect' } }
+                });
+
+                assert.equal(item.system.action.test, 'SpellCastingTest');
+                assert.equal(item.system.action.followed.test, 'DrainTest');
+                assert.equal(item.system.action.opposed.test, 'PhysicalDefenseTest');
+                assert.equal(item.system.action.opposed.resist.test, 'PhysicalResistTest');
+            });
             it('Correctly adds defense tests without resist tests to direct combat spells', async () => {
                 const item = await factory.createItem({type: 'spell'});
 

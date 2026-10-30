@@ -4,7 +4,7 @@ import { TestCreator } from '../TestCreator';
 
 interface SuppressiveFireTemplateFlowHost {
     actor: {
-        getToken(): TokenDocument | null
+        getToken: () => TokenDocument | null
     } | undefined
     data: {
         fireMode: FireModeType
@@ -13,7 +13,7 @@ interface SuppressiveFireTemplateFlowHost {
 }
 
 interface SuppressiveFireTest extends SuppressiveFireTemplateFlowHost {
-    populateDocuments(): Promise<void>
+    populateDocuments: () => Promise<void>
     suppressiveFireTemplateFlow: SuppressiveFireTemplateFlow
 }
 
@@ -31,7 +31,7 @@ export class SuppressiveFireTemplateFlow {
     constructor(private readonly test: SuppressiveFireTemplateFlowHost) { }
 
     get canPlace(): boolean {
-        return this.test.data.fireMode.suppression === true;
+        return this.test.data.fireMode.suppression;
     }
 
     dialogListeners(getMeters: () => number): TestDialogListener[] {
@@ -48,7 +48,7 @@ export class SuppressiveFireTemplateFlow {
 
         if (!this.canPlace) return;
         if (this.#placement) {
-            this.cancelPreview();
+            void this.cancelPreview();
             return;
         }
 
@@ -57,14 +57,14 @@ export class SuppressiveFireTemplateFlow {
 
     async drawChatPreview() {
         if (this.#placement) {
-            this.cancelPreview();
+            void this.cancelPreview();
             return;
         }
 
         await this.#startPreview(this.test.data.suppressiveFireWidth);
     }
 
-    static async drawChatPreviewFromMessage(event: Event) {
+    static async drawChatPreviewFromMessage(event: Event | JQuery.ClickEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -80,7 +80,7 @@ export class SuppressiveFireTemplateFlow {
     }
 
     static chatMessageListeners(html: HTMLElement | JQuery) {
-        $(html).find('.place-suppressive-fire-template').on('click', this.drawChatPreviewFromMessage);
+        $(html).find('.place-suppressive-fire-template').on('click', this.drawChatPreviewFromMessage.bind(this));
     }
 
     async #startPreview(meters: number) {

@@ -4,6 +4,7 @@ import { MatrixData } from "../template/Matrix";
 import { VehicleLimits } from "../template/Limits";
 import { ActorArmorData } from "../template/Armor";
 import { Initiative } from "../template/Initiative";
+import { AvailabilityField } from "../template/Technology";
 import { Tracks } from "../template/ConditionMonitors";
 import { VisibilityChecks } from "../template/Visibility";
 import { ModifiableField } from "../fields/ModifiableField";
@@ -49,7 +50,7 @@ const VehicleData = () => ({
         initial: "medium",
         choices: SR5.vehicle.categories,
     }),
-    availability: new StringField({ required: true }),
+    availability: AvailabilityField(),
     cost: new NumberField({ required: true, nullable: false, initial: 0 }),
     isDrone: new BooleanField(),
     isOffRoad: new BooleanField(),

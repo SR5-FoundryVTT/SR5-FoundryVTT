@@ -9,7 +9,7 @@ export const RenderSettings = {
      * Insert the system link, depending on Foundry VTT version.
      */
     listen: () => {
-        Hooks.on("renderSettings", async (_app, html: HTMLElement) => {
+        Hooks.on("renderSettings", (_app, html: HTMLElement) => {
             // try v13 HTML structure first
             const infoElement = html.firstChild as HTMLElement;
             let systemRow = infoElement?.querySelector('.system');

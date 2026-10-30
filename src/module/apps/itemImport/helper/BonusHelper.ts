@@ -5,6 +5,18 @@ import { ImportHelper as IH } from "./ImportHelper";
 import { SkillNamingFlow } from "@/module/flows/SkillNamingFlow";
 
 export class BonusHelper {
+    /** Chummer spell categories and the test category Foundry gives spellcasting tests of that category. */
+    private static readonly spellCategories: Record<string, string> = {
+        Combat: 'spell_combat',
+        Detection: 'spell_detection',
+        Health: 'spell_healing',
+        Illusion: 'spell_illusion',
+        Manipulation: 'spell_manipulation',
+    };
+
+    /** Chummer's base ground movement multipliers, which a percent bonus scales. */
+    private static readonly movementRates = { walk: 2, run: 4 } as const;
+
     private static normalizeValue(sheet: BC.DocCreateData, value: string | number): string {
         if (typeof value === 'number')
             return value.toString();
@@ -26,6 +38,14 @@ export class BonusHelper {
 
             value = value.replace("Rating", path);
         }
+
+        value = value.replace(/\bdiv\b/g, '/');
+
+        // Chummer's {MAG}, {BOD}... read the owning character's attribute.
+        value = value.replace(/\{([A-Z]{3})\}/g, (match, attribute: string) => {
+            const key = Constants.attributeTable[attribute as keyof typeof Constants.attributeTable];
+            return key ? `(@actor.system.attributes.${key}.value)` : match;
+        });
 
         return value;
     }
@@ -134,9 +154,16 @@ export class BonusHelper {
         });
     }
 
-    public static addBonus(sheet: BC.DocCreateData, bonus?: BonusSchema): void {
+    public static addBonus(sheet: BC.DocCreateData, bonus?: BonusSchema, options: { onlyForWireless?: boolean } = {}): void {
         if (!bonus) return;
+        const start = sheet.effects?.length ?? 0;
         this.addEffects(sheet, bonus);
+        if (options.onlyForWireless) {
+            for (const effect of sheet.effects?.slice(start) ?? []) {
+                effect.system ??= {};
+                effect.system.onlyForWireless = true;
+            }
+        }
     }
 
     private static addEffects(sheet: BC.DocCreateData, bonus: BonusSchema): void {
@@ -255,10 +282,11 @@ export class BonusHelper {
                 const excludedSkill = this.normalizeSkillName(skillCategory.exclude?._TEXT ?? "");
 
                 type Keys = keyof typeof BC.BonusConstant.skillCategoryTable;
-                const skills = BC.BonusConstant.skillCategoryTable[skillCategory.name._TEXT as Keys]
-                                .filter(skillId => !excludedSkill || skillId !== excludedSkill);
+                const categorySkills = BC.BonusConstant.skillCategoryTable[skillCategory.name._TEXT as Keys];
+                if (!categorySkills) continue;
+                const skills = categorySkills.filter(skillId => !excludedSkill || skillId !== excludedSkill);
 
-                if (!skills?.length)
+                if (!skills.length)
                     console.log("Error skillcategory:", skillCategory.name._TEXT);
                 else
                     this.createEffect(
@@ -320,6 +348,69 @@ export class BonusHelper {
                     }, 'skill_filter', skill.condition
                 );
             }
+        }
+
+        // Essence penalty in hundredths of a point.
+        if (bonus.essencepenaltyt100) {
+            this.createEffect(
+                sheet, {
+                    system: { changes: [{ key: "system.attributes.essence", value: `(${bonus.essencepenaltyt100._TEXT}) / 100` }] },
+                }
+            );
+        }
+
+        for (const [key, entries] of [['walk', bonus.walkmultiplier], ['run', bonus.runmultiplier]] as const) {
+            for (const movement of IH.getArray(entries)) {
+                // Only ground movement has a modifier field.
+                if (movement.category._TEXT !== 'Ground') continue;
+
+                // Foundry moves Agility × (rate + modifier), so a percent of the rate becomes a flat modifier.
+                const value = (Number(movement.val?._TEXT) || 0)
+                    + this.movementRates[key] * (Number(movement.percent?._TEXT) || 0) / 100;
+                if (!value) continue;
+
+                this.createEffect(
+                    sheet, {
+                        system: { changes: [{ key: `system.modifiers.${key}`, value: value.toString() }] },
+                    }
+                );
+            }
+        }
+
+        if (bonus.spellcategory) {
+            for (const spellCategory of IH.getArray(bonus.spellcategory)) {
+                const category = this.spellCategories[spellCategory.name._TEXT];
+                if (!category) continue;
+
+                // Only spellcasting tests, so alchemical preparation triggers and rituals are left out.
+                this.createEffect(
+                    sheet, {
+                        system: {
+                            changes: [{ key: "data.pool", value: spellCategory.val._TEXT, target: 'spell_filter' }],
+                            targets: [{ id: 'spell_filter', applyTo: 'test_all', conditions: [
+                                { type: 'tests', mode: 'include', values: ['SpellCastingTest'] },
+                                { type: 'categories', mode: 'include', values: [category] },
+                            ] }],
+                        },
+                    }
+                );
+            }
+        }
+
+        for (const [key, value] of [['data.damage', bonus.unarmeddv], ['data.damage.ap', bonus.unarmedap]] as const) {
+            if (!value) continue;
+
+            this.createEffect(
+                sheet, {
+                    system: {
+                        changes: [{ key, value: value._TEXT, target: 'unarmed_filter' }],
+                        targets: [{ id: 'unarmed_filter', applyTo: 'test_all', conditions: [
+                            { type: 'skills', mode: 'include', values: ['unarmed_combat'] },
+                            { type: 'categories', mode: 'include', values: ['attack_melee'] },
+                        ] }],
+                    },
+                }
+            );
         }
     }
 

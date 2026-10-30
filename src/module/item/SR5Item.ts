@@ -13,6 +13,8 @@ import { SinPrep } from './prep/SinPrep';
 import { ActionPrep } from './prep/functions/ActionPrep';
 import { RangePrep } from './prep/functions/RangePrep';
 import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
+import { PreparationPrep } from './prep/PreparationPrep';
+import { PreparationDecayFlow } from '../flows/PreparationDecayFlow';
 import { ArmorPrep } from './prep/functions/ArmorPrep';
 
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
@@ -231,11 +233,18 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             SinPrep.prepareBaseData(this.system);
         else if (this.isType('bioware', 'cyberware'))
             WarePrep.prepareBaseData(this.system, equippedMods);
+        else if (this.isType('preparation')) {
+            PreparationPrep.prepareBaseData(this.system);
+            PreparationDecayFlow.track(this);
+        }
     }
 
     override prepareDerivedData(this: SR5Item): void {
         super.prepareDerivedData();
         this.applyItemActiveEffects();
+
+        if (this.isType('bioware', 'cyberware'))
+            WarePrep.prepareDerivedData(this.system, this.getEquippedMods());
 
         const technology = this.getTechnologyData();
         if (technology) {
@@ -255,31 +264,41 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             HostPrep.prepareDerivedData(this.system);
     }
 
+    /**
+     * Apply this item's own item effects, and the parent item effects of its nested items.
+     * Nested items only change their parent while equipped.
+     */
     private applyItemActiveEffects() {
-        for (const effect of allApplicableDocumentEffects(this, { applyTo: ['item'] })) {
-            const changes = effect.changesForApplyTo('item');
+        for (const effect of allApplicableDocumentEffects(this, { applyTo: ['item'] }))
+            this.applyEffectChanges(effect, effect.changesForApplyTo('item'));
 
-            // prepareData can run more than once without a reset() in between, and ModifiableField.applyChange
-            // only pushes entries. Clear this effect's prior contributions from each targeted ModifiableValue
-            // before re-applying, so repeated passes don't double them.
-            const source = ModifiableValue.effectSource(effect);
-            for (const change of changes) {
-                const altered = { ...change } as unknown as ActiveEffect.ChangeData;
-                SR5ActiveEffect.alterChange(this, altered);
-                const value = SR5ActiveEffect.getModifiableValue(this, altered.key ?? '');
-                if (value) ModifiableValue.removeFromSource(value, source);
-            }
+        for (const item of this.items) {
+            for (const effect of allApplicableDocumentEffects(item, { applyTo: ['parent_item'] }))
+                this.applyEffectChanges(effect, effect.changesForApplyTo('parent_item'), item.isEquipped());
+        }
+    }
 
-            if (effect.disabled || effect.isSuppressed) continue;
+    private applyEffectChanges(effect: SR5ActiveEffect, changes: ReturnType<SR5ActiveEffect['changesForApplyTo']>, active = true) {
+        // prepareData can run more than once without a reset() in between, and ModifiableField.applyChange
+        // only pushes entries. Clear this effect's prior contributions from each targeted ModifiableValue
+        // before re-applying, so repeated passes don't double them.
+        const source = ModifiableValue.effectSource(effect);
+        for (const change of changes) {
+            const altered = { ...change } as unknown as ActiveEffect.ChangeData;
+            SR5ActiveEffect.alterChange(this, altered);
+            const value = SR5ActiveEffect.getModifiableValue(this, altered.key ?? '');
+            if (value) ModifiableValue.removeFromSource(value, source);
+        }
 
-            for (const change of changes) {
-                try {
-                    SR5ActiveEffect.applyChange(this, { ...change, effect } as unknown as ActiveEffect.ChangeData);
-                } catch (error) {
-                    console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of item (${this.name}) / id (${this.id})`);
-                    console.error(error);
-                    ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of item (${this.name}) / id (${this.id})`);
-                }
+        if (!active || effect.disabled || effect.isSuppressed) return;
+
+        for (const change of changes) {
+            try {
+                SR5ActiveEffect.applyChange(this, { ...change, effect } as unknown as ActiveEffect.ChangeData);
+            } catch (error) {
+                console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of item (${this.name}) / id (${this.id})`);
+                console.error(error);
+                ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of item (${this.name}) / id (${this.id})`);
             }
         }
     }
@@ -318,7 +337,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             actor = this.actor ?? undefined;
         }
 
-        if (!actor) return;
+        // A preparation rolls on its own Force and Potency, it doesn't need an actor. SR5#306.
+        if (!actor && !this.isType('preparation')) return;
 
         const showDialog = !TestCreator.shouldHideDialog(event);
         const test = await TestCreator.fromItem(this, actor, { showDialog });
@@ -333,7 +353,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * The original naming leans on the dnd5e systems use of it for chat messages.
      * NOTE: This is very legacy, difficult to read and should be improved upon.
      */
-    async getChatData(htmlOptions: TextEditor.EnrichmentOptions = {}) {
+    async getChatData(htmlOptions: foundry.applications.ux.TextEditor.EnrichmentOptions = {}) {
         const system = foundry.utils.duplicate(this.system) as SR5Item['system'];
 
         system.description.value = await foundry.applications.ux.TextEditor.implementation.enrichHTML(system.description.value, htmlOptions);
@@ -692,7 +712,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     static getTargets() {
         if (!game.ready || !game.user) return;
         const { character } = game.user;
-        const { controlled } = canvas.tokens!;
+        const { controlled } = canvas.tokens;
         const targets = controlled.reduce<SR5Actor[]>((arr, t) => t.actor ? [...arr, t.actor] : arr, []);
         if (character instanceof SR5Actor && controlled.length === 0) targets.push(character);
         if (!targets.length) throw new Error(`You must designate a specific Token as the roll target`);
@@ -720,6 +740,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * Create an item in this item
      * @param effectData
      */
+    // oxlint-disable-next-line typescript/require-await -- Public Promise based item API, callers await it.
     async createNestedActiveEffect(effectData: ActiveEffect.Stored | ActiveEffect.Stored[]) {
         if (!Array.isArray(effectData)) effectData = [effectData];
 
@@ -995,7 +1016,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     isType<ST extends readonly Item.ConfiguredSubType[]>(this: SR5Item, ...types: ST): this is SR5Item<ST[number]> {
-        return types.includes(this.type as ST[number]);
+        return types.includes(this.type);
     }
 
     asType<ST extends readonly Item.ConfiguredSubType[]>(this: SR5Item, ...types: ST): SR5Item<ST[number]> | undefined {
@@ -1012,7 +1033,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     isAreaOfEffect(): boolean {
         return (this.isType('weapon') && this.system.category === 'thrown' && this.system.thrown.blast.radius > 0)
             || (this.isType('weapon') && (this.getEquippedAmmo()?.system.blast?.radius ?? 0) > 0)
-            || (this.isType('spell') && this.system.range === 'los_a')
+            || this.asType('spell', 'preparation')?.system.range === 'los_a'
             || (this.isType('ammo') && this.system.blast.radius > 0);
     }
 
@@ -1258,6 +1279,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * @returns A list of slaved devices.
      */
+    // oxlint-disable-next-line typescript/require-await -- Public Promise based item API, kept async for consistency.
     async getDevices() {
         const host = this.asType('host');
         if (!host) return [];
@@ -1548,10 +1570,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // Attributes for hosts work only within their own attributes.
         if (this.isType('host')) {
             const rollData = this.getRollData();
-            return rollData.attributes?.[name];
+            return rollData.attributes?.[name] as AttributeFieldType | undefined;
         }
 
-        return rollData.attributes?.[name];
+        return rollData.attributes?.[name] as AttributeFieldType | undefined;
     }
 
     /**

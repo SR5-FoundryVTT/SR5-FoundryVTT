@@ -147,7 +147,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
 
         describe('chat card verdict band', () => {
-            const renderCard = async (test): Promise<HTMLElement> => {
+            const renderCard = async (test: SuccessTest): Promise<HTMLElement> => {
                 const html = await foundry.applications.handlebars.renderTemplate(
                     'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',
                     await test._prepareMessageTemplateData());
@@ -226,7 +226,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                 );
                 return (/<input[^>]*name="test\.data\.limit"[^>]*>/.exec(html))?.[0] ?? '';
             };
-            const manualLimitOverride = (test) =>
+            const manualLimitOverride = (test: SuccessTest) =>
                 test.limit.changes.find(change => change.name === 'SR5.ManualOverride');
 
             it('renders an applied limit (>0) as a normal editable number', async () => {
@@ -349,7 +349,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                 );
                 return (/<input[^>]*name="test\.data\.threshold"[^>]*>/.exec(html))?.[0] ?? '';
             };
-            const manualThresholdOverride = (test) =>
+            const manualThresholdOverride = (test: SuccessTest) =>
                 test.threshold.changes.find(change => change.name === 'SR5.ManualOverride');
 
             it('renders an applied threshold (>0) as a normal editable number', async () => {
@@ -466,7 +466,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(test.netHits.value, 1);
         });
 
-        it('buy hits allows push the limit but blocks second chance', async () => {
+        it('buy hits allows push the limit but blocks second chance', () => {
             const test = TestCreator.fromPool({ pool: 8 }, { showMessage: false, showDialog: false });
             test.data.buyHits = true;
 

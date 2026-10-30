@@ -14,7 +14,7 @@ import { SR5ActiveEffect } from './effect/SR5ActiveEffect';
  * @returns Instance of the given effects, not a copy.
  */
 export function prepareSortedEffects(effects: SR5ActiveEffect[], byKey = "name") {
-    return effects.sort((a, b) => a[byKey].localeCompare(b[byKey]));
+    return effects.sort((a, b) => (a[byKey] as string).localeCompare(b[byKey] as string));
 }
 
 /**

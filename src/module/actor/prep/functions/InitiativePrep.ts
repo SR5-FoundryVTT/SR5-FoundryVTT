@@ -70,7 +70,7 @@ export class InitiativePrep {
         }
         ModifiableValue.calcTotal(initiative.current.dice, {min: 0, max: 5});
 
-        (initiative.current.dice as any).text = `${initiative.current.dice.value}d6`;
+        (initiative.current.dice as typeof initiative.current.dice & { text?: string }).text = `${initiative.current.dice.value}d6`;
     }
 
     /**

@@ -19,7 +19,7 @@ export const ConditionRules = {
 
         let unconscious = false;
         let dying = false;
-        let dead = false;
+        let dead: boolean;
 
         // Some actor types die differently.
         if (actor.isType('ic', 'sprite')) {

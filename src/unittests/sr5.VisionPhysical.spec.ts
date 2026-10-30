@@ -256,7 +256,7 @@ export const shadowrunVisionPhysical = (context: QuenchBatchContext) => {
             if (!canvas.ready || !canvas.dimensions || !canvas.scene) this.skip();
 
             const source = (visionMode: string, radius: number) => {
-                const vision = new SR5VisionSource() as any;
+                const vision = new SR5VisionSource({ object: {} as Token.Implementation }) as any;
                 Object.assign(vision.data, { x: 0, y: 0, elevation: 0, radius, externalRadius: 0, lightRadius: 0, visionMode });
                 vision._initialize({});
                 return vision;

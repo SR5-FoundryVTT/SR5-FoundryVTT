@@ -1,0 +1,8 @@
+{{!--
+    Kept as terse as the spell footer: the category plus what makes this a preparation.
+    The actor lists add the full spell properties on top, see list-items/preparation/item.hbs.
+--}}
+{{#unless (empty item.system.category)}}
+    <label>{{localizeOb item.system.category @root.config.spellCategories}}</label>
+{{/unless}}
+{{> "systems/shadowrun5e/dist/templates/v2/item-properties/preparation.hbs" item=item }}

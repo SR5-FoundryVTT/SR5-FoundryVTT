@@ -1,4 +1,5 @@
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
+import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
 
 export class SpellParser extends Parser<'spell'> {
     protected readonly parseType = 'spell';
@@ -14,7 +15,7 @@ export class SpellParser extends Parser<'spell'> {
     }
 
     private prepareSystem(system: BlankItem<'spell'>['system'], itemData: ExtractItemType<'spells', 'spell'>) {
-        system.category = itemData.category_english.toLowerCase().replace(/\s+/g, '_') as any;
+        system.category = itemData.category_english.toLowerCase().replace(/\s+/g, '_') as typeof system.category;
 
         const type = itemData.type_english ?? itemData.type;
         system.type = type === 'M' ? 'mana' : 'physical';
@@ -24,10 +25,20 @@ export class SpellParser extends Parser<'spell'> {
             ? 'touch'
             : rangeRaw.toLowerCase()
                 .replace(/\s+/g, '_')
-                .replace(/[()]/g, '') as any;
+                .replace(/[()]/g, '') as typeof system.range;
 
         const dvRaw = itemData.dv_english ?? itemData.dv;
         system.drain = parseInt(dvRaw.replace(/[A-Z]+/gi, ''), 10);
+
+        // Chummer tracks the alchemical variant of a spell as a separate known spell. SR5#304.
+        system.alchemical = itemData.alchemy === 'True';
+
+        // Exports from Chummer versions without spell elements keep the compendium's element.
+        if (itemData.elements_english !== undefined) {
+            const element = IH.parseElements(itemData.elements_english);
+            system.action.damage.element.base = element;
+            system.action.damage.element.value = element;
+        }
     }
 
     private parseDuration(system: BlankItem<'spell'>['system'], itemData: ExtractItemType<'spells', 'spell'>) {
@@ -99,7 +110,7 @@ export class SpellParser extends Parser<'spell'> {
             else if (token.includes('active'))
                 system.detection.passive = false;
             else if (token)
-                system.detection.type = token.toLowerCase() as any;
+                system.detection.type = token.toLowerCase() as typeof system.detection.type;
         });
         if (!system.detection.passive) {
             system.action.opposed.type = 'custom';
@@ -117,9 +128,9 @@ export class SpellParser extends Parser<'spell'> {
             if (token.includes('area')) return;
 
             if (token.includes('sense'))
-                system.illusion.sense = token.toLowerCase() as any;
+                system.illusion.sense = token.toLowerCase() as typeof system.illusion.sense;
             else if (token)
-                system.illusion.type = token.toLowerCase() as any;
+                system.illusion.type = token.toLowerCase() as typeof system.illusion.type;
         });
         if (system.type === 'mana') {
             system.action.opposed.type = 'custom';

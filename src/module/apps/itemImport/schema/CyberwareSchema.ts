@@ -17,17 +17,17 @@ export interface Cyberware {
     allowsubsystems?: {
         category: OneOrMany<{ _TEXT: string; }>;
     };
-    avail: { _TEXT: IntegerString | string; };
+    avail: { _TEXT: string; };
     bannedgrades?: {
         grade: Many<{ _TEXT: "Greyware" | "Greyware (Adapsin)" | "Used" | "Used (Adapsin)"; }>;
     };
     blocksmounts?: { _TEXT: string; };
     bonus?: BonusSchema;
-    capacity: { _TEXT: IntegerString | string; };
+    capacity: { _TEXT: string; };
     category: { _TEXT: string; };
-    cost: { _TEXT: IntegerString | string; };
+    cost: { _TEXT: string; };
     devicerating?: { _TEXT: "{Rating}"; };
-    ess: { _TEXT: IntegerString | string; };
+    ess: { _TEXT: string; };
     forbidden?: ConditionsSchema;
     forcegrade?: { _TEXT: "None" | "Standard"; };
     gears?: {
@@ -69,7 +69,8 @@ export interface Cyberware {
         };
         specificskill?: {
             bonus: { _TEXT: IntegerString; };
-            name: { _TEXT: "Palming" | "Swimming"; };
+            condition?: { _TEXT: "LimitCondition_SkillsActiveGymnasticsClimbing"; };
+            name: { _TEXT: "Gymnastics" | "Palming" | "Swimming"; };
         };
         sprintbonus?: {
             category: { _TEXT: "Swim"; };
@@ -119,6 +120,8 @@ export interface Cyberware {
             };
         }>;
     };
+    weaponcategories?: { _TEXT: string; };
+    weaponfilter?: { _TEXT: "not(cyberware) and not(hide)"; };
     wirelessbonus?: {
         limitmodifier?: Many<{
             condition: { _TEXT: "LimitCondition_Skillwires"; };
@@ -130,8 +133,9 @@ export interface Cyberware {
             name: { _TEXT: "Combat Active"; };
         };
         specificskill?: {
-            bonus: { _TEXT: IntegerString; };
-            name: { _TEXT: "Navigation" | "Perception"; };
+            bonus: { _TEXT: IntegerString | "Rating"; };
+            condition?: { _TEXT: string; };
+            name: { _TEXT: "Navigation" | "Perception" | "Performance"; };
         };
     };
     wirelesspairbonus?: {

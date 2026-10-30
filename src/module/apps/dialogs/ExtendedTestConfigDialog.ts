@@ -132,7 +132,7 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
         const visibility = record?.permissions.visibility ?? 'gmAndOwner';
         context.visibilityOptions = (['public', 'gmAndOwner', 'selectedUsers', 'gmOnly'] as ExtendedTestVisibility[]).map(value => ({
             value,
-            label: game.i18n.localize(`SR5.ExtendedTestManager.Visibility.${value}` as Parameters<typeof game.i18n.localize>[0]),
+            label: game.i18n.localize(`SR5.ExtendedTestManager.Visibility.${value}`),
             selected: visibility === value,
         }));
 
@@ -145,7 +145,7 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
         form: HTMLFormElement,
         formData: foundry.applications.ux.FormDataExtended
     ) {
-        const data = formData.object as Record<string, any>;
+        const data = formData.object as Record<string, string | number | boolean | undefined>;
 
         const readUsers = (prefix: string): string[] =>
             Object.entries(data)
@@ -189,7 +189,7 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
         void this.close();
     }
 
-    protected override _onClose(options: Parameters<ApplicationV2['_onClose']>[0]) {
+    protected override async _onClose(options: Parameters<ApplicationV2['_onClose']>[0]) {
         this.#resolve?.();
         return super._onClose(options);
     }

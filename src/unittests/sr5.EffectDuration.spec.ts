@@ -99,6 +99,28 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
             assert.notInclude(status.summary, 'Round');
         });
 
+        it('converts combat (rounds) durations prepared as seconds back into Combat Turns', () => {
+            const roundTime = CONFIG.time.roundTime || SR.combat.ROUND_TIME_SECONDS;
+            const status = durationStatus(
+                { value: 2, units: 'rounds', expired: false },
+                { units: 'seconds', remaining: 2 * roundTime, secondsRemaining: 2 * roundTime, label: `${2 * roundTime}s` },
+            );
+
+            assert.equal(status.state, 'active');
+            assert.equal(status.summary, game.i18n.format('SR5.ActiveEffect.Duration.CombatTurns', { turns: 2 }));
+        });
+
+        it('shows the selected Combat Turns for an out-of-combat effect', async () => {
+            const { effect } = await createEffect({ type: 'character' }, {
+                duration: { value: 1, units: 'rounds' },
+            });
+
+            const status = prepareEffectDurationStatus(effect);
+
+            assert.equal(status.state, 'active');
+            assert.equal(status.summary, game.i18n.format('SR5.ActiveEffect.Duration.CombatTurn', { turns: 1 }));
+        });
+
         it('renders reached, expired, and staged-restart states without negative time', () => {
             const pending = durationStatus(
                 { value: 1, units: 'rounds', expired: false, expiry: 'roundEnd' },
@@ -441,7 +463,7 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
             const combatants: { actorId: string }[] = [];
             for (let i = 0; i < count; i++) {
                 const actor = await factory.createActor({ type: 'character' });
-                combatants.push({ actorId: actor.id! });
+                combatants.push({ actorId: actor.id });
             }
             const events: string[] = [];
             const registry = foundry.documents.ActiveEffect.registry;
@@ -451,7 +473,7 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
                 await combat.startCombat();
                 for (const c of combat.combatants) await c.update({ initiative: 20 });
 
-                registry.refresh = (event: string, ctx: any) => { events.push(event); return originalRefresh(event, ctx); };
+                registry.refresh = async (event: string, ctx: any) => { events.push(event); return originalRefresh(event, ctx); };
                 await drive(combat);
             } finally {
                 registry.refresh = originalRefresh;

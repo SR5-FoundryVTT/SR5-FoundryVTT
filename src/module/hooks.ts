@@ -2,6 +2,9 @@ import { CompileSpriteTest } from './tests/CompileSpriteTest';
 import { OpposedSummonSpiritTest } from './tests/OpposedSummonSpiritTest';
 import { OpposedRitualTest } from './tests/OpposedRitualTest';
 import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
+import { PreparationCreationTest } from './tests/PreparationCreationTest';
+import { OpposedPreparationForceTest } from './tests/OpposedPreparationForceTest';
+import { PreparationTriggerTest } from './tests/PreparationTriggerTest';
 import { SR5 } from './config';
 import { Migrator } from './migrator/Migrator';
 import { registerSystemSettings } from './settings';
@@ -23,6 +26,7 @@ import { WorldTimeFlow } from './flows/WorldTimeFlow';
 import { ExtendedTestManager } from './apps/ExtendedTestManager';
 import { ExtendedTestFlow } from './flows/ExtendedTestFlow';
 import { ExtendedTestDueFlow } from './flows/ExtendedTestDueFlow';
+import { PreparationDecayFlow } from './flows/PreparationDecayFlow';
 import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
 import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
 import { CharacterImporter } from './apps/actorImport/characterImporter/CharacterImporter';
@@ -75,7 +79,7 @@ import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
 import { CheckOverwatchScoreTest } from '@/module/tests/CheckOverwatchScoreTest';
 import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
 
-import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
+import { createItemMacro, rollItemMacro, rollSkillMacro } from './macros';
 
 import { registerSystemKeybindings } from './keybindings';
 import { SkillTest } from './tests/SkillTest';
@@ -128,6 +132,7 @@ import { Metamagic } from './types/item/Metamagic';
 import { Modification } from './types/item/Modification';
 import { Program } from './types/item/Program';
 import { Quality } from './types/item/Quality';
+import { Preparation } from './types/item/Preparation';
 import { Ritual } from './types/item/Ritual';
 import { Sin } from './types/item/Sin';
 import { Spell } from './types/item/Spell';
@@ -191,6 +196,7 @@ export class HooksManager {
         // Announce extended tests game time has made rollable again. Debounced, as holding a
         // time preset would otherwise scan every record per tick.
         Hooks.on('updateWorldTime', foundry.utils.debounce(() => { void ExtendedTestDueFlow.announceDue(); }, 250));
+        Hooks.on('updateWorldTime', foundry.utils.debounce(() => { void PreparationDecayFlow.onWorldTimeChange(); }, 250));
 
         PerceptionFlow.registerHooks();
         AstralProjectionFlow.registerHooks();
@@ -278,6 +284,9 @@ ___________________
                 SpellCastingTest,
                 RitualSpellcastingTest,
                 OpposedRitualTest,
+                PreparationCreationTest,
+                OpposedPreparationForceTest,
+                PreparationTriggerTest,
                 CombatSpellDefenseTest,
                 DrainTest,
                 FadeTest,
@@ -331,6 +340,8 @@ ___________________
                 SummonSpiritTest,
                 CompileSpriteTest,
                 RitualSpellcastingTest,
+                PreparationCreationTest,
+                PreparationTriggerTest,
                 BruteForceTest,
                 HackOnTheFlyTest,
                 MatrixResistTest,
@@ -351,6 +362,7 @@ ___________________
                 OpposedSummonSpiritTest,
                 OpposedCompileSpriteTest,
                 OpposedRitualTest,
+                OpposedPreparationForceTest,
                 OpposedBruteForceTest,
                 OpposedHackOnTheFlyTest,
                 OpposedTraceIconTest,
@@ -468,6 +480,7 @@ ___________________
         CONFIG.Item.dataModels["modification"] = Modification;
         CONFIG.Item.dataModels["program"] = Program;
         CONFIG.Item.dataModels["quality"] = Quality;
+        CONFIG.Item.dataModels["preparation"] = Preparation;
         CONFIG.Item.dataModels["ritual"] = Ritual;
         CONFIG.Item.dataModels["sin"] = Sin;
         CONFIG.Item.dataModels["skill"] = Skill;
@@ -554,12 +567,12 @@ ___________________
         HooksManager.configureTextEnrichers();
 
         // Preload might reduce loading time during play.
-        HandlebarManager.loadTemplates();
+        void HandlebarManager.loadTemplates();
 
         // Register Tours
-        registerSR5Tours();
+        void registerSR5Tours();
 
-        DataStorage.validate();
+        void DataStorage.validate();
     }
 
     static async ready() {
@@ -570,6 +583,9 @@ ___________________
             Migrator.BeginMigration();
 
             await WorldTimeFlow.initialize();
+            // Record the starting world time, so the first advance can see
+            // which preparation triggers and expirations it crosses.
+            await PreparationDecayFlow.onWorldTimeChange();
 
             if (ChangelogApplication.showApplication)
                 new ChangelogApplication().render(true);
@@ -593,7 +609,7 @@ ___________________
     static hotbarDrop(bar, dropData, slot): boolean {
         switch (dropData.type) {
             case 'Item':
-                createItemMacro(dropData, slot);
+                void createItemMacro(dropData, slot);
                 return false;
         }
         return true;
@@ -692,7 +708,7 @@ ___________________
      * @param data The update data given.
      * @param id The items id.
      */
-    static async updateIcConnectedToHostItem(item: SR5Item, data: Item.UpdateData, options: Item.Database.OnUpdateOptions, userId: string) {
+    static async updateIcConnectedToHostItem(item: SR5Item, _data: Item.UpdateData, _options: Item.Database.OnUpdateOptions, _userId: string) {
         // Trigger type specific behaviour.
         if (item.isType('host'))
             await MatrixICFlow.handleUpdateItemHost(item);
@@ -746,17 +762,18 @@ ___________________
         });
     }
 
-    static async chatMessageListeners(message: ChatMessage, html, data) {
-        await SuccessTest.chatMessageListeners(message, html, data);
-        BlastTemplateFlow.chatMessageListeners(html, test => BlastScatterFlow.handle(test));
+    static async chatMessageListeners(message: ChatMessage, html) {
+        await SuccessTest.chatMessageListeners(message, html);
+        BlastTemplateFlow.chatMessageListeners(html, async test => BlastScatterFlow.handle(test));
         SuppressiveFireTemplateFlow.chatMessageListeners(html);
         ShotgunTemplateFlow.chatMessageListeners(html);
-        await OpposedTest.chatMessageListeners(message, html, data);
-        await ActionFollowupFlow.chatMessageListeners(message, html, data);
-        await TeamworkTest.chatMessageListeners(message, html);
-        await JournalEnrichers.messageRequestHooks(html);
-        await MatrixNetworkFlow.chatMessageListeners(message, html, data);
-        await ExtendedTestDueFlow.chatMessageListeners(message, html);
+        await OpposedTest.chatMessageListeners(message, html);
+        ActionFollowupFlow.chatMessageListeners(message, html);
+        TeamworkTest.chatMessageListeners(message, html);
+        JournalEnrichers.messageRequestHooks(html);
+        MatrixNetworkFlow.chatMessageListeners(message, html);
+        ExtendedTestDueFlow.chatMessageListeners(message, html);
+        PreparationDecayFlow.chatMessageListeners(message, html);
     }
 
     static configureVision() {

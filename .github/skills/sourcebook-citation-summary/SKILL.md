@@ -1,11 +1,9 @@
 ---
-name: "Sourcebook Citation Summary"
+name: sourcebook-citation-summary
 description: "Summarize a Shadowrun sourcebook citation such as SR5#140 or a named heading. Use for page summaries, page-range summaries, heading summaries, and heading lists grounded in the mcp_sourcebook-ci tools."
+disable-model-invocation: true
 argument-hint: "Citation target, such as SR5#140, SR5 pages 139-141, or SR5 heading Social Modifiers"
-agent: "agent"
-tools: ["sourcebook-citations/*"]
 ---
-
 Summarize the requested Shadowrun citation using the local `mcp_sourcebook-ci_*` tools.
 
 Workflow:

@@ -36,6 +36,7 @@ import { Metamagic } from "../types/item/Metamagic";
 import { Modification } from "../types/item/Modification";
 import { Program } from "../types/item/Program";
 import { Quality } from "../types/item/Quality";
+import { Preparation } from "../types/item/Preparation";
 import { Ritual } from "../types/item/Ritual";
 import { LicenseData, Sin } from "../types/item/Sin";
 import { Spell } from "../types/item/Spell";
@@ -75,6 +76,7 @@ const systemMap = {
     modification: Modification,
     program: Program,
     quality: Quality,
+    preparation: Preparation,
     ritual: Ritual,
     sin: Sin,
     skill: Skill,
@@ -158,7 +160,7 @@ export class DataDefaults {
      */
     static baseSystemData<EntityType extends SystemEntityType>(
         entity: EntityType,
-        createData: SystemConstructorArgs<EntityType> = undefined
+        createData?: SystemConstructorArgs<EntityType>
     ): ReturnType<SystemByType<EntityType>['toObject']> {
         if (createData) {
             let correctionLogs: CorrectionLog | null;
@@ -174,6 +176,6 @@ export class DataDefaults {
                 console.table(correctionLogs);
             }
         }
-        return new (systemMap[entity] as any)(createData).toObject();
+        return new (systemMap[entity] as unknown as new (data?: SystemConstructorArgs<EntityType>) => SystemByType<EntityType>)(createData).toObject() as ReturnType<SystemByType<EntityType>['toObject']>;
     }
 }

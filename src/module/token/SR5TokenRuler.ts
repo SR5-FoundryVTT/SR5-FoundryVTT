@@ -2,7 +2,6 @@ import { FLAGS, SYSTEM_NAME } from '../constants';
 import { MovementPhaseMarker } from './SR5TokenDocument';
 
 const Color = foundry.utils.Color;
-type TokenRuler = foundry.canvas.placeables.tokens.TokenRuler;
 type Waypoint = foundry.canvas.placeables.tokens.TokenRuler.Waypoint;
 type WaypointContext = NonNullable<ReturnType<foundry.canvas.placeables.tokens.TokenRuler['_getWaypointLabelContext']>>;
 

@@ -7,7 +7,7 @@ export interface BonusSchema {
     accel?: { _TEXT: IntegerString | "+Rating" | "Rating"; };
     actiondicepool?: { $: { category: "Matrix"; }; };
     activeskillkarmacost?: Many<{
-        condition: { _TEXT: "career"; };
+        condition: { _TEXT: "/character/created"; };
         max?: { _TEXT: IntegerString; };
         min?: { _TEXT: IntegerString; };
         name: Empty;
@@ -57,16 +57,19 @@ export interface BonusSchema {
     };
     addspell?: { _TEXT: "Alter Ballistics"; $: { alchemical: "True"; }; };
     addspirit?: Empty | OneOrMany<{
+        $?: { ratingdivisor: IntegerString; skill: "Summoning"; };
         addtoselected?: { _TEXT: "False"; };
         spirit?: OneOrMany<{ _TEXT: string; }>;
     }>;
     addware?: {
-        grade: { _TEXT: "None"; };
-        name: { _TEXT: "Busted Ware"; };
+        grade?: { _TEXT: "None"; };
+        id?: { _TEXT: "961eac53-0c43-4b19-8741-2872177a3a4c"; };
+        name?: { _TEXT: "Busted Ware"; };
+        rating?: { _TEXT: IntegerString; };
         type: { _TEXT: "Cyberware"; };
     };
     addweapon?: {
-        name: { _TEXT: "Elemental Body"; };
+        name: { _TEXT: "Corrosive Spit (Critter)" | "Elemental Body"; };
     };
     adeptpowerpoints?: { _TEXT: IntegerString; };
     allowskilldefaulting?: Empty;
@@ -83,7 +86,7 @@ export interface BonusSchema {
     availability?: { _TEXT: IntegerString; $: { condition: "career"; }; };
     biowareessmultiplier?: { _TEXT: IntegerString; };
     blackmarketdiscount?: Empty;
-    blockskillcategorydefaulting?: Many<{ _TEXT: "Academic" | "Professional" | "Technical Active"; }>;
+    blockskillcategorydefaulting?: OneOrMany<{ _TEXT: "Academic" | "Professional" | "Social Active" | "Technical Active"; }>;
     blockspelldescriptor?: { _TEXT: "Spell"; };
     body?: { _TEXT: IntegerString | "-Rating"; };
     burnoutsway?: Empty;
@@ -135,6 +138,7 @@ export interface BonusSchema {
     dodge?: { _TEXT: IntegerString | "-Rating" | "Rating"; };
     drainresist?: { _TEXT: IntegerString; };
     drainvalue?: { _TEXT: IntegerString; };
+    drugpositiveattributemodifier?: Many<{ _TEXT: IntegerString; $: { category: "Custom Drugs" | "Drugs"; }; }>;
     electricityarmor?: { _TEXT: IntegerString | "Rating"; };
     enableattribute?: {
         name: { _TEXT: "MAG" | "RES"; };
@@ -170,14 +174,14 @@ export interface BonusSchema {
     judgeintentionsdefense?: { _TEXT: IntegerString | "Rating"; };
     judgeintentionsoffense?: { _TEXT: "-Rating"; };
     knowledgeskillkarmacost?: Many<{
-        condition?: { _TEXT: "career"; };
+        condition?: { _TEXT: "/character/created"; };
         max?: { _TEXT: IntegerString; };
         min?: { _TEXT: IntegerString; };
         name: Empty;
         val: { _TEXT: IntegerString | "-number(Rating >= 2)" | "-number(Rating >= 3)"; };
     }>;
     knowledgeskillkarmacostmin?: {
-        condition: { _TEXT: "career"; };
+        condition: { _TEXT: "/character/created"; };
         max: { _TEXT: IntegerString; };
         name: Empty;
         val: { _TEXT: IntegerString; };
@@ -190,7 +194,7 @@ export interface BonusSchema {
     limitmodifier?: OneOrMany<{
         condition?: { _TEXT: string; };
         limit: { _TEXT: "Mental" | "Physical" | "Social"; };
-        value: { _TEXT: IntegerString | "Rating"; };
+        value: { _TEXT: IntegerString | "Rating" | "{MAG}"; };
     }>;
     limitspellcategory?: Empty | { _TEXT?: "Rituals"; $?: { exclude: "Rituals"; }; };
     limitspiritcategory?: Empty | {
@@ -227,7 +231,7 @@ export interface BonusSchema {
         reach: { _TEXT: IntegerString; };
         source?: { _TEXT: "DTR" | "HS"; };
         useskill: { _TEXT: "Exotic Melee Weapon" | "Unarmed Combat"; };
-        useskillspec?: { _TEXT: "Quills" | "Trunk"; };
+        useskillspec?: { _TEXT: "Quills" | "Spines" | "Trunk"; };
     };
     newspellkarmacost?: { _TEXT: IntegerString; $: { type: "Spells"; }; };
     notoriety?: { _TEXT: IntegerString; };
@@ -344,19 +348,19 @@ export interface BonusSchema {
         name: { _TEXT: "INT" | "LOG" | "MAG" | "WIL"; };
     }>;
     skillcategory?: OneOrMany<{
-        bonus: { _TEXT: IntegerString | "-Rating" | "Rating"; };
+        bonus: { _TEXT: IntegerString | "-Rating" | "Rating" | "{MAG}"; };
         condition?: { _TEXT: string; };
         exclude?: { _TEXT: "Gunnery" | "Intimidation" | "Perception"; };
         name: { _TEXT: string; };
     }>;
     skillcategorykarmacost?: {
-        condition: { _TEXT: "career"; };
+        condition: { _TEXT: "/character/created"; };
         min: { _TEXT: IntegerString; };
         name: { _TEXT: "Academic" | "Language" | "Professional" | "Street"; };
         val: { _TEXT: IntegerString; };
     };
     skillcategorykarmacostmultiplier?: OneOrMany<{
-        condition?: { _TEXT: "create"; };
+        condition?: { _TEXT: "/character/created = false"; };
         name: { _TEXT: "Academic" | "Professional" | "Social Active" | "Technical Active"; };
         val: { _TEXT: IntegerString; };
     }>;
@@ -365,7 +369,7 @@ export interface BonusSchema {
         val: { _TEXT: IntegerString; };
     };
     skillcategoryspecializationkarmacostmultiplier?: OneOrMany<{
-        condition?: { _TEXT: "create"; };
+        condition?: { _TEXT: "/character/created = false"; };
         name: { _TEXT: "Academic" | "Professional" | "Technical Active"; };
         val: { _TEXT: IntegerString; };
     }>;
@@ -407,12 +411,13 @@ export interface BonusSchema {
     }>;
     specificskill?: OneOrMany<{
         applytorating?: { _TEXT: "True"; };
-        bonus: { _TEXT: IntegerString | "Rating"; };
+        bonus: { _TEXT: IntegerString | "Rating" | "Rating * 2"; };
         condition?: { _TEXT: string; };
         name: { _TEXT: string; };
     }>;
     speed?: { _TEXT: IntegerString | "+Rating" | "Rating"; };
     spellcategory?: {
+        condition: { _TEXT: "not(/spell/alchemical)"; };
         name: { _TEXT: "Combat" | "Detection" | "Health" | "Illusion" | "Manipulation"; };
         val: { _TEXT: "Rating"; };
     };
@@ -464,7 +469,7 @@ export interface BonusSchema {
     toxininjectionresist?: { _TEXT: IntegerString | "Rating"; };
     trustfund?: { _TEXT: IntegerString; };
     unarmedap?: { _TEXT: "-Rating"; };
-    unarmeddv?: { _TEXT: IntegerString | "Rating*0.5" | "Rating-1"; };
+    unarmeddv?: { _TEXT: IntegerString | "Rating-1" | "floor(Rating div 2)"; };
     unarmeddvphysical?: Empty;
     unarmedreach?: { _TEXT: IntegerString; };
     uneducated?: Empty;
@@ -479,10 +484,8 @@ export interface BonusSchema {
         value: { _TEXT: IntegerString; };
     };
     weaponcategorydice?: {
-        category: {
-            name: { _TEXT: "Bows"; };
-            value: { _TEXT: IntegerString; };
-        };
+        bonus: { _TEXT: IntegerString; };
+        name: { _TEXT: "Bows"; };
     };
     weaponcategorydv?: {
         bonus: { _TEXT: IntegerString; };
@@ -496,5 +499,5 @@ export interface BonusSchema {
         value: { _TEXT: IntegerString; };
     };
     weaponspecificdice?: { _TEXT: "Rating"; $: { type: "Melee"; }; };
-    _TEXT?: IntegerString | "-Rating" | "Rating";
+    _TEXT?: IntegerString | "-Rating" | "Rating" | "Rating * 2" | "{MAG}";
 };

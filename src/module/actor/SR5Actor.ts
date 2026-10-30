@@ -1,6 +1,6 @@
 import { Helpers } from '../helpers';
 import { SR5Item } from '../item/SR5Item';
-import { FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME } from '../constants';
+import { FLAGS, SR, SYSTEM_NAME } from '../constants';
 import { ModifiableValue } from '../mods/ModifiableValue';
 import { DataDefaults } from '../data/DataDefaults';
 import { SkillFieldPrep } from './prep/functions/SkillFieldPrep';
@@ -33,9 +33,7 @@ import { SkillRollOptions } from '../types/rolls/ActorRolls';
 import { FireModeType } from '../types/flags/ItemFlags';
 import { Migrator } from '../migrator/Migrator';
 import { OverwatchStorage } from '../storage/OverwatchStorage';
-import { SuccessTest } from '../tests/SuccessTest';
 import { DamageApplicationFlow } from './flows/DamageApplicationFlow';
-import { ModifiableField } from '../types/fields/ModifiableField';
 import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { ActorMarksFlow } from './flows/ActorMarksFlow';
 import { SetMarksOptions } from '../storage/MarksStorage';
@@ -358,11 +356,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         if (id === undefined) return;
         const attributes = this.getAttributes();
         if (!attributes) return;
-        return attributes[id];
+        return attributes[id] as AttributeFieldType | undefined;
     }
 
     findVehicleStat(statName: string): AttributeFieldType | undefined {
-        return this.getVehicleStats()?.[statName];
+        return this.getVehicleStats()?.[statName] as AttributeFieldType | undefined;
     }
 
     findLimitFromAttribute(this: SR5Actor, attributeName?: string): LimitFieldType | undefined {
@@ -374,7 +372,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     findLimit(this: SR5Actor, limitName?: string): LimitFieldType | undefined {
         if (!limitName || !('limits' in this.system)) return undefined;
-        return this.system.limits?.[limitName];
+        return this.system.limits?.[limitName] as LimitFieldType | undefined;
     }
 
     getWoundModifier(this: SR5Actor): number {
@@ -532,15 +530,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const rollData = options?.rollData ?? this.getRollData({copySystem: true});
         // First check vehicle stats, as they don't always exist.
         const stats = rollData.vehicle_stats ?? this.getVehicleStats();
-        if (stats?.[name]) return stats[name];
+        if (stats?.[name]) return stats[name] as AttributeFieldType;
 
         // Finally, check general attributes.
         const attributes = rollData.attributes ?? this.getAttributes();
-        return attributes[name];
+        return attributes[name] as AttributeFieldType;
     }
 
     getLimit(this: SR5Actor, name: string): LimitFieldType | undefined {
-        return this.system.limits?.[name];
+        return this.system.limits?.[name] as LimitFieldType | undefined;
     }
 
     /**
@@ -556,7 +554,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *  Please check SR5ActorType for reference.
      */
     isType<ST extends readonly Actor.ConfiguredSubType[]>(this: SR5Actor, ...types: ST): this is SR5Actor<ST[number]> {
-        return types.includes(this.type as ST[number]);
+        return types.includes(this.type);
     }
 
     asType<ST extends readonly Actor.ConfiguredSubType[]>(this: SR5Actor, ...types: ST): SR5Actor<ST[number]> | undefined {
@@ -1119,7 +1117,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             },
             participants: []
         };
-        const content = await renderTemplate('systems/shadowrun5e/dist/templates/rolls/teamwork-test-message.hbs', templateData);
+        const content = await foundry.applications.handlebars.renderTemplate('systems/shadowrun5e/dist/templates/rolls/teamwork-test-message.hbs', templateData);
         // Prepare the actual message.
         const messageData = {
             user: game.user.id,
@@ -1535,7 +1533,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Remove out old defeated effects.
         if (removeStatus.length) {
             const existing = this.effects.reduce<string[]>((arr, e) => {
-                if ((e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status))) arr.push(e.id as string);
+                if ((e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status))) arr.push(e.id);
                 return arr;
             }, []);
 
@@ -1702,6 +1700,16 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     getTechnomancer(this: SR5Actor): SR5Actor | undefined {
         if (!this.isType('sprite') || !this.hasTechnomancer()) return undefined;
         const actor = fromUuidSync(this.system.technomancerUuid);
+        if (actor && actor instanceof SR5Actor) return actor;
+        return undefined;
+    }
+
+    /**
+     * Get the summoner of a spirit
+     */
+    getSummoner(this: SR5Actor): SR5Actor | undefined {
+        if (!this.isType('spirit') || !this.system.summonerUuid) return undefined;
+        const actor = fromUuidSync(this.system.summonerUuid);
         if (actor && actor instanceof SR5Actor) return actor;
         return undefined;
     }
