@@ -240,6 +240,9 @@ export class ActionParser extends Parser<'action'> {
         } else if (name.includes("Hack on the Fly")) {
             action.test = "HackOnTheFlyTest";
             action.opposed.test = "OpposedHackOnTheFlyTest";
+        } else if (name.includes("Trace Icon")) {
+            action.test = "MatrixTest";
+            action.opposed.test = "OpposedTraceIconTest";
         } else if (action.skill === "throwing_weapon") {
             action.test = "ThrownAttackTest";
         } else if (action.skill === "summoning") {

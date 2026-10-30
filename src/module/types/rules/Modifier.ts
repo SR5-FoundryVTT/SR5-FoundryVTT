@@ -19,6 +19,7 @@ declare namespace Shadowrun {
         'drain'|
         'environmental'|
         'environmental.light'|
+        'environmental.glare'|
         'environmental.visibility'|
         'environmental.wind'|
         'environmental.range'|
@@ -87,6 +88,7 @@ declare namespace Shadowrun {
     // Situational physical / enviornmental modifiers
     export interface EnvironmentalModifierCategories {
         light: number
+        glare: number
         wind: number
         visibility: number
         range: number
