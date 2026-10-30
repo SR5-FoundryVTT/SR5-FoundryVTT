@@ -521,6 +521,7 @@ export const FlowRunner = {
                 ctx: state?.ctx,
                 chainId: state?.chainId,
                 messageUuid: test.data.messageUuid,
+                exclude: step.config.exclude as string[] | undefined,
             });
             return true;
         }

@@ -167,6 +167,10 @@
                 "appliedByTest": {
                     "label": "Apply-To Test via Item"
                 },
+                "applyOnTarget": {
+                    "hint": "Doesn't affect the owner of its item. An action applies it to who it affects: its targets, or whoever an action step names, like the user.",
+                    "label": "Apply on target"
+                },
                 "conditionMode": {
                     "hint": "Include: the test must match these values; Exclude: the test must not match these values."
                 },
@@ -3327,7 +3331,7 @@
                 "Effects": "Applies",
                 "EffectsHint": "Which of the item's effects this applies to whoever it runs for.",
                 "EffectSelectDefault": "Default: targeted effects",
-                "NoTargetedEffects": "This item has no effects applying to targeted actors.",
+                "NoTargetedEffects": "This item has no effects to apply on target.",
                 "Result": "Result",
                 "ResultValue": "Value",
                 "ResultLabel": "Label",

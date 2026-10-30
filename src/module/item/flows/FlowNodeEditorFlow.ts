@@ -280,9 +280,9 @@ export const FlowNodeEditorFlow = {
             round: labeled(['up', 'down'], 'SR5.Flow.Node.Round'),
             knownOptions: KNOWN_OPTIONS.map(value => ({ value, label: FlowNodeEditorFlow.optionLabel(value) })),
             conditions: Object.keys(FlowConditions).map(value => ({ value, label: FlowNodeEditorFlow.conditionLabel(value) })),
-            // Effects copied to the recipients of an action. See SuccessTestEffectsFlow.
+            // Effects to apply on target, copied to the recipients of an action. See SuccessTestEffectsFlow.
             effects: item.effects.contents
-                .filter(effect => effect.system.targets.some(target => target.applyTo === 'targeted_actor'))
+                .filter(effect => effect.system.applyOnTarget)
                 .map(effect => ({ value: effect.id ?? '', label: effect.name })),
         };
     },

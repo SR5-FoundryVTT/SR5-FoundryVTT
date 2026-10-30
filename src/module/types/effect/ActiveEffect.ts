@@ -23,6 +23,8 @@ const ActiveEffectData = (baseChanges: foundry.data.ActiveEffectTypeDataModel.Ch
     appliedByTest:   new BooleanField(),
     onlyForEquipped: new BooleanField(),
     onlyForWireless: new BooleanField(),
+    // Dormant on its item, and copied by an action onto who it affects. See SuccessTestEffectsFlow.
+    applyOnTarget:   new BooleanField(),
     expiryAction:    new StringField({ required: true, initial: 'default', choices: ['default', 'delete', 'update'] }),
     rating:          new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
     // How a copy applied by an action treats copies of the same effect already on the recipient.

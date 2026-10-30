@@ -7,6 +7,7 @@ import { FlowConditions, FlowPlan } from '@/module/flows/FlowPlan';
 import { FlowRunner } from '@/module/flows/FlowRunner';
 import { FlowContext } from '@/module/flows/FlowContext';
 import { FlowGates } from '@/module/flows/FlowGates';
+import { FlowTree } from '@/module/flows/FlowTree';
 import { FlowChemicals } from '@/module/flows/FlowContributors';
 import { ToxinResistTest } from '@/module/tests/ToxinResistTest';
 import { DamageRules } from '@/module/rules/DamageRules';
@@ -268,6 +269,48 @@ export const shadowrunFlowNodes = (context: QuenchBatchContext) => {
 
             assert.lengthOf(copies(defender, 'Stacks'), 2);
             assert.lengthOf(copies(defender, 'Replaces'), 1);
+        });
+
+        // An effect to apply on target, authored like any effect on its actor.
+        const onTarget = (name: string) => ({
+            name,
+            system: {
+                applyOnTarget: true,
+                targets: [{ id: 'r', applyTo: 'actor' }],
+                changes: [{ key: 'system.attributes.reaction', value: '1', type: 'add', phase: 'initial', target: 'r' }],
+            },
+        });
+
+        it('does nothing to the owner of an effect to apply on target', async () => {
+            const { attack, attacker } = await effectAttack([onTarget('Adrenaline')]);
+            const carried = attacker.getAttribute('reaction')?.value;
+            await attack.item!.deleteEmbeddedDocuments('ActiveEffect', attack.item!.effects.map(effect => effect.id!));
+
+            assert.strictEqual(attacker.getAttribute('reaction')?.value, carried, 'The effect changes no attribute of its owner');
+        });
+
+        it('copies an effect to apply on target onto the target unticked, applying there as authored', async () => {
+            const { attack, defender } = await effectAttack([onTarget('Adrenaline')]);
+            const before = defender.getAttribute('reaction')?.value ?? 0;
+            await attack.effects.createTargetActorEffects(defender);
+
+            const [copy] = copies(defender, 'Adrenaline');
+            assert.exists(copy, 'The target gets the copy');
+            assert.strictEqual(copy.system.targets[0].applyTo, 'actor');
+            assert.isFalse(copy.system.applyOnTarget, 'The copy is unticked');
+            assert.strictEqual(defender.getAttribute('reaction')?.value, before + 1);
+        });
+
+        it('leaves effects a step selects out of the effects applied to the targets', async () => {
+            const { attack } = await effectAttack([onTarget('Adrenaline')]);
+            const effect = attack.item!.effects.find(effect => effect.name === 'Adrenaline')!;
+            await attack.item!.update({ 'system.action.followed': { test: 'SuccessTest', actor: 'self', when: [], effects: { select: 'ids', ids: [effect.id!] } } } as Item.UpdateData);
+            const test = await TestCreator.fromItem(attack.item!, attack.actor, { showDialog: false, showMessage: false });
+            if (!test) throw new Error('Failed to create test');
+
+            const steps = FlowTree.flatten(test);
+            const fallback = steps.find(step => step.id === 'opposed.effects');
+            assert.deepEqual(fallback?.config.exclude, [effect.id]);
         });
     });
 

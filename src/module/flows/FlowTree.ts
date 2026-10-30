@@ -98,7 +98,22 @@ export const FlowTree = {
         const followed = action.followed as FlowNodeData | undefined;
         if (followed) FlowTree.visit(visit, followed, 'followed', 'followed', { mode: root.autoExecuteFollowupTest ? 'auto' : 'prompt' });
 
+        FlowTree.excludeSelectedEffects(steps);
         return steps;
+    },
+
+    /**
+     * Effects a node selects by id are for its recipient only, not also for the targets the default
+     * effects step applies all effects to.
+     */
+    excludeSelectedEffects(steps: FlowStep[]) {
+        const fallback = steps.find(step => step.kind === 'applyEffects' && step.config.default);
+        if (!fallback || fallback.config.select === 'ids') return;
+
+        const selected = steps
+            .filter(step => step !== fallback && step.kind === 'applyEffects' && step.config.select === 'ids')
+            .flatMap(step => step.config.ids as string[] ?? []);
+        if (selected.length) fallback.config.exclude = [...new Set(selected)];
     },
 
     /**
@@ -303,7 +318,7 @@ export const FlowTree = {
     lowerDefaultEffects(visit: NodeVisit, action: FlowNodeData, hasOpposed: boolean) {
         const effects = action.effects as { select?: string, ids?: string[] } | undefined;
         if (effects?.select === 'none') return;
-        if (!effects?.select && !FlowTree.hasTargetedActorEffects(visit.root)) return;
+        if (!effects?.select && !FlowTree.hasActionEffects(visit.root)) return;
 
         visit.steps.push(createFlowStep({
             id: hasOpposed ? 'opposed.effects' : 'effects',
@@ -312,7 +327,7 @@ export const FlowTree = {
             when: hasOpposed ? ['hit'] : ['success'],
             actor: 'target',
             path: hasOpposed ? 'opposed' : '',
-            config: effects?.select ? { select: effects.select, ids: [...(effects.ids ?? [])] } : {},
+            config: { default: true, ...(effects?.select ? { select: effects.select, ids: [...(effects.ids ?? [])] } : {}) },
         }));
     },
 
@@ -346,12 +361,14 @@ export const FlowTree = {
     /**
      * Mirrors which effects SuccessTestEffectsFlow copies onto target actors.
      */
-    hasTargetedActorEffects(test: SuccessTest): boolean {
+    hasActionEffects(test: SuccessTest): boolean {
         const item = test.item;
         if (!item) return false;
 
         for (const _ of allApplicableDocumentEffects(item, { applyTo: ['targeted_actor'] })) return true;
         for (const _ of allApplicableItemsEffects(item, { applyTo: ['targeted_actor'], nestedItems: false })) return true;
+        for (const _ of allApplicableDocumentEffects(item, { onTarget: true })) return true;
+        for (const _ of allApplicableItemsEffects(item, { nestedItems: false, onTarget: true })) return true;
         return false;
     },
 };

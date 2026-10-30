@@ -28,6 +28,8 @@ export interface TargetActorEffectsOptions {
     ctx?: FlowContextData;
     chainId?: string;
     messageUuid?: string;
+    // Effects other steps of the action apply, left out of one applying all.
+    exclude?: string[];
 }
 
 /**
@@ -36,10 +38,10 @@ export interface TargetActorEffectsOptions {
  * The flow pattern follows the composite pattern.
  */
 /**
- * Targets of a chemical's effects copied onto whoever takes a dose: their data, their tests and
- * their modifiers, as for the actor carrying any other item.
+ * Targets copied onto the recipient of an action as authored: their data, their tests and their
+ * modifiers, as for the actor carrying any other item. For a chemical's effects and effects to apply on target.
  */
-const CHEMICAL_EFFECT_APPLY_TO: string[] = ['actor', 'test_all', 'test_target', 'modifier'];
+const APPLIED_EFFECT_APPLY_TO: string[] = ['actor', 'test_all', 'test_target', 'modifier'];
 
 export class SuccessTestEffectsFlow<T extends SuccessTest> {
     // The test this flow is applied to.
@@ -186,6 +188,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         const start = (CONFIG.ActiveEffect.documentClass as unknown as { getEffectStart(): object }).getEffectStart();
         for (const effectData of effectsData) {
             effectData['system.appliedByTest'] = true;
+            foundry.utils.setProperty(effectData, 'system.applyOnTarget', false);
             foundry.utils.setProperty(effectData, 'start', start);
             foundry.utils.setProperty(effectData, 'duration.expired', false);
             if (options.durationFormula && !foundry.utils.getProperty(effectData, 'system.durationFormula')) {
@@ -233,6 +236,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         const collectTrimmed = (effect: SR5ActiveEffect, trimmed: SR5ActiveEffect) => {
             // An action can apply only some of the items effects.
             if (options.select === 'ids' && !options.ids?.includes(effect.id ?? '')) return;
+            if (options.exclude?.includes(effect.id ?? '')) return;
             // Some only under a condition, like nausea incapacitating when Power is above Willpower. SR5#409.
             const condition = options.conditions?.[effect.id ?? ''];
             if (condition && !FlowContext.resolve(condition, source)) return;
@@ -244,23 +248,23 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             if (trimmed) collectTrimmed(effect, trimmed);
         };
 
-        // A chemical's effects are for whoever takes a dose, as authored. Other items hold the
-        // effects for the targets of their action as targeted actor effects.
+        const collectApplied = (effect: SR5ActiveEffect) => {
+            const trimmed = this._trimToAppliedEffectData(effect, targetActor, APPLIED_EFFECT_APPLY_TO);
+            if (trimmed) collectTrimmed(effect, trimmed);
+        };
+
+        // A chemical's effects are for whoever takes a dose, as authored.
         if (item.isType('chemical')) {
-            for (const effect of allApplicableDocumentEffects(item, { applyTo: CHEMICAL_EFFECT_APPLY_TO })) {
-                const trimmed = this._trimToAppliedEffectData(effect, targetActor, CHEMICAL_EFFECT_APPLY_TO);
-                if (trimmed) collectTrimmed(effect, trimmed);
-            }
+            for (const effect of allApplicableDocumentEffects(item, { applyTo: APPLIED_EFFECT_APPLY_TO })) collectApplied(effect);
             return effectsData;
         }
 
-        for (const effect of allApplicableDocumentEffects(item, { applyTo: ['targeted_actor'] })) {
-            collect(effect);
-        }
+        // Effects to apply on target are copied onto the recipient as authored, and apply there.
+        for (const effect of allApplicableDocumentEffects(item, { applyTo: APPLIED_EFFECT_APPLY_TO, onTarget: true })) collectApplied(effect);
+        for (const effect of allApplicableItemsEffects(item, { applyTo: APPLIED_EFFECT_APPLY_TO, nestedItems: false, onTarget: true })) collectApplied(effect);
 
-        for (const effect of allApplicableItemsEffects(item, { applyTo: ['targeted_actor'], nestedItems: false })) {
-            collect(effect);
-        }
+        for (const effect of allApplicableDocumentEffects(item, { applyTo: ['targeted_actor'] })) collect(effect);
+        for (const effect of allApplicableItemsEffects(item, { applyTo: ['targeted_actor'], nestedItems: false })) collect(effect);
 
         console.debug(`Shadowrun5e | To be created effects on target actor ${targetActor.name}`, effectsData);
 

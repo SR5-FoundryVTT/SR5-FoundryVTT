@@ -13,6 +13,9 @@
     {{#if showOnlyForWireless}}
         {{formGroup systemFields.onlyForWireless value=source.system.onlyForWireless rootId=rootId}}
     {{/if}}
+    {{#if showApplyOnTarget}}
+        {{formGroup systemFields.applyOnTarget value=source.system.applyOnTarget rootId=rootId}}
+    {{/if}}
 
     {{formGroup fields.statuses value=source.statuses options=statuses rootId=rootId classes="statuses"}}
 </section>

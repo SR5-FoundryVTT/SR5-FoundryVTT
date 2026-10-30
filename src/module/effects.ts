@@ -38,10 +38,20 @@ export function prepareSortedItemEffects(document: SR5Actor|SR5Item, options: Ap
 interface ApplicableItemEffectOptions {
     applyTo?: string[]
     nestedItems?: boolean
+    onTarget?: boolean
 }
 
 interface ApplicableDocumentEffectOptions {
     applyTo?: string[]
+    onTarget?: boolean
+}
+
+/**
+ * Effects to apply on target only apply where an action copied them. Collecting them to copy asks for them instead.
+ */
+function skips(effect: SR5ActiveEffect, applyTo: string[], onTarget: boolean) {
+    if (effect.dormantUntilApplied !== onTarget) return true;
+    return applyTo.length > 0 && !effect.appliesToAnyOf(applyTo);
 }
 
 /**
@@ -51,12 +61,14 @@ interface ApplicableDocumentEffectOptions {
  * 
  * @param document Either an actor or item document.
  * @param options.applyTo A iterable of apply-to target values
+ * @param options.onTarget Collect only the effects to apply on target, instead of skipping them
  */
 export function *allApplicableDocumentEffects(document: SR5Actor|SR5Item, options: ApplicableDocumentEffectOptions = {}) {
     const applyTo = options.applyTo ?? [];
+    const onTarget = options.onTarget ?? false;
 
     for (const effect of document.effects) {
-        if (applyTo.length > 0 && !effect.appliesToAnyOf(applyTo)) continue;
+        if (skips(effect, applyTo, onTarget)) continue;
         yield effect;
     }
 }
@@ -67,18 +79,20 @@ export function *allApplicableDocumentEffects(document: SR5Actor|SR5Item, option
  * @param document Either a actor or item document.
  * @param options.applyTo A iterable of apply-to target values
  * @param options.nestedItems Whether to include nested items
+ * @param options.onTarget Collect only the effects to apply on target, instead of skipping them
  * @returns An iterator effect
  */
 export function *allApplicableItemsEffects(document: SR5Actor|SR5Item, options: ApplicableItemEffectOptions = {}) {
     const applyTo = options.applyTo ?? [];
     const nestedItems = options.nestedItems ?? true;
+    const onTarget = options.onTarget ?? false;
 
     for (const item of document.items) {
         // A chemical's effects are for whoever takes a dose, not for the actor carrying it.
         if (item.isType('chemical')) continue;
 
         for (const effect of item.effects) {
-            if (applyTo.length > 0 && !effect.appliesToAnyOf(applyTo)) continue ;
+            if (skips(effect, applyTo, onTarget)) continue;
             yield effect;
         }
 
@@ -87,7 +101,7 @@ export function *allApplicableItemsEffects(document: SR5Actor|SR5Item, options: 
 
         for (const nestedItem of item.items) {
             for (const effect of nestedItem.effects) {
-                if (applyTo.length > 0 && !effect.appliesToAnyOf(applyTo)) continue;
+                if (skips(effect, applyTo, onTarget)) continue;
                 yield effect;
             }
         }

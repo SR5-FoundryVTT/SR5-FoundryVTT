@@ -48,6 +48,8 @@ type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
     /** Whether the parent item has the state the matching restriction checks for. */
     showOnlyForEquipped: boolean;
     showOnlyForWireless: boolean;
+    /** Chemicals apply their effects to whoever takes a dose already. */
+    showApplyOnTarget: boolean;
 
     /** Prepared boundary choices for the expiry trigger select. */
     boundaryOptions: { value: string; label: string; selected: boolean }[];
@@ -242,6 +244,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         const item = this.document.parent instanceof SR5Item ? this.document.parent : null;
         data.showOnlyForEquipped = !!item?.canBeEquipped();
         data.showOnlyForWireless = !!item?.isMatrixDevice;
+        data.showApplyOnTarget = !!item && !item.isType('chemical');
 
         // Duration tab context
         data.boundaryOptions = this.prepareBoundaryOptions(data.source);

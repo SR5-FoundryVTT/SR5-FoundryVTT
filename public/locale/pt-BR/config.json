@@ -156,6 +156,10 @@
                 "appliedByTest": {
                     "label": "Aplicado por teste"
                 },
+                "applyOnTarget": {
+                    "hint": "Não afeta o dono do seu item. Uma ação o aplica a quem ela afeta: seus alvos, ou quem um passo da ação indicar, como o usuário.",
+                    "label": "Aplicar no alvo"
+                },
                 "conditionMode": {
                     "hint": "Incluir: o teste deve corresponder a estes valores. Excluir: o teste não deve corresponder a estes valores."
                 },
@@ -2116,7 +2120,7 @@
                 "Effects": "Aplica",
                 "EffectsHint": "Quais efeitos do item isto aplica a quem ele atinge.",
                 "EffectSelectDefault": "Padrão: efeitos em alvos",
-                "NoTargetedEffects": "Este item não tem efeitos que se aplicam a atores alvejados.",
+                "NoTargetedEffects": "Este item não tem efeitos para aplicar no alvo.",
                 "Result": "Resultado",
                 "ResultValue": "Valor",
                 "ResultLabel": "Rótulo",

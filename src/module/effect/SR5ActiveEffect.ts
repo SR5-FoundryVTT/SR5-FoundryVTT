@@ -238,6 +238,14 @@ export class SR5ActiveEffect extends ActiveEffect {
         return this.system.onlyForWireless && this.parent instanceof SR5Item && this.parent.isMatrixDevice;
     }
 
+    /**
+     * An effect to apply on target does nothing where it's authored. An action copies it onto who
+     * it affects, and the copy applies there.
+     */
+    get dormantUntilApplied(): boolean {
+        return this.system.applyOnTarget && !this.system.appliedByTest;
+    }
+
     override get isSuppressed(): boolean {
         // Native registry sets duration.expired when the span+boundary are reached. Mirror that suppression
         // here so expired effects are greyed out and not applied, regardless of parent type.
@@ -318,6 +326,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         // Effects copied onto a target actor by a test always apply to that actor.
         if (this.system.appliedByTest) return true;
+        if (this.dormantUntilApplied) return false;
 
         // Otherwise hide only effects whose targets are exclusively targeted_actor,
         // as those are meant for another actor acted upon, not the one acting.
@@ -366,6 +375,7 @@ export class SR5ActiveEffect extends ActiveEffect {
             if (!appliesToActor) return {};
         }
         if (targetDoc instanceof SR5Item && change.effect instanceof SR5ActiveEffect) {
+            if (change.effect.dormantUntilApplied) return {};
             const target = change.effect.targetForChange(change as { target?: string });
             if (target?.applyTo !== 'item' && target?.applyTo !== 'parent_item') return {};
         }
