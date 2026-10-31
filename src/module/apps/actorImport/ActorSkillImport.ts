@@ -278,6 +278,8 @@ export class ActorSkillImport {
             const packSkill = packSkillsByName.get(normalizedSkillName);
             const sourceUuid = skillSet?.uuid && this.isSkillInSkillSet(skillSet, packSkill?.name ?? skillName) ? skillSet.uuid : undefined;
             const existingSkill = this.findSkillItem(items, packSkill?.name ?? skillName, 'active');
+            // skillgroup_english names the group of the rules, even if the character doesn't own it, or 'None' without one.
+            const group = skill.grouped === 'True' ? skill.skillgroup_english : '';
             if (existingSkill) {
                 this.applyImportedSkillData(existingSkill, skill, {
                     name: skillName,
@@ -285,7 +287,7 @@ export class ActorSkillImport {
                     rating: parseInt(skill.rating),
                     attribute: this.parseAttName(skill.attribute),
                     defaulting: skill.default === 'True',
-                    group: skill.skillgroup_english || '',
+                    group,
                     packSkill,
                     sourceUuid,
                 });
@@ -298,7 +300,7 @@ export class ActorSkillImport {
                 rating: parseInt(skill.rating),
                 attribute: this.parseAttName(skill.attribute),
                 defaulting: skill.default === 'True',
-                group: skill.skillgroup_english || '',
+                group,
                 packSkill,
                 sourceUuid,
             });
