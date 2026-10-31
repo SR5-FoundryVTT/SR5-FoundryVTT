@@ -96,7 +96,6 @@ export const UpdateActionFlow = {
         handler(type, changeData, applyData, item);
     },
 
-
     /**
      * See injectActionTestsIntoChangeData for documentation.
      */

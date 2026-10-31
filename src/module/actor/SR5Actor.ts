@@ -156,6 +156,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const [data, options] = args;
         await super._preCreate(...args);
 
+        CreateActorFlow.injectEmbeddedItemActionTests(this);
+
         // Abort skill creation data injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
         // Abort if a skillset was already assigned (e.g. during Chummer import)

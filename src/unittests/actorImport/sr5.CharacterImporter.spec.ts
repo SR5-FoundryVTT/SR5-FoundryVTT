@@ -201,6 +201,9 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.action.damage.type.base, 'physical');
             assert.strictEqual(weapon.system.action.limit.base, 5);
             assert.strictEqual(weapon.system.action.type, 'varies');
+            assert.strictEqual(weapon.system.action.test, 'RangedAttackTest');
+            assert.strictEqual(weapon.system.action.opposed.test, 'PhysicalDefenseTest');
+            assert.strictEqual(weapon.system.action.opposed.resist.test, 'PhysicalResistTest');
 
             //category
             assert.strictEqual(weapon.system.category, 'range');
