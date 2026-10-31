@@ -35,6 +35,54 @@ export const Migrators = (context: QuenchBatchContext) => {
         await factory.destroy();
     });
 
+    describe('Version0_37_9 skill group cleanup', () => {
+        const createSource = (items: Item.CreateData[]) => ({
+            _id: foundry.utils.randomID(16),
+            _stats: { systemVersion: '0.37.8' },
+            name: 'Imported Character',
+            type: 'character',
+            items,
+            effects: [],
+            system: DataDefaults.baseSystemData('character'),
+        });
+        const createSkill = (name: string, group: string): Item.CreateData => ({
+            name,
+            type: 'skill',
+            system: DataDefaults.baseSystemData('skill', { type: 'skill', skill: { category: 'active', group } }),
+        });
+        const createGroup = (name: string, skills: string[]): Item.CreateData => ({
+            name,
+            type: 'skill',
+            system: DataDefaults.baseSystemData('skill', { type: 'group', group: { skills, rating: 2 } }),
+        });
+
+        it('clears groups the actor does not own and keeps owned groups', () => {
+            const source = createSource([
+                createGroup('Firearms', ['Pistols']),
+                createSkill('Pistols', 'Firearms'),
+                createSkill('Blades', 'Close Combat'),
+                createSkill('Archery', 'None'),
+            ]);
+
+            assert.isTrue(Migrator.migrate('Actor', source));
+
+            const groupOf = (name: string) => foundry.utils.getProperty(source.items.find(item => item.name === name)!, 'system.skill.group');
+            assert.strictEqual(groupOf('Pistols'), 'Firearms');
+            assert.strictEqual(groupOf('Blades'), '');
+            assert.strictEqual(groupOf('Archery'), '');
+        });
+
+        it('does not migrate actors without stale groups', () => {
+            const source = createSource([
+                createGroup('Firearms', ['Pistols']),
+                createSkill('Pistols', 'Firearms'),
+                createSkill('Blades', ''),
+            ]);
+
+            assert.isFalse(Migrator.migrate('Actor', source));
+        });
+    });
+
     describe('Version0_32_0 legacy skill migration', () => {
         it('migrates legacy actor skill fields into owned skill items without pack data', () => {
             const source = {
