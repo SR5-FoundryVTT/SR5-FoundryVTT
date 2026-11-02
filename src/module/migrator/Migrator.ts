@@ -21,6 +21,7 @@ import { Version0_35_2 } from './versions/Version0_35_2';
 import { Version0_36_0 } from './versions/Version0_36_0';
 import { Version0_37_0 } from './versions/Version0_37_0';
 import { Version0_37_4 } from './versions/Version0_37_4';
+import { Version0_37_9 } from './versions/Version0_37_9';
 import { Version0_38_0 } from './versions/Version0_38_0';
 import { VersionMigration, MigratableDocument, MigratableDocumentName, MigratableDocumentType } from "./VersionMigration";
 
@@ -71,6 +72,7 @@ export class Migrator {
         new Version0_36_0(),
         new Version0_37_0(),
         new Version0_37_4(),
+        new Version0_37_9(),
         new Version0_38_0(),
     ] as const;
 

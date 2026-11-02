@@ -67,7 +67,7 @@ const WeaponData = () => ({
     ...BaseItemData(),
     ...ActionPartData({
         normal_weapon: true,
-        resistTest: "PhysicalDefenseTest",
+        resistTest: "PhysicalResistTest",
         opposedTest: "PhysicalDefenseTest",
     }),
     ...TechnologyPartData(),
