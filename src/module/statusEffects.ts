@@ -1,4 +1,6 @@
 import { FLAGS, SYSTEM_NAME } from './constants';
+import { ASTRAL_PERCEPTION_STATUS } from './vision/astralPerception/astralVisionModes';
+import { MANIFEST_STATUS, MATERIALIZE_STATUS } from './vision/astralProjection/ManifestationState';
 
 const DEFAULT_MOVEMENT_EXPIRY = 'firstActionPhase';
 
@@ -11,6 +13,69 @@ function getMovementExpiry() {
 }
 
 const SRStatus = [
+    {
+        id: ASTRAL_PERCEPTION_STATUS,
+        name: 'SR5.StatusEffects.AstralPerception',
+        img: 'icons/svg/eye.svg',
+        hud: false,
+        system: {
+            targets: [
+                {
+                    id: 'actor',
+                    applyTo: 'actor',
+                },
+                {
+                    id: 'physicalAction',
+                    applyTo: 'test_all',
+                    conditions: [{
+                        type: 'categories',
+                        mode: 'exclude',
+                        values: [
+                            'attack_matrix', 'brute_force', 'compiling', 'complex_form',
+                            'defense_matrix', 'drain', 'fade', 'hack_on_the_fly', 'magic',
+                            'matrix', 'resist_matrix', 'resonance', 'spell_combat',
+                            'spell_detection', 'spell_healing', 'spell_illusion',
+                            'spell_manipulation', 'spell_ritual', 'summoning',
+                        ],
+                    }],
+                },
+            ],
+            changes: [
+                {
+                    key: 'system.visibilityChecks.targets.astral.astralActive',
+                    type: 'override',
+                    value: true,
+                    target: 'actor',
+                },
+                { key: 'data.pool', type: 'add', value: '-2', target: 'physicalAction' },
+            ],
+        },
+    },
+    {
+        // SR5#314 a manifesting astral being is seen as a ghostly image; see physicalDetectionMode.
+        id: MANIFEST_STATUS,
+        name: 'SR5.StatusEffects.Manifesting',
+        img: 'icons/svg/aura.svg',
+        hud: false,
+    },
+    {
+        // SR5#303 a materialized spirit has a physical body and is dual-natured.
+        id: MATERIALIZE_STATUS,
+        name: 'SR5.StatusEffects.Materialized',
+        img: 'icons/svg/mystery-man.svg',
+        hud: false,
+        system: {
+            targets: [{ id: 'actor', applyTo: 'actor' }],
+            changes: [
+                {
+                    key: 'system.visibilityChecks.targets.physical.hasBody',
+                    type: 'override',
+                    value: true,
+                    target: 'actor',
+                },
+            ],
+        },
+    },
     {
         id: 'sr5run',
         name: 'SR5.StatusEffects.Running',
@@ -118,8 +183,7 @@ const SRStatus = [
 export function getSRStatus(): CONFIG.StatusEffect[] {
     const expiry = getMovementExpiry();
 
-    return SRStatus.map(status => ({
-        ...status,
-        duration: { ...status.duration, expiry },
-    }));
+    return SRStatus.map(status => 'duration' in status
+        ? { ...status, duration: { ...status.duration, expiry } }
+        : status);
 }

@@ -56,7 +56,7 @@ const SpiritData = () => ({
     bound: new BooleanField(),
 
     // === Visibility ===
-    visibilityChecks: new SchemaField(VisibilityChecks("astral", "astralActive")),
+    visibilityChecks: new SchemaField(VisibilityChecks({ heat: "warm", aura: true, astralActive: true, astralPerception: true })),
 
     // === Modifiers ===
     modifiers: new SchemaField(CreateModifiers(

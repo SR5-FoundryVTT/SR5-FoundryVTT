@@ -115,6 +115,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
         entity.img = IconAssign.iconAssign(entity);
 
         BH.addBonus(entity, this.getBonus(jsonData));
+        BH.addSense(entity, jsonData.id._TEXT);
         if (!this.isActor()) {
             this.addFormulaEffects(entity as Item.CreateData, jsonData);
             if ('wirelessbonus' in jsonData && jsonData.wirelessbonus)
