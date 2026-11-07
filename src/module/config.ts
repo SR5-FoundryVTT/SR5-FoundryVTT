@@ -65,55 +65,6 @@ export const SR5 = {
         troll: 'SR5.Character.Types.Troll',
     },
 
-    metaSubtypes: {
-        metahuman: 'SR5.MetaSubtypes.metahuman',
-        metasapient: 'SR5.MetaSubtypes.metasapient',
-        shapeshifter: 'SR5.MetaSubtypes.shapeshifter',
-        infected: 'SR5.MetaSubtypes.infected',
-        critter: 'SR5.MetaSubtypes.critter',
-        spirit: 'SR5.MetaSubtypes.spirit',
-        sprite: 'SR5.MetaSubtypes.sprite',
-        other: 'SR5.MetaSubtypes.other',
-    },
-
-    metasapientTypes: {
-        centaur: 'SR5.MetasapientTypes.Centaur',
-        naga: 'SR5.MetasapientTypes.Naga',
-        pixie: 'SR5.MetasapientTypes.Pixie',
-        sasquatch: 'SR5.MetasapientTypes.Sasquatch',
-    },
-
-    shapeshifterTypes: {
-        bovine: 'SR5.ShapeshifterTypes.Bovine',
-        canine: 'SR5.ShapeshifterTypes.Canine',
-        equine: 'SR5.ShapeshifterTypes.Equine',
-        falconine: 'SR5.ShapeshifterTypes.Falconine',
-        leonine: 'SR5.ShapeshifterTypes.Leonine',
-        lupine: 'SR5.ShapeshifterTypes.Lupine',
-        pantherine: 'SR5.ShapeshifterTypes.Pantherine',
-        tigrine: 'SR5.ShapeshifterTypes.Tigrine',
-        ursine: 'SR5.ShapeshifterTypes.Ursine',
-        vulpine: 'SR5.ShapeshifterTypes.Vulpine',
-    },
-
-    infectedTypes: {
-        bandersnatch: 'SR5.InfectedTypes.Bandersnatch',
-        banshee: 'SR5.InfectedTypes.Banshee',
-        dzoonooqua: 'SR5.InfectedTypes.DzooNooQua',
-        fomoraig: 'SR5.InfectedTypes.Fomoraig',
-        ghoul: 'SR5.InfectedTypes.Ghoul',
-        gnawer: 'SR5.InfectedTypes.Gnawer',
-        goblin: 'SR5.InfectedTypes.Goblin',
-        grendel: 'SR5.InfectedTypes.Grendel',
-        harvester: 'SR5.InfectedTypes.Harvester',
-        loupgarou: 'SR5.InfectedTypes.LoupGarou',
-        mutaqua: 'SR5.InfectedTypes.Mutaqua',
-        nosferatu: 'SR5.InfectedTypes.Nosferatu',
-        sukuyan: 'SR5.InfectedTypes.Sukuyan',
-        vampire: 'SR5.InfectedTypes.Vampire',
-        wendigo: 'SR5.InfectedTypes.Wendigo',
-    },
-
     // All available attributes. These are available as testable attributes across all actor types.
     attributes: {
         agility: 'SR5.AttrAgility',

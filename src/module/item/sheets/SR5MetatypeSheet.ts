@@ -21,10 +21,6 @@ export interface SR5MetatypeSheetData extends ItemSheet.RenderContext, SR5Applic
     displayName: string;
     metatypes: Record<string, string>;
     localizedMetatypes: Record<string, string>;
-    metaSubtypes: Record<string, string>;
-    localizedMetaSubtypes: Record<string, string>;
-    subsubtypes?: Record<string, string>;
-    hasSubsubtypes?: boolean;
     attributesList: { key: string; label: string; min: number; max: number; aug_max: number }[];
     resolvedQualities: ResolvedGrantedItem[];
     resolvedWeapons: ResolvedGrantedItem[];
@@ -102,36 +98,6 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
         context.localizedMetatypes = Object.fromEntries(
             Object.entries(sortedMetatypes).map(([k, v]) => [k, game.i18n.localize(v as string)])
         );
-
-        const rawSubtypes = CONFIG.SR5?.metaSubtypes ?? SR5.metaSubtypes;
-        const sortedSubtypes = Helpers.sortConfigValuesByTranslation(rawSubtypes);
-        context.metaSubtypes = sortedSubtypes;
-        context.localizedMetaSubtypes = Object.fromEntries(
-            Object.entries(sortedSubtypes).map(([k, v]) => [k, game.i18n.localize(v as string)])
-        );
-
-        // Resolve dynamic subsubtypes based on selected subtype
-        let dynamicSubsubtypes: Record<string, string> | undefined;
-        if (system.subtype === 'metasapient') {
-            dynamicSubsubtypes = SR5.metasapientTypes;
-        } else if (system.subtype === 'shapeshifter') {
-            dynamicSubsubtypes = SR5.shapeshifterTypes;
-        } else if (system.subtype === 'infected') {
-            dynamicSubsubtypes = SR5.infectedTypes;
-        } else if (system.subtype === 'spirit') {
-            dynamicSubsubtypes = SR5.spiritTypes;
-        } else if (system.subtype === 'sprite') {
-            dynamicSubsubtypes = SR5.spriteTypes;
-        }
-
-        if (dynamicSubsubtypes) {
-            context.hasSubsubtypes = true;
-            context.subsubtypes = Object.fromEntries(
-                Object.entries(dynamicSubsubtypes).map(([k, v]) => [k, game.i18n.localize(v)])
-            );
-        } else {
-            context.hasSubsubtypes = false;
-        }
 
         // Prepare attribute rows for all standard physical and mental attributes
         const standardAttrs = ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge'];

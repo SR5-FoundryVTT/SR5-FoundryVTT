@@ -19,7 +19,11 @@ export class MetatypeImporter extends DataImporter {
             if (meta.metavariants?.metavariant) {
                 const variants = IH.getArray(meta.metavariants.metavariant);
                 for (const variant of variants) {
-                    allMetatypes.push(variant);
+                    allMetatypes.push({
+                        ...variant,
+                        _parentMetatype: meta.name?._TEXT,
+                        _parentCategory: meta.category?._TEXT,
+                    } as Metatype);
                 }
             }
         }

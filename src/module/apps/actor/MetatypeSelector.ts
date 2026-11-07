@@ -71,20 +71,21 @@ export class MetatypeSelector extends HandlebarsApplicationMixin(ApplicationV2)<
         // Preselect the metatype currently on the actor
         if (this.selectedUuid === null) {
             const currentItem = this.actor.metatypeItem;
-            const currentUuid = currentItem?.uuid ?? (this.actor.isType('character') ? this.actor.system.metatypeUuid : null);
+            const currentUuid = (this.actor.isType('character') ? this.actor.system.metatypeUuid : null) || currentItem?.uuid;
             const currentName = currentItem?.name ?? (this.actor.isType('character') ? this.actor.system.metatype : '');
 
-            const match = docs.find(d => {
-                if (currentUuid && d.uuid === currentUuid) return true;
-                if (currentName) {
-                    const dName = d.name.toLowerCase();
-                    const cName = currentName.toLowerCase();
-                    if (dName === cName) return true;
-                    if (d.system?.metatype?.toLowerCase() === cName) return true;
-                    if (MetatypeFlow.localizeMetatype(d).toLowerCase() === cName) return true;
-                }
-                return false;
-            });
+            const match =
+                (currentUuid ? docs.find(d => d.uuid === currentUuid) : undefined) ??
+                docs.find(d => {
+                    if (currentName) {
+                        const dName = d.name.toLowerCase();
+                        const cName = currentName.toLowerCase();
+                        if (dName === cName) return true;
+                        if (d.system?.metatype?.toLowerCase() === cName) return true;
+                        if (MetatypeFlow.localizeMetatype(d).toLowerCase() === cName) return true;
+                    }
+                    return false;
+                });
             if (match?.uuid) {
                 this.selectedUuid = match.uuid;
             }

@@ -21,61 +21,44 @@ export class MetatypeItemParser extends Parser<'metatype'> {
         return { min, max, aug_max };
     }
 
-    protected override getSystem(jsonData: MetatypeSchemaType) {
+    protected override getSystem(jsonData: MetatypeSchemaType & { _parentMetatype?: string; _parentCategory?: string }) {
         const system = this.getBaseSystem();
 
-        const rawName = (jsonData.name?._TEXT || '').toLowerCase();
+        const rawName = (jsonData.name?._TEXT || '').trim().toLowerCase();
+        const parentMetatype = (jsonData._parentMetatype || '').trim().toLowerCase();
         const baseMetatypes = Object.keys(CONFIG.SR5?.metatypes ?? SR5.metatypes);
-        const matchedMetatype = baseMetatypes.find(r => rawName.includes(r)) || 'human';
+        const matchedBaseMetatype = baseMetatypes.find(r => rawName.includes(r) || parentMetatype.includes(r));
 
-        const rawCat = (jsonData.category?._TEXT || '').toLowerCase();
-        let subtype: keyof typeof SR5.metaSubtypes = 'metahuman';
+        const rawCat = (jsonData.category?._TEXT || jsonData._parentCategory || '').trim().toLowerCase();
+        let subtype = 'metahuman';
         let subsubtype = '';
+
+        const cleanName = rawName.replace(/^shapeshifter:\s*/i, '').trim() || rawName;
 
         if (rawCat.includes('infected') || rawName.includes('infected')) {
             subtype = 'infected';
-            const matchedInfected = Object.keys(SR5.infectedTypes).find(s => rawName.includes(s));
-            if (matchedInfected) subsubtype = matchedInfected;
+            subsubtype = cleanName;
         } else if (rawCat.includes('metasapient')) {
             subtype = 'metasapient';
-            const matchedSapient = Object.keys(SR5.metasapientTypes).find(s => rawName.includes(s));
-            if (matchedSapient) subsubtype = matchedSapient;
+            subsubtype = cleanName;
         } else if (rawCat.includes('shapeshifter') || rawName.includes('shapeshifter')) {
             subtype = 'shapeshifter';
-            const matchedShifter = Object.keys(SR5.shapeshifterTypes).find(s => rawName.includes(s));
-            if (matchedShifter) subsubtype = matchedShifter;
+            subsubtype = cleanName;
         } else if (rawCat.includes('sprites') || rawCat.includes('sprite')) {
             subtype = 'sprite';
         } else if (rawCat.includes('spirit') || (jsonData.bodmin?._TEXT && String(jsonData.bodmin._TEXT).includes('F'))) {
             subtype = 'spirit';
         } else if (rawCat.includes('critter') || rawCat.includes('animals') || rawCat.includes('paranormal') || rawCat.includes('mundane') || rawCat.includes('draconic')) {
             subtype = 'critter';
+        } else if (rawCat && rawCat !== 'metahuman' && rawCat !== 'metavariant') {
+            subtype = rawCat;
         }
 
-        const infectedBaseMetatypes: Record<string, keyof typeof SR5.metatypes> = {
-            banshee: 'elf',
-            goblin: 'dwarf',
-            gnawer: 'dwarf',
-            wendigo: 'ork',
-            grendel: 'ork',
-            dzoonooqua: 'troll',
-            fomoraig: 'troll',
-            mutaqua: 'troll',
-            bandersnatch: 'troll',
-            nosferatu: 'human',
-            vampire: 'human',
-            loupgarou: 'human',
-            harvester: 'human',
-            sukuyan: 'human',
-            ghoul: 'human',
-        };
-
-        if (subtype === 'infected' && subsubtype && infectedBaseMetatypes[subsubtype]) {
-            system.metatype = infectedBaseMetatypes[subsubtype];
-        } else {
-            system.metatype = matchedMetatype;
+        if (parentMetatype && !subsubtype && rawName !== parentMetatype) {
+            subsubtype = cleanName;
         }
 
+        system.metatype = matchedBaseMetatype || parentMetatype || cleanName || 'human';
         system.subtype = subtype;
         system.subsubtype = subsubtype;
         system.karma = Number(jsonData.karma?._TEXT) || 0;

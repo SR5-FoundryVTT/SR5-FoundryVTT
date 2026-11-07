@@ -35,16 +35,17 @@
                             <div class="metatype-header-meta-row">
                                 <label>{{localize "SR5.Metatype.BaseMetatype"}}</label>
                                 <span>
-                                    <select name="system.metatype" class="short" rootId=rootId data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">
+                                    <input type="text" name="system.metatype" value="{{system.metatype}}" list="{{rootId}}-base-metatypes" class="short" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}" />
+                                    <datalist id="{{rootId}}-base-metatypes">
                                         {{#each localizedMetatypes}}
-                                            <option value="{{@key}}" {{#if (eq @key @root.system.metatype)}}selected{{/if}}>{{this}}</option>
+                                            <option value="{{@key}}" label="{{this}}">{{this}}</option>
                                         {{/each}}
-                                    </select>
+                                    </datalist>
                                 </span>
                             </div>
                         {{else}}
-                            {{#if (ne displayName (lookup localizedMetatypes system.metatype))}}
-                                <label class="metatype-header-value" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">{{lookup localizedMetatypes system.metatype}}</label>
+                            {{#if (ne displayName (or (lookup localizedMetatypes system.metatype) system.metatype))}}
+                                <label class="metatype-header-value" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">{{or (lookup localizedMetatypes system.metatype) system.metatype}}</label>
                             {{/if}}
                         {{/if}}
                     {{/if}}

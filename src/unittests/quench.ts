@@ -40,6 +40,8 @@ import { shadowrunChatMessageLayoutTesting } from './sr5.ChatMessageLayout.spec'
 import { shadowrunAlchemy } from './sr5.Alchemy.spec';
 
 import { Quench, QuenchRegisterBatchFunction, QuenchRegisterBatchOptions } from '@ethaks/fvtt-quench';
+import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
+import { shadowrunMatrixDamageResist } from '@/unittests/sr5.MatrixDamageResist.spec';
 import { shadowrunMetatypeItemTesting } from '@/unittests/sr5.MetatypeItem.spec';
 
 const QUENCH_TIMEOUT_MS = 5000;
@@ -142,12 +144,18 @@ export const quenchRegister = (quench: Quench) => {
     registerBatch(quench, 'shadowrun5e.flow.driver', shadowrunDriver, {
         displayName: 'SHADOWRUN5e: Driver Flow Test',
     });
+    registerBatch(quench, 'shadowrun5e.flow.rigger', shadowrunRiggerTesting, {
+        displayName: 'SHADOWRUN5e: Rigger Flow Testing',
+    });
     registerBatch(quench, 'shadowrun5e.flow.tests', shadowrunTesting, { displayName: 'SHADOWRUN5e: SuccessTest Test' });
     registerBatch(quench, 'shadowrun5e.flow.tests_attack', shadowrunAttackTesting, {
         displayName: 'SHADOWRUN5e: Attack Test',
     });
     registerBatch(quench, 'shadowrun5e.flow.test_value_resolution', shadowrunTestValueResolution, { displayName: 'SHADOWRUN5e: Test Value Resolution' });
     registerBatch(quench, 'shadowrun5e.flow.tests_matrix', shadowrunMatrixTesting, { displayName: 'SHADOWRUN5e: Matrix Test' });
+    registerBatch(quench, 'shadowrun5e.flow.tests_resist_matrix', shadowrunMatrixDamageResist, {
+        displayName: 'SHADOWRUN5e: Resist Matrix Test'
+    });
     registerBatch(quench, 'shadowrun5e.flow.sr5roll', shadowrunRolling, { displayName: 'SHADOWRUN5e: SR5Roll' });
     registerBatch(quench, 'shadowrun5e.integration.dice_so_nice', shadowrunDiceSoNiceTesting, {
         displayName: 'SHADOWRUN5e: Dice So Nice Integration',

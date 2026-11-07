@@ -503,12 +503,6 @@ export class MetatypeFlow {
         const shifterTranslation = Helpers.localizeName(subsubtype, 'SR5.ShapeshifterTypes');
         if (shifterTranslation !== subsubtype) return shifterTranslation;
 
-        // 4. Try CONFIG.SR5.infectedTypes lookup directly
-        const infectedConfig = (CONFIG.SR5?.infectedTypes as Record<string, string> | undefined)?.[subsubtype.toLowerCase()];
-        if (infectedConfig && game.i18n.has(infectedConfig)) {
-            return game.i18n.localize(infectedConfig);
-        }
-
         return subsubtype.charAt(0).toUpperCase() + subsubtype.slice(1);
     }
 }

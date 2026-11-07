@@ -33,7 +33,7 @@ const sampleElfData: Item.CreateData<'metatype'> = {
             charisma: { min: 3, max: 8, aug_max: 12 },
         },
         qualities: [
-            'Compendium.shadowrun5e.sr5e-qualities.Item.quality00lowlight',
+            'Compendium.shadowrun5e.sr5e-qualities.Item.quality0lowlight',
         ],
         weapons: [],
         items: [],
@@ -59,7 +59,7 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
 
             // Trait UUIDs are stored as arrays of DocumentUUID strings
             assert.deepEqual(metatypeItem.system.qualities, [
-                'Compendium.shadowrun5e.sr5e-qualities.Item.quality00lowlight',
+                'Compendium.shadowrun5e.sr5e-qualities.Item.quality0lowlight',
             ]);
             assert.deepEqual(metatypeItem.system.weapons, []);
             assert.deepEqual(metatypeItem.system.items, []);
@@ -324,22 +324,23 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
                     metatype: 'ork',
                 }
             });
-            // Ork grunt has body: +3, strength: +2
-            assert.strictEqual(grunt.system.attributes.body.value, 4);
-            assert.strictEqual(grunt.system.attributes.strength.value, 3);
+            // Ork grunt has body: +3, strength: +2 (base defaults to 0 without an applied metatype item)
+            assert.strictEqual(grunt.system.attributes.body.value, 3);
+            assert.strictEqual(grunt.system.attributes.strength.value, 2);
         });
 
         it('MetatypeSelector prepares cards from world and compendium items', async () => {
+            // Create world metatypes
+            const worldElf = await factory.createItem(sampleElfData) as SR5Item<'metatype'>;
+            const worldHuman = await factory.createItem(sampleHumanData) as SR5Item<'metatype'>;
+
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
                     metatype: 'Elf',
+                    metatypeUuid: worldElf.uuid,
                 },
             });
-
-            // Create world metatypes
-            const worldElf = await factory.createItem(sampleElfData) as SR5Item<'metatype'>;
-            const worldHuman = await factory.createItem(sampleHumanData) as SR5Item<'metatype'>;
 
             const selector = new MetatypeSelector(actor);
             const context = await selector._prepareContext({ isFirstRender: true });
@@ -347,13 +348,13 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             assert.isArray(context.items);
             assert.isTrue(context.items.length >= 2, 'Should have at least 2 metatype cards');
 
-            const elfCard = context.items.find(m => m.uuid === worldElf.uuid || m.name === 'Elf');
+            const elfCard = context.items.find(m => m.uuid === worldElf.uuid);
             assert.isDefined(elfCard, 'Elf card should exist');
             assert.strictEqual(elfCard.karma, 40);
             assert.strictEqual(elfCard.sourceLabel, 'World');
             assert.isTrue(elfCard.isSelected, 'Current actor metatype should be preselected');
 
-            const humanCard = context.items.find(m => m.uuid === worldHuman.uuid || m.name === 'Human');
+            const humanCard = context.items.find(m => m.uuid === worldHuman.uuid);
             assert.isDefined(humanCard, 'Human card should exist');
             assert.strictEqual(humanCard.karma, 0);
             assert.strictEqual(humanCard.sourceLabel, 'World');
@@ -634,6 +635,69 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
 
             assert.isTrue(executedWhileUnlocked, 'Compendium should be unlocked during callback execution');
             assert.isTrue(mockPack.locked, 'Compendium locked state should be restored to true after execution');
+        });
+
+        it('Importing a metatype not in base choices via MetatypeItemParser succeeds without DataModel validation failing', async () => {
+            const { MetatypeItemParser } = await import('@/module/apps/itemImport/parser/metatype/MetatypeItemParser');
+            const parser = new MetatypeItemParser();
+
+            const unlistedChummerMetatype = {
+                id: { _TEXT: '99999999-8888-7777-6666-555555555555' },
+                name: { _TEXT: 'Martian Stalker' },
+                category: { _TEXT: 'Extraplanar Travelers' },
+                karma: { _TEXT: '35' },
+                bodmin: { _TEXT: '3' },
+                bodmax: { _TEXT: '8' },
+                bodaug: { _TEXT: '12' },
+                agimin: { _TEXT: '4' },
+                agimax: { _TEXT: '9' },
+                agiaug: { _TEXT: '13' },
+            };
+
+            const parsedData = await parser.Parse(
+                unlistedChummerMetatype as unknown as Parameters<typeof parser.Parse>[0],
+                'Metatype'
+            ) as Item.CreateData<'metatype'> & { type: 'metatype' };
+
+            // Create the actual SR5Item<'metatype'> document in Foundry to trigger full DataModel validation
+            const importedItem = await factory.createItem(parsedData);
+
+            assert.isDefined(importedItem, 'Unlisted metatype item should be created without validation failure');
+            assert.strictEqual(importedItem.type, 'metatype');
+            assert.strictEqual(importedItem.name, 'Martian Stalker');
+            assert.strictEqual(importedItem.system.metatype, 'martian stalker');
+            assert.strictEqual(importedItem.system.subtype, 'extraplanar travelers');
+            assert.strictEqual(importedItem.system.karma, 35);
+
+            // Apply the imported non-choice metatype to an actor and verify Actor DataModel validation also succeeds
+            const character = await factory.createActor({ type: 'character' });
+            const embedded = await MetatypeFlow.applyMetatypeToActor(character, importedItem);
+            assert.isDefined(embedded);
+            assert.strictEqual(character.system.metatype, 'Martian Stalker');
+            assert.strictEqual(character.system.attributes.body.base, 3);
+            assert.strictEqual(character.system.attributes.agility.base, 4);
+
+            // Also verify a flattened metavariant of a non-base metatype (e.g. Lesser Centaur under Centaur / Metasapients)
+            const unlistedMetavariant = {
+                id: { _TEXT: '88888888-7777-6666-5555-444444444444' },
+                name: { _TEXT: 'Lesser Centaur' },
+                _parentMetatype: 'Centaur',
+                _parentCategory: 'Metasapients',
+                karma: { _TEXT: '25' },
+                bodmin: { _TEXT: '3' },
+                bodmax: { _TEXT: '8' },
+                bodaug: { _TEXT: '12' },
+            };
+
+            const parsedVariantData = await parser.Parse(
+                unlistedMetavariant as unknown as Parameters<typeof parser.Parse>[0],
+                'Metatype'
+            ) as Item.CreateData<'metatype'> & { type: 'metatype' };
+            const importedVariant = await factory.createItem(parsedVariantData);
+            assert.isDefined(importedVariant, 'Unlisted metavariant item should be created without validation failure');
+            assert.strictEqual(importedVariant.system.metatype, 'centaur');
+            assert.strictEqual(importedVariant.system.subtype, 'metasapient');
+            assert.strictEqual(importedVariant.system.subsubtype, 'lesser centaur');
         });
     });
 };

@@ -1,4 +1,3 @@
-import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 const { ArrayField, DocumentUUIDField, NumberField, ObjectField, StringField } = foundry.data.fields;
 
@@ -11,19 +10,17 @@ export interface AttributeRange {
 export const MetatypeData = () => ({
     ...BaseItemData(),
 
-    // Parent baseline metatype category: human, elf, dwarf, ork, troll, or custom module-expanded
+    // Parent baseline metatype category: human, elf, dwarf, ork, troll, or custom/imported string
     metatype: new StringField({
         required: true,
         nullable: false,
         initial: 'human',
-        choices: () => CONFIG.SR5?.metatypes ?? SR5.metatypes,
     }),
     // Subtype category (metahuman, metasapient, shapeshifter, infected, critter, spirit, sprite, other)
     subtype: new StringField({
         required: true,
         nullable: false,
         initial: 'metahuman',
-        choices: () => CONFIG.SR5?.metaSubtypes ?? SR5.metaSubtypes,
     }),
     // Specific sub-sub-type (species, strain, animal form, spirit type, sprite type)
     subsubtype: new StringField({
