@@ -172,7 +172,6 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
             if (typeof rawVal === 'string') {
                 const resolved = MetatypeFlow.resolveTaxonomyInput(rawVal, baseChoices.metatypeChoices);
                 foundry.utils.setProperty(submitData, 'system.metatype', resolved.name);
-                foundry.utils.setProperty(submitData, 'system.taxonomy.metatype', resolved);
                 foundry.utils.setProperty(submitData, 'flags.shadowrun5e.taxonomy.metatype', resolved);
             }
         }
@@ -184,7 +183,6 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
                 const resolved = MetatypeFlow.resolveTaxonomyInput(rawVal, baseChoices.subtypeChoices);
                 effectiveSubtype = resolved.name;
                 foundry.utils.setProperty(submitData, 'system.subtype', resolved.name);
-                foundry.utils.setProperty(submitData, 'system.taxonomy.subtype', resolved);
                 foundry.utils.setProperty(submitData, 'flags.shadowrun5e.taxonomy.subtype', resolved);
             }
         }
@@ -197,7 +195,6 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
                     : baseChoices.subsubtypeChoices;
                 const resolved = MetatypeFlow.resolveTaxonomyInput(rawVal, subChoices);
                 foundry.utils.setProperty(submitData, 'system.subsubtype', resolved.name);
-                foundry.utils.setProperty(submitData, 'system.taxonomy.subsubtype', resolved);
                 foundry.utils.setProperty(submitData, 'flags.shadowrun5e.taxonomy.subsubtype', resolved);
             }
         }

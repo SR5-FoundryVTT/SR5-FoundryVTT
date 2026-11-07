@@ -455,7 +455,6 @@ export class MetatypeFlow {
     static extractTaxonomy(item: SR5Item<'metatype'>): MetatypeTaxonomy {
         const sys = item.system;
         const flagTax = item.flags?.shadowrun5e?.taxonomy;
-        const sysTax = sys?.taxonomy;
 
         const getExplicitLabel = (entry: Partial<MetatypeTaxonomyEntry> | undefined, targetName: string): string => {
             if (!entry || !targetName) return '';
@@ -464,25 +463,22 @@ export class MetatypeFlow {
             return String(entry.label ?? '').trim();
         };
 
-        const metaName = (sys?.metatype || sysTax?.metatype?.name || flagTax?.metatype?.name || 'human').trim().toLowerCase();
+        const metaName = (sys?.metatype || flagTax?.metatype?.name || 'human').trim().toLowerCase();
         const baseMap = (CONFIG.SR5?.metatypes ?? SR5.metatypes) as Record<string, string>;
         const baseKey = baseMap[metaName];
         const baseLocalized = baseKey && typeof game !== 'undefined' && game.i18n?.has(baseKey)
             ? game.i18n.localize(baseKey)
             : '';
         const metaLabel = getExplicitLabel(flagTax?.metatype, metaName)
-            || getExplicitLabel(sysTax?.metatype, metaName)
             || baseLocalized
             || Helpers.capitalizeFirstLetter(metaName);
 
-        const subName = (sys?.subtype || sysTax?.subtype?.name || flagTax?.subtype?.name || 'metahuman').trim().toLowerCase();
+        const subName = (sys?.subtype || flagTax?.subtype?.name || 'metahuman').trim().toLowerCase();
         const subLabel = getExplicitLabel(flagTax?.subtype, subName)
-            || getExplicitLabel(sysTax?.subtype, subName)
             || Helpers.capitalizeFirstLetter(subName);
 
-        const subsubName = (sys?.subsubtype || sysTax?.subsubtype?.name || flagTax?.subsubtype?.name || '').trim().toLowerCase();
-        const explicitSubsubLabel = getExplicitLabel(flagTax?.subsubtype, subsubName)
-            || getExplicitLabel(sysTax?.subsubtype, subsubName);
+        const subsubName = (sys?.subsubtype || flagTax?.subsubtype?.name || '').trim().toLowerCase();
+        const explicitSubsubLabel = getExplicitLabel(flagTax?.subsubtype, subsubName);
         const itemNameFallback = item.name && item.name.toLowerCase() !== metaName
             ? (item.name.includes(':') ? item.name.split(':').pop()!.trim() : item.name.trim())
             : '';

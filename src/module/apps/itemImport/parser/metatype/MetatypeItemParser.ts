@@ -65,34 +65,9 @@ export class MetatypeItemParser extends Parser<'metatype'> {
 
         const metatypeName = matchedBaseMetatype || parentMetatype || cleanName || 'human';
 
-        const translatedItemName = IH.translate(
-            IH.getArray(jsonData.translate)[0]?._TEXT ?? rawNameText,
-            jsonData.id?._TEXT
-        ).trim();
-
-        const baseTranslationKey = baseMetatypeMap[metatypeName];
-        const metatypeLabel = baseTranslationKey && typeof game !== 'undefined' && game.i18n?.has(baseTranslationKey)
-            ? game.i18n.localize(baseTranslationKey)
-            : (parentMetatypeText ? IH.translate(parentMetatypeText) : (translatedItemName || Helpers.capitalizeFirstLetter(metatypeName)));
-
-        const effectiveCatText = rawCat === 'metavariant' && jsonData._parentCategory
-            ? jsonData._parentCategory.trim()
-            : rawCatText;
-        const translatedCat = effectiveCatText ? IH.getTranslatedCategory('metatypes', effectiveCatText).trim() : '';
-        const subtypeLabel = translatedCat || Helpers.capitalizeFirstLetter(subtype);
-
-        const subsubtypeLabel = subsubtype
-            ? (translatedItemName.replace(/^shapeshifter:\s*/i, '').trim() || rawNameText.replace(/^shapeshifter:\s*/i, '').trim() || Helpers.capitalizeFirstLetter(subsubtype))
-            : '';
-
         system.metatype = metatypeName;
         system.subtype = subtype;
         system.subsubtype = subsubtype;
-        system.taxonomy = {
-            metatype: { name: metatypeName, label: metatypeLabel },
-            subtype: { name: subtype, label: subtypeLabel },
-            subsubtype: { name: subsubtype, label: subsubtypeLabel },
-        };
         system.karma = Number(jsonData.karma?._TEXT) || 0;
 
         system.attributes = {
@@ -188,7 +163,10 @@ export class MetatypeItemParser extends Parser<'metatype'> {
         return system;
     }
 
-    public override async Parse(jsonData: MetatypeSchemaType, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
+    public override async Parse(
+        jsonData: MetatypeSchemaType & { _parentMetatype?: string; _parentCategory?: string },
+        compendiumKey: CompendiumKey
+    ): Promise<Item.CreateData> {
         const entity = await super.Parse(jsonData, compendiumKey) as Item.CreateData;
 
         // Build flags.shadowrun5e.metaTypesItems for Chummer power tracking
@@ -280,12 +258,46 @@ export class MetatypeItemParser extends Parser<'metatype'> {
         }
 
         const sys = entity.system as Item.SystemOfType<'metatype'> | undefined;
+        const metatypeName = (sys?.metatype || 'human').trim().toLowerCase();
+        const subtypeName = (sys?.subtype || 'metahuman').trim().toLowerCase();
+        const subsubtypeName = (sys?.subsubtype || '').trim().toLowerCase();
+
+        const rawNameText = (jsonData.name?._TEXT || '').trim();
+        const rawCatText = (jsonData.category?._TEXT || jsonData._parentCategory || '').trim();
+        const rawCat = rawCatText.toLowerCase();
+        const parentMetatypeText = (jsonData._parentMetatype || '').trim();
+
+        const translatedItemName = IH.translate(
+            IH.getArray(jsonData.translate)[0]?._TEXT ?? rawNameText,
+            jsonData.id?._TEXT
+        ).trim();
+
+        const baseMetatypeMap = (CONFIG.SR5?.metatypes ?? SR5.metatypes) as Record<string, string>;
+        const baseTranslationKey = baseMetatypeMap[metatypeName];
+        const metatypeLabel = baseTranslationKey && typeof game !== 'undefined' && game.i18n?.has(baseTranslationKey)
+            ? game.i18n.localize(baseTranslationKey)
+            : (parentMetatypeText ? IH.translate(parentMetatypeText) : (translatedItemName || Helpers.capitalizeFirstLetter(metatypeName)));
+
+        const effectiveCatText = rawCat === 'metavariant' && jsonData._parentCategory
+            ? jsonData._parentCategory.trim()
+            : rawCatText;
+        const translatedCat = effectiveCatText ? IH.getTranslatedCategory('metatypes', effectiveCatText).trim() : '';
+        const subtypeLabel = translatedCat || Helpers.capitalizeFirstLetter(subtypeName);
+
+        const subsubtypeLabel = subsubtypeName
+            ? (translatedItemName.replace(/^shapeshifter:\s*/i, '').trim() || rawNameText.replace(/^shapeshifter:\s*/i, '').trim() || Helpers.capitalizeFirstLetter(subsubtypeName))
+            : '';
+
         entity.flags = {
             ...(entity.flags || {}),
             shadowrun5e: {
                 ...(entity.flags?.shadowrun5e || {}),
                 ...(metaTypesItems.length > 0 ? { metaTypesItems } : {}),
-                ...(sys?.taxonomy ? { taxonomy: sys.taxonomy } : {}),
+                taxonomy: {
+                    metatype: { name: metatypeName, label: metatypeLabel },
+                    subtype: { name: subtypeName, label: subtypeLabel },
+                    subsubtype: { name: subsubtypeName, label: subsubtypeLabel },
+                },
             },
         };
 

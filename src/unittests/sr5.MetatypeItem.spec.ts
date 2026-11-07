@@ -698,8 +698,8 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(importedVariant.system.metatype, 'centaur');
             assert.strictEqual(importedVariant.system.subtype, 'metasapient');
             assert.strictEqual(importedVariant.system.subsubtype, 'lesser centaur');
-            assert.deepEqual(importedVariant.system.taxonomy.subtype, { name: 'metasapient', label: 'Metasapients' });
-            assert.deepEqual(importedVariant.system.taxonomy.subsubtype, { name: 'lesser centaur', label: 'Lesser Centaur' });
+            assert.deepEqual(importedVariant.flags?.shadowrun5e?.taxonomy?.subtype, { name: 'metasapient', label: 'Metasapients' });
+            assert.deepEqual(importedVariant.flags?.shadowrun5e?.taxonomy?.subsubtype, { name: 'lesser centaur', label: 'Lesser Centaur' });
         });
 
         it('Chummer import and manual sheet entry persist { name, label } taxonomy pairs and expose dynamic datalist choices', async () => {
@@ -736,8 +736,6 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             const vampireItem = await factory.createItem(parsedVampire);
             assert.strictEqual(vampireItem.system.subtype, 'infected');
             assert.strictEqual(vampireItem.system.subsubtype, 'vampire');
-            assert.deepEqual(vampireItem.system.taxonomy.subtype, { name: 'infected', label: 'Infiziert' });
-            assert.deepEqual(vampireItem.system.taxonomy.subsubtype, { name: 'vampire', label: 'Vampir' });
             assert.deepEqual(vampireItem.flags?.shadowrun5e?.taxonomy?.subtype, { name: 'infected', label: 'Infiziert' });
             assert.deepEqual(vampireItem.flags?.shadowrun5e?.taxonomy?.subsubtype, { name: 'vampire', label: 'Vampir' });
             assert.strictEqual(MetatypeFlow.localizeSubtype(vampireItem), 'Infiziert');
@@ -783,11 +781,9 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             );
 
             assert.strictEqual(manualItem.system.subtype, 'infected');
-            assert.deepEqual(manualItem.system.taxonomy.subtype, { name: 'infected', label: 'Infiziert' });
             assert.deepEqual(manualItem.flags?.shadowrun5e?.taxonomy?.subtype, { name: 'infected', label: 'Infiziert' });
 
             assert.strictEqual(manualItem.system.subsubtype, 'cyber-vampir');
-            assert.deepEqual(manualItem.system.taxonomy.subsubtype, { name: 'cyber-vampir', label: 'Cyber-Vampir' });
             assert.deepEqual(manualItem.flags?.shadowrun5e?.taxonomy?.subsubtype, { name: 'cyber-vampir', label: 'Cyber-Vampir' });
 
             const nextContext = await sheet._prepareContext({ isFirstRender: false });
