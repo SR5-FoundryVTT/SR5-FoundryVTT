@@ -13,13 +13,14 @@ import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { ItemPrep } from './functions/ItemPrep';
 import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
+import type { SR5Actor } from '@/module/actor/SR5Actor';
 
 export class VehiclePrep {
     static prepareBaseData(system: Actor.SystemOfType<'vehicle'>) {
         ModifiableFieldPrep.resetAllModifiers(system);
     }
 
-    static prepareDerivedData(system: Actor.SystemOfType<'vehicle'>, items: SR5Item[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'vehicle'>, items: SR5Item[], actor?: SR5Actor) {
         VehiclePrep.prepareVehicleStats(system);
         VehiclePrep.prepareDeviceAttributes(system);
         VehiclePrep.prepareLimits(system);
@@ -40,6 +41,7 @@ export class VehiclePrep {
         VehiclePrep.prepareMovement(system);
 
         InitiativePrep.prepareInit('vehicle', system);
+        VehiclePrep.prepareVehicleInitiative(system, actor);
 
         ItemPrep.prepareArmor(system, items);
         CharacterPrep.prepareRecoil(system);
@@ -48,6 +50,35 @@ export class VehiclePrep {
         ItemAvailabilityFlow.calculateValue(system.availability);
     }
 
+    /**
+     * Dynamically adjust vehicle initiative based on its active control mode.
+     * - Autopilot / Remote / Manual: uses onboard Pilot * 2 + 4d6 (default meatspace)
+     * - Rigger: uses driver's Matrix VR initiative (hot-sim/cold-sim)
+     */
+    static prepareVehicleInitiative(system: Actor.SystemOfType<'vehicle'>, actor?: SR5Actor) {
+        if (!actor || system.controlMode !== 'rigger') return;
+
+        const driver = actor.getVehicleDriver();
+        if (!driver) return;
+
+        const driverInit = (driver.system.initiative as any)?.matrix || driver.system.initiative?.current;
+        if (driverInit) {
+            const constVal = driverInit.constant?.value ?? 0;
+            const diceVal = driverInit.dice?.value ?? 0;
+
+            ModifiableValue.addUnique(system.initiative.current.constant, 'SR5.Rigger.JumpedIn', constVal, {
+                type: 'override',
+                priority: ModifiableValue.Priority.TOP
+            });
+            ModifiableValue.addUnique(system.initiative.current.dice, 'SR5.Rigger.JumpedIn', diceVal, {
+                type: 'override',
+                priority: ModifiableValue.Priority.TOP
+            });
+            ModifiableValue.calcTotal(system.initiative.current.constant);
+            ModifiableValue.calcTotal(system.initiative.current.dice, { min: 0, max: 5 });
+            (system.initiative.current.dice as any).text = `${system.initiative.current.dice.value}d6`;
+        }
+    }
     static prepareVehicleStats(system: Actor.SystemOfType<'vehicle'>) {
         const { vehicle_stats, isDrone } = system;
 

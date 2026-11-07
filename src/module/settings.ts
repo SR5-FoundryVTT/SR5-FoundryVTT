@@ -86,6 +86,15 @@ export const registerSystemSettings = () => {
         default: '',
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.RequireRiggerInterface, {
+        name: 'SETTINGS.RequireRiggerInterfaceName',
+        hint: 'SETTINGS.RequireRiggerInterfaceDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+    });
+
     game.settings.register(SYSTEM_NAME, FLAGS.ShowGlitchAnimation, {
         name: 'SETTINGS.ShowGlitchAnimationName',
         hint: 'SETTINGS.ShowGlitchAnimationDescription',
@@ -406,6 +415,17 @@ export const registerSystemSettings = () => {
     game.settings.register(SYSTEM_NAME, FLAGS.MatrixActionsPack, {
         name: 'SR5.CompendiaSettings.MatrixActionsPack.label',
         hint: 'SR5.CompendiaSettings.MatrixActionsPack.hint',
+        scope: 'world',
+        config: false,
+        type: String
+    });
+
+    /**
+     * Override the default vehicle actions pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.VehicleActionsPack, {
+        name: 'SR5.CompendiaSettings.VehicleActionsPack.label',
+        hint: 'SR5.CompendiaSettings.VehicleActionsPack.hint',
         scope: 'world',
         config: false,
         type: String

@@ -697,7 +697,8 @@
             "MissingSkill": "O ator não possui a pericia solicitada.",
             "NoAvailableActorFound": "Nenhum ator disponível foi encontrado para esta ação",
             "SkillWithoutAttribute": "A pericia não tem um atributo configurado.",
-            "TestExpectsVehicleOnly": "Este teste só pode ser feito com um ator do tipo veículo"
+            "TestExpectsVehicleOnly": "Este teste só pode ser feito com um ator do tipo veículo",
+            "NoDriverSelectedForJumpIn": "Nenhum piloto selecionado ou atribuído para saltar."
         },
         "EssenceCost": "Custo de Essência",
         "Expand": "Expandir",
@@ -2005,7 +2006,8 @@
             "SuccessTest": "Teste de Sucesso",
             "SummonSpiritTest": "Invocar Espírito",
             "SuppressionDefenseTest": "Defesa de Supressão",
-            "ThrownAttackTest": "Ataque de Arma Lançada"
+            "ThrownAttackTest": "Ataque de Arma Lançada",
+            "OpposedVehicleTest": "Opposed Vehicle Test"
         },
         "Threshold": "Limiar",
         "TimeControl": {
@@ -2309,7 +2311,8 @@
             "SkillCantBeDefault": "Esta pericia não pode ser lançada, pois não pode ser feita sem perícia",
             "SummoningNotConcluded": "Invocação incompleta. Aguarde o espírito se opor à invocação para determinar o dreno.",
             "TokenSelectionNeeded": "Um ou mais tokens precisam ser selecionados",
-            "NoActorCreatePermission": "Você não tem permissão para criar atores."
+            "NoActorCreatePermission": "Você não tem permissão para criar atores.",
+            "TokenMovementLockedJumpedIn": "{vehicle} está sob controle rigger! Movimento do personagem bloqueado."
         },
         "Weapon": {
             "AmmoCount": "Qtd Munição",
@@ -2426,7 +2429,25 @@
         "Wireless": "Conexão Sem Fio",
         "StatusEffects": {
             "Running": "Correndo",
-            "Sprinting": "Corrida Veloz"
+            "Sprinting": "Corrida Veloz",
+            "sr5jumpedIn": "Imerso no Veículo (Movimento Bloqueado)",
+            "sr5riggedVehicle": "Veículo sob Controle Rigger",
+            "sr5sensorLock": "Alvo Travado (Sensor Ativo)",
+            "sr5spunOut": "Derrapou / Descontrolou (Penalidade de Manuseio)"
+        },
+        "Rigger": {
+            "RiggerInterface": "Interface Rigger",
+            "JumpIn": "Saltar para Veículo",
+            "JumpOut": "Sair do Veículo",
+            "JumpedInSuccess": "{rigger} saltou para {vehicle}",
+            "JumpedOutSuccess": "Saiu de {vehicle}",
+            "JumpInTestRequired": "Saltar para o veículo {vehicle} requer um teste.",
+            "JumpedInEffectName": "Imerso ({rigger})",
+            "RiggerMovingVehicle": "{rigger} está pilotando {vehicle}",
+            "GODRiggerInterfaceWarning": "<div class='sr5-god-alert'><div class='god-header'>⚡ DIVISÃO DE VIGILÂNCIA DA GRADE // ALERTA DO SISTEMA</div><div class='god-body'><p><strong>AVISO:</strong> O veículo <em>{vehicle}</em> não possui uma Interface Rigger verificada.</p></div></div>",
+            "MissingRiggerInterface": "O veículo {vehicle} não possui uma Interface Rigger instalada!",
+            "ActiveSensorLock": "Trava de Sensor Ativo",
+            "ActiveSensorLockSuccess": "{attacker} travou sensores em {target} (+{netHits} penalidade de defesa do alvo)"
         }
     },
     "TYPES": {

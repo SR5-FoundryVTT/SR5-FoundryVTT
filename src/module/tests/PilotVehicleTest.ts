@@ -15,31 +15,53 @@ export class PilotVehicleTest extends SuccessTest {
         // Both item and actor are needed to determine what to roll.
         if (!item || !actor) return {};
 
+        const rawItemLimit = item.getAction()?.limit?.attribute;
+        const itemLimit = rawItemLimit && ['handling', 'speed', 'sensor'].includes(rawItemLimit) ? rawItemLimit : undefined;
+
+        if (actor.isType('character')) {
+            return {
+                attribute: 'reaction',
+                skill: 'pilot_ground_craft',
+                limit: { attribute: itemLimit || 'handling' }
+            };
+        }
+
         const vehicleData = actor.asType('vehicle');
         if (!vehicleData) {
-            ui.notifications?.error(game.i18n.localize('SR5.Errors.TestExpectsVehicleOnly'))
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.TestExpectsVehicleOnly'));
             return {};
         }
+
+        const limitAttribute = itemLimit || vehicleData.system.environment;
 
         switch (vehicleData.system.controlMode) {
             case "autopilot": {
                 const attribute = 'pilot';
                 const skill = actor.getVehicleTypeSkillName();
-                const limit = {attribute: vehicleData.system.environment};
+                const limit = { attribute: limitAttribute };
 
-                return {attribute, skill, limit};
+                return { attribute, skill, limit };
             }
             case "rigger": {
                 const attribute = 'reaction';
                 const skill = actor.getVehicleTypeSkillName();
-                const limit = {attribute: vehicleData.system.environment};
+                const limit = { attribute: limitAttribute };
 
-                return {attribute, skill, limit};
+                return { attribute, skill, limit };
             }
 
-            default:
+            default: {
                 const skillId = actor.getVehicleTypeSkillName()!;
-                return actor.skillActionData(skillId)!;
+                const skillAction = actor.skillActionData(skillId);
+                const limit = { attribute: limitAttribute };
+                if (!skillAction) {
+                    return { attribute: 'reaction', skill: skillId, limit };
+                }
+                return {
+                    ...skillAction,
+                    limit
+                };
+            }
         }
     }
 

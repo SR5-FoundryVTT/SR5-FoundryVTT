@@ -1261,7 +1261,8 @@
             "NoAvailableActorFound": "해당 행동에 사용할 수 있는 액터를 찾을 수 없음",
             "SkillWithoutAttribute": "해당 기술에 특성치 설정이 없습니다.",
             "TestExpectsVehicleOnly": "해당 판정은 탑승물 유형의 액터만 사용 가능",
-            "TooManyActionsWithCategory": "액터에 {category} 범주의 해동이 정확히 하나 있어야 함"
+            "TooManyActionsWithCategory": "액터에 {category} 범주의 해동이 정확히 하나 있어야 함",
+            "NoDriverSelectedForJumpIn": "점프인할 드론/차량 운전자가 선택되지 않았습니다."
         },
         "EssenceCost": "에센스",
         "Expand": "펼치기",
@@ -2970,9 +2971,13 @@
         },
         "StatusEffects": {
             "Running": "달리기",
-            "Sprinting": "전력 질주"
-        },																 
-	      "Stock": "개머리판",
+            "Sprinting": "전력 질주",
+            "sr5jumpedIn": "점프인 완료 (이동 잠금)",
+            "sr5riggedVehicle": "리거 조종 차량",
+            "sr5sensorLock": "센서 조준됨",
+            "sr5spunOut": "스핀아웃 (조종 페널티)"
+        },
+        "Stock": "개머리판",
         "StreetCred": "길거리 명성",
         "StunTrack": "기절 추적기",
         "Submersion": "몰닉",
@@ -3114,7 +3119,9 @@
             "SuccessTest": "성공 판정",
             "SummonSpiritTest": "영혼 소환",
             "SuppressionDefenseTest": "제압사격 방어",
-            "ThrownAttackTest": "투척 무기 공격"
+            "ThrownAttackTest": "투척 무기 공격",
+            "OpposedActiveSensorLockTest": "능동 센서 조준 대항",
+            "OpposedVehicleTest": "Opposed Vehicle Test"
         },
         "Threshold": "요구 성공횟수",
         "TimeControl": {
@@ -3261,7 +3268,7 @@
                 "Extended": "요구 성공횟수에 도달할 때까지 연장 판정으로 굴립니다. 간격을 0으로 두면 일반 판정으로 굴립니다.",
                 "ExtendedInterval": "굴림 사이의 게임 시간입니다. 0이면 연장 판정이 아닌 일반 판정으로 굴립니다.",
                 "Limit": "계산된 한계치",
-                "LimitIgnored": "현재 해당 판정에 대하여 한계가 무시됨Limit is currently ignored for this test",								
+                "LimitIgnored": "현재 해당 판정에 대하여 한계가 무시됨Limit is currently ignored for this test",
                 "Modifier": "주사위 풀에 적용되는 모든 수정치의 합계",
                 "Pool": "굴릴 수 있는 주사위 개수",
                 "PushTheLimit": "한계 돌파 엣지 규칙 적용",
@@ -3409,7 +3416,8 @@
             "SkillSetDefaultTypeOutsideCompendium": "설정된 기술 설정 컨펜디움에 포함된 기술 설정만 액터 생성에 영향을 줌",
             "SummoningNotConcluded": "소환이 완료되지 않았습니다. 드레인 결정을 위해 영혼 경쟁 판정이 완료되길 기다려야 합니다.",
             "TokenSelectionNeeded": "하나 이상의 토큰이 선택되어야 함",
-            "NoActorCreatePermission": "액터를 생성할 권한이 없습니다."
+            "NoActorCreatePermission": "액터를 생성할 권한이 없습니다.",
+            "TokenMovementLockedJumpedIn": "{vehicle}은 현재 리거 조종 중입니다! 캐릭터 이동이 잠겼습니다."
         },
         "Weapon": {
             "AmmoCount": "탄약 수량",
@@ -3621,7 +3629,21 @@
         "Wireless": "무선",
         "WirelessOffline": "오프라인",
         "WirelessOnline": "온라인",
-        "WirelessUnavailable": "이용 불가능"
+        "WirelessUnavailable": "이용 불가능",
+        "Rigger": {
+            "RiggerInterface": "리거 인터페이스",
+            "JumpIn": "점프인 (차량 탑승)",
+            "JumpOut": "점프아웃 (차량 이탈)",
+            "JumpedInSuccess": "{rigger}님이 {vehicle}에 점프인했습니다",
+            "JumpedOutSuccess": "{vehicle}에서 점프아웃했습니다",
+            "JumpInTestRequired": "소유하지 않은 차량 {vehicle}에 점프인하려면 판정이 필요합니다.",
+            "JumpedInEffectName": "점프인 상태 ({rigger})",
+            "RiggerMovingVehicle": "{rigger}님이 {vehicle}을(를) 조종 중입니다",
+            "GODRiggerInterfaceWarning": "<div class='sr5-god-alert'><div class='god-header'>⚡ 그리드 감시 부서 // 시스템 경보</div><div class='god-body'><p><strong>경고:</strong> 차량 <em>{vehicle}</em>에 검증된 리거 인터페이스 연결이 없습니다.</p></div></div>",
+            "MissingRiggerInterface": "차량 {vehicle}에 리거 인터페이스가 설치되어 있지 않습니다!",
+            "ActiveSensorLock": "능동 센서 조준 (Active Sensor Lock)",
+            "ActiveSensorLockSuccess": "{attacker}님이 {target}에 센서 조준을 완료했습니다 (+{netHits} 방어 페널티)"
+        }
     },
     "TYPES": {
         "Actor": {
