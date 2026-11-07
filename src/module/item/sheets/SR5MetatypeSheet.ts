@@ -2,9 +2,9 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { SR5Item } from '../SR5Item';
 import { SR5 } from '@/module/config';
-import { Helpers } from '@/module/helpers';
 import { parseDropData } from '@/module/utils/sheets';
 import { MetatypeFlow } from '@/module/flows/MetatypeFlow';
+import { MetatypeTaxonomy, MetatypeTaxonomyEntry } from '@/module/types/item/Metatype';
 import ItemSheet = foundry.applications.sheets.ItemSheet;
 
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -19,8 +19,10 @@ export interface ResolvedGrantedItem {
 export interface SR5MetatypeSheetData extends ItemSheet.RenderContext, SR5ApplicationMixinTypes.RenderContext {
     item: SR5Item<'metatype'>;
     displayName: string;
-    metatypes: Record<string, string>;
-    localizedMetatypes: Record<string, string>;
+    taxonomy: MetatypeTaxonomy;
+    metatypeChoices: MetatypeTaxonomyEntry[];
+    subtypeChoices: MetatypeTaxonomyEntry[];
+    subsubtypeChoices: MetatypeTaxonomyEntry[];
     attributesList: { key: string; label: string; min: number; max: number; aug_max: number }[];
     resolvedQualities: ResolvedGrantedItem[];
     resolvedWeapons: ResolvedGrantedItem[];
@@ -92,12 +94,11 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
             context.descriptionHTML = await this.enrichEditorFieldToHTML(this.item.system.description.value);
         }
 
-        const rawMetatypes = CONFIG.SR5?.metatypes ?? SR5.metatypes;
-        const sortedMetatypes = Helpers.sortConfigValuesByTranslation(rawMetatypes);
-        context.metatypes = sortedMetatypes;
-        context.localizedMetatypes = Object.fromEntries(
-            Object.entries(sortedMetatypes).map(([k, v]) => [k, game.i18n.localize(v as string)])
-        );
+        context.taxonomy = MetatypeFlow.extractTaxonomy(this.document);
+        const choices = await MetatypeFlow.collectTaxonomyChoices(context.taxonomy.subtype.name, [this.document]);
+        context.metatypeChoices = choices.metatypeChoices;
+        context.subtypeChoices = choices.subtypeChoices;
+        context.subsubtypeChoices = choices.subsubtypeChoices;
 
         // Prepare attribute rows for all standard physical and mental attributes
         const standardAttrs = ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge'];
@@ -158,6 +159,50 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
         context.resolvedItems = await resolveUuids(system.items || []);
 
         return context;
+    }
+
+    override async _processSubmitData(
+        ...[event, form, submitData, options]: Parameters<ItemSheet['_processSubmitData']>
+    ) {
+        const currentTax = MetatypeFlow.extractTaxonomy(this.document);
+        const baseChoices = await MetatypeFlow.collectTaxonomyChoices(currentTax.subtype.name, [this.document]);
+
+        if (foundry.utils.hasProperty(submitData, 'system.metatype')) {
+            const rawVal = foundry.utils.getProperty(submitData, 'system.metatype');
+            if (typeof rawVal === 'string') {
+                const resolved = MetatypeFlow.resolveTaxonomyInput(rawVal, baseChoices.metatypeChoices);
+                foundry.utils.setProperty(submitData, 'system.metatype', resolved.name);
+                foundry.utils.setProperty(submitData, 'system.taxonomy.metatype', resolved);
+                foundry.utils.setProperty(submitData, 'flags.shadowrun5e.taxonomy.metatype', resolved);
+            }
+        }
+
+        let effectiveSubtype = currentTax.subtype.name;
+        if (foundry.utils.hasProperty(submitData, 'system.subtype')) {
+            const rawVal = foundry.utils.getProperty(submitData, 'system.subtype');
+            if (typeof rawVal === 'string') {
+                const resolved = MetatypeFlow.resolveTaxonomyInput(rawVal, baseChoices.subtypeChoices);
+                effectiveSubtype = resolved.name;
+                foundry.utils.setProperty(submitData, 'system.subtype', resolved.name);
+                foundry.utils.setProperty(submitData, 'system.taxonomy.subtype', resolved);
+                foundry.utils.setProperty(submitData, 'flags.shadowrun5e.taxonomy.subtype', resolved);
+            }
+        }
+
+        if (foundry.utils.hasProperty(submitData, 'system.subsubtype')) {
+            const rawVal = foundry.utils.getProperty(submitData, 'system.subsubtype');
+            if (typeof rawVal === 'string') {
+                const subChoices = effectiveSubtype !== currentTax.subtype.name
+                    ? (await MetatypeFlow.collectTaxonomyChoices(effectiveSubtype, [this.document])).subsubtypeChoices
+                    : baseChoices.subsubtypeChoices;
+                const resolved = MetatypeFlow.resolveTaxonomyInput(rawVal, subChoices);
+                foundry.utils.setProperty(submitData, 'system.subsubtype', resolved.name);
+                foundry.utils.setProperty(submitData, 'system.taxonomy.subsubtype', resolved);
+                foundry.utils.setProperty(submitData, 'flags.shadowrun5e.taxonomy.subsubtype', resolved);
+            }
+        }
+
+        return await super._processSubmitData(event, form, submitData, options);
     }
 
     protected override async _onDrop(event: DragEvent) {

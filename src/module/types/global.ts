@@ -235,6 +235,11 @@ declare module "fvtt-types/configuration" {
                 grantedByMetatype?: string;
                 grantedCategory?: string;
                 metaTypesItems?: Array<{ id?: string; name: string; type?: string; chummerId?: string; foundryUuid?: string; category?: string; power?: string; select?: string; }>;
+                taxonomy?: {
+                    metatype?: { name: string; label: string };
+                    subtype?: { name: string; label: string };
+                    subsubtype?: { name: string; label: string };
+                };
             };
         };
         Macro: {

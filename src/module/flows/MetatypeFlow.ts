@@ -1,6 +1,8 @@
 import { Helpers } from '../helpers';
+import { SR5 } from '../config';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
+import { MetatypeTaxonomy, MetatypeTaxonomyEntry } from '../types/item/Metatype';
 import { MetatypeItemResolver, MetatypeItemFlag } from '../apps/itemImport/helper/MetatypeItemResolver';
 import { NaturalWeaponHelper } from '../apps/itemImport/helper/NaturalWeaponHelper';
 import { Constants, CompendiumKey } from '../apps/itemImport/importer/Constants';
@@ -306,13 +308,13 @@ export class MetatypeFlow {
         const localWeapons: string[] = [];
         const localItems: string[] = [];
 
-        for (let i = 0; i < createdItems.length; i++) {
-            const createdItem = createdItems[i];
-            const meta = resolved[i];
+        for (const createdItem of createdItems) {
             const uuid = createdItem.uuid;
             if (!uuid) continue;
-            if (meta.category === 'quality') localQualities.push(uuid);
-            else if (meta.category === 'weapon') localWeapons.push(uuid);
+            const category = createdItem.flags?.shadowrun5e?.grantedCategory
+                ?? (createdItem.isType('weapon') ? 'weapon' : createdItem.isType('quality', 'critter_power') ? 'quality' : 'item');
+            if (category === 'quality') localQualities.push(uuid);
+            else if (category === 'weapon') localWeapons.push(uuid);
             else localItems.push(uuid);
         }
 
@@ -448,26 +450,203 @@ export class MetatypeFlow {
     }
 
     /**
+     * Extract normalized { name, label } taxonomy entries from a metatype item.
+     */
+    static extractTaxonomy(item: SR5Item<'metatype'>): MetatypeTaxonomy {
+        const sys = item.system;
+        const flagTax = item.flags?.shadowrun5e?.taxonomy;
+        const sysTax = sys?.taxonomy;
+
+        const getExplicitLabel = (entry: Partial<MetatypeTaxonomyEntry> | undefined, targetName: string): string => {
+            if (!entry || !targetName) return '';
+            const entryName = String(entry.name ?? '').trim().toLowerCase();
+            if (entryName && entryName !== targetName) return '';
+            return String(entry.label ?? '').trim();
+        };
+
+        const metaName = (sys?.metatype || sysTax?.metatype?.name || flagTax?.metatype?.name || 'human').trim().toLowerCase();
+        const baseMap = (CONFIG.SR5?.metatypes ?? SR5.metatypes) as Record<string, string>;
+        const baseKey = baseMap[metaName];
+        const baseLocalized = baseKey && typeof game !== 'undefined' && game.i18n?.has(baseKey)
+            ? game.i18n.localize(baseKey)
+            : '';
+        const metaLabel = getExplicitLabel(flagTax?.metatype, metaName)
+            || getExplicitLabel(sysTax?.metatype, metaName)
+            || baseLocalized
+            || Helpers.capitalizeFirstLetter(metaName);
+
+        const subName = (sys?.subtype || sysTax?.subtype?.name || flagTax?.subtype?.name || 'metahuman').trim().toLowerCase();
+        const subLabel = getExplicitLabel(flagTax?.subtype, subName)
+            || getExplicitLabel(sysTax?.subtype, subName)
+            || Helpers.capitalizeFirstLetter(subName);
+
+        const subsubName = (sys?.subsubtype || sysTax?.subsubtype?.name || flagTax?.subsubtype?.name || '').trim().toLowerCase();
+        const explicitSubsubLabel = getExplicitLabel(flagTax?.subsubtype, subsubName)
+            || getExplicitLabel(sysTax?.subsubtype, subsubName);
+        const itemNameFallback = item.name && item.name.toLowerCase() !== metaName
+            ? (item.name.includes(':') ? item.name.split(':').pop()!.trim() : item.name.trim())
+            : '';
+        const subsubLabel = subsubName
+            ? (explicitSubsubLabel || itemNameFallback || Helpers.capitalizeFirstLetter(subsubName))
+            : '';
+
+        return {
+            metatype: { name: metaName, label: metaLabel },
+            subtype: { name: subName, label: subLabel },
+            subsubtype: { name: subsubName, label: subsubLabel },
+        };
+    }
+
+    /**
+     * Collect all distinct { name, label } choices for metatype, subtype, and subsubtype
+     * from CONFIG.SR5.metatypes (base 5) plus all world and compendium metatype items.
+     */
+    static async collectTaxonomyChoices(currentSubtype?: string, extraItems: SR5Item<'metatype'>[] = []): Promise<{
+        metatypeChoices: MetatypeTaxonomyEntry[];
+        subtypeChoices: MetatypeTaxonomyEntry[];
+        subsubtypeChoices: MetatypeTaxonomyEntry[];
+    }> {
+        const metatypeMap = new Map<string, MetatypeTaxonomyEntry>();
+        const subtypeMap = new Map<string, MetatypeTaxonomyEntry>();
+        const subsubtypeBySubMap = new Map<string, Map<string, MetatypeTaxonomyEntry>>();
+        const allSubsubtypeMap = new Map<string, MetatypeTaxonomyEntry>();
+
+        // 1. Seed base metatypes from CONFIG.SR5.metatypes
+        const rawBaseMetatypes = (CONFIG.SR5?.metatypes ?? SR5.metatypes) as Record<string, string>;
+        for (const [key, i18nKey] of Object.entries(rawBaseMetatypes)) {
+            const name = key.trim().toLowerCase();
+            const label = typeof game !== 'undefined' && game.i18n?.has(i18nKey)
+                ? game.i18n.localize(i18nKey)
+                : Helpers.capitalizeFirstLetter(name);
+            metatypeMap.set(name, { name, label });
+        }
+
+        // 2. Gather metatype documents from extraItems, world items, and metatype compendiums
+        const docs: SR5Item<'metatype'>[] = [...extraItems];
+        if (typeof game !== 'undefined') {
+            if (game.items) {
+                for (const item of game.items.values()) {
+                    if (item instanceof SR5Item && item.isType('metatype')) {
+                        docs.push(item);
+                    }
+                }
+            }
+            const packIds = ['shadowrun5e.sr5e-metatypes', 'sr5e-metatypes', 'world.sr5metatype', 'sr5metatype'];
+            const visitedPacks = new Set<string>();
+            for (const packId of packIds) {
+                const pack = game.packs?.get(packId);
+                if (!pack || visitedPacks.has(pack.collection)) continue;
+                visitedPacks.add(pack.collection);
+                try {
+                    const packDocs = await pack.getDocuments();
+                    for (const doc of packDocs) {
+                        if (doc instanceof SR5Item && doc.isType('metatype')) {
+                            docs.push(doc);
+                        }
+                    }
+                } catch {
+                    // ignore inaccessible packs
+                }
+            }
+        }
+
+        const preferLabel = (existing: MetatypeTaxonomyEntry | undefined, candidate: MetatypeTaxonomyEntry): MetatypeTaxonomyEntry => {
+            if (!existing) return candidate;
+            const defaultLabel = Helpers.capitalizeFirstLetter(candidate.name);
+            if (existing.label === defaultLabel && candidate.label && candidate.label !== defaultLabel) {
+                return candidate;
+            }
+            return existing;
+        };
+
+        for (const doc of docs) {
+            const tax = this.extractTaxonomy(doc);
+            if (tax.metatype.name) {
+                metatypeMap.set(tax.metatype.name, preferLabel(metatypeMap.get(tax.metatype.name), tax.metatype));
+            }
+            if (tax.subtype.name) {
+                subtypeMap.set(tax.subtype.name, preferLabel(subtypeMap.get(tax.subtype.name), tax.subtype));
+            }
+            if (tax.subsubtype.name) {
+                allSubsubtypeMap.set(tax.subsubtype.name, preferLabel(allSubsubtypeMap.get(tax.subsubtype.name), tax.subsubtype));
+                const subKey = tax.subtype.name || 'metahuman';
+                let bucket = subsubtypeBySubMap.get(subKey);
+                if (!bucket) {
+                    bucket = new Map<string, MetatypeTaxonomyEntry>();
+                    subsubtypeBySubMap.set(subKey, bucket);
+                }
+                bucket.set(tax.subsubtype.name, preferLabel(bucket.get(tax.subsubtype.name), tax.subsubtype));
+            }
+        }
+
+        const sortEntries = (entries: Iterable<MetatypeTaxonomyEntry>) =>
+            Array.from(entries).sort((a, b) => a.label.localeCompare(b.label));
+
+        const normalizedCurrentSub = (currentSubtype || '').trim().toLowerCase();
+        const filteredSubsubBucket = normalizedCurrentSub ? subsubtypeBySubMap.get(normalizedCurrentSub) : undefined;
+        const subsubtypeSource = (filteredSubsubBucket && filteredSubsubBucket.size > 0)
+            ? filteredSubsubBucket.values()
+            : allSubsubtypeMap.values();
+
+        return {
+            metatypeChoices: sortEntries(metatypeMap.values()),
+            subtypeChoices: sortEntries(subtypeMap.values()),
+            subsubtypeChoices: sortEntries(subsubtypeSource),
+        };
+    }
+
+    /**
+     * Resolve a user-submitted string from an input + datalist against known { name, label } choices.
+     * - If the string matches an existing choice by `label` or `name` (case-insensitively), returns that choice's `{ name, label }`.
+     * - If the string is a new custom entry, returns `{ name: trimmed.toLowerCase(), label: trimmed }`.
+     */
+    static resolveTaxonomyInput(input: string | null | undefined, choices: MetatypeTaxonomyEntry[] = []): MetatypeTaxonomyEntry {
+        const trimmed = String(input ?? '').trim();
+        if (!trimmed) return { name: '', label: '' };
+
+        const lower = trimmed.toLowerCase();
+        const match = choices.find(c => c.label.toLowerCase() === lower || c.name.toLowerCase() === lower);
+        if (match) {
+            return { name: match.name, label: match.label };
+        }
+        return { name: lower, label: trimmed };
+    }
+
+    /**
+     * Shared helper to format a metatype taxonomy field ('subtype' or 'subsubtype') for display.
+     */
+    static #localizeTaxonomyField(key: 'subtype' | 'subsubtype', itemOrValue?: SR5Item<'metatype'> | string | null): string {
+        if (!itemOrValue) return '';
+        if (typeof itemOrValue !== 'string') {
+            return this.extractTaxonomy(itemOrValue)[key].label;
+        }
+        const trimmed = itemOrValue.trim();
+        if (!trimmed) return '';
+        const lower = trimmed.toLowerCase();
+        if (typeof game !== 'undefined' && game.items) {
+            for (const item of game.items.values()) {
+                if (item instanceof SR5Item && item.isType('metatype')) {
+                    const entry = this.extractTaxonomy(item)[key];
+                    if (entry.name === lower && entry.label) {
+                        return entry.label;
+                    }
+                }
+            }
+        }
+        return Helpers.capitalizeFirstLetter(trimmed);
+    }
+
+    /**
      * Format the metatype subtype (category) for display.
      */
     static localizeSubtype(itemOrSubtype?: SR5Item<'metatype'> | string | null): string {
-        if (!itemOrSubtype) return '';
-        const subtype = typeof itemOrSubtype === 'string'
-            ? itemOrSubtype
-            : (itemOrSubtype.system?.subtype || '');
-        if (!subtype) return '';
-        return subtype.charAt(0).toUpperCase() + subtype.slice(1);
+        return this.#localizeTaxonomyField('subtype', itemOrSubtype);
     }
 
     /**
      * Format the metatype subsubtype (strain, species, form) for display.
      */
     static localizeSubsubtype(itemOrSubsubtype?: SR5Item<'metatype'> | string | null): string {
-        if (!itemOrSubsubtype) return '';
-        const subsubtype = typeof itemOrSubsubtype === 'string'
-            ? itemOrSubsubtype
-            : (itemOrSubsubtype.system?.subsubtype || '');
-        if (!subsubtype) return '';
-        return subsubtype.charAt(0).toUpperCase() + subsubtype.slice(1);
+        return this.#localizeTaxonomyField('subsubtype', itemOrSubsubtype);
     }
 }

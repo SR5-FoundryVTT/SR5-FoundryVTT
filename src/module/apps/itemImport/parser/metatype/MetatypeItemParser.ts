@@ -3,6 +3,7 @@ import { Metatype as MetatypeSchemaType } from '../../schema/MetatypeSchema';
 import { CompendiumKey, Constants } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { SR5 } from '@/module/config';
+import { Helpers } from '@/module/helpers';
 import { MetatypeItemFlag } from '../../helper/MetatypeItemResolver';
 import { NaturalWeaponHelper } from '../../helper/NaturalWeaponHelper';
 
@@ -24,12 +25,16 @@ export class MetatypeItemParser extends Parser<'metatype'> {
     protected override getSystem(jsonData: MetatypeSchemaType & { _parentMetatype?: string; _parentCategory?: string }) {
         const system = this.getBaseSystem();
 
-        const rawName = (jsonData.name?._TEXT || '').trim().toLowerCase();
-        const parentMetatype = (jsonData._parentMetatype || '').trim().toLowerCase();
-        const baseMetatypes = Object.keys(CONFIG.SR5?.metatypes ?? SR5.metatypes);
+        const rawNameText = (jsonData.name?._TEXT || '').trim();
+        const rawName = rawNameText.toLowerCase();
+        const parentMetatypeText = (jsonData._parentMetatype || '').trim();
+        const parentMetatype = parentMetatypeText.toLowerCase();
+        const baseMetatypeMap = (CONFIG.SR5?.metatypes ?? SR5.metatypes) as Record<string, string>;
+        const baseMetatypes = Object.keys(baseMetatypeMap);
         const matchedBaseMetatype = baseMetatypes.find(r => rawName.includes(r) || parentMetatype.includes(r));
 
-        const rawCat = (jsonData.category?._TEXT || jsonData._parentCategory || '').trim().toLowerCase();
+        const rawCatText = (jsonData.category?._TEXT || jsonData._parentCategory || '').trim();
+        const rawCat = rawCatText.toLowerCase();
         let subtype = 'metahuman';
         let subsubtype = '';
 
@@ -58,9 +63,36 @@ export class MetatypeItemParser extends Parser<'metatype'> {
             subsubtype = cleanName;
         }
 
-        system.metatype = matchedBaseMetatype || parentMetatype || cleanName || 'human';
+        const metatypeName = matchedBaseMetatype || parentMetatype || cleanName || 'human';
+
+        const translatedItemName = IH.translate(
+            IH.getArray(jsonData.translate)[0]?._TEXT ?? rawNameText,
+            jsonData.id?._TEXT
+        ).trim();
+
+        const baseTranslationKey = baseMetatypeMap[metatypeName];
+        const metatypeLabel = baseTranslationKey && typeof game !== 'undefined' && game.i18n?.has(baseTranslationKey)
+            ? game.i18n.localize(baseTranslationKey)
+            : (parentMetatypeText ? IH.translate(parentMetatypeText) : (translatedItemName || Helpers.capitalizeFirstLetter(metatypeName)));
+
+        const effectiveCatText = rawCat === 'metavariant' && jsonData._parentCategory
+            ? jsonData._parentCategory.trim()
+            : rawCatText;
+        const translatedCat = effectiveCatText ? IH.getTranslatedCategory('metatypes', effectiveCatText).trim() : '';
+        const subtypeLabel = translatedCat || Helpers.capitalizeFirstLetter(subtype);
+
+        const subsubtypeLabel = subsubtype
+            ? (translatedItemName.replace(/^shapeshifter:\s*/i, '').trim() || rawNameText.replace(/^shapeshifter:\s*/i, '').trim() || Helpers.capitalizeFirstLetter(subsubtype))
+            : '';
+
+        system.metatype = metatypeName;
         system.subtype = subtype;
         system.subsubtype = subsubtype;
+        system.taxonomy = {
+            metatype: { name: metatypeName, label: metatypeLabel },
+            subtype: { name: subtype, label: subtypeLabel },
+            subsubtype: { name: subsubtype, label: subsubtypeLabel },
+        };
         system.karma = Number(jsonData.karma?._TEXT) || 0;
 
         system.attributes = {
@@ -247,18 +279,17 @@ export class MetatypeItemParser extends Parser<'metatype'> {
             });
         }
 
-        if (metaTypesItems.length > 0) {
-            entity.flags = {
-                ...(entity.flags || {}),
-                shadowrun5e: {
-                    ...(entity.flags?.shadowrun5e || {}),
-                    metaTypesItems,
-                },
-            };
-        }
+        const sys = entity.system as Item.SystemOfType<'metatype'> | undefined;
+        entity.flags = {
+            ...(entity.flags || {}),
+            shadowrun5e: {
+                ...(entity.flags?.shadowrun5e || {}),
+                ...(metaTypesItems.length > 0 ? { metaTypesItems } : {}),
+                ...(sys?.taxonomy ? { taxonomy: sys.taxonomy } : {}),
+            },
+        };
 
         if (!entity.img) {
-            const sys = entity.system as Item.SystemOfType<'metatype'> | undefined;
             if (sys?.subtype === 'infected') {
                 entity.img = 'systems/shadowrun5e/dist/icons/importer/critter/infected.svg';
             } else if (sys?.subtype === 'critter') {

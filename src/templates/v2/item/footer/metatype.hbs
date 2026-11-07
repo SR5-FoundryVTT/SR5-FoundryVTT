@@ -2,13 +2,23 @@
     <div class="basic-row">
         <label data-tooltip="{{systemFields.subtype.hint}}">{{localize "SR5.Metatype.Category"}}</label>
         <span>
-            <input type="text" name="system.subtype" class="short" value="{{system.subtype}}" data-tooltip="{{localize 'SR5.Metatype.Category'}}" />
+            <input type="text" name="system.subtype" class="short" value="{{taxonomy.subtype.label}}" list="{{rootId}}-subtype-choices" data-tooltip="{{localize 'SR5.Metatype.Category'}}" />
+            <datalist id="{{rootId}}-subtype-choices">
+                {{#each subtypeChoices}}
+                    <option value="{{this.label}}" data-name="{{this.name}}">{{this.name}}</option>
+                {{/each}}
+            </datalist>
         </span>
     </div>
     <div class="basic-row">
         <label data-tooltip="{{systemFields.subsubtype.hint}}">{{localize "SR5.Metatype.Subsubtype"}}</label>
         <span>
-            <input type="text" name="system.subsubtype" class="short" value="{{system.subsubtype}}" data-tooltip="{{localize 'SR5.Metatype.Subsubtype'}}" />
+            <input type="text" name="system.subsubtype" class="short" value="{{taxonomy.subsubtype.label}}" list="{{rootId}}-subsubtype-choices" data-tooltip="{{localize 'SR5.Metatype.Subsubtype'}}" />
+            <datalist id="{{rootId}}-subsubtype-choices">
+                {{#each subsubtypeChoices}}
+                    <option value="{{this.label}}" data-name="{{this.name}}">{{this.name}}</option>
+                {{/each}}
+            </datalist>
         </span>
     </div>
     <div class="basic-row">
@@ -18,9 +28,9 @@
         </span>
     </div>
 {{else}}
-    <label data-tooltip="{{localize 'SR5.Metatype.Category'}}">{{localizeSubtype system.subtype}}</label>
+    <label data-tooltip="{{localize 'SR5.Metatype.Category'}}">{{localizeSubtype item}}</label>
     {{#if (ne system.subsubtype "")}}
-        <label data-tooltip="{{localize 'SR5.Metatype.Subsubtype'}}">{{localizeSubsubtype system.subsubtype}}</label>
+        <label data-tooltip="{{localize 'SR5.Metatype.Subsubtype'}}">{{localizeSubsubtype item}}</label>
     {{/if}}
     <label data-tooltip="{{localize 'SR5.Metatype.KarmaCost'}}">{{localize "SR5.Karma"}}&nbsp;{{system.karma}}</label>
 {{/if}}

@@ -698,6 +698,124 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(importedVariant.system.metatype, 'centaur');
             assert.strictEqual(importedVariant.system.subtype, 'metasapient');
             assert.strictEqual(importedVariant.system.subsubtype, 'lesser centaur');
+            assert.deepEqual(importedVariant.system.taxonomy.subtype, { name: 'metasapient', label: 'Metasapients' });
+            assert.deepEqual(importedVariant.system.taxonomy.subsubtype, { name: 'lesser centaur', label: 'Lesser Centaur' });
+        });
+
+        it('Chummer import and manual sheet entry persist { name, label } taxonomy pairs and expose dynamic datalist choices', async () => {
+            const { MetatypeItemParser } = await import('@/module/apps/itemImport/parser/metatype/MetatypeItemParser');
+            const { ImportHelper } = await import('@/module/apps/itemImport/helper/ImportHelper');
+            const { SR5MetatypeSheet } = await import('@/module/item/sheets/SR5MetatypeSheet');
+
+            // 1. Simulate translated Chummer import (e.g. German: Infected -> Infiziert, Vampire -> Vampir)
+            const prevTranslation = ImportHelper.isTranslationEnabled;
+            ImportHelper.isTranslationEnabled = true;
+            ImportHelper.setTranslatedCategory('metatypes', [
+                { _TEXT: 'Infected', $: { translate: 'Infiziert' } },
+            ]);
+
+            let parsedVampire: Item.CreateData<'metatype'> & { type: 'metatype' };
+            try {
+                const parser = new MetatypeItemParser();
+                const chummerVampire = {
+                    id: { _TEXT: '77777777-6666-5555-4444-333333333333' },
+                    name: { _TEXT: 'Vampire' },
+                    translate: { _TEXT: 'Vampir' },
+                    category: { _TEXT: 'Infected' },
+                    _parentMetatype: 'Human',
+                    karma: { _TEXT: '27' },
+                };
+                parsedVampire = await parser.Parse(
+                    chummerVampire as unknown as Parameters<typeof parser.Parse>[0],
+                    'Metatype'
+                ) as Item.CreateData<'metatype'> & { type: 'metatype' };
+            } finally {
+                ImportHelper.isTranslationEnabled = prevTranslation;
+            }
+
+            const vampireItem = await factory.createItem(parsedVampire);
+            assert.strictEqual(vampireItem.system.subtype, 'infected');
+            assert.strictEqual(vampireItem.system.subsubtype, 'vampire');
+            assert.deepEqual(vampireItem.system.taxonomy.subtype, { name: 'infected', label: 'Infiziert' });
+            assert.deepEqual(vampireItem.system.taxonomy.subsubtype, { name: 'vampire', label: 'Vampir' });
+            assert.deepEqual(vampireItem.flags?.shadowrun5e?.taxonomy?.subtype, { name: 'infected', label: 'Infiziert' });
+            assert.deepEqual(vampireItem.flags?.shadowrun5e?.taxonomy?.subsubtype, { name: 'vampire', label: 'Vampir' });
+            assert.strictEqual(MetatypeFlow.localizeSubtype(vampireItem), 'Infiziert');
+            assert.strictEqual(MetatypeFlow.localizeSubsubtype(vampireItem), 'Vampir');
+
+            // 2. Create a new manual metatype item in the world and inspect SR5MetatypeSheet._prepareContext choices
+            const manualItem = await factory.createItem({
+                name: 'Custom Strain',
+                type: 'metatype',
+                system: {
+                    metatype: 'human',
+                    subtype: 'infected',
+                },
+            });
+
+            const sheet = new SR5MetatypeSheet({ document: manualItem });
+            const context = await sheet._prepareContext({ isFirstRender: true });
+
+            // Subtype choices should include 'infected' with label 'Infiziert' from the imported item
+            const infectedChoice = context.subtypeChoices.find(c => c.name === 'infected');
+            assert.isDefined(infectedChoice, 'Subtype datalist choices should include imported infected subtype');
+            assert.strictEqual(infectedChoice?.label, 'Infiziert');
+
+            // Subsubtype choices (filtered by subtype='infected') should include 'vampire' with label 'Vampir'
+            const vampireChoice = context.subsubtypeChoices.find(c => c.name === 'vampire');
+            assert.isDefined(vampireChoice, 'Subsubtype datalist choices should include imported vampire subsubtype');
+            assert.strictEqual(vampireChoice?.label, 'Vampir');
+
+            // 3. Submitting an existing datalist label ('Infiziert') or typing a new custom subsubtype ('Cyber-Vampir')
+            // via SR5MetatypeSheet._processSubmitData resolves { name, label } and makes the new custom subsubtype
+            // available as a choice for subsequent items
+            const submitPayload: Parameters<typeof sheet['_processSubmitData']>[2] = {
+                system: {
+                    subtype: 'Infiziert',
+                    subsubtype: 'Cyber-Vampir',
+                },
+            };
+            await sheet._processSubmitData(
+                new SubmitEvent('submit'),
+                document.createElement('form'),
+                submitPayload,
+                {}
+            );
+
+            assert.strictEqual(manualItem.system.subtype, 'infected');
+            assert.deepEqual(manualItem.system.taxonomy.subtype, { name: 'infected', label: 'Infiziert' });
+            assert.deepEqual(manualItem.flags?.shadowrun5e?.taxonomy?.subtype, { name: 'infected', label: 'Infiziert' });
+
+            assert.strictEqual(manualItem.system.subsubtype, 'cyber-vampir');
+            assert.deepEqual(manualItem.system.taxonomy.subsubtype, { name: 'cyber-vampir', label: 'Cyber-Vampir' });
+            assert.deepEqual(manualItem.flags?.shadowrun5e?.taxonomy?.subsubtype, { name: 'cyber-vampir', label: 'Cyber-Vampir' });
+
+            const nextContext = await sheet._prepareContext({ isFirstRender: false });
+            const customChoice = nextContext.subsubtypeChoices.find(c => c.name === 'cyber-vampir');
+            assert.isDefined(customChoice, 'Newly entered custom subsubtype should appear in datalist choices for subsequent items');
+            assert.strictEqual(customChoice?.label, 'Cyber-Vampir');
+
+            // 4. Verify compatibility with external module sync payloads (e.g. shadows-creater CompendiumSyncService)
+            // that write string metatype/subtype/subsubtype and localized item.name without explicit taxonomy flags
+            const syncedCentaur = await factory.createItem({
+                name: 'Zentaur',
+                type: 'metatype',
+                system: {
+                    metatype: 'human',
+                    subtype: 'metasapient',
+                    subsubtype: 'centaur',
+                    karma: 25,
+                },
+            });
+            assert.strictEqual(syncedCentaur.system.metatype, 'human');
+            assert.strictEqual(syncedCentaur.system.subtype, 'metasapient');
+            assert.strictEqual(syncedCentaur.system.subsubtype, 'centaur');
+            assert.strictEqual(MetatypeFlow.localizeSubsubtype(syncedCentaur), 'Zentaur');
+
+            const metasapientChoices = await MetatypeFlow.collectTaxonomyChoices('metasapient', [syncedCentaur]);
+            const centaurChoice = metasapientChoices.subsubtypeChoices.find(c => c.name === 'centaur');
+            assert.isDefined(centaurChoice, 'External module synced item should expose its { name, label } in subsubtypeChoices');
+            assert.strictEqual(centaurChoice?.label, 'Zentaur');
         });
     });
 };

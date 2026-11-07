@@ -30,23 +30,21 @@
                     </div>
                 </div>
                 <div class="item-type-container metatype-header-meta">
-                    {{#if (or (eq system.subtype 'metahuman') (eq system.subtype 'infected'))}}
-                        {{#if @root.isEditMode}}
-                            <div class="metatype-header-meta-row">
-                                <label>{{localize "SR5.Metatype.BaseMetatype"}}</label>
-                                <span>
-                                    <input type="text" name="system.metatype" value="{{system.metatype}}" list="{{rootId}}-base-metatypes" class="short" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}" />
-                                    <datalist id="{{rootId}}-base-metatypes">
-                                        {{#each localizedMetatypes}}
-                                            <option value="{{@key}}" label="{{this}}">{{this}}</option>
-                                        {{/each}}
-                                    </datalist>
-                                </span>
-                            </div>
-                        {{else}}
-                            {{#if (ne displayName (or (lookup localizedMetatypes system.metatype) system.metatype))}}
-                                <label class="metatype-header-value" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">{{or (lookup localizedMetatypes system.metatype) system.metatype}}</label>
-                            {{/if}}
+                    {{#if @root.isEditMode}}
+                        <div class="metatype-header-meta-row">
+                            <label>{{localize "SR5.Metatype.BaseMetatype"}}</label>
+                            <span>
+                                <input type="text" name="system.metatype" value="{{taxonomy.metatype.label}}" list="{{rootId}}-base-metatypes" class="short" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}" />
+                                <datalist id="{{rootId}}-base-metatypes">
+                                    {{#each metatypeChoices}}
+                                        <option value="{{this.label}}" data-name="{{this.name}}">{{this.name}}</option>
+                                    {{/each}}
+                                </datalist>
+                            </span>
+                        </div>
+                    {{else if (or (eq system.subtype 'metahuman') (eq system.subtype 'infected'))}}
+                        {{#if (ne displayName taxonomy.metatype.label)}}
+                            <label class="metatype-header-value" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">{{taxonomy.metatype.label}}</label>
                         {{/if}}
                     {{/if}}
                 </div>

@@ -898,16 +898,6 @@
         },
         "Immunity": "Immunité",
         "ImmunityToNormalWeapons": "Immunité aux armes normales",
-        "RaceSubtypes": {
-            "metahuman": "Méta-humain",
-            "metasapient": "Méta-sapient",
-            "shapeshifter": "Changeur de forme",
-            "infected": "Infecté",
-            "critter": "Créature",
-            "spirit": "Esprit",
-            "sprite": "Sprite",
-            "other": "Autre"
-        },
         "Karma": "Karma",
         "MetatypeSelector": {
             "Cancel": "Annuler",
