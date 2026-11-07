@@ -93,6 +93,7 @@ import { AutocompleteInlineHooksFlow } from './effect/autoinline/AutocompleteInl
 import { DocumentSituationModifiers } from './rules/DocumentSituationModifiers';
 import { RenderSettings } from './systemLinks';
 import registerSR5Tours from './tours/tours';
+import Sr5Tour from './tours/sr5Tours';
 import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
@@ -143,7 +144,6 @@ import { MatrixICFlow } from './actor/flows/MatrixICFlow';
 import { MatrixNetworkFlow } from './item/flows/MatrixNetworkFlow';
 import { SocketMessage } from './sockets';
 import { TagifyHooks } from '@/module/tagify/TagifyHooks';
-import { RiggingHooks } from '@/module/tests/hooks/RiggingHooks';
 import { SocketMessageFlow } from './flows/SocketMessageFlow';
 import { CompendiumBrowser } from './apps/compendiumBrowser/CompendiumBrowser';
 import { Skill } from './types/item/Skill';
@@ -193,7 +193,6 @@ export class HooksManager {
         Hooks.on('updateWorldTime', foundry.utils.debounce(() => { void PreparationDecayFlow.onWorldTimeChange(); }, 250));
 
         MatrixHooks.registerHooks();
-        RiggingHooks.registerHooks();
         TagifyHooks.registerHooks();
 
         RenderSettings.listen();
@@ -566,6 +565,7 @@ ___________________
         await IconAssign.refreshIconFiles();
 
         if (game.user?.isGM) {
+            void Sr5Tour.cleanupOrphanedTourDocuments();
             Migrator.BeginMigration();
 
             await WorldTimeFlow.initialize();

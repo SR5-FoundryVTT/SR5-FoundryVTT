@@ -8,6 +8,26 @@
         {{#each itemType.program}}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/program/item.hbs' item=this }}
         {{/each}}
+        {{#if (and (isType actor 'vehicle') rccInfo.loadedAutosofts)}}
+            <div class="list-item list-item-header" style="margin-top: 8px;">
+                <label style="font-weight: bold;">{{localize "SR5.RCC.SharedAutosofts"}}</label>
+            </div>
+            {{#each rccInfo.loadedAutosofts}}
+                <div class="list-item-container">
+                    <div class="list-item" data-uuid="{{this.uuid}}">
+                        <div class="list-item-start">
+                            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" this }}
+                            <a data-action="openUuid">{{this.name}}</a>
+                        </div>
+                        <div class="list-item-icons skinny-icons">
+                            <span class="badge" style="background: rgba(0, 150, 255, 0.2); padding: 2px 6px; border-radius: 3px; font-size: 0.85em; font-weight: normal;">
+                                <i class="fas fa-wifi"></i> {{localize "SR5.RCC.SharedFromRCC"}}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            {{/each}}
+        {{/if}}
         </div>
     </div>
 </section>

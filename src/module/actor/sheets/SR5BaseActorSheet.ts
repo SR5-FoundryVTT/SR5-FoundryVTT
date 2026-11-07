@@ -1,5 +1,6 @@
 import { DeepPartial } from 'fvtt-types/utils';
 
+import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 import { SR5 } from '../../config';
 import { Helpers } from '../../helpers';
 import { SR5Actor } from '../SR5Actor';
@@ -9,6 +10,8 @@ import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import { MoveInventoryDialog } from '../../apps/dialogs/MoveInventoryDialog';
 import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
+import { AutosoftConfigManager } from '@/module/apps/actor/AutosoftConfigManager';
+import { RiggingRules } from '@/module/rules/RiggingRules';
 
 import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { prepareSortedEffects, prepareSortedItemEffects } from '../../effects';
@@ -181,22 +184,6 @@ const sortByLocalizedLabel = <T extends { label: string }>(a: T, b: T) => {
 };
 
 /**
- * Sort a list of items by equipped and name in ascending alphabetical order.
- *
- * @param a Any type of item data
- * @param b Any type of item data
- * @returns
- */
-const sortByEquipped = (a: SR5Item, b: SR5Item) => {
-    const leftEquipped = a.system?.technology?.equipped;
-    const rightEquipped = b.system?.technology?.equipped;
-
-    if (leftEquipped && !rightEquipped) return -1;
-    if (rightEquipped && !leftEquipped) return 1;
-    return sortByName(a, b);
-};
-
-/**
  * Sort a list of items by quality type and name in ascending alphabetical order.
  *
  * @param a A quality item data
@@ -329,6 +316,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
             addItem: SR5BaseActorSheet.#createItem,
             editItem: SR5BaseActorSheet.#editItem,
+            openAutosoftConfigManager: SR5BaseActorSheet.#openAutosoftConfigManager,
             moveItem: SR5BaseActorSheet.#moveItem,
             deleteItem: SR5BaseActorSheet.#deleteItem,
             favoriteItem: SR5BaseActorSheet.#favoriteItem,
@@ -713,7 +701,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await Promise.all([
             this._applyModifierTooltip("[data-attribute-modifier-tooltip]", (id) => this.actor.getAttribute(id)),
             this._applyModifierTooltip("[data-limit-modifier-tooltip]", (id) => this.actor.getLimit(id)),
-            this._applyModifierTooltip("[data-skill-modifier-tooltip]", (id) => this.actor.getSkillById(id)),
+            this._applyModifierTooltip("[data-skill-modifier-tooltip]", (id) => this.actor.getSkillById(id) ?? this.actor.getSkill(id, { byId: true })),
             this._applyModifierTooltip("[data-modifier-tooltip-path]", (path) =>
                 foundry.utils.getProperty(this.actor.system, path) as ModifiableValueType | undefined
             ),
@@ -825,6 +813,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Show all item types but remove empty unexpected item types.
         const inventoryTypes = this.getInventoryItemTypes();
         for (const type of Object.keys(inventory.types)) {
+            if (!Object.hasOwn(SR5.itemTypes, type)) {
+                delete inventory.types[type];
+                continue;
+            }
             if (inventoryTypes.includes(type as Item.ConfiguredSubType)) continue;
             if (inventory.types[type].items.length === 0) delete inventory.types[type];
         }
@@ -869,6 +861,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (targetElement?.dataset && 'link' in targetElement.dataset) return;
 
         let dragData;
+
+        if (target?.dataset.actorUuid) {
+            const actor = fromUuidSync(target.dataset.actorUuid);
+            if (actor instanceof SR5Actor) {
+                dragData = actor.toDragData();
+            }
+        }
 
         if (target?.dataset.itemId) {
             const item = this.actor.items.get(target.dataset.itemId);
@@ -1121,6 +1120,22 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             item = await fromUuid(uuid);
         }
         if (item) await item.sheet?.render(true, { mode: 'edit' } as any);
+    }
+
+    static async #openAutosoftConfigManager(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        const id = SheetFlow.closestItemId(event.target);
+        let item = this.actor.items.get(id);
+        if (!item) {
+            const uuid = SheetFlow.closestUuid(event.target);
+            // @ts-expect-error typing clashes between items.get and fromUuid
+            item = (await fromUuid(uuid)) as SR5Item | null;
+        }
+        if (item && item.isType('program')) {
+            const app = new AutosoftConfigManager(this.actor, item as SR5Item<'program'>);
+            await app.render(true);
+        }
     }
 
     static async #moveItem(this: SR5BaseActorSheet, event: PointerEvent) {
@@ -1381,6 +1396,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             // Handled types are on the sheet outside the inventory.
             if (handledTypes.includes(item.type)) continue;
 
+            // Skip items with invalid types that have no template definition
+            if (!Object.hasOwn(SR5.itemTypes, item.type)) continue;
+
             // Determine what inventory the item sits in.
             const inventory = itemIdInventory[item.id] || this.actor.defaultInventory;
             // Build inventory list this item should be shown an.
@@ -1533,9 +1551,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 case 'quality':
                     (items as SR5Item<'quality'>[]).sort(sortByQuality);
                     break;
-                case 'program':
-                    items.sort(sortByEquipped);
-                    break;
                 default:
                     items.sort(sortByName);
                     break;
@@ -1567,10 +1582,25 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     _prepareProgramCount(itemTypes: Record<string, SR5Item[]>): string {
         if (!itemTypes.program) return '';
+
+        if (this.actor.isType('vehicle')) {
+            const maxSlots = RiggingRules.getMaxAutosoftSlots(this.actor);
+            const runningCount = RiggingRules.getRunningLocalAutosofts(this.actor).length;
+            return `(${runningCount}/${maxSlots})`;
+        }
+
         if (!this.actor.hasDevicePersona()) return '';
 
-        const active = itemTypes.program.filter(program => program.system.technology?.equipped).length;
         const activeDevice = this.actor.getMatrixDevice();
+        if (!activeDevice) return '';
+
+        if (activeDevice.isType('device') && activeDevice.system.category === 'rcc') {
+            const sharing = Number(activeDevice.system.sharing || 0);
+            const loaded = RiggingRules.getLoadedRCCAutosofts(activeDevice).length;
+            return `(${loaded}/${sharing})`;
+        }
+
+        const active = itemTypes.program.filter(program => program.system.technology?.equipped).length;
         const max = activeDevice?.system.programs ?? 0;
 
         return `(${active}/${max})`;
@@ -1668,7 +1698,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             const skillId = listItemElem.dataset.skillId;
             if (!skillId) return null;
 
-            const skill = this.actor.getSkillById(skillId);
+            const skill = this.actor.getSkillById(skillId) ?? this.actor.getSkill(skillId, { byId: true });
             if (!skill) return null;
 
             return { container, skillId, skill };
@@ -1904,6 +1934,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     static async #onToggleEquippedItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        event.stopPropagation();
         if (!isElementInstance(event.target, HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         const item = this.actor.items.get(id);

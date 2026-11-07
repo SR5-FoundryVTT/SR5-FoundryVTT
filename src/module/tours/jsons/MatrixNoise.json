@@ -1,0 +1,41 @@
+{
+  "title": "SR5.Tours.MatrixNoise.Title",
+  "description": "SR5.Tours.MatrixNoise.Description",
+  "canBeResumed": true,
+  "display": true,
+  "actorType": "vehicle",
+  "steps": [
+    {
+      "id": "MatrixNoiseOverview",
+      "selector": "[name='system.category']",
+      "tooltipDirection": "RIGHT",
+      "tab": "details",
+      "title": "SR5.Tours.MatrixNoise.OverviewTitle",
+      "content": "SR5.Tours.MatrixNoise.OverviewContent"
+    },
+    {
+      "id": "RCCNoiseVsSharing",
+      "selector": "[name='system.noise_reduction']",
+      "tooltipDirection": "RIGHT",
+      "tab": "details",
+      "title": "SR5.Tours.MatrixNoise.RCCNoiseVsSharingTitle",
+      "content": "SR5.Tours.MatrixNoise.RCCNoiseVsSharingContent"
+    },
+    {
+      "id": "NoiseReductionCalculation",
+      "selector": ".tab[data-tab='matrix']",
+      "tooltipDirection": "RIGHT",
+      "tab": "matrix",
+      "title": "SR5.Tours.MatrixNoise.CalculationTitle",
+      "content": "SR5.Tours.MatrixNoise.CalculationContent"
+    },
+    {
+      "id": "SoftWarningBadges",
+      "selector": ".tab[data-tab='matrix']",
+      "tooltipDirection": "RIGHT",
+      "tab": "matrix",
+      "title": "SR5.Tours.MatrixNoise.SoftWarningBadgesTitle",
+      "content": "SR5.Tours.MatrixNoise.SoftWarningBadgesContent"
+    }
+  ]
+}

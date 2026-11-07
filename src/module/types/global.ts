@@ -195,6 +195,7 @@ declare module "fvtt-types/configuration" {
         Actor: {
             shadowrun5e: {
                 overwatchScore?: number;
+                isTourDocument?: boolean;
             }
         };
         ChatMessage: {
@@ -220,6 +221,8 @@ declare module "fvtt-types/configuration" {
                 lastComplexFormLevel?: ComplexFormLevelType;
                 lastFireRange?: FireRangeType;
                 embeddedItems: Item.Source[];
+                rccUuid?: string;
+                isTourDocument?: boolean;
             };
         };
         Macro: {
@@ -231,7 +234,12 @@ declare module "fvtt-types/configuration" {
             shadowrun5e: {
                 TokenMovementPhaseMarkers?: MovementPhaseMarker[];
             };
-        }
+        };
+        TokenDocument: {
+            shadowrun5e: {
+                TokenUseRoutingLib?: boolean;
+            };
+        };
         User: {
             shadowrun5e: {
                 showApplication?: boolean;

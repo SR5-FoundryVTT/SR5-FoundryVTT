@@ -3450,7 +3450,10 @@
             "SkillSetDefaultTypeOutsideCompendium": "Nur Skillsets im konfigurierten Skillset Kompendium beeinflussen neue Akteure.",
             "SummoningNotConcluded": "Herbeirufung unvollständig. Warte auf Gegenprobe des Geists, um Entzug zu bestimmen.",
             "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein",
-            "NoActorCreatePermission": "Du hast keine Berechtigung, Akteure zu erstellen."
+            "NoActorCreatePermission": "Du hast keine Berechtigung, Akteure zu erstellen.",
+            "RCCOverAllocated": "RCC-Sharing + Rauschunterdrückung überschreitet Gerätestufe",
+            "OverAutosoftSlots": "Autosoft-Programmplätze für diese Drohne überschritten",
+            "OverSharingLimit": "Geladene Autosofts überschreiten RCC-Zugriffskapazität"
         },
         "Weapon": {
             "AmmoCount": "Munition",
@@ -3666,6 +3669,39 @@
         "StatusEffects": {
             "Running": "Laufen",
             "Sprinting": "Sprint"
+        },
+        "Autosoft": "Autosoft",
+        "AutosoftType": "Autosoft-Typ",
+        "AutosoftConfigManager": {
+            "Title": "Autosoft konfigurieren",
+            "TargetActor": "Ziel-Drohne / Fahrzeug",
+            "TargetWeapon": "Ziel-Waffe (Geschütze)",
+            "TargetModel": "Ziel-Modell",
+            "NoWeapons": "Keine Waffen am Ziel montiert",
+            "NoDrones": "Keine eigenen Drohnen oder Fahrzeuge gefunden",
+            "Submit": "Konfiguration speichern",
+            "Cancel": "Abbrechen",
+            "Configured": "Autosoft-Konfiguration für {name} gespeichert."
+        },
+        "TargetModel": "Ziel-Modell",
+        "TargetWeapon": "Ziel-Waffe",
+        "AutosoftTypes": {
+            "Clearsight": "Clearsight",
+            "Evasion": "Ausweichen",
+            "Maneuvering": "Manövrieren",
+            "Stealth": "Schleichen",
+            "Targeting": "Zielerfassung",
+            "ElectronicWarfare": "Elektronische Kriegsführung"
+        },
+        "RCC": {
+            "Sharing": "Zugriff",
+            "NoiseReduction": "Rauschunterdrückung",
+            "SharedAutosofts": "Geteilte RCC-Autosofts",
+            "SharedFromRCC": "Geteilt via RCC",
+            "ReconfigureTitle": "Rigger-Konsole neukonfiguriert",
+            "ReconfiguredMessage": "hat die Rigger-Konsole neukonfiguriert",
+            "SimpleAction": "Einfache Handlung",
+            "SimpleActionInCombat": "Einfache Handlung (Kampf)"
         }
     },
     "TYPES": {

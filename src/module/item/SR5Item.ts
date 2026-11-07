@@ -41,7 +41,7 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import GetEmbeddedDocumentOptions = foundry.abstract.Document.GetEmbeddedDocumentOptions;
 
 type OneOrMany<T> = T | T[];
-const { fromUuid, mergeObject, expandObject } = foundry.utils;
+const { fromUuid, fromUuidSync, mergeObject, expandObject } = foundry.utils;
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -1174,6 +1174,16 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this.system.technology?.condition_monitor || DataDefaults.createData('condition_monitor');
     }
 
+    get targetWeaponLabel(): string {
+        if (!this.isType('program') || !this.system.targetWeapon) return '';
+        const tw = this.system.targetWeapon;
+        if (tw.startsWith('Actor.') || tw.startsWith('Compendium.') || tw.startsWith('Item.')) {
+            const doc = fromUuidSync(tw) as SR5Item | null;
+            if (doc && doc instanceof SR5Item && doc.isType('weapon') && doc.name) return doc.name;
+        }
+        return tw;
+    }
+
     getRating(this: SR5Item): number {
         return this.system.technology?.rating || 0;
     }
@@ -1646,6 +1656,38 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             UpdateActionFlow.injectActionTestsIntoChangeData(this.type, changed, changed, this);
             await UpdateActionFlow.onUpdateAlterActionData(changed, this);
             UpdateSkillFlow.injectSkillCategoryDefaults(changed, this);
+        }
+
+        if (this.isType('device') && this.system.category === 'rcc') {
+            const sys = changed.system as { sharing?: number; noise_reduction?: number; technology?: { rating?: number } } | undefined;
+            if (sys) {
+                const currentRating = sys.technology?.rating !== undefined
+                    ? Number(sys.technology.rating)
+                    : this.getRating();
+
+                let sharing = sys.sharing !== undefined ? Number(sys.sharing) : Number(this.system.sharing || 0);
+                let noiseReduction = sys.noise_reduction !== undefined ? Number(sys.noise_reduction) : Number(this.system.noise_reduction || 0);
+
+                if (sys.sharing !== undefined) {
+                    sharing = Math.max(0, Math.min(currentRating, sharing));
+                    sys.sharing = sharing;
+                    if (sharing + noiseReduction > currentRating) {
+                        sys.noise_reduction = Math.max(0, currentRating - sharing);
+                    }
+                } else if (sys.noise_reduction !== undefined) {
+                    noiseReduction = Math.max(0, Math.min(currentRating, noiseReduction));
+                    sys.noise_reduction = noiseReduction;
+                    if (sharing + noiseReduction > currentRating) {
+                        sys.sharing = Math.max(0, currentRating - noiseReduction);
+                    }
+                } else if (sys.technology?.rating !== undefined) {
+                    if (sharing + noiseReduction > currentRating) {
+                        sharing = Math.min(sharing, currentRating);
+                        sys.sharing = sharing;
+                        sys.noise_reduction = Math.max(0, currentRating - sharing);
+                    }
+                }
+            }
         }
 
         return super._preUpdate(...args);
