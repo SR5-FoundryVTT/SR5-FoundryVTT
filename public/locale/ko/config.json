@@ -2971,8 +2971,8 @@
         "StatusEffects": {
             "Running": "달리기",
             "Sprinting": "전력 질주"
-        },																 
-	      "Stock": "개머리판",
+        },
+        "Stock": "개머리판",
         "StreetCred": "길거리 명성",
         "StunTrack": "기절 추적기",
         "Submersion": "몰닉",
@@ -3261,7 +3261,7 @@
                 "Extended": "요구 성공횟수에 도달할 때까지 연장 판정으로 굴립니다. 간격을 0으로 두면 일반 판정으로 굴립니다.",
                 "ExtendedInterval": "굴림 사이의 게임 시간입니다. 0이면 연장 판정이 아닌 일반 판정으로 굴립니다.",
                 "Limit": "계산된 한계치",
-                "LimitIgnored": "현재 해당 판정에 대하여 한계가 무시됨Limit is currently ignored for this test",								
+                "LimitIgnored": "현재 해당 판정에 대하여 한계가 무시됨Limit is currently ignored for this test",
                 "Modifier": "주사위 풀에 적용되는 모든 수정치의 합계",
                 "Pool": "굴릴 수 있는 주사위 개수",
                 "PushTheLimit": "한계 돌파 엣지 규칙 적용",
@@ -3409,7 +3409,10 @@
             "SkillSetDefaultTypeOutsideCompendium": "설정된 기술 설정 컨펜디움에 포함된 기술 설정만 액터 생성에 영향을 줌",
             "SummoningNotConcluded": "소환이 완료되지 않았습니다. 드레인 결정을 위해 영혼 경쟁 판정이 완료되길 기다려야 합니다.",
             "TokenSelectionNeeded": "하나 이상의 토큰이 선택되어야 함",
-            "NoActorCreatePermission": "액터를 생성할 권한이 없습니다."
+            "NoActorCreatePermission": "액터를 생성할 권한이 없습니다.",
+            "RCCOverAllocated": "RCC 프로그램 공유 + 노이즈 감쇄 합이 장치 등급을 초과했습니다",
+            "OverAutosoftSlots": "이 드론의 오토소프트 슬롯 용량을 초과했습니다",
+            "OverSharingLimit": "탑재된 오토소프트가 RCC 공유 한도를 초과했습니다"
         },
         "Weapon": {
             "AmmoCount": "탄약 수량",

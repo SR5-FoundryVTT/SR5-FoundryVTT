@@ -13,6 +13,7 @@ import { prepareSortedEffects, prepareSortedItemEffects } from '../effects';
 
 import { SINFlow } from './flows/SINFlow';
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
+import { ActorOwnershipFlow } from '../actor/flows/ActorOwnershipFlow';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { parseDropData } from '../utils/sheets';
 
@@ -463,6 +464,55 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         if (this.item.isType('preparation')) {
             data.preparationCreationTime = WorldTimeFlow.format(this.item.system.created.worldTime);
+        }
+
+        if (this.item.isType('program')) {
+            const owner = this.item.actorOwner;
+            const models: Array<{ value: string; label: string }> = [{ value: '', label: `-- ${game.i18n.localize('SR5.Default')} --` }];
+            const weapons: Array<{ value: string; label: string }> = [{ value: '', label: `-- ${game.i18n.localize('SR5.Default')} --` }];
+
+            if (owner) {
+                if (owner.isType('vehicle')) {
+                    const modelVal = owner.system.model || owner.name;
+                    if (modelVal) {
+                        const modelLabel = owner.system.model
+                            ? (owner.name && owner.name !== owner.system.model ? `${owner.name} (${owner.system.model})` : owner.system.model)
+                            : (owner.name || modelVal);
+                        models.push({ value: modelVal, label: modelLabel });
+                    }
+                    for (const w of (owner.itemsForType.get('weapon') || [])) {
+                        if (w.uuid) {
+                            weapons.push({ value: w.uuid, label: w.name || w.uuid });
+                        }
+                    }
+                } else {
+                    const vehicles = (game.actors as unknown as SR5Actor[]).filter(
+                        (a): a is SR5Actor<'vehicle'> =>
+                            a.isType('vehicle')
+                            && !a.compendium
+                            && (ActorOwnershipFlow._isOwnerOfActor(owner, a)
+                                || a.getVehicleDriver()?.uuid === owner.uuid
+                                || a.master?.actorOwner?.uuid === owner.uuid)
+                    );
+                    for (const v of vehicles) {
+                        const modelVal = v.system.model || v.name;
+                        if (modelVal && !models.some(m => m.value === modelVal)) {
+                            const modelLabel = v.system.model
+                                ? (v.name && v.name !== v.system.model ? `${v.name} (${v.system.model})` : v.system.model)
+                                : (v.name || modelVal);
+                            models.push({ value: modelVal, label: modelLabel });
+                        }
+                        for (const w of (v.itemsForType.get('weapon') || [])) {
+                            if (w.uuid && !weapons.some(wp => wp.value === w.uuid)) {
+                                weapons.push({ value: w.uuid, label: `${w.name} (${v.name})` });
+                            }
+                        }
+                    }
+                }
+            }
+
+            data['actorModels'] = models.length > 1 ? models : undefined;
+            data['actorWeapons'] = weapons.length > 1 ? weapons : undefined;
         }
 
         data.rollModes = CONFIG.ChatMessage.modes;

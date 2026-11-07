@@ -10,7 +10,7 @@ import { VisibilityChecks } from "../template/Visibility";
 import { ModifiableField } from "../fields/ModifiableField";
 import { Attributes, AttributeField } from "../template/Attributes";
 import { CommonData, PhysicalCombatValues, CreateModifiers, ActorBase } from "./Common";
-const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, StringField, ArrayField } = foundry.data.fields;
 
 const VehicleStats = () => ({
     pilot: new ModifiableField(AttributeField()),
@@ -49,6 +49,11 @@ const VehicleData = () => ({
         required: true,
         initial: "medium",
         choices: SR5.vehicle.categories,
+    }),
+    model: new StringField({
+        required: false,
+        blank: true,
+        initial: "",
     }),
     availability: AvailabilityField(),
     cost: new NumberField({ required: true, nullable: false, initial: 0 }),
@@ -120,7 +125,5 @@ export class Vehicle extends ActorBase<ReturnType<typeof VehicleData>> {
     }
     static override LOCALIZATION_PREFIXES = ["SR5.Vehicle", "SR5.Actor"];
 }
-
-console.log("VehicleData", VehicleData(), new Vehicle());
 
 export type VehicleStatsType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof VehicleStats>>;

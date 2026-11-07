@@ -2309,7 +2309,10 @@
             "SkillCantBeDefault": "Esta pericia não pode ser lançada, pois não pode ser feita sem perícia",
             "SummoningNotConcluded": "Invocação incompleta. Aguarde o espírito se opor à invocação para determinar o dreno.",
             "TokenSelectionNeeded": "Um ou mais tokens precisam ser selecionados",
-            "NoActorCreatePermission": "Você não tem permissão para criar atores."
+            "NoActorCreatePermission": "Você não tem permissão para criar atores.",
+            "RCCOverAllocated": "Compartilhamento RCC + Redução de Ruído excede o Nível do Dispositivo",
+            "OverAutosoftSlots": "Slots de programa Autosoft excedidos para este drone",
+            "OverSharingLimit": "Autosofts carregados excedem a capacidade do RCC"
         },
         "Weapon": {
             "AmmoCount": "Qtd Munição",

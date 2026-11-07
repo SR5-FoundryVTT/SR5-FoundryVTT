@@ -1515,7 +1515,10 @@
             "SkillAlreadyExists": "La compétence {name} existe déjà sur l'acteur {actorName} ({actorUuid}). Utilisez chaque nom de compétence une seule fois par catégorie.",
             "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
             "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés",
-            "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs."
+            "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs.",
+            "RCCOverAllocated": "Partage RCC + Réduction de bruit dépasse l'indice d'appareil",
+            "OverAutosoftSlots": "Nombre d'emplacements d'autosoft dépassé pour ce drone",
+            "OverSharingLimit": "Les autosofts chargés dépassent la capacité de partage RCC"
         },
         "Tooltips": {
             "RangedAttack": {
