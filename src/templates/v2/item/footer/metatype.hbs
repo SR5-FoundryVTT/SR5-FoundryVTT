@@ -1,0 +1,36 @@
+{{#if @root.isEditMode}}
+    <div class="basic-row">
+        <label data-tooltip="{{systemFields.subtype.hint}}">{{localize "SR5.Metatype.Category"}}</label>
+        <span>
+            <input type="text" name="system.subtype" class="short" value="{{taxonomy.subtype.label}}" list="{{rootId}}-subtype-choices" data-tooltip="{{localize 'SR5.Metatype.Category'}}" />
+            <datalist id="{{rootId}}-subtype-choices">
+                {{#each subtypeChoices}}
+                    <option value="{{this.label}}" data-name="{{this.name}}">{{this.name}}</option>
+                {{/each}}
+            </datalist>
+        </span>
+    </div>
+    <div class="basic-row">
+        <label data-tooltip="{{systemFields.subsubtype.hint}}">{{localize "SR5.Metatype.Subsubtype"}}</label>
+        <span>
+            <input type="text" name="system.subsubtype" class="short" value="{{taxonomy.subsubtype.label}}" list="{{rootId}}-subsubtype-choices" data-tooltip="{{localize 'SR5.Metatype.Subsubtype'}}" />
+            <datalist id="{{rootId}}-subsubtype-choices">
+                {{#each subsubtypeChoices}}
+                    <option value="{{this.label}}" data-name="{{this.name}}">{{this.name}}</option>
+                {{/each}}
+            </datalist>
+        </span>
+    </div>
+    <div class="basic-row">
+        <label data-tooltip="{{systemFields.karma.hint}}">{{localize "SR5.Karma"}}</label>
+        <span>
+            <input type="number" name="system.karma" value="{{source.system.karma}}" class="short skinny" min="0" />
+        </span>
+    </div>
+{{else}}
+    <label data-tooltip="{{localize 'SR5.Metatype.Category'}}">{{localizeSubtype item}}</label>
+    {{#if (ne system.subsubtype "")}}
+        <label data-tooltip="{{localize 'SR5.Metatype.Subsubtype'}}">{{localizeSubsubtype item}}</label>
+    {{/if}}
+    <label data-tooltip="{{localize 'SR5.Metatype.KarmaCost'}}">{{localize "SR5.Karma"}}&nbsp;{{system.karma}}</label>
+{{/if}}

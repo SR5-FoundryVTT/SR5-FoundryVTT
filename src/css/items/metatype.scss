@@ -1,0 +1,467 @@
+@use 'sass:color';
+@use '../config/variables' as vars;
+
+.sr5v2.item.metatype-sheet,
+.sr5v2.item.metatype,
+.metatype-sheet {
+    // Header layout
+    .metatype-sheet-header {
+        align-items: flex-end;
+    }
+
+    .metatype-sheet-header-body {
+        justify-content: space-between;
+    }
+
+    .metatype-sheet-header-main {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: flex-start;
+        gap: vars.$large-distance;
+    }
+
+    .metatype-sheet-header-center {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-end;
+        gap: vars.$small-distance;
+
+        .sheet-header-name {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .metatype-sheet-header-source {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            gap: vars.$large-distance;
+            min-width: 0;
+
+            label {
+                color: vars.$yellow;
+                font-size: 0.85rem;
+            }
+
+            input.short {
+                background: vars.$dark2;
+                border: 1px solid vars.$dark;
+                color: vars.$white;
+                border-radius: vars.$radius;
+            }
+        }
+    }
+
+    .metatype-header-meta {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-end;
+        flex: 0 0 auto;
+        min-width: 8rem;
+        gap: vars.$small-distance;
+        padding: 0 vars.$large-distance;
+
+        .metatype-header-value {
+            color: vars.$yellow;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: block;
+            text-align: right;
+            padding: 0.15rem 0.3rem;
+            white-space: nowrap;
+        }
+
+        .metatype-header-meta-row {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            gap: vars.$small-distance;
+
+            label {
+                flex: 0 0 auto;
+                white-space: nowrap;
+                font-size: 0.85rem;
+                font-weight: bold;
+                color: vars.$yellow;
+            }
+
+            span {
+                flex: 1 1 auto;
+                min-width: 0;
+
+                input.short,
+                select.short {
+                    width: 100%;
+                    background: vars.$dark2;
+                    border: 1px solid vars.$dark;
+                    color: vars.$white;
+                    border-radius: vars.$radius;
+                    font-size: 0.85rem;
+                    text-align: center;
+                    padding: 0.15rem 0.3rem;
+                    height: 1.6rem;
+
+                    &:disabled {
+                        background: vars.$dark2;
+                        border: 1px solid vars.$dark;
+                        color: vars.$white;
+                        opacity: 0.95;
+                        cursor: default;
+                    }
+                }
+            }
+        }
+    }
+
+    // Top meta bar (Karma Cost)
+    .metatype-meta-bar {
+        display: flex;
+        align-items: center;
+        gap: vars.$large-distance;
+        padding: vars.$small-distance vars.$medium-distance;
+        background: vars.$fadedBlack;
+        border: 1px solid vars.$dark;
+        border-radius: vars.$radius;
+        margin-bottom: vars.$medium-distance;
+
+        .metatype-meta-field {
+            display: flex;
+            align-items: center;
+            gap: vars.$medium-distance;
+
+            label {
+                font-size: 0.85rem;
+                font-weight: bold;
+                margin: 0;
+                color: vars.$yellow;
+            }
+
+            .compact-number-input {
+                width: 4rem;
+                height: 1.6rem;
+                text-align: center;
+                background: vars.$dark2;
+                border: 1px solid vars.$dark;
+                border-radius: vars.$radius;
+                color: vars.$white;
+                font-size: 0.85rem;
+                padding: 0 vars.$small-distance;
+                margin: 0;
+
+                &:focus {
+                    border-color: vars.$fDarkRed;
+                    outline: none;
+                }
+            }
+
+            .badge-karma {
+                font-size: 0.85rem;
+                font-weight: 600;
+                padding: 0.15rem 0.5rem;
+                background: vars.$darkred;
+                border: 1px solid vars.$fDarkRed;
+                border-radius: vars.$radius;
+                color: vars.$white;
+            }
+        }
+    }
+
+    // Section title
+    .attribute-ranges-section {
+        h3 {
+            color: vars.$white;
+            border-bottom: 1px solid vars.$darkred;
+            padding-bottom: vars.$small-distance;
+            margin-bottom: vars.$medium-distance;
+            font-size: 1.1rem;
+        }
+    }
+
+    // Neat 2-Column Attribute Grid
+    .metatype-attribute-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: vars.$small-distance vars.$medium-distance;
+        margin-bottom: vars.$medium-distance;
+
+        .metatype-attribute-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: vars.$fadedBlack;
+            border: 1px solid vars.$dark;
+            border-radius: vars.$radius;
+            padding: 0.25rem vars.$medium-distance;
+            gap: vars.$small-distance;
+            transition: border-color 0.15s ease, background 0.15s ease;
+
+            &:hover {
+                background: vars.$dark2;
+                border-color: vars.$fLightRed;
+            }
+
+            .attr-label {
+                font-weight: bold;
+                font-size: 0.82rem;
+                color: vars.$white;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            // Edit mode input layout
+            .attr-inputs {
+                display: flex;
+                align-items: center;
+                gap: 0.2rem;
+                flex: 0 0 auto;
+
+                .attr-input-group {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.15rem;
+
+                    .sub-label {
+                        font-size: 0.65rem;
+                        color: vars.$silver;
+                        text-transform: uppercase;
+                    }
+
+                    input.compact-cell {
+                        width: 2.1rem;
+                        height: 1.5rem;
+                        text-align: center;
+                        background: vars.$dark2;
+                        border: 1px solid vars.$dark;
+                        border-radius: vars.$radius;
+                        color: vars.$white;
+                        font-size: 0.85rem;
+                        padding: 0;
+                        margin: 0;
+                        box-sizing: border-box;
+
+                        &:focus {
+                            border-color: vars.$fDarkRed;
+                            background: vars.$darkred;
+                            outline: none;
+                        }
+                    }
+                }
+            }
+
+            // Play mode compact range display: 1 / 6 (9)
+            .attr-range-display {
+                display: flex;
+                align-items: center;
+                gap: 0.2rem;
+                flex: 0 0 auto;
+                font-family: vars.$systemFonts;
+                font-size: 0.85rem;
+                font-weight: 600;
+                background: vars.$dark2;
+                border: 1px solid vars.$dark;
+                border-radius: vars.$radius;
+                padding: 0.1rem 0.4rem;
+
+                .range-part {
+                    color: vars.$white;
+                    min-width: 0.9rem;
+                    text-align: center;
+                }
+
+                .range-sep {
+                    color: vars.$silver;
+                    font-weight: normal;
+                }
+
+                .range-aug {
+                    color: vars.$yellow;
+                    margin-left: 0.1rem;
+                }
+            }
+        }
+    }
+
+    // Granted Items Section
+    .granted-section {
+        h3 {
+            color: vars.$white;
+            border-bottom: 1px solid vars.$darkred;
+            padding-bottom: vars.$small-distance;
+            margin-bottom: vars.$medium-distance;
+            font-size: 1rem;
+        }
+
+        .drop-zone {
+            background: vars.$fadedBlack;
+            border: 1px dashed vars.$dark !important;
+            border-radius: vars.$radius;
+            padding: vars.$small-distance vars.$medium-distance;
+            min-height: 2.2rem;
+            margin-bottom: vars.$medium-distance;
+            transition: background 0.15s ease, border-color 0.15s ease;
+
+            &.dragover {
+                background: vars.$bgrButton;
+                border-color: vars.$fLightRed !important;
+            }
+
+            p.text-muted {
+                color: vars.$silver;
+                font-size: 0.75rem;
+                margin: 0.2rem 0;
+            }
+
+            .granted-items-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: vars.$small-distance;
+
+                .badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: vars.$small-distance;
+                    background: vars.$dark2;
+                    border: 1px solid vars.$dark;
+                    border-radius: vars.$radius;
+                    padding: 0.15rem 0.4rem;
+                    font-size: 0.8rem;
+                    color: vars.$white;
+
+                    img {
+                        width: 18px;
+                        height: 18px;
+                        border: none;
+                        object-fit: contain;
+                    }
+
+                    a[data-action="openGrantedItem"] {
+                        color: vars.$white;
+                        text-decoration: none;
+
+                        &:hover {
+                            color: vars.$yellow;
+                        }
+                    }
+
+                    a[data-action="removeGrantedUuid"] {
+                        color: vars.$fLightRed;
+                        cursor: pointer;
+                        margin-left: vars.$small-distance;
+
+                        &:hover {
+                            color: vars.$red;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Metatype banner shown on actor sheet (bio tab)
+.metatype-banner {
+    margin-top: vars.$large-distance;
+    margin-bottom: vars.$medium-distance;
+    padding: vars.$small-distance vars.$medium-distance;
+    background: vars.$fadedBlack;
+    border: none;
+    border-radius: vars.$radius;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .metatype-banner-info {
+        display: flex;
+        align-items: center;
+        gap: vars.$large-distance;
+        cursor: pointer;
+        flex: 1;
+
+        img {
+            width: 36px;
+            height: 36px;
+            border: none;
+            object-fit: contain;
+        }
+
+        .metatype-banner-title {
+            font-weight: bold;
+            font-size: 1.05em;
+            display: flex;
+            align-items: center;
+            gap: vars.$small-distance;
+            color: vars.$white;
+            transition: color 0.15s ease;
+
+            .metatype-base-type {
+                font-size: 0.85em;
+                font-weight: normal;
+                color: vars.$silver;
+            }
+        }
+
+        &:hover {
+            .metatype-banner-title {
+                color: vars.$yellow;
+            }
+        }
+
+        .metatype-banner-details {
+            font-size: 0.8em;
+            color: vars.$silver;
+            display: flex;
+            gap: vars.$large-distance;
+        }
+    }
+
+    .metatype-banner-actions {
+        display: flex;
+        gap: vars.$small-distance;
+
+        a {
+            display: flex;
+            align-items: center;
+            padding: 0 vars.$small-distance;
+            cursor: pointer;
+            color: vars.$white;
+
+            &:hover {
+                color: vars.$yellow;
+            }
+
+            &[data-action="removeMetatype"] {
+                color: vars.$fLightRed;
+
+                &:hover {
+                    color: vars.$red;
+                }
+            }
+        }
+    }
+
+    &.metatype-banner-empty {
+        justify-content: center;
+        padding: vars.$medium-distance;
+        border-style: dashed;
+
+        .select-metatype-prompt {
+            color: vars.$yellow;
+            cursor: pointer;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: vars.$small-distance;
+
+            &:hover {
+                color: vars.$white;
+                text-shadow: 0 0 4px vars.$yellow;
+            }
+        }
+    }
+}

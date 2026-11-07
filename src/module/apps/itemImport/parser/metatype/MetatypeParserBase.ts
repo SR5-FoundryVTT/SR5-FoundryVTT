@@ -5,6 +5,7 @@ import { DataDefaults } from 'src/module/data/DataDefaults';
 import { InitiativeType } from 'src/module/types/template/Initiative';
 import { ImportHelper as IH, OneOrMany, RetrievedItem } from '../../helper/ImportHelper';
 import { WeaponParserBase } from '../weapon/WeaponParserBase';
+import { NaturalWeaponHelper } from '../../helper/NaturalWeaponHelper';
 
 type MetatypeItemData = {
     _TEXT: string;
@@ -189,65 +190,6 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
         powers: { _TEXT: string; $?: { select?: string; }; }[],
         options: { actorName: string; },
     ): Item.Source[] {
-        const items: Item.Source[] = [];
-
-        for (const entry of powers) {
-            if (entry._TEXT.trim().toLowerCase() !== 'natural weapon') continue;
-
-            const select = (entry.$?.select ?? '').trim();
-            if (!select) continue;
-
-            // 1. Extract optional Name (e.g., "Bite:" or "Claws (DV...")
-            let rawName = 'Natural Weapon';
-            const nameMatch = /^([^:(]+?)[:(]/.exec(select);
-            if (nameMatch && !/^DV\b/i.test(nameMatch[1].trim())) {
-                rawName = nameMatch[1].trim();
-            }
-
-            // Split the name by '/' (e.g., "Bite / Claws" -> ["Bite", "Claws"])
-            const names = rawName.split('/').map(n => n.trim()).filter(Boolean);
-            if (names.length === 0) names.push('Natural Weapon');
-
-            const damageText = /\bDV\s+([^,]+)/i.exec(select)?.[1]?.trim();
-            if (!damageText) {
-                console.warn(`[Natural Weapon Parse]\nCritter: ${options.actorName}\nSelect: ${select}`);
-                continue;
-            }
-            const apText = /\bAP\s+([^,]+)/i.exec(select)?.[1]?.trim() ?? '-';
-
-            // 4. Extract Reach (Optional)
-            const reachMatch = /(?:\bREACH\s+([-+]?\d+)\b|\b([-+]?\d+)\s+REACH\b)/i.exec(select);
-            const reach = reachMatch ? Number(reachMatch[1] ?? reachMatch[2]) || 0 : undefined;
-
-            // 5. Detect if the weapon is Ranged
-            const isRanged = /\bRANGED?\b/i.test(select);
-
-            // --- Build Item System Data ---
-            const system = DataDefaults.baseSystemData('weapon');
-            system.action.type = 'varies';
-            system.melee.reach = reach || 0;
-            system.technology.equipped = true;
-            system.subcategory = 'natural_weapon';
-            system.category = isRanged ? 'range' : 'melee';
-
-            system.action.attribute = 'agility';
-            system.action.skill = isRanged ? 'exotic_ranged_weapon' : 'unarmed_combat';
-            system.action.damage = weaponParser.parseDamageData(damageText, apText, system.action.damage.normal_weapon);
-
-            // --- Push Items ---
-            // Loop through all parsed names and create a unique item for each one
-            for (const itemName of names) {
-                items.push({
-                    _id: foundry.utils.randomID(),
-                    name: itemName,
-                    type: 'weapon' as const,
-                    img: 'systems/shadowrun5e/dist/icons/importer/critter_power/critter_power.svg',
-                    // Deep clone prevents multiple items from sharing the exact same memory reference
-                    system: foundry.utils.deepClone(system), 
-                } satisfies Item.CreateData<'weapon'> as unknown as Item.Source);
-            }
-        }
-
-        return items;
+        return NaturalWeaponHelper.parseNaturalWeapons(powers, options) as unknown as Item.Source[];
     }
 }

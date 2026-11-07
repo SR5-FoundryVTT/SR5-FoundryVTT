@@ -26,6 +26,7 @@
                             placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
             </span>
         </div>
+
         {{#if @root.isEditMode}}
             <div class="sheet-header-source">
                 {{formInput systemFields.description.fields.source value=source.system.description.source
@@ -103,6 +104,11 @@
                         max=system.attributes.edge.value
                         id="edge" }}
                 {{/if}}
+            {{/if}}
+            {{#if (and actor.metatypeItem.system.subtype (ne actor.metatypeItem.system.subtype 'metahuman'))}}
+                <div class="sheet-header-subtype">
+                    <span>{{localizeSubtype actor.metatypeItem}}</span>
+                </div>
             {{/if}}
             {{#if (eq actor.type 'vehicle')}}
                 <div>

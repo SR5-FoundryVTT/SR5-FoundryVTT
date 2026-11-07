@@ -1,0 +1,90 @@
+{
+  "name": "Human",
+  "type": "metatype",
+  "flags": {
+    "shadowrun5e": {
+      "metaTypesItems": []
+    }
+  },
+  "img": "icons/svg/mystery-man.svg",
+  "effects": [],
+  "_id": "dncIKczU9rLT6iLQ",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": "SR5"
+    },
+    "importFlags": null,
+    "metatype": "human",
+    "subtype": "metahuman",
+    "subsubtype": null,
+    "karma": 0,
+    "attributes": {
+      "body": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "agility": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "reaction": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "strength": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "willpower": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "logic": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "intuition": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "charisma": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "edge": {
+        "min": 2,
+        "max": 7,
+        "aug_max": 10
+      }
+    },
+    "qualities": [],
+    "weapons": [],
+    "items": []
+  },
+  "ownership": {
+    "default": 0
+  },
+  "folder": null,
+  "sort": 0,
+  "_stats": {
+    "systemId": "shadowrun5e",
+    "systemVersion": null,
+    "coreVersion": "14",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!dncIKczU9rLT6iLQ"
+}

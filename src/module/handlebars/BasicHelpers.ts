@@ -59,6 +59,11 @@ export const registerBasicHelpers = () => {
         return args.filter(a => typeof a === 'string').join('');
     });
 
+    Handlebars.registerHelper('capitalize', function (str?: string) {
+        if (!str || typeof str !== 'string') return '';
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    });
+
     Handlebars.registerHelper('for', function (from: number, to: number, options: Handlebars.HelperOptions) {
         let accum = '';
         for (let i = from; i < to; i += 1) {

@@ -1,0 +1,106 @@
+{
+  "name": "Troll",
+  "type": "metatype",
+  "flags": {
+    "shadowrun5e": {
+      "metaTypesItems": [
+        {
+          "foundryUuid": "Compendium.world.sr5trait.Item.vtuieKxvSSfRyB2N",
+          "chummerId": "02e76a38-304e-4a0e-93a3-ad2938306afc",
+          "name": "Thermographic Vision",
+          "category": "quality"
+        },
+        {
+          "foundryUuid": "Compendium.world.sr5trait.Item.fydCbpyhuL0u6dfL",
+          "chummerId": "72d1d797-4b61-4fbd-97b7-ffb8ea9ddf36",
+          "name": "Dermal Deposits",
+          "category": "quality"
+        }
+      ]
+    }
+  },
+  "img": "icons/svg/mystery-man.svg",
+  "effects": [],
+  "_id": "XILke7Ke55edRvGQ",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": "SR5"
+    },
+    "importFlags": null,
+    "metatype": "troll",
+    "subtype": "metahuman",
+    "subsubtype": null,
+    "karma": 90,
+    "attributes": {
+      "body": {
+        "min": 5,
+        "max": 10,
+        "aug_max": 15
+      },
+      "agility": {
+        "min": 1,
+        "max": 5,
+        "aug_max": 7
+      },
+      "reaction": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "strength": {
+        "min": 5,
+        "max": 10,
+        "aug_max": 15
+      },
+      "willpower": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "logic": {
+        "min": 1,
+        "max": 5,
+        "aug_max": 7
+      },
+      "intuition": {
+        "min": 1,
+        "max": 5,
+        "aug_max": 7
+      },
+      "charisma": {
+        "min": 1,
+        "max": 4,
+        "aug_max": 6
+      },
+      "edge": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      }
+    },
+    "qualities": [
+      "Compendium.world.sr5trait.Item.vtuieKxvSSfRyB2N",
+      "Compendium.world.sr5trait.Item.fydCbpyhuL0u6dfL"
+    ],
+    "weapons": [],
+    "items": []
+  },
+  "ownership": {
+    "default": 0
+  },
+  "folder": null,
+  "sort": 0,
+  "_stats": {
+    "systemId": "shadowrun5e",
+    "systemVersion": null,
+    "coreVersion": "14",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!XILke7Ke55edRvGQ"
+}

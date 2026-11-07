@@ -425,6 +425,17 @@ body.theme-light,
                         text-align: center;
                     }
                 }
+
+                .sheet-header-subtype {
+                    box-sizing: border-box;
+                    width: 100%;
+                    text-align: right;
+                    padding-right: 0.5rem;
+                    color: var(--sr5v2-label);
+                    font-size: 0.95rem;
+                    font-weight: 600;
+                    line-height: 1.5;
+                }
             }
 
             .sheet-header-labels {
@@ -459,6 +470,20 @@ body.theme-light,
                     flex-shrink: 1;
                 }
             }
+
+            .sheet-header-metatype {
+                font-size: var(--font-size-12);
+                color: var(--sr5v2-text-secondary);
+                min-width: 0;
+                line-height: 1.2;
+
+                a {
+                    color: inherit;
+                    &:hover {
+                        color: var(--sr5v2-text-primary);
+                    }
+                }
+            }
         }
 
         .sheet-footer {
@@ -487,6 +512,17 @@ body.theme-light,
             .list-item > * {
                 flex: 1 1 auto;
                 min-width: 0; /* prevent overflow from long labels */
+            }
+
+            .sheet-footer-metatype {
+                display: inline-flex;
+                align-items: center;
+
+                a {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.35rem;
+                }
             }
         }
 

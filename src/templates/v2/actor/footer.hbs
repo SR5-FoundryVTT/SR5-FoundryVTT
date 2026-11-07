@@ -2,14 +2,38 @@
     <div class="list-item">
         {{#if (eq actor.type 'character')}}
             {{#if @root.isEditMode}}
-                <div class="basic-row">
-                    <label data-tooltip="{{systemFields.metatype.hint}}">{{systemFields.metatype.label}}</label>
-                    <span>
-                        {{formInput systemFields.metatype value=source.system.metatype rootId=rootId localize=true classes="short thicc" }}
+                <div class="basic-row metatype-drop-slot">
+                    <label>{{localize "TYPES.Item.metatype"}}</label>
+                    <span class="metatype-slot-display flexrow align-center gap-1" data-tooltip="{{localize 'SR5.Metatype.ChangeMetatype'}}">
+                        {{#if actor.metatypeItem}}
+                            <a data-action="openMetatypeSheet" class="flexrow align-center gap-1" data-tooltip="{{localizeMetatype actor.metatypeItem}}">
+                                {{#if actor.metatypeItem.img}}
+                                    <img src="{{actor.metatypeItem.img}}" width="20" height="20" style="border:none;" />
+                                {{/if}}
+                                <strong>{{#if actor.metatypeItem.system.metatype}}{{localizeTypeOr actor.metatypeItem.system.metatype config.metatypes}}{{else}}{{localizeMetatype actor.metatypeItem}}{{/if}}</strong>
+                            </a>
+                            <a data-action="removeMetatype" data-tooltip="{{localize 'SR5.MetatypeSelector.Title'}}"><i class="fa-solid fa-times text-danger"></i></a>
+                        {{else}}
+                            <a data-action="openMetatypeSelector" class="flexrow align-center gap-1" data-tooltip="{{localize 'SR5.MetatypeSelector.Title'}}">
+                                <span class="text-muted">{{#if system.metatype}}{{localizeMetatype system.metatype}}{{else}}{{localize "SR5.MetatypeSelector.Title"}}{{/if}}</span>
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                        {{/if}}
                     </span>
                 </div>
-            {{else if (not system.is_critter)}}
-                <label>{{localizeOb system.metatype config.character.types}}</label>
+            {{else}}
+                <label class="sheet-footer-metatype">
+                    {{#if actor.metatypeItem}}
+                        <a data-action="openMetatypeSheet" class="flexrow align-center gap-1" data-tooltip="{{localizeMetatype actor.metatypeItem}}">
+                            {{#if actor.metatypeItem.img}}
+                                <img src="{{actor.metatypeItem.img}}" width="18" height="18" style="border:none;" />
+                            {{/if}}
+                            <span>{{#if actor.metatypeItem.system.metatype}}{{localizeTypeOr actor.metatypeItem.system.metatype config.metatypes}}{{else}}{{localizeMetatype actor.metatypeItem}}{{/if}}</span>
+                        </a>
+                    {{else}}
+                        {{localizeMetatype system.metatype}}
+                    {{/if}}
+                </label>
             {{/if}}
 
             {{#if @root.isPlayMode}}

@@ -876,11 +876,41 @@
             "Sin": "SIN",
             "Spell": "Sort",
             "SpritePower": "Pouvoir de Sprite",
-            "Weapon": "Arme"
+            "Weapon": "Arme",
+            "Metatype": "Métatype"
+        },
+        "Metatype": {
+            "label": "Métatype",
+            "BaseMetatype": "Métatype de base",
+            "Category": "Catégorie",
+            "Subtype": "Sous-type",
+            "Subsubtype": "Sous-variante",
+            "KarmaCost": "Coût en Karma",
+            "GrantedQualities": "Avantages accordés",
+            "GrantedWeapons": "Armes accordées",
+            "GrantedItems": "Objets accordés",
+            "DropToGrant": "Glisser un objet ici pour l'accorder avec ce métatype",
+            "AttributeRanges": "Plages d'attributs",
+            "Min": "Min",
+            "Max": "Max",
+            "AugMax": "Aug Max",
+            "ChangeMetatype": "Changer de métatype"
         },
         "Immunity": "Immunité",
         "ImmunityToNormalWeapons": "Immunité aux armes normales",
         "Karma": "Karma",
+        "MetatypeSelector": {
+            "Cancel": "Annuler",
+            "Compendium": "Compendium",
+            "Confirm": "Confirmer",
+            "Current": "Actuel",
+            "NoResults": "Aucun métatype correspondant à votre recherche.",
+            "Remove": "Retirer le métatype",
+            "RemoveTooltip": "Retirer le métatype actuel et ses avantages",
+            "Search": "Rechercher des métatypes...",
+            "Title": "Sélectionner un métatype",
+            "World": "Monde"
+        },
         "KnockedDown": "Projeté au sol",
         "KnowledgeSkillAcademic": "Connaissances académiques",
         "KnowledgeSkillInterests": "Hobbies",
@@ -974,7 +1004,6 @@
         "MeatSpaceInit": "Init. terrestre",
         "MeleeWeaponAttack": "Attaque arme de mélée",
         "MentalLimit": "Limite Mentale",
-        "Metatype": "Métatype",
         "MigrationComplete": "Migration Complète",
         "MigrationUpdateCompendiumNoUpdateActor": "A cause de limitations techniques avec FoundryVTT, le pack compendium d'acteurs ne peuvent pas être mis à jour. Vous devez mettre à jour ce pack manuellement.",
         "MigrationUpdateCompendiumUpdateMessage": "Chaque compendium pack du monde qui existe ont été mis à jour",
@@ -1616,6 +1645,45 @@
         "StatusEffects": {
             "Running": "Course",
             "Sprinting": "Sprint"
+        }
+    },
+    "TYPES": {
+        "Actor": {
+            "character": "Personnage",
+            "ic": "CI",
+            "spirit": "Esprit",
+            "sprite": "Sprite",
+            "vehicle": "Véhicule/Drone"
+        },
+        "Item": {
+            "action": "Action",
+            "adept_power": "Pouvoir d'adepte",
+            "ammo": "Munitions",
+            "armor": "Armure",
+            "bioware": "Bioware",
+            "call_in_action": "Invoquer/Compiler",
+            "complex_form": "Forme complexe",
+            "contact": "Contact",
+            "critter_power": "Pouvoir de créature",
+            "cyberware": "Cyberware",
+            "device": "Appareil",
+            "echo": "Écho",
+            "equipment": "Équipement",
+            "grid": "Grille",
+            "host": "Hôte",
+            "lifestyle": "Mode de vie",
+            "metamagic": "Métamagie",
+            "modification": "Modification",
+            "program": "Programme",
+            "quality": "Qualité",
+            "ritual": "Rituel",
+            "sin": "SIN",
+            "skill": "Compétence",
+            "spell": "Sort",
+            "sprite_power": "Pouvoir de sprite",
+            "vehicle": "Véhicule",
+            "weapon": "Arme",
+            "metatype": "Métatype"
         }
     }
 }

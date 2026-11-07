@@ -14,6 +14,8 @@
             {{/if}}
         {{else if (isType item 'skill')}}
             {{> "systems/shadowrun5e/dist/templates/v2/item/footer/skill.hbs" item=item }}
+        {{else if (isType item 'metatype')}}
+            {{> "systems/shadowrun5e/dist/templates/v2/item/footer/metatype.hbs" item=item }}
         {{else if (isType item 'call_in_action')}}
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/call_in_action.hbs" item=item }}
         {{else if (isType item 'contact')}}

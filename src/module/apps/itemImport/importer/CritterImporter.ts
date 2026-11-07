@@ -4,6 +4,7 @@ import { ImportHelper as IH } from '../helper/ImportHelper';
 import { SpiritParser } from '../parser/metatype/SpiritParser';
 import { SpriteParser } from '../parser/metatype/SpriteParser';
 import { CritterParser } from '../parser/metatype/CritterParser';
+import { MetatypeItemParser } from '../parser/metatype/MetatypeItemParser';
 import { MetatypeSchema, Metatype } from "../schema/MetatypeSchema";
 
 export class CritterImporter extends DataImporter {
@@ -51,12 +52,25 @@ export class CritterImporter extends DataImporter {
             }));
         });
 
-        return CritterImporter.ParseItems<Metatype>(
-            [...baseMetatypes, ...metavariants],
+        const allCritters = [...baseMetatypes, ...metavariants];
+
+        // 1. Automatically import metatypes based on the critters into world.sr5metatype
+        await DataImporter.ParseItems<Metatype>(
+            allCritters,
+            {
+                compendiumKey: () => 'Metatype',
+                parser: new MetatypeItemParser(),
+                documentType: 'Critter Metatype'
+            }
+        );
+
+        // 2. Import critter actors into world.sr5critter
+        await CritterImporter.ParseItems<Metatype>(
+            allCritters,
             {
                 compendiumKey: (jsonData: Metatype) => {
                     if (jsonData.category?._TEXT === 'Sprites') return 'Sprite';
-                    if (CritterImporter.parserWrap.isSpirit(jsonData)) return 'Sprite';
+                    if (CritterImporter.parserWrap.isSpirit(jsonData)) return 'Spirit';
                     return 'Critter';
                 },
                 parser: new CritterImporter.parserWrap(),

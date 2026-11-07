@@ -271,4 +271,74 @@ export class ImportHelper {
 
         return folder;
     }
+
+    /**
+     * Executes a callback within a temporarily unlocked compendium pack if it is currently locked,
+     * ensuring that the pack's original locked state is restored when finished.
+     *
+     * @param compendium Compendium collection or pack key name (e.g. 'world.sr5trait' or 'sr5trait')
+     * @param callback Asynchronous callback receiving the compendium pack
+     */
+    public static async withUnlockedCompendium<T>(
+        compendium: CompendiumCollection<'Actor' | 'Item'> | string,
+        callback: (pack: CompendiumCollection<'Actor' | 'Item'>) => Promise<T>
+    ): Promise<T> {
+        const pack = (typeof compendium === 'string'
+            ? (game.packs.get(compendium.startsWith('world.') ? compendium : `world.${compendium}`) || game.packs.get(compendium))
+            : compendium) as CompendiumCollection<'Actor' | 'Item'> | undefined;
+
+        if (!pack) {
+            const packName = typeof compendium === 'string' ? compendium : compendium.collection;
+            throw new Error(`Compendium pack "${packName}" not found.`);
+        }
+
+        const wasLocked = pack.locked;
+        if (wasLocked) {
+            await pack.configure({ locked: false });
+        }
+
+        try {
+            return await callback(pack);
+        } finally {
+            if (wasLocked) {
+                try {
+                    await pack.configure({ locked: true });
+                } catch (err) {
+                    console.error(`SR5 | Failed to re-lock compendium pack "${pack.collection}":`, err);
+                }
+            }
+        }
+    }
+
+    /**
+     * Safely creates documents in a world compendium, unlocking and re-locking the compendium if necessary.
+     *
+     * @param compKeyOrPack Compendium key (e.g. 'Quality', 'Weapon') or pack collection name (e.g. 'world.sr5trait')
+     * @param data Single document create data or array of create data
+     * @param options Additional creation options
+     */
+    public static async createDocumentInCompendium<T extends foundry.abstract.Document.Any = foundry.abstract.Document.Any>(
+        compKeyOrPack: string,
+        data: Item.CreateData | Actor.CreateData | Item.CreateData[] | Actor.CreateData[],
+        options: Record<string, unknown> = {}
+    ): Promise<T | T[]> {
+        const isCompKey = compKeyOrPack in Constants.MAP_COMPENDIUM_KEY;
+        const compendium = isCompKey
+            ? await this.GetCompendium(compKeyOrPack as CompendiumKey)
+            : (game.packs.get(compKeyOrPack.startsWith('world.') ? compKeyOrPack : `world.${compKeyOrPack}`) || game.packs.get(compKeyOrPack)) as CompendiumCollection<'Actor' | 'Item'>;
+
+        if (!compendium) {
+            throw new Error(`Compendium pack "${compKeyOrPack}" not found.`);
+        }
+
+        return this.withUnlockedCompendium(compendium, async (pack) => {
+            const documentClass = pack.documentClass as unknown as {
+                create: (data: unknown, operation?: Record<string, unknown>) => Promise<T | T[]>;
+            };
+            const created = await documentClass.create(data, { pack: pack.collection, keepId: true, ...options });
+            await pack.getIndex();
+            return created;
+        });
+    }
 }
+

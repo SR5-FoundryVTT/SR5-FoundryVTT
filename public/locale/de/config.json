@@ -1820,7 +1820,47 @@
             "Sin": "SIN",
             "Spell": "Zauberspruch",
             "SpritePower": "Spritekraft",
-            "Weapon": "Waffe"
+            "Weapon": "Waffe",
+            "Metatype": "Metatyp"
+        },
+        "Metatype": {
+            "label": "Metatyp",
+            "BaseMetatype": "Hauptspezies",
+            "Category": "Kategorie",
+            "Subtype": "Unterart",
+            "Subsubtype": "Subvariante",
+            "KarmaCost": "Karmakosten",
+            "GrantedQualities": "Verliehene Vor-/Nachteile",
+            "GrantedWeapons": "Verliehene Waffen",
+            "GrantedItems": "Verliehene Gegenstände",
+            "DropToGrant": "Gegenstand hierher ziehen, um ihn diesem Metatyp zuzuordnen",
+            "AttributeRanges": "Attributsbereiche",
+            "Min": "Min",
+            "Max": "Max",
+            "AugMax": "Aug Max",
+            "ChangeMetatype": "Metatyp wechseln",
+            "FIELDS": {
+                "metatype": {
+                    "label": "Hauptspezies",
+                    "hint": "Basis-Metatyp"
+                },
+                "subtype": {
+                    "label": "Kategorie",
+                    "hint": "Metatyp-Kategorie"
+                },
+                "subsubtype": {
+                    "label": "Subvariante",
+                    "hint": "Spezifische Spezies, Stamm oder Tiergestalt"
+                },
+                "karma": {
+                    "label": "Karmakosten",
+                    "hint": "Karmakosten für diesen Metatyp"
+                },
+                "attributes": {
+                    "label": "Attributsbereiche",
+                    "hint": "Min, Max und Aug Max Attributswerte"
+                }
+            }
         },
         "Karma": "Karma",
         "KarmaManager": {
@@ -1833,6 +1873,18 @@
             "StartingKarma": "Start Karma",
             "Submit": "Bestätigen",
             "Title": "Karma Manager"
+        },
+        "MetatypeSelector": {
+            "Cancel": "Abbrechen",
+            "Compendium": "Kompendium",
+            "Confirm": "Bestätigen",
+            "Current": "Aktuell",
+            "NoResults": "Keine passenden Metatypen gefunden.",
+            "Remove": "Metatyp entfernen",
+            "RemoveTooltip": "Aktuellen Metatyp und dessen Boni entfernen",
+            "Search": "Metatypen durchsuchen...",
+            "Title": "Metatyp auswählen",
+            "World": "Welt"
         },
         "Keybinding": {
             "AddRemoveManyQty": {
@@ -2104,7 +2156,6 @@
         },
         "Metamagic": "Metamagie",
         "Metamagics": "Metamagie",
-        "Metatype": "Metatyp",
         "MigrationComplete": "Migration vollständig",
         "MigrationUpdateCompendiumNoUpdateActor": "Aufgrund technischer Limitierungen von FoundryVTT müssen Kompendien vom Typ Acteur manuell aktualisiert werden.",
         "MigrationUpdateCompendiumUpdateMessage": "Alle in der Welt vorhandenen Kompendiumpakete wurden aktualisiert",
@@ -3703,7 +3754,8 @@
             "spell": "Zauberspruch",
             "sprite_power": "Spritekraft",
             "vehicle": "Vehicle",
-            "weapon": "Waffe"
+            "weapon": "Waffe",
+            "metatype": "Metatyp"
         }
     }
 }
