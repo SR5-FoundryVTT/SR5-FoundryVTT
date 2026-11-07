@@ -1839,16 +1839,6 @@
             "AugMax": "강화 최대",
             "ChangeMetatype": "메타인종 변경"
         },
-        "MetaSubtypes": {
-            "metahuman": "메타휴먼",
-            "metasapient": "메타새피언트",
-            "shapeshifter": "셰이프시프터",
-            "infected": "감염자",
-            "critter": "크리터",
-            "spirit": "정령",
-            "sprite": "스프라이트",
-            "other": "기타"
-        },
         "Karma": "카르마",
         "KarmaManager": {
             "Cancel": "취소",

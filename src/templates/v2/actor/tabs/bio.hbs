@@ -12,9 +12,9 @@
                             {{/if}}
                         </div>
                         <div class="metatype-banner-details">
-                            <span>{{localize "SR5.Metatype.Category"}}: {{localize (concat 'SR5.MetaSubtypes.' this.system.subtype)}}</span>
+                            <span>{{localize "SR5.Metatype.Category"}}: {{localizeSubtype this.system.subtype}}</span>
                             {{#if (and this.system.subsubtype (ne this.system.subsubtype ""))}}
-                                <span>{{localize "SR5.Metatype.Subsubtype"}}: {{this.system.subsubtype}}</span>
+                                <span>{{localize "SR5.Metatype.Subsubtype"}}: {{localizeSubsubtype this.system.subsubtype}}</span>
                             {{/if}}
                             {{#if (ne this.system.karma undefined)}}
                                 <span>{{localize "SR5.Metatype.KarmaCost"}}: {{this.system.karma}}</span>

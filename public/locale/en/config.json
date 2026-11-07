@@ -1892,51 +1892,6 @@
                 }
             }
         },
-        "MetaSubtypes": {
-            "metahuman": "Metahuman",
-            "metasapient": "Metasapient",
-            "shapeshifter": "Shapeshifter",
-            "infected": "Infected",
-            "critter": "Critter",
-            "spirit": "Spirit",
-            "sprite": "Sprite",
-            "other": "Other"
-        },
-        "MetasapientTypes": {
-            "Centaur": "Centaur",
-            "Naga": "Naga",
-            "Pixie": "Pixie",
-            "Sasquatch": "Sasquatch"
-        },
-        "ShapeshifterTypes": {
-            "Bovine": "Bovine",
-            "Canine": "Canine",
-            "Equine": "Equine",
-            "Falconine": "Falconine",
-            "Leonine": "Leonine",
-            "Lupine": "Lupine",
-            "Pantherine": "Pantherine",
-            "Tigrine": "Tigrine",
-            "Ursine": "Ursine",
-            "Vulpine": "Vulpine"
-        },
-        "InfectedTypes": {
-            "Bandersnatch": "Bandersnatch",
-            "Banshee": "Banshee",
-            "DzooNooQua": "Dzoo-Noo-Qua",
-            "Fomoraig": "Fomoraig",
-            "Ghoul": "Ghoul",
-            "Gnawer": "Gnawer",
-            "Goblin": "Goblin",
-            "Grendel": "Grendel",
-            "Harvester": "Harvester",
-            "LoupGarou": "Loup-Garou",
-            "Mutaqua": "Mutaqua",
-            "Nosferatu": "Nosferatu",
-            "Sukuyan": "Sukuyan",
-            "Vampire": "Vampire",
-            "Wendigo": "Wendigo"
-        },
         "Karma": "Karma",
         "KarmaManager": {
             "Cancel": "Cancel",

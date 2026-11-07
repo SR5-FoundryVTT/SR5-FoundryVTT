@@ -438,25 +438,7 @@ export class MetatypeFlow {
             return characterTypeTranslation;
         }
 
-        // 3. Try 'SR5.InfectedTypes' (e.g. "Vampire" -> "Vampir", "Nosferatu" -> "Nosferatu")
-        const infectedTypeTranslation = Helpers.localizeName(name, 'SR5.InfectedTypes');
-        if (infectedTypeTranslation !== name) {
-            return infectedTypeTranslation;
-        }
-
-        // 4. Try 'SR5.MetasapientTypes' (e.g. "Sasquatch" -> "Sasquatch", "Centaur" -> "Zentaur")
-        const metasapientTranslation = Helpers.localizeName(name, 'SR5.MetasapientTypes');
-        if (metasapientTranslation !== name) {
-            return metasapientTranslation;
-        }
-
-        // 5. Try 'SR5.ShapeshifterTypes'
-        const shapeshifterTranslation = Helpers.localizeName(name, 'SR5.ShapeshifterTypes');
-        if (shapeshifterTranslation !== name) {
-            return shapeshifterTranslation;
-        }
-
-        // 6. Try 'SR5.Content.Metatypes'
+        // 3. Try 'SR5.Content.Metatypes'
         const contentTranslation = Helpers.localizeName(name, 'SR5.Content.Metatypes');
         if (contentTranslation !== name) {
             return contentTranslation;
@@ -466,7 +448,7 @@ export class MetatypeFlow {
     }
 
     /**
-     * Localize the metatype subtype (category) into the active language.
+     * Format the metatype subtype (category) for display.
      */
     static localizeSubtype(itemOrSubtype?: SR5Item<'metatype'> | string | null): string {
         if (!itemOrSubtype) return '';
@@ -474,15 +456,11 @@ export class MetatypeFlow {
             ? itemOrSubtype
             : (itemOrSubtype.system?.subtype || '');
         if (!subtype) return '';
-        const key = `SR5.MetaSubtypes.${subtype}`;
-        if (game.i18n.has(key)) {
-            return game.i18n.localize(key);
-        }
         return subtype.charAt(0).toUpperCase() + subtype.slice(1);
     }
 
     /**
-     * Localize the metatype subsubtype (strain, species, form) into the active language.
+     * Format the metatype subsubtype (strain, species, form) for display.
      */
     static localizeSubsubtype(itemOrSubsubtype?: SR5Item<'metatype'> | string | null): string {
         if (!itemOrSubsubtype) return '';
@@ -490,19 +468,6 @@ export class MetatypeFlow {
             ? itemOrSubsubtype
             : (itemOrSubsubtype.system?.subsubtype || '');
         if (!subsubtype) return '';
-
-        // 1. Try SR5.InfectedTypes
-        const infectedTranslation = Helpers.localizeName(subsubtype, 'SR5.InfectedTypes');
-        if (infectedTranslation !== subsubtype) return infectedTranslation;
-
-        // 2. Try SR5.MetasapientTypes
-        const metasapientTranslation = Helpers.localizeName(subsubtype, 'SR5.MetasapientTypes');
-        if (metasapientTranslation !== subsubtype) return metasapientTranslation;
-
-        // 3. Try SR5.ShapeshifterTypes
-        const shifterTranslation = Helpers.localizeName(subsubtype, 'SR5.ShapeshifterTypes');
-        if (shifterTranslation !== subsubtype) return shifterTranslation;
-
         return subsubtype.charAt(0).toUpperCase() + subsubtype.slice(1);
     }
 }

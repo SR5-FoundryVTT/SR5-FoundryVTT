@@ -1212,16 +1212,6 @@
             "AugMax": "Máx Aumentado",
             "ChangeMetatype": "Mudar Metatipo"
         },
-        "MetaSubtypes": {
-            "metahuman": "Meta-humano",
-            "metasapient": "Meta-sapiente",
-            "shapeshifter": "Metamorfo",
-            "infected": "Infectado",
-            "critter": "Criatura",
-            "spirit": "Espírito",
-            "sprite": "Sprite",
-            "other": "Outro"
-        },
         "Karma": "Carma",
         "MetatypeSelector": {
             "Cancel": "Cancelar",
