@@ -91,7 +91,7 @@ export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<Karm
         await this.close();
     }
 
-    static #cancel(this: KarmaManager, event: Event) {
+    static #cancel(this: KarmaManager) {
         void this.close();
     }
 
@@ -100,8 +100,8 @@ export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<Karm
         options: DeepPartial<ApplicationV2.RenderOptions>
     ) {
         this.element.querySelector<HTMLInputElement>('[name="incoming-karma"]')
-            ?.addEventListener('change', (event: any) => {
-                this.karmaModifier = Number(event.target?.value ?? 0);
+            ?.addEventListener('change', (event: Event) => {
+                this.karmaModifier = Number((event.target as HTMLInputElement | null)?.value ?? 0);
                 if (this.getModifiedKarma() < 0) {
                     this.karmaModifier = -this.getModifiedKarma();
                 }

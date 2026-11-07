@@ -5,7 +5,6 @@ import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import { SR5Die } from "../rolls/SR5Die";
-import { SR5TokenDocument } from "../token/SR5TokenDocument";
 import SocketMessageData = Shadowrun.SocketMessageData;
 import BaseCombat = foundry.documents.BaseCombat;
 
@@ -92,7 +91,7 @@ export class SR5Combat extends Combat<"base"> {
         const method = combat?.[fnName] as unknown;
         if (typeof method !== 'function') return;
 
-        return await method.call(combat);
+        return await (method.call(combat) as Promise<unknown>);
     }
 
     // =========================================================
@@ -105,7 +104,7 @@ export class SR5Combat extends Combat<"base"> {
 
     // Foundry's Combat interface defines nextCombatant as a getter, but SR5's initiative flow
     // doesn't have a single "next" combatant due to initiative passes.
-    override get nextCombatant(): undefined { return undefined; }
+    override get nextCombatant(): null { return null; }
 
 
     // =========================================================
@@ -220,7 +219,7 @@ export class SR5Combat extends Combat<"base"> {
         } as Combat.UpdateData;
         const updateOptions = {direction: 1, worldTime: { delta: advanceTime }} as Combat.Database.UpdateOperation;
 
-        // @ts-expect-error
+        // @ts-expect-error TODO: fvtt-types v14 - The combatRound hook typings do not match the data passed here.
         Hooks.callAll("combatRound", this, updateData, updateOptions);
         await this.update(updateData, updateOptions);
 
@@ -310,10 +309,10 @@ export class SR5Combat extends Combat<"base"> {
             updateData.system = { history: this._nextHistory() };
 
             if (this.combatant)
-                updateData.combatants = [{ _id: this.combatant.id!, system: { acted: true } }];
+                updateData.combatants = [{ _id: this.combatant.id, system: { acted: true } }];
         }
 
-        // @ts-expect-error
+        // @ts-expect-error TODO: fvtt-types v14 - The combatTurn hook typings do not match the data passed here.
         Hooks.callAll("combatTurn", this, updateData, updateOptions);
         await this.update(updateData, updateOptions);
 

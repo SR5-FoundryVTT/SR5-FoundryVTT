@@ -30,7 +30,7 @@ export interface Power {
 export interface CritterpowersSchema {
     $: { xmlns: ""; "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance"; "xsi:schemaLocation": "http://www.w3.org/2001/XMLSchema critterpowers.xsd"; };
     categories: {
-        category: Many<{ _TEXT: string; $?: { translate?: string; whitelist: "true"; }; }>;
+        category: Many<{ _TEXT: string; $?: { translate?: string; whitelist: "True"; }; }>;
     };
     powers: {
         power: Many<Power>;

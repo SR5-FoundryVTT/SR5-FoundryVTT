@@ -170,7 +170,7 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             // 4. Deleting Elf removes Elf's benefits while still preserving the 2 invested points
             const elfItem = character.items.find(i => i.isType('metatype'));
             assert.isDefined(elfItem);
-            await elfItem!.delete();
+            await elfItem.delete();
             assert.strictEqual(character.system.attributes.body.base, 2, 'Body preserves 2 invested points after metatype deletion');
             assert.strictEqual(character.system.attributes.strength.base, 0);
             assert.strictEqual(character.system.attributes.agility.base, 0);
@@ -236,13 +236,13 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             // Verify actor's embedded metatype item has its links rewritten to actor's local item UUIDs
             const actorMetatype = character.items.find(i => i.isType('metatype'));
             assert.isDefined(actorMetatype);
-            assert.deepEqual(actorMetatype!.system.qualities, [grantedQuality!.uuid]);
-            assert.deepEqual(actorMetatype!.system.weapons, [grantedWeapon!.uuid]);
+            assert.deepEqual(actorMetatype.system.qualities, [grantedQuality.uuid]);
+            assert.deepEqual(actorMetatype.system.weapons, [grantedWeapon.uuid]);
 
             // Delete the metatype item and verify granted traits are cleaned up
-            await actorMetatype!.delete();
-            assert.isUndefined(character.items.find(i => i.id === grantedQuality!.id));
-            assert.isUndefined(character.items.find(i => i.id === grantedWeapon!.id));
+            await actorMetatype.delete();
+            assert.isUndefined(character.items.find(i => i.id === grantedQuality.id));
+            assert.isUndefined(character.items.find(i => i.id === grantedWeapon.id));
         });
 
         it('Deleting character metatype item clears metatype link', async () => {
@@ -252,7 +252,7 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             assert.isDefined(metatypeItem);
 
             // Delete the metatype item
-            await metatypeItem!.delete();
+            await metatypeItem.delete();
 
             const remainingMetatypes = character.items.filter(i => i.isType('metatype'));
             assert.strictEqual(remainingMetatypes.length, 0, 'Metatype item should be deleted');
@@ -308,10 +308,11 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(trollItem.system.qualities[1], 'Compendium.world.sr5trait.Item.fydCbpyhuL0u6dfL');
 
             const flags = trollItem.flags?.shadowrun5e?.metaTypesItems;
+            assert.isDefined(flags);
             assert.isArray(flags);
-            assert.lengthOf(flags!, 2);
-            assert.strictEqual(flags![0].chummerId, '02e76a38-304e-4a0e-93a3-ad2938306afc');
-            assert.strictEqual(flags![1].chummerId, '72d1d797-4b61-4fbd-97b7-ffb8ea9ddf36');
+            assert.lengthOf(flags, 2);
+            assert.strictEqual(flags[0].chummerId, '02e76a38-304e-4a0e-93a3-ad2938306afc');
+            assert.strictEqual(flags[1].chummerId, '72d1d797-4b61-4fbd-97b7-ffb8ea9ddf36');
         });
 
         it('NPC grunt metatype applies metatype modifiers to attributes', async () => {
@@ -348,15 +349,15 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
 
             const elfCard = context.items.find(m => m.uuid === worldElf.uuid || m.name === 'Elf');
             assert.isDefined(elfCard, 'Elf card should exist');
-            assert.strictEqual(elfCard!.karma, 40);
-            assert.strictEqual(elfCard!.sourceLabel, 'World');
-            assert.isTrue(elfCard!.isSelected, 'Current actor metatype should be preselected');
+            assert.strictEqual(elfCard.karma, 40);
+            assert.strictEqual(elfCard.sourceLabel, 'World');
+            assert.isTrue(elfCard.isSelected, 'Current actor metatype should be preselected');
 
             const humanCard = context.items.find(m => m.uuid === worldHuman.uuid || m.name === 'Human');
             assert.isDefined(humanCard, 'Human card should exist');
-            assert.strictEqual(humanCard!.karma, 0);
-            assert.strictEqual(humanCard!.sourceLabel, 'World');
-            assert.isFalse(humanCard!.isSelected, 'Non-current metatype should not be preselected');
+            assert.strictEqual(humanCard.karma, 0);
+            assert.strictEqual(humanCard.sourceLabel, 'World');
+            assert.isFalse(humanCard.isSelected, 'Non-current metatype should not be preselected');
 
             assert.isTrue(context.hasCurrentMetatype);
         });
@@ -571,7 +572,7 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
                 category: { _TEXT: 'Infected' },
                 bodmin: { _TEXT: '3' },
             };
-            const parsed = await parser.Parse(infectedData as any, 'Metatype');
+            const parsed = await parser.Parse(infectedData as unknown as Parameters<typeof parser.Parse>[0], 'Metatype');
             assert.isDefined(parsed.img);
             assert.include(parsed.img, 'critter/infected.svg');
         });
@@ -596,15 +597,9 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
                 },
             };
 
-            const parsed = await parser.Parse(vampireData as any, 'Metatype');
+            const parsed = await parser.Parse(vampireData as unknown as Parameters<typeof parser.Parse>[0], 'Metatype');
             const system = parsed.system as Item.SystemOfType<'metatype'>;
-            const metaFlags = (parsed.flags?.shadowrun5e as any)?.metaTypesItems as Array<{
-                name: string;
-                power: string;
-                select?: string;
-                foundryUuid?: string;
-                category: string;
-            }>;
+            const metaFlags = parsed.flags?.shadowrun5e?.metaTypesItems;
 
             // Weapons array must contain the resolved natural weapon UUID
             assert.isTrue(system.weapons.length > 0, 'Metatype system.weapons should contain the parsed natural weapon');
@@ -614,7 +609,7 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             // Flag should register it under category "weapon"
             const weaponFlag = metaFlags?.find(f => f.name.includes('Bite') || f.power === 'Natural Weapon');
             assert.isDefined(weaponFlag, 'metaTypesItems should contain flag entry for natural weapon');
-            assert.strictEqual(weaponFlag?.category, 'weapon', 'Weapon flag should have category weapon');
+            assert.strictEqual(weaponFlag.category, 'weapon', 'Weapon flag should have category weapon');
         });
 
         it('ImportHelper.withUnlockedCompendium safely restores locked state after operation', async () => {
@@ -622,16 +617,20 @@ export const shadowrunMetatypeItemTesting = (context: QuenchBatchContext) => {
             const mockPack = {
                 collection: 'world.testpack',
                 locked: true,
-                configure: async function(options: { locked: boolean }) {
+                configure: function(options: { locked: boolean }) {
                     this.locked = options.locked;
-                    return this;
+                    return Promise.resolve(this);
                 },
             };
 
             let executedWhileUnlocked = false;
-            await ImportHelper.withUnlockedCompendium(mockPack as any, async (pack) => {
-                executedWhileUnlocked = !pack.locked;
-            });
+            await ImportHelper.withUnlockedCompendium(
+                mockPack as unknown as foundry.documents.collections.CompendiumCollection<'Actor' | 'Item'>,
+                (pack) => {
+                    executedWhileUnlocked = !pack.locked;
+                    return Promise.resolve();
+                }
+            );
 
             assert.isTrue(executedWhileUnlocked, 'Compendium should be unlocked during callback execution');
             assert.isTrue(mockPack.locked, 'Compendium locked state should be restored to true after execution');

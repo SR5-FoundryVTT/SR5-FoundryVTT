@@ -32,7 +32,7 @@ export class InventoryFlow {
         // This will happen if there has been some tempering with inventory data.
         // To prevent this causing issues, just set it to default data
         if (actor.system.inventories === undefined) {
-            actor.system.inventories = foundry.utils.duplicate((game.model.Actor[actor.type] as any).inventories);
+            actor.system.inventories = foundry.utils.duplicate((game.model.Actor[actor.type] as { inventories: typeof actor.system.inventories }).inventories);
         }
 
         this.actor = actor;
@@ -44,12 +44,15 @@ export class InventoryFlow {
      * @param name How to name the inventory, will also be its label for custom inventories.
      * @returns Created inventories name
      */
-    async create(name: string): Promise<string | void> {
+    async create(name: string): Promise<string | undefined> {
         console.debug(`Shadowrun 5e | Creating inventory ${name}`);
 
         name = InventoryFlow._sanitzeName(name);
 
-        if (name.length === 0) return console.error('Shadowrun 5e | The given name has been reduced to a zero length, please try another name');
+        if (name.length === 0) {
+            console.error('Shadowrun 5e | The given name has been reduced to a zero length, please try another name');
+            return;
+        }
         if (this.exists(name)) {
             ui.notifications?.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
             return;
@@ -99,7 +102,7 @@ export class InventoryFlow {
 
         // Default inventory is virtual, so only none default inventories need to have their items merged.
         if (this.actor.defaultInventory.name !== moveTo) {
-            // @ts-expect-error
+            // @ts-expect-error TODO: fvtt-types v14 - The update data type does not allow dotted-path keys with array values.
             updateData[`system.inventories.${moveTo}.itemIds`] = [
                 ...this.actor.system.inventories[name].itemIds,
                 ...this.actor.system.inventories[moveTo].itemIds
@@ -145,7 +148,7 @@ export class InventoryFlow {
      * @param current The old name of the inventory.
      * @param newName The new name of the inventory.
      */
-    async rename(current: string, newName: string): Promise<string | void> {
+    async rename(current: string, newName: string): Promise<string | undefined> {
         console.debug(`Shadowrun 5e | Renaming the inventory ${current} to ${newName}`);
 
         // Disallow editing of default inventory.
@@ -156,7 +159,10 @@ export class InventoryFlow {
 
         newName = InventoryFlow._sanitzeName(newName);
 
-        if (newName.length === 0) return console.error('Shadowrun 5e | The given name has been reduced to a zero length, please try another name');
+        if (newName.length === 0) {
+            console.error('Shadowrun 5e | The given name has been reduced to a zero length, please try another name');
+            return;
+        }
         if (this.actor.defaultInventory.name === current) return;
         if (current === newName) return;
 

@@ -5,34 +5,35 @@ import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { prepareEffectDurationStatus } from '../effect/EffectDurationStatus';
+import { preparePreparationPotencyStatus } from '../item/prep/PreparationPotencyStatus';
 
 export const registerItemLineHelpers = () => {
 
-    Handlebars.registerHelper('hasRoll', function (item: SR5Item, options) {
+    Handlebars.registerHelper('hasRoll', function (item: SR5Item) {
         return item?.hasRoll ?? false;
     });
 
-    Handlebars.registerHelper('isBroken', function (item: SR5Item, options) {
+    Handlebars.registerHelper('isBroken', function (item: SR5Item) {
         return item?.isMatrixDevice && item.isBroken;
     });
 
-    Handlebars.registerHelper('canBeWireless', function (doc: SR5Item | SR5Actor, options) {
+    Handlebars.registerHelper('canBeWireless', function (doc: SR5Item | SR5Actor) {
         if (doc instanceof SR5Item) return  doc.canBeWireless();
         if (doc instanceof SR5Actor) return doc.getMatrixDevice()?.canBeWireless() ?? false;
         return false;
     });
 
-    Handlebars.registerHelper('isWireless', function (doc: SR5Item | SR5Actor, options) {
+    Handlebars.registerHelper('isWireless', function (doc: SR5Item | SR5Actor) {
         if (doc instanceof SR5Item) return  doc.isWireless();
         if (doc instanceof SR5Actor) return doc.getMatrixDevice()?.isWireless() ?? false;
         return false;
     });
 
-    Handlebars.registerHelper('isRunningSilent', function (item: SR5Item, options) {
+    Handlebars.registerHelper('isRunningSilent', function (item: SR5Item) {
         return item?.isRunningSilent() ?? false;
     });
 
-    Handlebars.registerHelper('hasSource', function (item: SR5Item, options) {
+    Handlebars.registerHelper('hasSource', function (item: SR5Item) {
         // todo figure out source for active effects and actors
         const source = (item instanceof SR5Item) ? item.getSource() ?? '' : ''
         return source !== '';
@@ -44,11 +45,11 @@ export const registerItemLineHelpers = () => {
         return ActorOwnershipFlow._isOwnerOfItem(owner, item);
     });
 
-    Handlebars.registerHelper('isMatrixAction', function (item: SR5Item, options) {
+    Handlebars.registerHelper('isMatrixAction', function (item: SR5Item) {
         return item.isType('action') && item.hasActionCategory('matrix');
     });
 
-    Handlebars.registerHelper('isEquipped', function (item: SR5Item, options) {
+    Handlebars.registerHelper('isEquipped', function (item: SR5Item) {
         return item?.isEquipped();
     });
 
@@ -68,7 +69,7 @@ export const registerItemLineHelpers = () => {
         return false;
     });
 
-    Handlebars.registerHelper('marksRequired', function (item: SR5Item, options) {
+    Handlebars.registerHelper('marksRequired', function (item: SR5Item) {
         const neededMarks: number = item.getAction()?.category.matrix.marks ?? 0;
         const needed = neededMarks > 0 ? `${neededMarks}` : '';
         const owner = item.getAction()?.category.matrix.owner ? game.i18n.localize('SR5.Owner') : '';
@@ -105,37 +106,42 @@ export const registerItemLineHelpers = () => {
         return prepareEffectDurationStatus(effect);
     })
 
-    Handlebars.registerHelper('isFreshImport', function (document, options) {
+    Handlebars.registerHelper('preparationPotencyStatus', function (item: SR5Item) {
+        if (!item?.isType('preparation')) return;
+        return preparePreparationPotencyStatus(item.system);
+    })
+
+    Handlebars.registerHelper('isFreshImport', function (document) {
         if (!(document instanceof SR5Item)) return false;
         return document.system
     })
 
-    Handlebars.registerHelper('usesAmmo', function (item, options) {
+    Handlebars.registerHelper('usesAmmo', function (item) {
         if (!(item instanceof SR5Item)) return false;
         return item.usesAmmo();
     })
 
-    Handlebars.registerHelper('equippedAmmo', function (item: SR5Item, options) {
+    Handlebars.registerHelper('equippedAmmo', function (item: SR5Item) {
         return item.getEquippedAmmo();
     })
 
-    Handlebars.registerHelper('equippedMods', function (item: SR5Item, options) {
+    Handlebars.registerHelper('equippedMods', function (item: SR5Item) {
         return item.getEquippedMods();
     })
 
-    Handlebars.registerHelper('ammoOptions', function (item: SR5Item, options) {
+    Handlebars.registerHelper('ammoOptions', function (item: SR5Item) {
         return item.items.filter(i => i.isType('ammo')).map(i => ({ label: i.name, value: i.id }));
     })
 
-    Handlebars.registerHelper('hasAmmo', function (item: SR5Item, options) {
+    Handlebars.registerHelper('hasAmmo', function (item: SR5Item) {
         return item.items.filter(i => i.isType('ammo')).length > 0;
     })
 
-    Handlebars.registerHelper('matrixIconType', function (icon: SR5Item | SR5Actor, options) {
+    Handlebars.registerHelper('matrixIconType', function (icon: SR5Item | SR5Actor) {
         return game.i18n.localize(MatrixNetworkFlow.getDocumentType(icon));
     })
 
-    Handlebars.registerHelper('hasConnectedIcons', function (target: Shadowrun.MatrixTargetDocument, options) {
+    Handlebars.registerHelper('hasConnectedIcons', function (target: Shadowrun.MatrixTargetDocument) {
         return (target.document instanceof SR5Actor && target.document.hasWirelessDevices());
     })
 };

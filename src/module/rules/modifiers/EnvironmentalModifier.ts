@@ -47,7 +47,7 @@ export class EnvironmentalModifier extends SituationModifier {
         // Calculation based on active modifier categories, excluding manual overwrite.
         const activeCategories = Object.entries(this.applied.active);
         // Should an active category miss a level set, ignore and fail gracefully.
-        const activeValues = activeCategories.map(([category, level]) => level || 0);
+        const activeValues = activeCategories.map(([, level]) => level || 0);
         // Calculate the amout of categor
         const count = this.activeLevels(activeValues);
 

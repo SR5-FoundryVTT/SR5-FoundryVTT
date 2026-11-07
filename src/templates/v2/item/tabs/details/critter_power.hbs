@@ -1,0 +1,51 @@
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{localize (objValue @root.config.itemTypes item.type)}}</label>
+    </div>
+</div>
+
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.powerType.hint}}">{{systemFields.powerType.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.powerType value=source.system.powerType localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label>{{localize "SR5.Rating"}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.rating value=source.system.rating
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label>{{systemFields.duration.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.duration value=source.system.duration localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label>{{systemFields.range.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.range value=source.system.range localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label>{{systemFields.karma.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.karma value=source.system.karma
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>

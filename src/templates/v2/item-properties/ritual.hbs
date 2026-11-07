@@ -1,4 +1,6 @@
-<label>{{localizeOb item.system.type @root.config.spellTypes}}</label>
+{{#unless (empty item.system.type)}}
+    <label>{{localizeOb item.system.type @root.config.spellTypes}}</label>
+{{/unless}}
 {{#if item.system.descriptors}}
     <label>{{item.system.descriptors}}</label>
 {{/if}}

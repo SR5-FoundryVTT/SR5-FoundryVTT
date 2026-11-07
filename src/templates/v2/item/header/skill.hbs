@@ -47,7 +47,8 @@
                         <label data-tooltip="{{systemFields.type.hint}}">{{systemFields.type.label}}</label>
                         <span>
                             {{formInput systemFields.type value=source.system.type localize=true
-                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                        classes="short" rootId=@root.rootId
+                                        disabled=(or @root.isPlayMode (not @root.canChangeSkillType))}}
                         </span>
                     </div>
                     {{#if (eq item.system.type 'skill')}}

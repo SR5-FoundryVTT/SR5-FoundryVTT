@@ -35,7 +35,7 @@ export class SoakFlow {
         return false;
     }
 
-    isDamageFromImpactDispersion(damage: DamageType) {
+    isDamageFromImpactDispersion(_damage: DamageType) {
         // TODO: FA 52. Ammo currently cannot have mods, so not sure how to implement Alter Ballistics idiomatically.
         return false;
     }

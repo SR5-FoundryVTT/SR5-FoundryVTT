@@ -1,6 +1,8 @@
 {{#if item.system.technology.rating}}
-    <label>{{localize 'SR5.Rtg'}}&nbsp;{{item.system.technology.rating}}</label>
+    <label>{{localize 'SR5.Rating'}}&nbsp;{{item.system.technology.rating}}</label>
 {{/if}}
 {{#each system.licenses}}
-    <label>{{this.name}}&nbsp;({{this.rtg}})</label>
+    {{#unless (empty this.name)}}
+        <label>{{this.name}}&nbsp;({{this.rtg}})</label>
+    {{/unless}}
 {{/each}}

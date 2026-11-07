@@ -7,12 +7,12 @@ import { MatrixPrep } from './functions/MatrixPrep';
 import { SR5 } from "../../config";
 import { RangedWeaponRules } from '../../rules/RangedWeaponRules';
 import { SR } from '../../constants';
-import { ModifiableValueType } from 'src/module/types/template/Base';
 import { SR5Item } from 'src/module/item/SR5Item';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { ItemPrep } from './functions/ItemPrep';
+import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
 
 export class VehiclePrep {
     static prepareBaseData(system: Actor.SystemOfType<'vehicle'>) {
@@ -44,6 +44,8 @@ export class VehiclePrep {
         ItemPrep.prepareArmor(system, items);
         CharacterPrep.prepareRecoil(system);
         VehiclePrep.prepareRecoilCompensation(system);
+
+        ItemAvailabilityFlow.calculateValue(system.availability);
     }
 
     static prepareVehicleStats(system: Actor.SystemOfType<'vehicle'>) {
@@ -156,10 +158,10 @@ export class VehiclePrep {
         // algorithm to determine speed, CRB pg 202 table.
         // Allow ActiveEffects to apply to movement directly.
         movement.walk.base = 5 * Math.pow(2, speedTotal - 1);
-        movement.walk.value = ModifiableValue.calcTotal(movement.walk as ModifiableValueType, {min: 0});
+        movement.walk.value = ModifiableValue.calcTotal(movement.walk, {min: 0});
 
         movement.run.base = 10 * Math.pow(2, speedTotal - 1);
-        movement.run.value = ModifiableValue.calcTotal(movement.run as ModifiableValueType, {min: 0});
+        movement.run.value = ModifiableValue.calcTotal(movement.run, {min: 0});
     }
 
     /**

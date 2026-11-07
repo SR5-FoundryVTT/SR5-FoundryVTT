@@ -14,7 +14,7 @@ export class WareParser extends Parser<'bioware' | 'cyberware'> {
 
         // Cyberware and Bioware have no equipped flag in chummer so it cannot be parsed - we consider it as always equipped
         system.technology.equipped = true;
-        system.essence = Number(itemData.ess) || 0;
+        system.technology.essence.base = Number(itemData.ess) || 0;
         system.capacity.total = Number(itemData.capacity) || 0;
         system.grade = itemData.grade.toLowerCase() as 'standard' | 'alpha' | 'beta' | 'delta' | 'gamma';
 

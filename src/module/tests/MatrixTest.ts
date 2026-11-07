@@ -107,7 +107,7 @@ export class MatrixTest<T extends MatrixTestData = MatrixTestData> extends Succe
      */
     override async _cleanUpAfterDialog() {
         await super._cleanUpAfterDialog();
-        await MatrixTestDataFlow.setIconUuidBasedOnPlacementSelection(this);
+        MatrixTestDataFlow.setIconUuidBasedOnPlacementSelection(this);
     }
 
     get iconOptions(): { value: string, label: string }[] {

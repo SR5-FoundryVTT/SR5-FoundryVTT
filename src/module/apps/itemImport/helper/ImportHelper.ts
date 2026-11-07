@@ -1,4 +1,6 @@
 import { Constants, CompendiumKey, ChummerFile } from '../importer/Constants';
+import { SR5 } from '../../../config';
+import { DamageType } from '../../../types/item/Action';
 import CompendiumCollection = foundry.documents.collections.CompendiumCollection;
 
 export type OneOrMany<T> = T | T[];
@@ -58,6 +60,16 @@ export class ImportHelper {
         if (value)
             return Array.isArray(value) ? value : [value];
         return [];
+    }
+
+    /**
+     * Convert Chummer's comma-separated spell elements, like "Fire, Water", to a damage element.
+     * Foundry damage holds a single element, so only the first one listed is kept.
+     * @param elements Chummer's English element names
+     */
+    public static parseElements(elements: string | undefined | null): DamageType['element']['base'] {
+        const element = elements?.split(',')[0].trim().toLowerCase() ?? '';
+        return element in SR5.elementTypes ? element as keyof typeof SR5.elementTypes : '';
     }
 
     /**
@@ -138,7 +150,7 @@ export class ImportHelper {
             const doc = await pack.getDocument(ids[0]);
             docs = doc ? [doc] : [];
         } else {
-            docs = await pack.getDocuments({ _id__in: ids }) as Item.Stored[];
+            docs = await pack.getDocuments({ _id__in: ids });
         }
 
         return docs.map(doc => ({
@@ -276,7 +288,8 @@ export class ImportHelper {
             : compendium) as CompendiumCollection<'Actor' | 'Item'> | undefined;
 
         if (!pack) {
-            throw new Error(`Compendium pack "${compendium}" not found.`);
+            const packName = typeof compendium === 'string' ? compendium : compendium.collection;
+            throw new Error(`Compendium pack "${packName}" not found.`);
         }
 
         const wasLocked = pack.locked;
@@ -305,11 +318,11 @@ export class ImportHelper {
      * @param options Additional creation options
      */
     public static async createDocumentInCompendium<T extends foundry.abstract.Document.Any = foundry.abstract.Document.Any>(
-        compKeyOrPack: CompendiumKey | string,
-        data: any | any[],
-        options: Record<string, any> = {}
+        compKeyOrPack: string,
+        data: Item.CreateData | Actor.CreateData | Item.CreateData[] | Actor.CreateData[],
+        options: Record<string, unknown> = {}
     ): Promise<T | T[]> {
-        const isCompKey = typeof compKeyOrPack === 'string' && compKeyOrPack in Constants.MAP_COMPENDIUM_KEY;
+        const isCompKey = compKeyOrPack in Constants.MAP_COMPENDIUM_KEY;
         const compendium = isCompKey
             ? await this.GetCompendium(compKeyOrPack as CompendiumKey)
             : (game.packs.get(compKeyOrPack.startsWith('world.') ? compKeyOrPack : `world.${compKeyOrPack}`) || game.packs.get(compKeyOrPack)) as CompendiumCollection<'Actor' | 'Item'>;
@@ -319,10 +332,12 @@ export class ImportHelper {
         }
 
         return this.withUnlockedCompendium(compendium, async (pack) => {
-            const documentClass = pack.documentClass;
-            const created = await (documentClass as any).create(data, { pack: pack.collection, keepId: true, ...options });
+            const documentClass = pack.documentClass as unknown as {
+                create: (data: unknown, operation?: Record<string, unknown>) => Promise<T | T[]>;
+            };
+            const created = await documentClass.create(data, { pack: pack.collection, keepId: true, ...options });
             await pack.getIndex();
-            return created as unknown as T | T[];
+            return created;
         });
     }
 }

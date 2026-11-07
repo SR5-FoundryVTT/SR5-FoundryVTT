@@ -19,9 +19,9 @@ export const OverwatchFlow = {
         if (!against) return;
         if (!against.hasTestCategory('matrix')) return;
         if (!MatrixRules.isIllegalAction(
-            against.data.action.attribute as any,
-            against.data.action.attribute2 as any,
-            against.data.action.limit.attribute as any)) {
+            against.data.action.attribute as Shadowrun.ActorAttribute,
+            against.data.action.attribute2 as Shadowrun.ActorAttribute,
+            against.data.action.limit.attribute as Shadowrun.ActorAttribute)) {
             return;
         }
 

@@ -94,16 +94,21 @@
   "ownership": {
     "default": 0
   },
-  "flags": {},
+  "flags": {
+    "shadowrun5e": {
+      "embeddedItems": []
+    }
+  },
   "_stats": {
     "compendiumSource": null,
     "duplicateSource": null,
     "exportSource": null,
     "coreVersion": "13.351",
     "systemId": "shadowrun5e",
-    "systemVersion": "0.33.0",
-    "createdTime": 1774604030335,
-    "modifiedTime": 1774604056790
+    "systemVersion": "0.37.4",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null
   },
   "_key": "!items!hQPdmc2dOU9ihDoN"
 }

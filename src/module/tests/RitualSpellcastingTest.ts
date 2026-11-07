@@ -32,12 +32,12 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
     override _prepareData(data: DeepPartial<RitualSpellcastingTestData>, options: Partial<TestOptions>): RitualSpellcastingTestData {
         const prepared = super._prepareData(data, options);
 
-        this._prepareRitualData(prepared as RitualSpellcastingTestData);
+        this._prepareRitualData(prepared);
 
         prepared.drain ||= 0;
         prepared.drainDamage ||= DataDefaults.createData('damage');
 
-        return prepared as RitualSpellcastingTestData;
+        return prepared;
     }
 
     override get _dialogTemplate() {

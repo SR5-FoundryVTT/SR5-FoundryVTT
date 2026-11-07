@@ -406,6 +406,8 @@ export type ActorSchema = {
             range_english: string;
             damage: string;
             damage_english: string;
+            elements?: string;
+            elements_english?: string;
             duration: string;
             duration_english: string;
             dv: string;

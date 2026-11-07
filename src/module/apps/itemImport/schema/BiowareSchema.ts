@@ -7,13 +7,16 @@ import { Empty, Many, OneOrMany, IntegerString } from './Types';
 export interface Bioware {
     addtoparentess?: Empty;
     addweapon?: Empty | { _TEXT: string; };
+    allowdrug?: {
+        drugcategory: Many<{ _TEXT: "BTLs" | "Custom Drugs" | "Drugs" | "Toxins"; }>;
+    };
     allowgear?: {
-        gearcategory: Many<{ _TEXT: "Chemicals" | "Custom" | "Custom Drug" | "Drugs" | "Toxins"; }>;
+        gearcategory: Many<{ _TEXT: "Chemicals" | "Custom"; }>;
     };
     allowsubsystems?: {
         category: { _TEXT: "Chemical Gland Modifications"; };
     };
-    avail: { _TEXT: IntegerString | string; };
+    avail: { _TEXT: string; };
     bannedgrades?: {
         grade: Many<{ _TEXT: "Alphaware" | "Omegaware" | "Standard" | "Standard (Burnout's Way)" | "Used" | "Used (Adapsin)"; }>;
     };
@@ -21,8 +24,8 @@ export interface Bioware {
     bonus?: BonusSchema;
     capacity: { _TEXT: IntegerString; };
     category: { _TEXT: string; };
-    cost: { _TEXT: IntegerString | string; };
-    ess: { _TEXT: IntegerString | string; };
+    cost: { _TEXT: string; };
+    ess: { _TEXT: string; };
     forbidden?: ConditionsSchema;
     forcegrade?: { _TEXT: "None"; };
     hide?: Empty;
@@ -35,10 +38,13 @@ export interface Bioware {
     pairbonus?: {
         reach?: { _TEXT: IntegerString; $: { name: "Claws (Bio-Weapon)" | "Retractable Claws (Bio-Weapon)"; }; };
         unarmeddv?: { _TEXT: IntegerString; };
-        unarmedreach?: { _TEXT: IntegerString; };
         walkmultiplier?: {
             category: { _TEXT: "Swim"; };
             val: { _TEXT: IntegerString; };
+        };
+        weaponaccuracy?: {
+            name: { _TEXT: "Large Tusk(s)" | "Medium Tusk(s)"; };
+            value: { _TEXT: IntegerString; };
         };
     };
     pairinclude?: {

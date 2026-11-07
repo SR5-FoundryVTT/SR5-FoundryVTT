@@ -56,7 +56,7 @@ export const MatrixSheetFlow = {
 
             // update the embedded item with the new wireless state
             await actor.updateEmbeddedDocuments('Item', [{
-                '_id': device._id!,
+                '_id': device._id,
                 system: { technology: { wireless: newState } }
             }]);
         } else {
@@ -77,7 +77,7 @@ export const MatrixSheetFlow = {
      */
     async promptConnectToMatrixNetwork(actor: SR5Actor): Promise<boolean> {
         const app = new NetworkManager(actor);
-        await app.render(true);
+        await app.render({ force: true });
         return true;
     }
 }

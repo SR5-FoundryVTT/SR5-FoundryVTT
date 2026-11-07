@@ -1,2 +1,4 @@
 <label>{{localize "SR5.PP"}}&nbsp;{{item.system.pp}}</label>
-<label>{{localizeOb item.system.type @root.config.adeptPower.types}}</label>
+{{#unless (empty item.system.type)}}
+    <label>{{localizeOb item.system.type @root.config.adeptPower.types}}</label>
+{{/unless}}

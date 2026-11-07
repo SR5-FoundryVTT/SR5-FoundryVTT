@@ -2,6 +2,7 @@ import { SR5 } from "../config";
 import { FiringModeType } from "../types/item/Weapon";
 import { FireModeType } from "../types/flags/ItemFlags";
 
+export type ShotgunChoke = 'narrow' | 'medium' | 'wide';
 
 export const FireModeRules = {
     /**
@@ -89,7 +90,7 @@ export const FireModeRules = {
      * 
      * @returns A list of firemodes sorted by weapon mode and rounds necessary.
      */
-    availableFireModes: function (rangedWeaponModes: FiringModeType, ammoLeft?: number): FireModeType[] {
+    availableFireModes: function (rangedWeaponModes: FiringModeType): FireModeType[] {
         // Reduce all fire modes to what's available on weapon
         // TODO: rounds check
         return SR5.fireModes
@@ -105,5 +106,19 @@ export const FireModeRules = {
             const modeBIndex = SR5.rangeWeaponMode.indexOf(modeB.mode);
             return modeAIndex > modeBIndex ? 1 : -1;
         });
-    }
+    },
+
+    /**
+     * The available suppressive fire arc widths in meters according to
+     * - SR5#179 'Suppressive Fire'
+     * - RG#120 'Enhanced Suppression'
+     * @returns 
+     */
+    suppressiveFireArcs: function() {
+        return {
+            enhanced: 5,
+            normal: 10
+        }
+    },
+
 }

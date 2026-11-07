@@ -56,18 +56,18 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
         options: DeepPartial<ApplicationV2.RenderOptions>
     ) {
         this.element.querySelector<HTMLInputElement>('[name="incoming-street-cred"]')
-            ?.addEventListener('change', (event: any) => {
-                this.streetCredModifier = Number(event.target?.value ?? 0);
+            ?.addEventListener('change', (event: Event) => {
+                this.streetCredModifier = Number((event.target as HTMLInputElement | null)?.value ?? 0);
                 void this.render();
             })
         this.element.querySelector<HTMLInputElement>('[name="incoming-notoriety"]')
-            ?.addEventListener('change', (event: any) => {
-                this.notorietyModifier = Number(event.target?.value ?? 0);
+            ?.addEventListener('change', (event: Event) => {
+                this.notorietyModifier = Number((event.target as HTMLInputElement | null)?.value ?? 0);
                 void this.render();
             })
         this.element.querySelector<HTMLInputElement>('[name="incoming-public-awareness"]')
-            ?.addEventListener('change', (event: any) => {
-                this.publicAwarenessModifier = Number(event.target?.value ?? 0);
+            ?.addEventListener('change', (event: Event) => {
+                this.publicAwarenessModifier = Number((event.target as HTMLInputElement | null)?.value ?? 0);
                 void this.render();
             })
         return super._onRender(context, options);
@@ -124,7 +124,7 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
         void this.close();
     }
 
-    static async #cancel(this: ReputationManager) {
+    static #cancel(this: ReputationManager) {
         void this.close();
     }
 

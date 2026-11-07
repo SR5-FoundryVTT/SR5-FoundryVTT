@@ -213,6 +213,25 @@ async function waitForGameReady(page, timeout = 120000) {
     await page.waitForFunction(() => globalThis.game?.ready === true, null, { timeout });
 }
 
+async function selectJoinUser(select, user) {
+    const options = await select
+        .locator('option:not([value=""])')
+        .evaluateAll((elements) =>
+            elements.map(({ value, text, disabled }) => ({ value, name: text.trim(), disabled })),
+        );
+    const match = options.find(({ name }) => name.toLowerCase() === user.toLowerCase());
+    if (!match) {
+        const available = options.map(({ name }) => name).join(', ') || 'none';
+        throw new Error(`User "${user}" is not available in the launched world (available users: ${available}).`);
+    }
+    if (match.disabled) {
+        throw new Error(
+            `User "${match.name}" is already logged in to the launched world. Log them out or set FOUNDRY_USER.`,
+        );
+    }
+    await select.selectOption(match.value);
+}
+
 async function joinWorld(page, user = 'Gamemaster') {
     try {
         await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -235,9 +254,14 @@ async function joinWorld(page, user = 'Gamemaster') {
         );
     }
 
-    const username = page.locator('[name=username]');
-    await username.waitFor({ timeout: 30000 });
-    await username.fill(user);
+    // Foundry builds alternate between a user <select name="userId"> and a free-text <input name="username">.
+    const userField = page.locator('form[name=join] :is([name=userId], [name=username])');
+    await userField.waitFor({ timeout: 30000 });
+    if ((await userField.evaluate((element) => element.tagName)) === 'SELECT') {
+        await selectJoinUser(userField, user);
+    } else {
+        await userField.fill(user);
+    }
 
     const password = process.env.FOUNDRY_PASSWORD;
     if (password) {
@@ -487,7 +511,7 @@ async function main() {
     const viewport = headless ? { width: 1024, height: 768 } : null;
     if (!headless) args.push('--start-maximized');
 
-    const browser = await chromium.launch({ headless, args });
+    const browser = await chromium.launch({ headless, args, channel: process.env.FOUNDRY_BROWSER_CHANNEL || undefined });
     try {
         const context = await browser.newContext({ baseURL: url, viewport });
         const page = await context.newPage();

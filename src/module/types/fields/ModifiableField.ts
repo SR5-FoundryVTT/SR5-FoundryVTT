@@ -4,6 +4,7 @@ import { AnyObject } from "fvtt-types/utils";
 import DataModel = foundry.abstract.DataModel;
 import SchemaField = foundry.data.fields.SchemaField;
 import { DataDefaults } from "@/module/data/DataDefaults";
+import { ModifiableValue } from "@/module/mods/ModifiableValue";
 
 /**
  * A ModifiableSchemaField is a SchemaField that represents a ModifiableValue type, which 
@@ -32,13 +33,14 @@ export class ModifiableField<
 > extends foundry.data.fields.SchemaField<Fields, Options, AssignmentType, InitializedType, PersistedType> {
     override applyChange(value: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData): undefined {
         const changeValue = Number(change.value);
-        if (isNaN(changeValue)) return undefined;
+        if (!Number.isFinite(changeValue)) return undefined;
         if (!change.effect) return undefined;
 
         const field = value as ModifiableValueType;
         const effectName = change.effect.name;
         const effectType = change.type;
         const effectPriority = change.priority ?? CONST.ACTIVE_EFFECT_CHANGE_TYPES[change.type]?.defaultPriority ?? 20;
+        const effectSource = ModifiableValue.effectSource(change.effect);
 
         field.changes.push(
             DataDefaults.createData('change_entry', {
@@ -46,7 +48,7 @@ export class ModifiableField<
                 type: effectType,
                 value: changeValue,
                 priority: effectPriority,
-                source: change.effect.uuid,
+                source: effectSource,
             })
         );
 

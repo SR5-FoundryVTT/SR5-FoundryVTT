@@ -40,7 +40,7 @@ export class ModifierFlow {
      */
     totalFor(name: string, options: ModifierFlowOptions={}): number {
         // Get special cases that need local handling.
-        if (this[name] !== undefined) return this[name];
+        if (this[name] !== undefined) return this[name] as number;
 
         // Get global modifiers that can come from the general modifier system.
         const modifiers = this.actor.getSituationModifiers();

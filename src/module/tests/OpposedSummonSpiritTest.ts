@@ -81,7 +81,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
 
         prepared.summonedSpiritUuid ||= '';
 
-        return prepared as OpposedSummonSpiritTestData;
+        return prepared;
     }
 
     override get _chatMessageTemplate(): string {
@@ -253,5 +253,6 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
         const actor = await fromUuid<Actor>(this.data.summonedSpiritUuid);
         await actor?.delete();
         delete this.actor;
+        await super._cleanUpAfterDialogCancel();
     }
 }

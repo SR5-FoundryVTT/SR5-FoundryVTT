@@ -1,7 +1,6 @@
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { SR5Item } from '../SR5Item';
-import { AttributeRange, Metatype } from '@/module/types/item/Metatype';
 import { SR5 } from '@/module/config';
 import { Helpers } from '@/module/helpers';
 import { parseDropData } from '@/module/utils/sheets';
@@ -87,7 +86,7 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
     };
 
     override async _prepareContext(options: Parameters<ItemSheet['_prepareContext']>[0]) {
-        const context = await super._prepareContext(options) as SR5MetatypeSheetData;
+        const context = await super._prepareContext(options);
         context.item = this.document;
         context.displayName = MetatypeFlow.localizeMetatype(this.document) || this.document.name;
 
@@ -128,7 +127,7 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
         if (dynamicSubsubtypes) {
             context.hasSubsubtypes = true;
             context.subsubtypes = Object.fromEntries(
-                Object.entries(dynamicSubsubtypes).map(([k, v]) => [k, game.i18n.localize(v as string)])
+                Object.entries(dynamicSubsubtypes).map(([k, v]) => [k, game.i18n.localize(v)])
             );
         } else {
             context.hasSubsubtypes = false;
@@ -197,7 +196,7 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
 
     protected override async _onDrop(event: DragEvent) {
         const raw = parseDropData<{ type?: string; uuid?: string }>(event);
-        if (!raw || raw.type !== 'Item' || !raw.uuid) return;
+        if (raw?.type !== 'Item' || !raw.uuid) return;
 
         const droppedItem = await fromUuid(raw.uuid);
         if (!(droppedItem instanceof SR5Item)) return;
@@ -271,7 +270,7 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
             }
 
             if (actorItem?.sheet) {
-                actorItem.sheet.render(true);
+                await actorItem.sheet.render(true);
                 return;
             }
         }
@@ -279,7 +278,7 @@ export class SR5MetatypeSheet extends SR5ApplicationMixin(ItemSheet)<SR5Metatype
         // Fallback: Open original document directly
         const doc = await fromUuid(uuid);
         if (doc instanceof SR5Item && doc.sheet) {
-            doc.sheet.render(true);
+            await doc.sheet.render(true);
         }
     }
 }

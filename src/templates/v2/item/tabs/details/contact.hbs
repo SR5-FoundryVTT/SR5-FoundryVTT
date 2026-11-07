@@ -1,0 +1,60 @@
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{localize (objValue @root.config.itemTypes item.type)}}</label>
+    </div>
+</div>
+
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.type.hint}}">{{systemFields.type.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.type value=source.system.type
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label>{{systemFields.loyalty.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.loyalty value=source.system.loyalty
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label>{{systemFields.connection.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.connection value=source.system.connection
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label>{{systemFields.family.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.family value=source.system.family
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label>{{systemFields.blackmail.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.blackmail value=source.system.blackmail
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label>{{systemFields.group.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.group value=source.system.group
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>

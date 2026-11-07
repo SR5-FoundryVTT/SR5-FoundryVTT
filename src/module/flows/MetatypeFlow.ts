@@ -22,11 +22,11 @@ export class MetatypeFlow {
 
         const isDoc = metatypeItemSource instanceof foundry.abstract.Document;
         const sourceData = (isDoc
-            ? (metatypeItemSource as SR5Item<'metatype'>).toObject()
+            ? metatypeItemSource.toObject()
             : foundry.utils.deepClone(metatypeItemSource)) as Item.CreateData<'metatype'>;
 
         const sourceUuid = isDoc
-            ? (metatypeItemSource as SR5Item<'metatype'>).uuid
+            ? metatypeItemSource.uuid
             : (typeof sourceData._id === 'string' ? sourceData._id : '');
 
         // 1. Clean up existing metatype items and their granted items
@@ -63,7 +63,7 @@ export class MetatypeFlow {
         };
 
         const ranges = newMetatypeItem.system.getActiveAttributeRanges();
-        const isCritter = (actor.system as any).is_critter || actor.isType('spirit', 'sprite');
+        const isCritter = (actor.isType('character') && Boolean(actor.system.is_critter)) || actor.isType('spirit', 'sprite');
 
         for (const [attr, range] of Object.entries(ranges)) {
             if (range.min != null && attr in actor.system.attributes) {
@@ -184,7 +184,7 @@ export class MetatypeFlow {
                     }
                 }
 
-                const flags = metatypeItem.flags?.shadowrun5e?.metaTypesItems as MetatypeItemFlag[] | undefined;
+                const flags = metatypeItem.flags?.shadowrun5e?.metaTypesItems;
                 const metaFlag = Array.isArray(flags)
                     ? flags.find(f => f.foundryUuid === uuid || f.chummerId === uuid)
                     : undefined;
@@ -381,7 +381,7 @@ export class MetatypeFlow {
         }
 
         const ranges = metatypeItem.system.getActiveAttributeRanges();
-        const isCritter = (actor.system as any).is_critter || actor.isType('spirit', 'sprite');
+        const isCritter = (actor.isType('character') && Boolean(actor.system.is_critter)) || actor.isType('spirit', 'sprite');
 
         for (const [attr, range] of Object.entries(ranges)) {
             if (range.min != null && attr in actor.system.attributes) {

@@ -6,6 +6,8 @@ import { VersionMigration } from '@/module/migrator/VersionMigration';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 import { Version0_36_0 } from 'src/module/migrator/versions/Version0_36_0';
 import { Version0_37_0 } from 'src/module/migrator/versions/Version0_37_0';
+import { Version0_38_0 } from 'src/module/migrator/versions/Version0_38_0';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -18,6 +20,18 @@ export const Migrators = (context: QuenchBatchContext) => {
         active: Record<string, LegacySkillTestData>;
         language: LegacySkillContainerTestData;
         knowledge: Record<string, LegacySkillContainerTestData>;
+    };
+    type LegacyItemFixture = {
+        _id: string;
+        name: string;
+        type: string;
+        system?: object;
+        effects?: unknown[];
+        flags?: object;
+    };
+    type LegacySpriteSystem = ReturnType<typeof DataDefaults.baseSystemData<'sprite'>> & {
+        level?: number;
+        modifiers: { matrix_initiative?: number };
     };
 
     class TestMigration extends VersionMigration {
@@ -33,6 +47,54 @@ export const Migrators = (context: QuenchBatchContext) => {
 
     after(async () => {
         await factory.destroy();
+    });
+
+    describe('Version0_37_9 skill group cleanup', () => {
+        const createSource = (items: Item.CreateData[]) => ({
+            _id: foundry.utils.randomID(16),
+            _stats: { systemVersion: '0.37.8' },
+            name: 'Imported Character',
+            type: 'character',
+            items,
+            effects: [],
+            system: DataDefaults.baseSystemData('character'),
+        });
+        const createSkill = (name: string, group: string): Item.CreateData => ({
+            name,
+            type: 'skill',
+            system: DataDefaults.baseSystemData('skill', { type: 'skill', skill: { category: 'active', group } }),
+        });
+        const createGroup = (name: string, skills: string[]): Item.CreateData => ({
+            name,
+            type: 'skill',
+            system: DataDefaults.baseSystemData('skill', { type: 'group', group: { skills, rating: 2 } }),
+        });
+
+        it('clears groups the actor does not own and keeps owned groups', () => {
+            const source = createSource([
+                createGroup('Firearms', ['Pistols']),
+                createSkill('Pistols', 'Firearms'),
+                createSkill('Blades', 'Close Combat'),
+                createSkill('Archery', 'None'),
+            ]);
+
+            assert.isTrue(Migrator.migrate('Actor', source));
+
+            const groupOf = (name: string) => foundry.utils.getProperty(source.items.find(item => item.name === name)!, 'system.skill.group');
+            assert.strictEqual(groupOf('Pistols'), 'Firearms');
+            assert.strictEqual(groupOf('Blades'), '');
+            assert.strictEqual(groupOf('Archery'), '');
+        });
+
+        it('does not migrate actors without stale groups', () => {
+            const source = createSource([
+                createGroup('Firearms', ['Pistols']),
+                createSkill('Pistols', 'Firearms'),
+                createSkill('Blades', ''),
+            ]);
+
+            assert.isFalse(Migrator.migrate('Actor', source));
+        });
     });
 
     describe('Version0_32_0 legacy skill migration', () => {
@@ -116,7 +178,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.isTrue(migrated);
             assert.lengthOf(source.items, 4);
 
-            const pistols = source.items.find(item => item.type === 'skill' && item.name === 'Pistols') as Item.CreateData | undefined;
+            const pistols = source.items.find(item => item.type === 'skill' && item.name === 'Pistols');
             assert.exists(pistols);
             assert.strictEqual(foundry.utils.getProperty(pistols, 'system.skill.category'), 'active');
             assert.strictEqual(foundry.utils.getProperty(pistols, 'system.skill.rating'), 4);
@@ -126,12 +188,12 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(foundry.utils.getProperty(pistols, 'system.description.source'), 'SR5 Core 130');
             assert.strictEqual(pistols?.name, 'Pistols');
 
-            const customSkill = source.items.find(item => item.type === 'skill' && item.name === 'Freestyle Gunnery') as Item.CreateData | undefined;
+            const customSkill = source.items.find(item => item.type === 'skill' && item.name === 'Freestyle Gunnery');
             assert.exists(customSkill);
             assert.deepEqual(foundry.utils.getProperty(customSkill, 'system.skill.specializations'), [{ name: 'Trick Shots' }]);
             assert.strictEqual(customSkill?.img, 'icons/svg/target.svg');
 
-            const languageSkill = source.items.find(item => item.type === 'skill' && item.name === 'Spanish') as Item.CreateData | undefined;
+            const languageSkill = source.items.find(item => item.type === 'skill' && item.name === 'Spanish');
             assert.exists(languageSkill);
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.category'), 'language');
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.rating'), 12);
@@ -139,7 +201,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.defaulting'), false);
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.language.isNative'), true);
 
-            const knowledgeSkill = source.items.find(item => item.type === 'skill' && item.name === 'Gang Politics') as Item.CreateData | undefined;
+            const knowledgeSkill = source.items.find(item => item.type === 'skill' && item.name === 'Gang Politics');
             assert.exists(knowledgeSkill);
             assert.strictEqual(foundry.utils.getProperty(knowledgeSkill, 'system.skill.category'), 'knowledge');
             assert.strictEqual(foundry.utils.getProperty(knowledgeSkill, 'system.skill.knowledgeType'), 'street');
@@ -404,7 +466,7 @@ export const Migrators = (context: QuenchBatchContext) => {
     });
 
     describe('Version0_35_0 spirit legacy migration', () => {
-        const createSkillItem = (name: string, rating = 0): any => ({
+        const createSkillItem = (name: string, rating = 0) => ({
             _id: foundry.utils.randomID(16),
             name,
             type: 'skill',
@@ -418,12 +480,12 @@ export const Migrators = (context: QuenchBatchContext) => {
             }),
         });
 
-        const createSpirit = (spiritType: string, force = 6): any => ({
+        const createSpirit = (spiritType: string, force = 6) => ({
             _id: foundry.utils.randomID(16),
             _stats: { systemVersion: '0.33.9' },
             name: 'Legacy Spirit',
             type: 'spirit',
-            items: [] as any[],
+            items: [] as LegacyItemFixture[],
             effects: [],
             system: DataDefaults.baseSystemData('spirit', {
                 spiritType,
@@ -456,8 +518,8 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.initiative.astral.constant.base, 0);
             assert.strictEqual(actor.system.initiative.astral.dice.base, 3);
 
-            const assensing = actor.items.find((item: any) => item.name === 'Assensing');
-            const arcana = actor.items.find((item: any) => item.name === 'Arcana');
+            const assensing = actor.items.find(item => item.name === 'Assensing') as LegacyItemFixture;
+            const arcana = actor.items.find(item => item.name === 'Arcana') as LegacyItemFixture;
             assert.strictEqual(foundry.utils.getProperty(assensing, 'system.skill.rating'), 1);
             assert.strictEqual(foundry.utils.getProperty(arcana, 'system.skill.rating'), 0);
         });
@@ -490,8 +552,8 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.initiative.astral.constant.base, 0);
             assert.strictEqual(actor.system.initiative.astral.dice.base, 1);
 
-            const assensing = actor.items.find((item: any) => item.name === 'Assensing');
-            const unarmedCombat = actor.items.find((item: any) => item.name === 'Unarmed Combat');
+            const assensing = actor.items.find(item => item.name === 'Assensing') as LegacyItemFixture;
+            const unarmedCombat = actor.items.find(item => item.name === 'Unarmed Combat') as LegacyItemFixture;
             assert.strictEqual(foundry.utils.getProperty(assensing, 'system.skill.rating'), 1);
             assert.strictEqual(foundry.utils.getProperty(unarmedCombat, 'system.skill.rating'), 0);
         });
@@ -516,7 +578,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.initiative.astral.attribute_b, 'force');
             assert.strictEqual(actor.system.initiative.astral.dice.base, 3);
 
-            const assensing = actor.items.find((item: any) => item.name === 'Assensing');
+            const assensing = actor.items.find(item => item.name === 'Assensing') as LegacyItemFixture;
             assert.strictEqual(foundry.utils.getProperty(assensing, 'system.skill.rating'), 3);
         });
 
@@ -561,7 +623,7 @@ export const Migrators = (context: QuenchBatchContext) => {
     });
 
     describe('Version0_35_0 sprite legacy migration', () => {
-        const createSkillItem = (name: string, rating = 0, category: 'active' | 'knowledge' | 'language' = 'active'): any => ({
+        const createSkillItem = (name: string, rating = 0, category: 'active' | 'knowledge' | 'language' = 'active') => ({
             _id: foundry.utils.randomID(16),
             name,
             type: 'skill',
@@ -575,12 +637,12 @@ export const Migrators = (context: QuenchBatchContext) => {
             }),
         });
 
-        const createSprite = (spriteType: string, level = 6): any => ({
+        const createSprite = (spriteType: string, level = 6) => ({
             _id: foundry.utils.randomID(16),
             _stats: { systemVersion: '0.34.0' },
             name: 'Legacy Sprite',
             type: 'sprite',
-            items: [] as any[],
+            items: [] as LegacyItemFixture[],
             effects: [],
             system: DataDefaults.baseSystemData('sprite', {
                 spriteType,
@@ -594,7 +656,7 @@ export const Migrators = (context: QuenchBatchContext) => {
                     data_processing: { base: 0 },
                     firewall: { base: 0 },
                 },
-            }),
+            }) as LegacySpriteSystem,
         });
 
         it('migrates known legacy sprite type into offsets, level toggles, initiative formula constant, and skill toggles', () => {
@@ -626,9 +688,9 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.attributes.level.base, 6);
             assert.isUndefined(actor.system.level);
 
-            const computer = actor.items.find((item: any) => item.name === 'Computer');
-            const hacking = actor.items.find((item: any) => item.name === 'Hacking');
-            const hardware = actor.items.find((item: any) => item.name === 'Hardware');
+            const computer = actor.items.find(item => item.name === 'Computer') as LegacyItemFixture;
+            const hacking = actor.items.find(item => item.name === 'Hacking') as LegacyItemFixture;
+            const hardware = actor.items.find(item => item.name === 'Hardware') as LegacyItemFixture;
             assert.strictEqual(foundry.utils.getProperty(computer, 'system.skill.rating'), 1);
             assert.strictEqual(foundry.utils.getProperty(hacking, 'system.skill.rating'), 1);
             assert.strictEqual(foundry.utils.getProperty(hardware, 'system.skill.rating'), 0);
@@ -659,9 +721,9 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.matrix.firewall.base, 1);
             assert.strictEqual(actor.system.initiative.matrix.constant.base, 4);
 
-            const computer = actor.items.find((item: any) => item.name === 'Computer');
-            const electronicWarfare = actor.items.find((item: any) => item.name === 'Electronic Warfare');
-            const cybercombat = actor.items.find((item: any) => item.name === 'Cybercombat');
+            const computer = actor.items.find(item => item.name === 'Computer') as LegacyItemFixture;
+            const electronicWarfare = actor.items.find(item => item.name === 'Electronic Warfare') as LegacyItemFixture;
+            const cybercombat = actor.items.find(item => item.name === 'Cybercombat') as LegacyItemFixture;
             assert.strictEqual(foundry.utils.getProperty(computer, 'system.skill.rating'), 1);
             assert.strictEqual(foundry.utils.getProperty(electronicWarfare, 'system.skill.rating'), 1);
             assert.strictEqual(foundry.utils.getProperty(cybercombat, 'system.skill.rating'), 0);
@@ -682,7 +744,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.matrix.attack.base, 7);
             assert.strictEqual(actor.system.initiative.matrix.constant.base, 2);
 
-            const computer = actor.items.find((item: any) => item.name === 'Computer');
+            const computer = actor.items.find(item => item.name === 'Computer') as LegacyItemFixture;
             assert.strictEqual(foundry.utils.getProperty(computer, 'system.skill.rating'), 3);
         });
 
@@ -750,7 +812,7 @@ export const Migrators = (context: QuenchBatchContext) => {
                     },
                 },
                 system: DataDefaults.baseSystemData('weapon'),
-            } as any);
+            });
 
             migrator.migrateActor(actor);
 
@@ -860,6 +922,217 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.lengthOf(effect.system.targets, 1);
             assert.strictEqual(effect.system.targets[0].applyTo, 'actor');
             assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id);
+        });
+    });
+
+    describe('Version0_38_0 item-sheet migration', () => {
+        it('adds missing ids to nested item effects stored in flags', () => {
+            const migrator = new Version0_38_0();
+            const item: any = {
+                flags: {
+                    shadowrun5e: {
+                        embeddedItems: [{
+                            name: 'Nested Mod',
+                            type: 'modification',
+                            effects: [{ name: 'Nested Effect' }],
+                            flags: {
+                                shadowrun5e: {
+                                    embeddedItems: [{
+                                        name: 'Deep Nested Mod',
+                                        type: 'modification',
+                                        effects: [{ name: 'Deep Nested Effect' }],
+                                    }],
+                                },
+                            },
+                        }],
+                    },
+                },
+                system: {},
+            };
+
+            migrator.migrateItem(item);
+
+            const nested = item.flags.shadowrun5e.embeddedItems[0];
+            const deepNested = nested.flags.shadowrun5e.embeddedItems[0];
+            assert.isString(nested._id);
+            assert.isString(nested.effects[0]._id);
+            assert.isString(deepNested._id);
+            assert.isString(deepNested.effects[0]._id);
+        });
+
+        it('migrates technology cost and availability into base/value fields', () => {
+            const migrator = new Version0_38_0();
+            const item: any = {
+                system: {
+                    technology: {
+                        cost: 500,
+                        availability: '6R',
+                        calculated: {
+                            essence: { value: 0, adjusted: false },
+                            cost: { value: 500, adjusted: false },
+                            availability: { value: '6R', adjusted: false },
+                        },
+                    },
+                },
+            };
+
+            assert.isTrue(migrator.handlesItem(item));
+            migrator.migrateItem(item);
+
+            assert.deepEqual(item.system.technology.cost, { base: 500, value: 500, changes: [] });
+            assert.deepEqual(item.system.technology.availability, {
+                base: 6,
+                value: 6,
+                changes: [],
+                restriction: 'restricted',
+                label: '6R',
+            });
+            assert.deepEqual(item.system.technology.essence, { base: 0, value: 0, changes: [] });
+            assert.notProperty(item.system.technology, 'calculated');
+        });
+
+        it('moves ware essence into technology essence base', () => {
+            const migrator = new Version0_38_0();
+            const item: any = {
+                type: 'cyberware',
+                system: {
+                    essence: 0.5,
+                    grade: 'alpha',
+                    technology: {
+                        cost: 500,
+                        availability: '6R',
+                        calculated: {
+                            essence: { value: 0.4, adjusted: false },
+                            cost: { value: 500, adjusted: false },
+                            availability: { value: '6R', adjusted: false },
+                        },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+
+            assert.deepEqual(item.system.technology.essence, { base: 0.5, value: 0.5, changes: [] });
+        });
+
+        it('turns an adjusted cost into a rating multiplier effect and keeps existing effects', () => {
+            const migrator = new Version0_38_0();
+            const existingEffect = { _id: 'existing', name: 'Existing effect' };
+            const item: any = {
+                effects: [existingEffect],
+                system: {
+                    technology: {
+                        rating: 4,
+                        cost: 100,
+                        availability: '3R',
+                        calculated: {
+                            cost: { value: 400, adjusted: true },
+                            availability: { value: '3R', adjusted: false },
+                        },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+
+            assert.deepEqual(item.system.technology.cost, { base: 100, value: 100, changes: [] });
+            assert.strictEqual(item.system.technology.availability.restriction, 'restricted');
+            assert.strictEqual(item.effects.length, 2);
+            assert.strictEqual(item.effects[0], existingEffect);
+            const effect = item.effects[1];
+            assert.isString(effect._id);
+            assert.strictEqual(effect.flags.shadowrun5e.ratingMultiplier, 'cost');
+            assert.strictEqual(effect.system.targets[0].applyTo, 'item');
+            assert.strictEqual(effect.system.changes[0].value, '@system.technology.rating');
+            assert.strictEqual(effect.system.changes[0].priority, 1);
+            assert.isNotTrue(effect.system.onlyForEquipped);
+            assert.isNotTrue(effect.system.onlyForWireless);
+        });
+
+        it('migrates an availability-only rating multiplier', () => {
+            const migrator = new Version0_38_0();
+            const item: any = {
+                system: {
+                    technology: {
+                        rating: 0,
+                        cost: 100,
+                        availability: '3F',
+                        calculated: {
+                            cost: { adjusted: false },
+                            availability: { adjusted: true },
+                        },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+
+            assert.strictEqual(item.system.technology.availability.base, 3);
+            assert.strictEqual(item.system.technology.availability.restriction, 'forbidden');
+            assert.deepEqual(item.system.technology.availability.changes, []);
+            assert.strictEqual(item.effects.length, 1);
+            assert.strictEqual(item.effects[0].flags.shadowrun5e.ratingMultiplier, 'availability');
+            assert.strictEqual(item.effects[0].name, `${game.i18n.localize('SR5.Rating')} ${game.i18n.localize('SR5.Availability')}`);
+            assert.strictEqual(item.effects[0].system.changes[0].priority, ModifiableValue.Priority.RATING);
+        });
+
+        it('skips the availability rating multiplier when the legacy availability could not be parsed', () => {
+            const migrator = new Version0_38_0();
+            const item: any = {
+                system: {
+                    technology: {
+                        rating: 4,
+                        cost: 100,
+                        availability: '(Rating * 3)R',
+                        calculated: {
+                            cost: { adjusted: true },
+                            availability: { adjusted: true },
+                        },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+
+            assert.strictEqual(item.effects.length, 1);
+            assert.strictEqual(item.effects[0].flags.shadowrun5e.ratingMultiplier, 'cost');
+        });
+    });
+
+    describe('Version0_38_0 vehicle availability migration', () => {
+        it('migrates vehicle availability into base/value fields', () => {
+            const migrator = new Version0_38_0();
+            const actor: any = { type: 'vehicle', system: { availability: '12R' } };
+
+            assert.isTrue(migrator.handlesActor(actor));
+            migrator.migrateActor(actor);
+
+            assert.deepEqual(actor.system.availability, {
+                base: 12,
+                value: 12,
+                changes: [],
+                restriction: 'restricted',
+                label: '12R',
+            });
+        });
+
+        it('migrates an empty vehicle availability to zero', () => {
+            const migrator = new Version0_38_0();
+            const actor: any = { type: 'vehicle', system: { availability: '' } };
+
+            migrator.migrateActor(actor);
+
+            assert.strictEqual(actor.system.availability.base, 0);
+            assert.strictEqual(actor.system.availability.restriction, 'none');
+        });
+
+        it('leaves non-vehicle actors untouched', () => {
+            const migrator = new Version0_38_0();
+            const actor: any = { type: 'character', system: { availability: '12R' } };
+
+            migrator.migrateActor(actor);
+
+            assert.strictEqual(actor.system.availability, '12R');
         });
     });
 };

@@ -64,6 +64,33 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     };
 
     describe('SR5ActiveEffect', () => {
+        it('resolves the owning actor for nested item effects', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'weapon',
+                name: 'Parent Weapon',
+                system: { category: 'range' },
+            }]);
+
+            await weapon.createNestedItem({
+                type: 'modification',
+                name: 'Nested Mod',
+                effects: [{
+                    name: 'Nested Effect',
+                    system: {
+                        targets: [{ id: 'item', applyTo: 'item' }],
+                        changes: [
+                            { key: 'system.technology.cost', value: '50', type: 'add', target: 'item' },
+                        ],
+                    },
+                }],
+            } as Item.Source);
+
+            const nestedEffect = weapon.items[0]?.effects.contents[0];
+            assert.exists(nestedEffect);
+            assert.strictEqual(nestedEffect?.actor, actor);
+        });
+
         it('MODIFY mode: apply system custom mode to main and sub value-keys', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
@@ -1239,6 +1266,23 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.equal(actor.system.attributes.body.value, 3);
         });
 
+        it('A equipped or wireless only effect should apply for an item without those states', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const items = await actor.createEmbeddedDocuments('Item', [{ type: 'quality', name: 'Test Quality' }]);
+
+            await items[0].createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: {
+                    onlyForEquipped: true,
+                    onlyForWireless: true,
+                    changes: [{ key: 'system.attributes.body', value: '3', type: 'add' }],
+                }
+            }]);
+
+            assert.lengthOf(actor.system.attributes.body.changes, 1);
+            assert.equal(actor.system.attributes.body.value, 3);
+        });
+
         it('A wireless and equipped only effect should not apply for a wired and unequipped item', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const items = await actor.createEmbeddedDocuments('Item', [
@@ -1503,6 +1547,37 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             ModifiableValue.calcTotal(test.data.damage);
 
             assert.equal(test.data.damage.value, 3);
+        });
+
+        it('TEST modify damage and AP of unarmed MeleeAttackTest only', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const unarmed = await factory.createItem({ type: 'weapon', system: { category: 'melee', action: { skill: 'unarmed_combat' } } });
+            const blade = await factory.createItem({ type: 'weapon', system: { category: 'melee', action: { skill: 'blades' } } });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: {
+                    targets: [{ id: 't', applyTo: 'test_all', conditions: [
+                        { type: 'skills', mode: 'include', values: ['unarmed_combat'] },
+                        { type: 'categories', mode: 'include', values: ['attack_melee'] },
+                    ] }],
+                    changes: [
+                        { key: 'data.damage', value: '1', type: 'add', target: 't' },
+                        { key: 'data.damage.ap', value: '-2', type: 'add', target: 't' },
+                    ],
+                }
+            }]);
+
+            const unarmedTest = (await TestCreator.fromItem(unarmed, actor, { showDialog: false, showMessage: false }))!;
+            await unarmedTest.execute();
+            ModifiableValue.calcTotal(unarmedTest.data.damage);
+            assert.equal(unarmedTest.data.damage.value, 1);
+            assert.equal(unarmedTest.data.damage.ap.value, -2);
+
+            const bladeTest = (await TestCreator.fromItem(blade, actor, { showDialog: false, showMessage: false }))!;
+            await bladeTest.execute();
+            ModifiableValue.calcTotal(bladeTest.data.damage);
+            assert.equal(bladeTest.data.damage.value, 0);
+            assert.equal(bladeTest.data.damage.ap.value, 0);
         });
 
         it('TEST modify attribute and limit on SkillTest', async () => {

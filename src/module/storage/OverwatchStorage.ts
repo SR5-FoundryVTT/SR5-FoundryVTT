@@ -62,14 +62,14 @@ export const OverwatchStorage = {
         const documents = uuids.map(uuid => ({uuid, document: fromUuidSync(uuid)}));
         
         // Remove any deleted actors.
-        const deletedActors = documents.filter(({uuid, document}) => document === null);
+        const deletedActors = documents.filter(({document}) => document === null);
         if (deletedActors.length > 0) {
             deletedActors.forEach(({uuid}) => {
                 const uuidStorage = Helpers.uuidForStorage(uuid);
                 delete ow[uuidStorage];
             });
             // Ignore promise, as this can be handled in background.
-            DataStorage.set(OverwatchStorage.key, ow);
+            void DataStorage.set(OverwatchStorage.key, ow);
         }
 
         return documents.filter(document => document !== null).map(({document}) => document) as SR5Actor[];

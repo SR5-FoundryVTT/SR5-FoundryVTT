@@ -2,9 +2,14 @@ import { Parser, SystemType } from '../Parser';
 import { Accessory } from '../../schema/WeaponsSchema';
 import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
+import { ChummerFormulaParser } from '../../helper/ChummerFormula';
 
 export class WeaponModParser extends Parser<'modification'> {
     protected readonly parseType = 'modification';
+
+    protected override formulaIdentifiers(system: object) {
+        return { ...super.formulaIdentifiers(system), ...ChummerFormulaParser.PARENT_ITEM };
+    }
 
     protected override getSystem(jsonData: Accessory) {
         const system = this.getBaseSystem();

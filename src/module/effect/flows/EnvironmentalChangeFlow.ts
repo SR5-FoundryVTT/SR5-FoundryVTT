@@ -15,7 +15,7 @@ import { EnvironmentalModifier } from "../../rules/modifiers/EnvironmentalModifi
  * Apply Low Light Rules to light modifiers. See SR5#175
  * @param modifier 
  */
-export const lowLightVision = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
+export const lowLightVision = (modifier: EnvironmentalModifier, _test?: SuccessTest) => {
     console.debug('Shadowrun 5e | Applying Low Light Effect', modifier);
 
     if (!modifier.applied.active.light) return;
@@ -28,7 +28,7 @@ export const lowLightVision = (modifier: EnvironmentalModifier, test?: SuccessTe
  * Apply Image Magnification to range modifiers. See SR5#175
  * @param modifier 
  */
-export const imageMagnification = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
+export const imageMagnification = (modifier: EnvironmentalModifier, _test?: SuccessTest) => {
     console.debug('Shadowrun 5e | Applying Image Magnification Effect', modifier);
 
     if (modifier.applied.active.range) modifier.applied.active.range = _shiftUpByOneRow(modifier.applied.active.range);
@@ -40,7 +40,7 @@ export const imageMagnification = (modifier: EnvironmentalModifier, test?: Succe
  * Apply Thermographic Vision to light modifiers. See SR5#175
  * @param modifier 
  */
-export const thermographicVision = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
+export const thermographicVision = (modifier: EnvironmentalModifier, _test?: SuccessTest) => {
     console.debug('Shadowrun 5e | Applying Thermographic Vision Effect', modifier);
 
     if (modifier.applied.active.light) modifier.applied.active.light = _shiftUpByOneRow(modifier.applied.active.light);
@@ -53,7 +53,7 @@ export const thermographicVision = (modifier: EnvironmentalModifier, test?: Succ
  * Apply Tracer Rounds to wind and range modifiers. See SR5#175
  * @param modifier 
  */
-export const tracerRounds = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
+export const tracerRounds = (modifier: EnvironmentalModifier, _test?: SuccessTest) => {
     console.debug('Shadowrun 5e | Applying Tracer Rounds Effect', modifier);
 
     if (modifier.applied.active.wind && modifier.applied.active.wind < SR.combat.environmental.levels.light) {
@@ -71,7 +71,7 @@ export const tracerRounds = (modifier: EnvironmentalModifier, test?: SuccessTest
  * Apply Smartlink to wind modifiers. See SR5#175
  * @param modifier 
  */
-export const smartlink = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
+export const smartlink = (modifier: EnvironmentalModifier, _test?: SuccessTest) => {
     console.debug('Shadowrun 5e | Applying Smartlink Effect', modifier);
 
     if (modifier.applied.active.wind) modifier.applied.active.wind = _shiftUpByOneRow(modifier.applied.active.wind);
@@ -82,7 +82,7 @@ export const smartlink = (modifier: EnvironmentalModifier, test?: SuccessTest) =
  * Apply Sunglasses to light modifiers. See SR5#175
  * @param modifier 
  */
-export const sunglasses = (modifier: EnvironmentalModifier, test?: SuccessTest) => {
+export const sunglasses = (modifier: EnvironmentalModifier, _test?: SuccessTest) => {
     console.error('Shadowrun 5e | Sunglasses not implemented yet', modifier);
     // NOTE: I refuse to implement sunglasses, due to them differentiating between light and glare...
 }

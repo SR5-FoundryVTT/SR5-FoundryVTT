@@ -29,7 +29,7 @@ export class GearsParser {
                 sins.push(g);
             else if (g.isammo === "True")
                 ammos.push(g);
-            else if (programCategories.includes(g.category_english as any))
+            else if (programCategories.includes(g.category_english as (typeof programCategories)[number]))
                 programs.push(g);
             else
                 gears.push(g);

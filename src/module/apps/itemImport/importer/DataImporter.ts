@@ -44,7 +44,7 @@ export abstract class DataImporter {
             explicitCharkey: true,  // Always use the charKey key for text nodes
         });
 
-        return parser.parseStringPromise(xmlString);
+        return parser.parseStringPromise(xmlString) as Promise<Schemas>;
     }
 
     /**

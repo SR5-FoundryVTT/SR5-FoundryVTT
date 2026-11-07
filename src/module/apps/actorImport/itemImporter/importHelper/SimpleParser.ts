@@ -8,7 +8,7 @@ export class SimpleParser<Type extends ItemSystems> extends Parser<Type> {
     }
 
     protected parseItem(
-        item: BlankItem<'echo' | 'metamagic' | "equipment">,
-        itemData: ExtractItemType<'metamagics', 'metamagic'> | ExtractItemType<'gears', 'gear'>
+        _item: BlankItem<'echo' | 'metamagic' | "equipment">,
+        _itemData: ExtractItemType<'metamagics', 'metamagic'> | ExtractItemType<'gears', 'gear'>
     ) { }
 }

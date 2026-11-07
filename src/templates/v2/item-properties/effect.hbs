@@ -1,10 +1,10 @@
 {{#if item.system.appliedByTest}}
     <label>{{localize "SR5.ActiveEffect.FIELDS.appliedByTest.label"}}</label>
 {{/if}}
-{{#if item.system.onlyForEquipped}}
+{{#if item.restrictsToEquipped}}
     <label>{{localize "SR5.ActiveEffect.FIELDS.onlyForEquipped.label"}}</label>
 {{/if}}
-{{#if item.system.onlyForWireless}}
+{{#if item.restrictsToWireless}}
     <label>{{localize "SR5.ActiveEffect.FIELDS.onlyForWireless.label"}}</label>
 {{/if}}
 {{#each item.system.targets as |target ti|}}

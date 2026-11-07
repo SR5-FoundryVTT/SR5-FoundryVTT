@@ -3,7 +3,6 @@ import { AttributesPrep } from "./AttributesPrep";
 import { SR5Item } from 'src/module/item/SR5Item';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { DataDefaults } from '@/module/data/DataDefaults';
-import { MatrixAttributeFieldType } from '@/module/types/template/Matrix';
 
 export class MatrixPrep {
     /**

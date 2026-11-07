@@ -33,22 +33,22 @@ async function runWithPatches(
 ): Promise<{ capturedDocument: any; executeCount: number; getOpposedCount: number }> {
     const clsAny = cls as any;
     const originalGetOpposed = clsAny._getOpposedActionTestData;
-    const originalExecute = cls.prototype.execute;
-    const originalSelectedActors = Helpers.getSelectedActorsOrCharacter;
+    const originalExecute = Reflect.get(cls.prototype, 'execute');
+    const originalSelectedActors = Helpers.getSelectedActorsOrCharacter.bind(Helpers);
 
     let capturedDocument: any = null;
     let executeCount = 0;
     let getOpposedCount = 0;
 
-    clsAny._getOpposedActionTestData = async (_againstData, document) => {
+    clsAny._getOpposedActionTestData = (_againstData, document) => {
         capturedDocument = document;
         getOpposedCount += 1;
-        return createOpposedTestData(cls.name, againstType);
+        return Promise.resolve(createOpposedTestData(cls.name, againstType));
     };
 
-    cls.prototype.execute = async function () {
+    cls.prototype.execute = function () {
         executeCount += 1;
-        return this as any;
+        return Promise.resolve(this as never);
     };
 
     Helpers.getSelectedActorsOrCharacter = () => selectedActors;
@@ -93,7 +93,7 @@ export const shadowrunOpposedCallInMessageActionTesting = (context: QuenchBatchC
 
             it('shows error and does not execute when all resolution paths are empty', async () => {
                 const originalCharacterId = game.user?.character?.id ?? null;
-                await game.user?.update({ character: null } as any);
+                await game.user?.update({ character: null });
 
                 const notifications = ui.notifications as any;
                 const originalError = notifications?.error;
@@ -111,7 +111,7 @@ export const shadowrunOpposedCallInMessageActionTesting = (context: QuenchBatchC
                     assert.strictEqual(errors, 1);
                 } finally {
                     notifications.error = originalError;
-                    await game.user?.update({ character: originalCharacterId } as any);
+                    await game.user?.update({ character: originalCharacterId });
                 }
             });
         });

@@ -1,4 +1,5 @@
 import { Parser } from '../Parser';
+import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
 import { Vehicle } from '../../schema/VehiclesSchema';
 import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH, NotEmpty, RetrievedItem } from '../../helper/ImportHelper';
@@ -10,13 +11,15 @@ export class VehicleParser extends Parser<'vehicle'> {
         vehicleName: string,
         items: RetrievedItem[],
         itemsData: NotEmpty<Vehicle['mods']>['mod' | 'name'] | NotEmpty<Vehicle['gears']>['gear'] | NotEmpty<Vehicle['weapons']>['weapon'],
+        included = false,
     ): Item.Source[] {
         const itemMap = new Map(items.map(({name_english, ...i}) => [name_english, i]));
 
         const result: Item.Source[] = [];
         for (const itemData of IH.getArray(itemsData)) {
             const name = ('name' in itemData ? itemData.name?._TEXT : itemData._TEXT) || '';
-            const item = itemMap.get(name);
+            // A vehicle can list the same item twice, which must become separate items.
+            const item = foundry.utils.deepClone(itemMap.get(name));
 
             if (!item) {
                 console.warn(`[Vehicle Mod Missing]\nVehicle: ${vehicleName}\nMod: ${name}`);
@@ -41,6 +44,8 @@ export class VehicleParser extends Parser<'vehicle'> {
                     system.technology.rating = rating;
             }
 
+            // The vehicle's own stats, cost and availability already include its mods.
+            if (included) Parser.includeInParent(item, { parentStats: true });
             result.push(item);
         }
 
@@ -70,7 +75,7 @@ export class VehicleParser extends Parser<'vehicle'> {
         system.vehicle_stats.seats.base = Number(jsonData.seats?._TEXT) || 0;
         system.attributes.body.base = Number(jsonData.body._TEXT) || 0;
         system.armor.rating.base = Number(jsonData.armor._TEXT) || 0;
-        system.availability = jsonData.avail?._TEXT || '';
+        Object.assign(system.availability, ItemAvailabilityFlow.parseAvailabilityString(jsonData.avail?._TEXT || ''));
         system.cost = Number(jsonData.cost?._TEXT) || 0;
         system.isDrone = jsonData.category._TEXT.includes("Drone") || false;
 
@@ -101,8 +106,8 @@ export class VehicleParser extends Parser<'vehicle'> {
 
         const name = jsonData.name._TEXT;
         return [
-            ...this.getVehicleItems(name, modItem, jsonData.mods?.mod),
-            ...this.getVehicleItems(name, modItem, jsonData.mods?.name),
+            ...this.getVehicleItems(name, modItem, jsonData.mods?.mod, true),
+            ...this.getVehicleItems(name, modItem, jsonData.mods?.name, true),
             ...this.getVehicleItems(name, gearItem, jsonData.gears?.gear),
             ...this.getVehicleItems(name, weaponItem, jsonData.weapons?.weapon),
         ];

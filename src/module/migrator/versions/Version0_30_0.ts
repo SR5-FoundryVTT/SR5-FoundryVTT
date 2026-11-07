@@ -32,7 +32,7 @@ export class Version0_30_0 extends VersionMigration {
             _item.system.licenses = Object.values(_item.system.licenses);
 
         if (_item.type === 'modification' && typeof _item.system?.mount_point === 'string') {
-            _item.system.mount_point = _item.system.mount_point.toLowerCase();
+            _item.system.mount_point = (_item.system.mount_point as string).toLowerCase();
 
             if (_item.system?.mount_point === 'under_barrel')
                 _item.system.mount_point = 'under';

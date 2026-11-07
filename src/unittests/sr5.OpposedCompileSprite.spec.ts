@@ -5,10 +5,10 @@ import { OpposedCompileSpriteTest } from '@/module/tests/OpposedCompileSpriteTes
 import { SR5TestFactory } from './utils';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 
-async function createOpposedCompileSpriteTest(
+function createOpposedCompileSpriteTest(
     technomancer: SR5Actor<'character'>,
     preparedSpriteUuid: string,
-): Promise<OpposedCompileSpriteTest> {
+): OpposedCompileSpriteTest {
     const againstData: any = TestCreator._minimalTestData();
     againstData.type = 'CompileSpriteTest';
     againstData.level = 4;
@@ -45,7 +45,7 @@ export const shadowrunOpposedCompileSpriteTesting = (context: QuenchBatchContext
     describe('OpposedCompileSprite Flow', () => {
         it('populateDocuments does not create a sprite actor', async () => {
             const technomancer = await factory.createActor({ type: 'character' });
-            const opposed = await createOpposedCompileSpriteTest(technomancer, '');
+            const opposed = createOpposedCompileSpriteTest(technomancer, '');
 
             const actorCountBefore = game.actors?.size ?? 0;
             await opposed.populateDocuments();
@@ -59,8 +59,8 @@ export const shadowrunOpposedCompileSpriteTesting = (context: QuenchBatchContext
             const technomancer = await factory.createActor({ type: 'character' });
             const preparedSprite = await factory.createActor({ type: 'sprite', name: 'Template Sprite' });
 
-            const opposed = await createOpposedCompileSpriteTest(technomancer, 'Compendium.world.sr5e-sprites.fake');
-            opposed.getPreparedSpriteActor = async () => preparedSprite as SR5Actor;
+            const opposed = createOpposedCompileSpriteTest(technomancer, 'Compendium.world.sr5e-sprites.fake');
+            opposed.getPreparedSpriteActor = () => Promise.resolve(preparedSprite as SR5Actor);
 
             const actorCountBefore = game.actors?.size ?? 0;
 
@@ -89,7 +89,7 @@ export const shadowrunOpposedCompileSpriteTesting = (context: QuenchBatchContext
                 system: { technomancerUuid: '' },
             });
 
-            const opposed = await createOpposedCompileSpriteTest(technomancer, preparedSprite.uuid);
+            const opposed = createOpposedCompileSpriteTest(technomancer, preparedSprite.uuid);
             const actorCountBefore = game.actors?.size ?? 0;
 
             await opposed.processFailure();
@@ -109,7 +109,7 @@ export const shadowrunOpposedCompileSpriteTesting = (context: QuenchBatchContext
                 system: { technomancerUuid: '' },
             });
 
-            const opposed = await createOpposedCompileSpriteTest(technomancer, preparedSprite.uuid);
+            const opposed = createOpposedCompileSpriteTest(technomancer, preparedSprite.uuid);
             Object.defineProperty(opposed.against, 'preparedSpriteIsEditable', {
                 get: () => false,
                 configurable: true,
@@ -128,7 +128,7 @@ export const shadowrunOpposedCompileSpriteTesting = (context: QuenchBatchContext
 
         it('does not create sprite when no prepared sprite is configured', async () => {
             const technomancer = await factory.createActor({ type: 'character' });
-            const opposed = await createOpposedCompileSpriteTest(technomancer, '');
+            const opposed = createOpposedCompileSpriteTest(technomancer, '');
 
             const actorCountBefore = game.actors?.size ?? 0;
             await opposed.processFailure();
@@ -142,8 +142,8 @@ export const shadowrunOpposedCompileSpriteTesting = (context: QuenchBatchContext
             const technomancer = await factory.createActor({ type: 'character' });
             const preparedSprite = await factory.createActor({ type: 'sprite' });
 
-            const opposed = await createOpposedCompileSpriteTest(technomancer, 'Compendium.world.sr5e-sprites.fake');
-            opposed.getPreparedSpriteActor = async () => preparedSprite as SR5Actor;
+            const opposed = createOpposedCompileSpriteTest(technomancer, 'Compendium.world.sr5e-sprites.fake');
+            opposed.getPreparedSpriteActor = () => Promise.resolve(preparedSprite as SR5Actor);
 
             const actorCountBefore = game.actors?.size ?? 0;
             await opposed.processSuccess();
@@ -155,7 +155,7 @@ export const shadowrunOpposedCompileSpriteTesting = (context: QuenchBatchContext
 
         it('propagates ownership to non-GM users linked to the technomancer', async () => {
             const technomancer = await factory.createActor({ type: 'character' });
-            const opposed = await createOpposedCompileSpriteTest(technomancer, '');
+            const opposed = createOpposedCompileSpriteTest(technomancer, '');
             const updateData: any = { system: {} };
 
             const users = game.users as any;

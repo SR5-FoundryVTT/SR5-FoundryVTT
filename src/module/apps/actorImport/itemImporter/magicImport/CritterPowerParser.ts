@@ -16,7 +16,7 @@ export class CritterPowerParser extends Parser<'critter_power'> {
             ? 'touch'
             : range.toLowerCase()
                 .replace(/\s+/g, '_')
-                .replace(/[()]/g, '') as any;
+                .replace(/[()]/g, '') as typeof system.range;
 
         const duration = (itemData.duration_english ?? itemData.duration ?? '').toLowerCase();
         if (duration === 's')

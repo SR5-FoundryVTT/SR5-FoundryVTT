@@ -76,7 +76,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
 
         prepared.compiledSpriteUuid ||= '';
 
-        return prepared as OpposedCompileSpriteTestData;
+        return prepared;
     }
 
     override get _chatMessageTemplate(): string {
@@ -145,6 +145,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
         const actor = await fromUuid(this.data.compiledSpriteUuid) as SR5Actor;
         await actor?.delete();
         delete this.actor;
+        await super._cleanUpAfterDialogCancel();
     }
 
 

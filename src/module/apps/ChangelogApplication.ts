@@ -21,7 +21,7 @@ export class ChangelogApplication extends Application {
 
     // Let the async operation happen in background.
     private static setRenderForCurrentVersion() {
-        game.user?.setFlag(SYSTEM_NAME, FLAGS.ChangelogShownForVersion, game.system.version);
+        void game.user?.setFlag(SYSTEM_NAME, FLAGS.ChangelogShownForVersion, game.system.version);
     }
 
     static get showApplication(): boolean {

@@ -1,6 +1,6 @@
 <div class="list-item-container {{cssClass}} {{#if (hasKey @root.expandedSkills id)}} expanded {{/if}}">
     <div class="list-item draggable"
-         data-source="{{skill.system.description.source}}"
+         data-source="{{skill.link}}"
          data-item-id="{{skill.id}}"
          data-skill-id="{{skill.id}}"
          data-skill-name="{{skill.name}}"
@@ -42,7 +42,7 @@
                 {{/if}}
             {{else}}
                 <span data-skill-modifier-tooltip="{{skill.id}}">
-                    {{#if skill.system.skill.language.isNative}}
+                    {{#if skill.isNative}}
                         {{localize "SR5.Skill.abbr.Native"}}
                     {{else}}
                         {{skill.value}}

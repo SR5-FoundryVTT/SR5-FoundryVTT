@@ -16,7 +16,8 @@ export class ArmorParser extends Parser<'armor'> {
 
         const result: Item.Source[] = [];
         for (const modRef of mods) {
-            const item = itemMap.get(modRef._TEXT);
+            // An armor can list the same mod twice, which must become separate items.
+            const item = foundry.utils.deepClone(itemMap.get(modRef._TEXT));
             if (!item) {
                 console.warn(`[Armor Mod Missing]\nArmor: ${jsonData.name._TEXT}\nMod: ${modRef._TEXT}`);
                 continue;
@@ -31,6 +32,7 @@ export class ArmorParser extends Parser<'armor'> {
                 system.technology.rating = rating;
             }
 
+            Parser.includeInParent(item);
             result.push(item);
         }
 

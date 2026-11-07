@@ -6,7 +6,8 @@ import LowLightVisionFilter from "./lowlightFilter";
 export default class LowlightVisionDetectionMode extends foundry.canvas.perception.DetectionMode {
 
     static override getDetectionFilter() {
-        return this._detectionFilter ??= LowLightVisionFilter.create();
+        this._detectionFilter ??= LowLightVisionFilter.create();
+        return this._detectionFilter;
     }
 
     override _canDetect(

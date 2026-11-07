@@ -110,7 +110,7 @@ export class TimeControlApplication extends HandlebarsApplicationMixin(Applicati
         return super._onFirstRender(context, options);
     }
 
-    protected override _onClose(options: DeepPartial<ApplicationV2.RenderOptions>) {
+    protected override async _onClose(options: DeepPartial<ApplicationV2.RenderOptions>) {
         Hooks.off('updateWorldTime', this.#onUpdateWorldTime);
         return super._onClose(options);
     }

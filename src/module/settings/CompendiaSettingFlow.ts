@@ -34,7 +34,7 @@ export const CompendiaSettingFlow = {
     getPackSettingConfiguration(id: PackType): PackSelectionConfig {
         // get the active pack name
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const packName = (game.settings.get(SYSTEM_NAME, id) as string) || SR5.packNames[id];
+        const packName = game.settings.get(SYSTEM_NAME, id) || SR5.packNames[id];
 
         // Find all other compatible item packs
         const itemPacks = game.packs.filter(p => p.metadata.type === 'Item' && p.metadata.packageType !== 'system' && p.metadata.system === SYSTEM_NAME);
@@ -66,8 +66,8 @@ export const CompendiaSettingFlow = {
         return {
             id,
             field: {
-                label: `SR5.CompendiaSettings.${id}.label` as Translation,
-                hint: `SR5.CompendiaSettings.${id}.hint` as Translation,
+                label: `SR5.CompendiaSettings.${id}.label`,
+                hint: `SR5.CompendiaSettings.${id}.hint`,
             },
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             value: packName,

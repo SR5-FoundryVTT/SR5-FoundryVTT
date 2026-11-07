@@ -1,0 +1,80 @@
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{localize (objValue @root.config.itemTypes item.type)}}</label>
+    </div>
+</div>
+
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.created.fields.worldTime.hint}}">
+            {{systemFields.created.fields.worldTime.label}}
+        </label>
+    </div>
+    <div class="list-item-col preparation-created-time">
+        <span>{{preparationCreationTime}}</span>
+        {{#if @root.isEditMode}}
+            <button type="button" data-action="editPreparationCreationTime"
+                    data-tooltip="SR5.Preparation.CreationTimeDialog.Edit">
+                <i class="fas fa-calendar" aria-hidden="true"></i>
+            </button>
+        {{/if}}
+    </div>
+</div>
+
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="SR5.Tooltips.Preparation.Force">{{systemFields.force.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.force value=source.system.force
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="SR5.Tooltips.Preparation.Trigger">{{systemFields.trigger.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.trigger value=source.system.trigger localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+
+{{#if (eq system.trigger 'time')}}
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label data-tooltip="SR5.Tooltips.Preparation.TriggerTime">{{systemFields.triggerTime.label}}</label>
+        </div>
+        <div class="list-item-col preparation-trigger-time-fields">
+            {{formInput systemFields.triggerTime.fields.value value=source.system.triggerTime.value
+                        classes="short" step="any" rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formInput systemFields.triggerTime.fields.unit value=source.system.triggerTime.unit localize=true
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        </div>
+    </div>
+{{/if}}
+
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="SR5.Tooltips.Preparation.Potency">{{systemFields.potency.label}}</label>
+    </div>
+    <div class="list-item-col paired-fields">
+        <input type="number" class="short paired-field" value="{{system.potency.value}}" disabled>
+        <label class="paired-separator">/</label>
+        {{formInput systemFields.potency.fields.base value=source.system.potency.base
+                    classes="short paired-field" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+
+<div class="list-item preparation-potency-timeline-row">
+    {{> "systems/shadowrun5e/dist/templates/v2/common/preparation-potency-meter.hbs" item=item }}
+</div>
+
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{localize "SR5.ItemTypes.Spell"}}</label>
+    </div>
+</div>
+
+{{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/spell-fields.hbs"}}

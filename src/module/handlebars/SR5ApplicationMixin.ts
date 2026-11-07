@@ -10,6 +10,7 @@ import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 import { isElementInstance } from '@/module/utils/dom';
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
+import HTMLProseMirrorElement = foundry.applications.elements.HTMLProseMirrorElement;
 
 const { TextEditor, SearchFilter } = foundry.applications.ux;
 const { fromUuid } = foundry.utils;
@@ -35,8 +36,8 @@ export namespace SR5ApplicationMixinTypes {
     };
 
     export interface Configuration extends ApplicationV2.Configuration, HandlebarsApplicationMixin.Configuration {
-        filters?: SearchFilter.Configuration[];
-        dragDrop?: DragDrop.Configuration[];
+        filters?: foundry.applications.ux.SearchFilter.Configuration[];
+        dragDrop?: foundry.applications.ux.DragDrop.Configuration[];
     };
 
     export interface RenderOptions extends ApplicationV2.RenderOptions, HandlebarsApplicationMixin.RenderOptions {
@@ -70,7 +71,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         declare isEditable?: boolean;
         declare document?: SR5Item | SR5Actor;
 
-        readonly #filters: SearchFilter[];
+        readonly #filters: foundry.applications.ux.SearchFilter[];
         readonly #dragDrop: SR5DragDropHandler[];
         private readonly expandedUuids = new Set<string>();
         private editIcon?: HTMLElement;
@@ -109,6 +110,31 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
             super(...args);
             this.#filters = this.#createFilters();
             this.#dragDrop = this.#createDragDropHandlers();
+        }
+
+        /**
+         * Save rich text editors holding unsaved content, which a rerender or close would discard.
+         * Only the editor fields are updated, so changes made by whatever triggered the rerender are kept.
+         * A failed update is reported and doesn't stop the rerender or close.
+         */
+        async #savePendingEditors() {
+            if (!this.document || !this.isEditable) return;
+            const editors = Array.from(this.form?.querySelectorAll<HTMLProseMirrorElement>('prose-mirror') ?? []);
+            const changes = Object.fromEntries(editors
+                .filter(editor => editor.name && editor.isDirty())
+                .map(editor => [editor.name, editor.value]));
+            if (foundry.utils.isEmpty(changes)) return;
+
+            try {
+                await this.document.update(changes);
+            } catch (error) {
+                ui.notifications?.error(error as Error, { console: true });
+            }
+        }
+
+        protected override async _preClose(options: Parameters<BaseType['_preClose']>[0]) {
+            await this.#savePendingEditors();
+            await super._preClose(options);
         }
 
         #isTrackableFormField(t: EventTarget | null): t is TrackableField {
@@ -250,23 +276,25 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
             return this._mode === 'play';
         }
 
-        protected _canDragStart(selector?: string | null): boolean {
+        protected _canDragStart(_selector?: string | null): boolean {
             return !!this.isEditable;
         }
 
-        protected _canDragDrop(selector?: string | null): boolean {
+        protected _canDragDrop(_selector?: string | null): boolean {
             return !!this.isEditable;
         }
 
-        protected _onDragStart(event: DragEvent) { }
+        protected _onDragStart(_event: DragEvent) { }
 
-        protected _onDragOver(event: DragEvent) { }
+        protected _onDragOver(_event: DragEvent) { }
 
-        protected async _onDrop(event: DragEvent) { }
+        protected async _onDrop(_event: DragEvent) { }
 
         protected override async _prepareContext(
             options: Parameters<BaseType["_prepareContext"]>[0]
         ): Promise<SR5ApplicationMixinTypes.RenderContext> {
+            // Runs first on every render, before the context reads the document.
+            await this.#savePendingEditors();
             const context = await super._prepareContext(options) as SR5ApplicationMixinTypes.RenderContext;
             context.isEditMode = this.isEditMode;
             context.isPlayMode = this.isPlayMode;
@@ -354,7 +382,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
          * @param options TextEditor, enrichHTML.options passed through
          * @returns Enriched HTML result
          */
-        async enrichEditorFieldToHTML(editorValue: string, options?: TextEditor.EnrichmentOptions): Promise<string> {
+        async enrichEditorFieldToHTML(editorValue: string, options?: foundry.applications.ux.TextEditor.EnrichmentOptions): Promise<string> {
             return foundry.applications.ux.TextEditor.implementation.enrichHTML(editorValue, options);
         }
 

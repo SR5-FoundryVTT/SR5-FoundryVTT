@@ -6,6 +6,7 @@ import VehicleModsParser from "./VehicleModsParser";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { ExtractItemType } from "../Parser";
 import { DataDefaults } from "@/module/data/DataDefaults";
+import { ItemAvailabilityFlow } from "@/module/item/flows/ItemAvailabilityFlow";
 
 export interface BlankVehicle extends Actor.CreateData {
     type: 'vehicle',
@@ -70,7 +71,7 @@ export class VehicleParser {
             system.cost = Number(vehicle.owncost?.replace(/[^\d.-]/g, "")) || 0;
             system.attributes.body.base = Number(vehicle.body) || 0;
             system.armor.rating.base = Number(vehicle.armor) || 0;
-            system.availability = vehicle.avail || '';
+            Object.assign(system.availability, ItemAvailabilityFlow.parseAvailabilityString(vehicle.avail || ''));
 
             system.importFlags = {
                 isFreshImport: true,

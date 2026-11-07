@@ -217,7 +217,7 @@ export class MetatypeItemParser extends Parser<'metatype'> {
                     const existingTargetId = IH.nameToId['Weapon']?.[w.name];
                     if (existingTargetId) {
                         weaponUuid = `Compendium.world.${Constants.MAP_COMPENDIUM_CONFIG.Weapon.pack}.Item.${existingTargetId}`;
-                    } else if (typeof game !== 'undefined' && game.packs) {
+                    } else if (typeof game !== 'undefined') {
                         try {
                             const ensuredUuid = await NaturalWeaponHelper.ensureNaturalWeaponInCompendium(w);
                             if (ensuredUuid) weaponUuid = ensuredUuid;

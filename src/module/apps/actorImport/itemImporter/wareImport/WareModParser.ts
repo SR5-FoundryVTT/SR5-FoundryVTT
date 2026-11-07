@@ -1,4 +1,5 @@
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
+import { Parser as ItemParser } from "@/module/apps/itemImport/parser/Parser";
 
 type WareType = 'bioware' | 'cyberware';
 
@@ -22,5 +23,8 @@ export class WareModParser extends Parser<'modification'> {
         if (this.wareType === 'bioware') {
             system.technology.wireless = 'none';
         }
+
+        // The ware's exported availability already includes its mods.
+        ItemParser.dropChanges(item as unknown as Item.Source, ['parent_item']);
     }
 }

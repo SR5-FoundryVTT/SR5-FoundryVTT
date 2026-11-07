@@ -15,12 +15,12 @@ export interface Gear {
     armorcapacity?: { _TEXT: IntegerString | "Rating/[1]" | "[0]" | "[1]" | "[2]" | "[3]" | "[4]" | "[5]" | "[6]" | "[Rating]"; };
     attack?: { _TEXT: IntegerString | "{CHA}"; };
     attributearray?: { _TEXT: string; };
-    avail: { _TEXT: IntegerString | string; };
+    avail: { _TEXT: string; };
     bonus?: BonusSchema;
     canformpersona?: { _TEXT: "Parent" | "Self"; };
-    capacity?: { _TEXT: IntegerString | string; };
+    capacity?: { _TEXT: string; };
     category: { _TEXT: string; };
-    cost: { _TEXT: IntegerString | string; };
+    cost: { _TEXT: string; };
     costfor?: { _TEXT: IntegerString; };
     dataprocessing?: { _TEXT: IntegerString | "Rating" | "{LOG}"; };
     devicerating?: { _TEXT: IntegerString | "Rating" | "{RES}" | "{Rating}"; };
@@ -58,6 +58,7 @@ export interface Gear {
     modfirewall?: { _TEXT: IntegerString | "{Rating}"; };
     modsleaze?: { _TEXT: IntegerString | "{Rating}"; };
     name: { _TEXT: string; };
+    notes?: { _TEXT: "Holds a separately purchased medkit up to Rating 4."; };
     page?: { _TEXT: IntegerString; };
     programs?: { _TEXT: IntegerString | "Rating" | "{Rating}+2"; };
     rating: { _TEXT: IntegerString | "{Parent Rating}"; };
@@ -65,7 +66,7 @@ export interface Gear {
     required?: ConditionsSchema;
     requireparent?: Empty;
     sleaze?: { _TEXT: IntegerString | "{INT}"; };
-    source?: { _TEXT: IntegerString | string; };
+    source?: { _TEXT: string; };
     weaponbonus?: {
         accuracy?: { _TEXT: IntegerString; };
         accuracyreplace?: { _TEXT: IntegerString; };
@@ -79,6 +80,13 @@ export interface Gear {
         userange?: { _TEXT: "Holdouts" | "Light Pistols"; };
     };
     weight?: { _TEXT: IntegerString | "Rating"; };
+    wirelessbonus?: {
+        specificskill: OneOrMany<{
+            bonus: { _TEXT: IntegerString | "Rating"; };
+            condition?: { _TEXT: string; };
+            name: { _TEXT: "First Aid" | "Locksmith" | "Medicine" | "Perception"; };
+        }>;
+    };
     translate?: OneOrMany<{ _TEXT: string; }>;
     altpage?: OneOrMany<{ _TEXT: string; }>;
     altnameonpage?: OneOrMany<Empty>;

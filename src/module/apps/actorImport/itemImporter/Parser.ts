@@ -3,6 +3,7 @@ import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { IconAssign } from "../../iconAssigner/IconAssign";
 import { DataDefaults, SystemEntityType } from "src/module/data/DataDefaults";
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
+import { ItemAvailabilityFlow } from "@/module/item/flows/ItemAvailabilityFlow";
 
 export type ItemSystems = SystemEntityType & Item.ConfiguredSubType;
 
@@ -18,6 +19,7 @@ export type BaseType = {
     description?: string | null;
     notes?: string | null;
     rating?: string | null;
+    maxrating?: string | null;
     avail?: string | null;
     qty?: string | null;
     owncost?: string | null;
@@ -35,7 +37,7 @@ export type ExtractItemType<
 > = Unwrap<NonNullable<ActorSchema[FieldKey]>[InnerKey]>;
 
 export type BlankItem<T extends ItemSystems> = ReturnType<Parser<T>["createItem"]>;
-type CacheType = Awaited<ReturnType<CompendiumCollection<'Item'>['getIndex']>>;
+type CacheType = Awaited<ReturnType<foundry.documents.collections.CompendiumCollection<'Item'>['getIndex']>>;
 
 export abstract class Parser<T extends ItemSystems> {
     protected abstract readonly parseType: T;
@@ -69,7 +71,7 @@ export abstract class Parser<T extends ItemSystems> {
                             ?? indexes.find(e => e.name === itemData.name_english && e.type === this.parseType);
 
             if (itemIndex) {
-                const pack = game.packs.get(packId) as CompendiumCollection<"Item"> | undefined;
+                const pack = game.packs.get(packId) as foundry.documents.collections.CompendiumCollection<"Item"> | undefined;
                 const item = await pack?.getDocument(itemIndex._id);
                 if (item)
                     return game.items.fromCompendium(item) as Item.CreateData as BlankItem<T>;
@@ -94,14 +96,17 @@ export abstract class Parser<T extends ItemSystems> {
         if (itemData.rating != null)
             technology.rating = Number(itemData.rating) || 0;
 
+        if (itemData.maxrating != null)
+            technology.max_rating = Number(itemData.maxrating) || 0;
+
         if (itemData.avail != null)
-            technology.availability = itemData.avail;
+            Object.assign(technology.availability, ItemAvailabilityFlow.parseAvailabilityString(itemData.avail));
 
         if (itemData.qty != null)
             technology.quantity = Number(itemData.qty) || 0;
 
         if (itemData.owncost != null)
-            technology.cost = Number(itemData.owncost.replace(/[^\d.-]/g, "")) || 0;
+            technology.cost.base = Number(itemData.owncost.replace(/[^\d.-]/g, "")) || 0;
 
         if (itemData.equipped != null)
             technology.equipped = itemData.equipped === "True";
@@ -169,7 +174,8 @@ export abstract class Parser<T extends ItemSystems> {
     }
 
     protected abstract parseItem(item: BlankItem<T>, itemData: BaseType): void;
-    protected async getEmbeddedItems(itemData: BaseType): Promise<Item.Source[]> {
+    // oxlint-disable-next-line typescript/require-await -- Default for an async hook that subclasses override with awaiting implementations.
+    protected async getEmbeddedItems(_itemData: BaseType): Promise<Item.Source[]> {
         return [] as Item.Source[];
     }
 }

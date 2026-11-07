@@ -1,6 +1,12 @@
-<label>{{localizeOb item.system.powerTypes @root.config.critterPower.types}}</label>
-<label>{{localizeOb item.system.duration @root.config.critterPower.durations}}</label>
-<label>{{localizeOb item.system.range @root.config.critterPower.ranges}}</label>
+{{#unless (empty item.system.powerType)}}
+    <label>{{localizeOb item.system.powerType @root.config.critterPower.types}}</label>
+{{/unless}}
+{{#unless (empty item.system.duration)}}
+    <label>{{localizeOb item.system.duration @root.config.critterPower.durations}}</label>
+{{/unless}}
+{{#unless (empty item.system.range)}}
+    <label>{{localizeOb item.system.range @root.config.critterPower.ranges}}</label>
+{{/unless}}
 {{#if item.system.rating}}
-    <label>{{localize "SR5.Rtg"}}&nbsp;{{item.system.rating}}</label>
+    <label>{{localize "SR5.Rating"}}&nbsp;{{item.system.rating}}</label>
 {{/if}}

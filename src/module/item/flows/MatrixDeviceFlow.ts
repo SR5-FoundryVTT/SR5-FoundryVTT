@@ -16,7 +16,7 @@ export const MatrixDeviceFlow = {
         matrixAttributes: MatrixAttributesType,
         changedSlot: string,
         attribute: Shadowrun.MatrixAttribute,
-    ): Record<string, any> {
+    ): Record<string, unknown> {
         // The attribute that used to be in the slot that's changing.
         const previousAttribute = matrixAttributes[changedSlot].att;
         // The slot of the selected attribute that will get the previous attribute.

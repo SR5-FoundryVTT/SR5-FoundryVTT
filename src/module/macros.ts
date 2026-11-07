@@ -26,7 +26,7 @@ export async function createItemMacro(dropData, slot) {
     if (item.isType('skill')) return createSkillMacro({ skillId: item.id!, skill: SkillFieldPrep.createSkillField(item).skillField }, slot);
 
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
-    let macro = game.macros.contents.find((m: Macro.Stored<"script" | "chat">) => m.name === item.name) as Macro.Stored | undefined;
+    let macro = game.macros.contents.find((m: Macro.Stored<"script" | "chat">) => m.name === item.name);
     if (!macro) {
         macro = await Macro.create(
             {
@@ -40,7 +40,7 @@ export async function createItemMacro(dropData, slot) {
         );
     }
 
-    if (macro) game.user?.assignHotbarMacro(macro, slot);
+    if (macro) void game.user?.assignHotbarMacro(macro, slot);
 }
 
 /**
@@ -49,11 +49,11 @@ export async function createItemMacro(dropData, slot) {
  * @param {string} itemName
  * @return {Promise}
  */
-export function rollItemMacro(itemName) {
+export async function rollItemMacro(itemName) {
     if (!game?.actors) return;
 
     const speaker = ChatMessage.getSpeaker();
-    let actor;
+    let actor: SR5Actor | undefined;
     if (speaker.token) actor = game.actors.tokens[speaker.token];
     if (!speaker.actor) return;
     if (!actor) actor = game.actors.get(speaker.actor);
@@ -99,7 +99,7 @@ export async function createSkillMacro(data: { skillId: string, skill: SkillFiel
  *
  * @param skillLabel Custom skill names must be supported and legacy skill names might be translated.
  */
-export async function rollSkillMacro(skillLabel): Promise<SuccessTest<SuccessTestData> | void> {
+export async function rollSkillMacro(skillLabel): Promise<SuccessTest<SuccessTestData> | undefined> {
     if (!game?.actors) return;
     if (!skillLabel) return;
 

@@ -42,6 +42,7 @@ import { Metamagic } from './item/Metamagic';
 import { Modification } from './item/Modification';
 import { Program } from './item/Program';
 import { Quality } from './item/Quality';
+import { Preparation } from "./item/Preparation";
 import { Ritual } from "./item/Ritual";
 import { Sin } from './item/Sin';
 import { Spell } from './item/Spell';
@@ -50,7 +51,6 @@ import { Weapon } from './item/Weapon';
 import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } from "./flags/ItemFlags";
 
 import SR5CompendiaSettings from "../settings/SR5CompendiaSettings";
-import { CombatTrackerDockConfig } from "../integrations/combatTrackerDockIntegration";
 import AstralPerceptionDetectionMode from "../vision/astralPerception/astralPerceptionDetectionMode";
 import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDetectionMode";
 import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
@@ -65,6 +65,10 @@ declare global {
         SR5: typeof SR5;
     }
 }
+
+/**
+ * TODO: fvtt-types v14 - Update global module declarations to match updated types in fvtt-types.
+ */
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
@@ -185,6 +189,7 @@ declare module "fvtt-types/configuration" {
             modification: typeof Modification;
             program: typeof Program;
             quality: typeof Quality;
+            preparation: typeof Preparation;
             ritual: typeof Ritual;
             sin: typeof Sin;
             skill: typeof Skill;
@@ -279,7 +284,6 @@ declare module "fvtt-types/configuration" {
             dropItemSheetData: any;
             // Hooks for Autocomplete Inline Properties integration
             aipSetup: (packageConfig: {packageName: string}[]) => void;
-            'combat-tracker-dock-init': (config: CombatTrackerDockConfig) => void;
         }
     }
 

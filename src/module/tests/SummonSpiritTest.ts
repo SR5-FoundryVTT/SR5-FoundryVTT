@@ -40,7 +40,7 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
     override _prepareData(data: DeepPartial<SummonSpiritTestData>, options: Partial<TestOptions>): SummonSpiritTestData {
         const prepared = super._prepareData(data, options);
 
-        this._prepareSummoningData(prepared as SummonSpiritTestData);
+        this._prepareSummoningData(prepared);
 
         prepared.preparedSpiritUuid = prepared.preparedSpiritUuid || '';
         prepared.optionalPowerCount = prepared.optionalPowerCount ?? Math.floor(Number(prepared.force || 0) / 3);
@@ -48,7 +48,7 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         prepared.drain ||= 0;
         prepared.drainDamage ||= DataDefaults.createData('damage');
 
-        return prepared as SummonSpiritTestData;
+        return prepared;
     }
 
     override get _dialogTemplate() {

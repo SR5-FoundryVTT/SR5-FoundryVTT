@@ -1,0 +1,9 @@
+{{#if (or @root.isEditMode itemType.preparation.length)}}
+    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/preparation/header.hbs'
+        label='SR5.Labels.ActorSheet.Preparations'
+        type='preparation'
+    }}
+    {{#each itemType.preparation}}
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/preparation/item.hbs' item=this }}
+    {{/each}}
+{{/if}}

@@ -64,11 +64,11 @@ export class Sanitizer {
             const currentPath = [...path, fieldName];
 
             if (field instanceof SchemaField && this.isStructured(value))
-                this._sanitize(value, failure, (subKey) => field.fields[subKey], corrections, currentPath);
+                this._sanitize(value, failure, (subKey) => field.fields[subKey] as foundry.data.fields.DataField.Any, corrections, currentPath);
             else if (field instanceof TypedObjectField && this.isStructured(value))
-                this._sanitize(value, failure, () => field.element, corrections, currentPath);
+                this._sanitize(value, failure, () => field.element as foundry.data.fields.DataField.Any, corrections, currentPath);
             else if (field instanceof ArrayField && Array.isArray(value))
-                this._sanitize(value, failure, () => field.element, corrections, currentPath);
+                this._sanitize(value, failure, () => field.element as foundry.data.fields.DataField.Any, corrections, currentPath);
             else {
                 let newValue: unknown;
 

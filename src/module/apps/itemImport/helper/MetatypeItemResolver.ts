@@ -58,7 +58,7 @@ export class MetatypeItemResolver {
 
             for (const item of items) {
                 if (!item.foundryUuid && !item.id && !item.chummerId) continue;
-                itemsToResolve.push(item as MetatypeItemFlag);
+                itemsToResolve.push(item);
             }
         }
 
@@ -180,7 +180,7 @@ export class MetatypeItemResolver {
             explicitArray: false,
             explicitCharkey: true,
         });
-        return parser.parseStringPromise(xmlString);
+        return (await parser.parseStringPromise(xmlString)) as T;
     }
 
     private static async getQualityData(chummerId?: string, name?: string): Promise<Quality | null> {

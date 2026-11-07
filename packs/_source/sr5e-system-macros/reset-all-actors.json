@@ -9,12 +9,13 @@
   "_stats": {
     "compendiumSource": null,
     "duplicateSource": null,
-    "coreVersion": "12.331",
+    "coreVersion": "14.367",
     "systemId": "shadowrun5e",
-    "systemVersion": "0.24.0",
-    "createdTime": 1736169971406,
-    "modifiedTime": 1736169971406,
-    "lastModifiedBy": null
+    "systemVersion": "0.37.4",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "exportSource": null
   },
   "folder": null,
   "ownership": {

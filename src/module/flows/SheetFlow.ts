@@ -38,6 +38,8 @@ export const SheetFlow = {
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Spell' });
             case 'ritual':
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Ritual' });
+            case 'preparation':
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Preparation' });
             case 'gear':
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Gear' });
             case 'complex_form':

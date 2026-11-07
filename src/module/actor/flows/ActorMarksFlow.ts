@@ -159,7 +159,7 @@ export const ActorMarksFlow = {
             let displayName = name;            
             if (document instanceof SR5Item && document.isActivePersonaDevice()) {
                 document = document.persona as Actor.Stored;
-                displayName = document!.name;
+                displayName = document.name;
             }
 
             const network = ActorMarksFlow.getDocumentNetwork(document);

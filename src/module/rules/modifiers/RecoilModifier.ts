@@ -12,9 +12,7 @@ export class RecoilModifier extends SituationModifier  {
     /**
      * Recoil modifiers don't allow for any selection.
      */
-    static override get hasSourceData() {
-        return false;
-    }
+    static override readonly hasSourceData = false;
 
     override _calcActiveTotal(options: SituationalModifierApplyOptions): number {
         if (!this.modifiers?.documentIsActor) return 0;

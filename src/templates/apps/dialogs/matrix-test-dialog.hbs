@@ -67,7 +67,7 @@
             {{/if}}
             <!-- Devices connected to persona or host -->
             {{#ife test.data.targetMainIcon false}}
-            <div class="form-group">
+            <div class="form-group target-select-row">
                 <label>{{localize "SR5.Labels.Matrix.TargetDevice"}}</label>
                 <select name="test.data.iconUuid" class="display">
                     {{selectOptions test.iconOptions selected=test.data.iconUuid}}

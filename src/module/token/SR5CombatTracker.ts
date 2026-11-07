@@ -13,7 +13,6 @@ type InitiativeModeOption = {
 };
 
 type SR5TurnContext = CombatTracker.TurnContext & {
-    pad?: boolean;
     modeClass?: string;
     modeIcon?: string;
     modeTitle?: string;
@@ -100,7 +99,6 @@ export class SR5CombatTracker extends CombatTracker {
         const modeConfig = SR5Combat.INITIATIVE_MODE_CONFIG[mode];
         const modeOptions = this._prepareInitiativeModeOptions(combatant);
 
-        turn.pad = combatant.system.pad;
         turn.modeClass = modeConfig.cls;
         turn.modeIcon = modeConfig.icon;
         turn.modeTitle = game.i18n.format('SR5.COMBAT.ModeTitle', { mode: game.i18n.localize(modeConfig.label) });

@@ -1,3 +1,6 @@
+import type { SR5Actor } from './actor/SR5Actor';
+import type { SR5Item } from './item/SR5Item';
+
 /**
  * The legacy chat message approach of the system uses a generic chat message to display roll and item information.
  *
@@ -18,7 +21,7 @@ export async function createChatMessage(template: string, templateData): Promise
 // templateData has no datatype to pipe through whatever it's given.
 // Clean up your data within templateData creation functions!
 const createChatData = async (template: string, templateData) => {
-    const html = await renderTemplate(template, templateData);
+    const html = await foundry.applications.handlebars.renderTemplate(template, templateData);
 
     const chatData = {
         user: game.user?.id,
@@ -41,7 +44,7 @@ export async function createItemChatMessage(options) {
     return createChatMessage('systems/shadowrun5e/dist/templates/rolls/item-card.hbs', templateData);
 }
 
-function createChatTemplateData(options) {
+function createChatTemplateData(options: { actor?: SR5Actor; item?: SR5Item; description?: unknown; tests?: unknown }) {
     // field extraction is explicit to enforce visible data flow to ensure clean data.
     // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
     const {actor, item, description, tests} = options;

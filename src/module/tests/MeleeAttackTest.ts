@@ -15,7 +15,7 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
 
         prepared.damage ||= DataDefaults.createData('damage');
 
-        return prepared as MeleeAttackData;
+        return prepared;
     }
 
     /**
@@ -35,10 +35,6 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
 
     override get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/melee-attack-test-dialog.hbs';
-    }
-
-    override get showSuccessLabel(): boolean {
-        return this.success;
     }
 
     override async prepareDocumentData() {

@@ -9,10 +9,12 @@ import { ModifiableValue } from './mods/ModifiableValue';
 import { SuccessTestData } from "./tests/SuccessTest";
 import { Translation } from './utils/strings';
 import { AttributeFieldType } from "./types/template/Attributes";
-import { SkillFieldType, SkillsType } from "./types/template/Skills";
+import { SkillFieldType } from "./types/template/Skills";
 import { ModifiedDamageType } from "./types/rolls/ActorRolls";
 import { RangeTemplateType } from "./types/template/Weapon";
 import { MatrixTestData, OpposedMatrixTestData } from './tests/MatrixTest';
+
+import ApplicationV2 = foundry.applications.api.ApplicationV2;
 
 type OneOrMany<T> = T | T[];
 
@@ -33,26 +35,26 @@ export class Helpers {
         return Math.round(value * multiplier) / multiplier;
     }
 
-    static listItemId(event): string {
-        return event.currentTarget.closest('.list-item').dataset.itemId;
+    static listItemId(event: { currentTarget: HTMLElement }): string {
+        return event.currentTarget.closest<HTMLElement>('.list-item')!.dataset.itemId as string;
     }
 
-    static listItemUuid(event): string {
-        return event.currentTarget.closest('.list-item').dataset.uuid;
+    static listItemUuid(event: { currentTarget: HTMLElement }): string {
+        return event.currentTarget.closest<HTMLElement>('.list-item')!.dataset.uuid as string;
     }
 
-    static listHeaderId(event): string {
-        return event.currentTarget.closest('.list-header').dataset.itemId;
+    static listHeaderId(event: { currentTarget: HTMLElement }): string {
+        return event.currentTarget.closest<HTMLElement>('.list-header')!.dataset.itemId as string;
     }
 
-    static eventUuid(event): string {
+    static eventUuid(event: { currentTarget?: HTMLElement | null }): string {
         return event.currentTarget?.dataset?.uuid ?? '';
     }
 
     // replace 'SR5.'s on keys with 'SR5_DOT_'
-    static onSetFlag(data) {
+    static onSetFlag(data: unknown): unknown {
         if (!data || typeof data !== 'object') return data;
-        const newData = {};
+        const newData: Record<string, unknown> = {};
         for (const [key, value] of Object.entries(data)) {
             const newKey = key.replace('SR5.', 'SR5_DOT_');
             newData[newKey] = this.onSetFlag(value);
@@ -61,9 +63,9 @@ export class Helpers {
     }
 
     // replace 'SR5_DOT_' with 'SR5.' on keys
-    static onGetFlag(data) {
+    static onGetFlag(data: unknown): unknown {
         if (!data || typeof data !== 'object') return data;
-        const newData = {};
+        const newData: Record<string, unknown> = {};
         for (const [key, value] of Object.entries(data)) {
             const newKey = key.replace('SR5_DOT_', 'SR5.');
             newData[newKey] = this.onGetFlag(value);
@@ -99,7 +101,7 @@ export class Helpers {
         return false;
     }
 
-    static setupCustomCheckbox(app, html) {
+    static setupCustomCheckbox(app: ApplicationV2, html: JQuery) {
         const setContent = (el) => {
             const checkbox = $(el).children('input[type=checkbox]');
             const checkmark = $(el).children('.checkmark');
@@ -111,11 +113,10 @@ export class Helpers {
                 $(checkmark).removeClass('fa-check-circle');
             }
         };
-        html.find('label.checkbox').each(function (this: any) {
+        html.find('label.checkbox').each(function (this: HTMLElement) {
             setContent(this);
         });
-        html.find('label.checkbox').click((event) => setContent(event.currentTarget));
-        html.find('.submit-checkbox').change((event) => app._onSubmit(event));
+        html.find('label.checkbox').on('click', (event) => setContent(event.currentTarget));
     }
 
     static label(str: string) {
@@ -133,31 +134,32 @@ export class Helpers {
         return frags.join(' ');
     }
 
-    static orderKeys(obj) {
-        const keys = Object.keys(obj).sort(function keyOrder(k1, k2) {
+    static orderKeys<T extends object>(obj: T): T {
+        const record = obj as Record<string, unknown>;
+        const keys = Object.keys(record).sort(function keyOrder(k1, k2) {
             if (k1 < k2) return -1;
             if (k1 > k2) return +1;
             return 0;
         });
 
         let i;
-        const after = {};
+        const after: Record<string, unknown> = {};
         for (i = 0; i < keys.length; i++) {
-            after[keys[i]] = obj[keys[i]];
-            delete obj[keys[i]];
+            after[keys[i]] = record[keys[i]];
+            delete record[keys[i]];
         }
 
         for (i = 0; i < keys.length; i++) {
-            obj[keys[i]] = after[keys[i]];
+            record[keys[i]] = after[keys[i]];
         }
         return obj;
     }
 
-    static hasModifiers(event) {
+    static hasModifiers(event?: Pick<KeyboardEvent, 'shiftKey' | 'altKey' | 'ctrlKey' | 'metaKey'> | null) {
         return event && (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey);
     }
 
-    static filter(obj, comp) {
+    static filter(obj, comp: (entry: [string, unknown]) => boolean) {
         const retObj = {};
         if (typeof obj === 'object' && obj !== null) {
             Object.entries(obj).forEach(([key, value]) => {
@@ -200,7 +202,7 @@ export class Helpers {
      * @param id The token's ID. If omitted, returns the first controlled token or undefined.
      * @returns The Token instance or undefined if not found.
      */
-    static getToken(id?: string): Token | undefined {
+    static getToken(id?: string): foundry.canvas.placeables.Token | undefined {
         if (!canvas || !canvas.ready || !canvas.tokens) return undefined;
 
         if (id) return canvas.tokens.placeables.find(token => token.id === id);
@@ -233,7 +235,7 @@ export class Helpers {
         return token;
     }
 
-    static getUserTargets(user?: User | null): Token[] {
+    static getUserTargets(user?: User | null): foundry.canvas.placeables.Token[] {
         user = user || game.user;
 
         if (!user) return []
@@ -312,7 +314,7 @@ export class Helpers {
      * @returns
      */
     static getTokenLOSHeight(token: TokenDocument): number {
-        return token.flags['wall-height']?.tokenHeight ?? 0;
+        return (token.flags['wall-height'] as { tokenHeight?: number } | undefined)?.tokenHeight ?? 0;
     }
 
     static convertLengthUnit(length: number, fromUnit: string): number {
@@ -328,7 +330,7 @@ export class Helpers {
         return Math.round(length * LENGTH_UNIT_TO_METERS_MULTIPLIERS[fromUnit]);
     }
 
-    static getControlledTokens(): Token[] {
+    static getControlledTokens(): foundry.canvas.placeables.Token[] {
         if (!canvas || !canvas.ready || !canvas.tokens) return [];
         return canvas.tokens.controlled;
     }
@@ -357,7 +359,7 @@ export class Helpers {
      * return all tokens a user has targeted at the moment.
      * @returns An array tokens.
      */
-    static getTargetedTokens(): Token[] {
+    static getTargetedTokens(): foundry.canvas.placeables.Token[] {
         if (!canvas.ready || !game.user) return [];
 
         return Array.from(game.user.targets);
@@ -581,7 +583,7 @@ export class Helpers {
 
             const foundItem = token.actor.items.get(itemId);
             if (foundItem) {
-                tokenItem = foundItem as unknown as SR5Item;
+                tokenItem = foundItem;
             }
         });
 
@@ -664,7 +666,7 @@ export class Helpers {
      * @param value Whatever needs to be stored.
      *
      */
-    static getUpdateDataEntry(path: string, value: any): Record<string, any> {
+    static getUpdateDataEntry(path: string, value: unknown): Record<string, unknown> {
         return { [path]: value };
     }
 
@@ -744,10 +746,10 @@ export class Helpers {
             return Helpers.getEntityFromCollection(data.pack, data.id) as Promise<SR5Item>;
 
         if (data.type === 'Actor')
-            return game.actors.get(data.id) as SR5Actor;
+            return game.actors.get(data.id);
 
         if (data.type === 'Item')
-            return game.items.get(data.id) as SR5Item;
+            return game.items.get(data.id);
 
         return undefined;
     }
@@ -768,7 +770,7 @@ export class Helpers {
      */
     static objectHasKeys(obj: object, keys: string[]): boolean {
         for (const key of keys) {
-            if (!obj.hasOwnProperty(key)) return false;
+            if (!Object.hasOwn(obj, key)) return false;
         }
 
         return true;
@@ -782,7 +784,7 @@ export class Helpers {
      *
      * @param event A PointerEvent by user interaction.
      */
-    static async renderEntityLinkSheet(event: Event) {
+    static async renderEntityLinkSheet(event: Event | JQuery.ClickEvent) {
         const element = $(event.currentTarget as HTMLElement);
         const uuid = element.data('uuid');
         await Helpers.renderDocumentSheet(uuid);
@@ -796,7 +798,7 @@ export class Helpers {
      */
     static async renderDocumentSheet(uuid: string, resolveTokenToActor = true) {
         if (!uuid) return;
-        let document = await fromUuid(uuid as any);
+        let document: unknown = await fromUuid(uuid);
         if (!document) return;
         if (document instanceof TokenDocument && resolveTokenToActor && document.actor)
             document = document.actor;
@@ -848,6 +850,7 @@ export class Helpers {
                     }
                 },
                 default: 'confirm',
+                // oxlint-disable-next-line typescript/require-await -- Dialog callback contract expects a Promise.
                 onAfterClose: async html => {
                     const selected = html.find('select[name="actor"]').val();
                     return { actorId: selected };

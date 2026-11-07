@@ -47,7 +47,7 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
                 return !(target?.onlyForItemTest && (test === undefined || effect.parent !== test?.item));
             });
             changes.push(...effectChanges.map(change => {
-                const c = foundry.utils.deepClone<typeof changes[number]>(change as any);
+                const c = foundry.utils.deepClone<typeof changes[number]>(change as unknown as typeof changes[number]);
                 c.effect = effect;
                 return c;
             }));

@@ -5,7 +5,7 @@ import { Empty, Many, OneOrMany, IntegerString } from './Types';
 export interface Action {
     boosts?: {
         boost: OneOrMany<{
-            addlimit?: { _TEXT: "{Physical}" | "{Weapon: Accuracy}"; };
+            addlimit?: { _TEXT: "{Mental}" | "{Physical}" | "{Weapon: Accuracy}"; };
             dicebonus: { _TEXT: string; };
             duration: { _TEXT: "One Attack" | "Rest of Turn"; };
             name: { _TEXT: string; };
@@ -18,11 +18,11 @@ export interface Action {
     name: { _TEXT: string; };
     page?: { _TEXT: IntegerString; };
     requireunlock?: Empty;
-    source?: { _TEXT: "DT" | "KC" | "R5" | "RG" | "SR5"; };
+    source?: { _TEXT: "DT" | "HKS" | "KC" | "R5" | "RG" | "SR5"; };
     specname?: { _TEXT: "Blocking" | "Data Bombs" | "Dodging" | "Parrying" | "Sprinting"; };
     test?: {
         bonusstring?: { _TEXT: string; };
-        defenselimit?: { _TEXT: "{Max: {Physical} or {Mental}}" | "{Mental}"; };
+        defenselimit?: { _TEXT: "{Max: {Physical} or {Mental}}" | "{Mental}" | "{Physical}"; };
         dice: { _TEXT: string; };
         limit?: { _TEXT: string; };
     };

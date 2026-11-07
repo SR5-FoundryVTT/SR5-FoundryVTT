@@ -456,12 +456,13 @@
   "_stats": {
     "coreVersion": "13.351",
     "systemId": "shadowrun5e",
-    "systemVersion": "0.33.0",
+    "systemVersion": "0.37.4",
     "createdTime": null,
-    "modifiedTime": 1774602750039,
+    "modifiedTime": null,
     "compendiumSource": null,
     "duplicateSource": null,
-    "exportSource": null
+    "exportSource": null,
+    "lastModifiedBy": null
   },
   "sort": 0,
   "_key": "!items!mp2xUdgp6v096fgT"

@@ -27,7 +27,7 @@ export class ItemPrep {
                 } else {
                     ModifiableValue.add(
                         armor.rating, item.name, normalArmor,
-                        { type: 'upgrade', priority: ModifiableValue.BASE_PRIORITY }
+                        { type: 'upgrade', priority: ModifiableValue.Priority.BASE }
                     );
                 }
             }
@@ -38,7 +38,7 @@ export class ItemPrep {
                 } else {
                     ModifiableValue.add(
                         armor.hardened, item.name, hardenedArmor,
-                        { type: 'upgrade', priority: ModifiableValue.BASE_PRIORITY }
+                        { type: 'upgrade', priority: ModifiableValue.Priority.BASE }
                     );
                 }
             }

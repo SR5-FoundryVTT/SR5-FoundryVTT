@@ -142,7 +142,7 @@ export class MatrixRules {
      * Derive a hosts attributes ratings based on it's host rating. SR5#247 'Host Attributes'
      * @param hostRating
      */
-    static hostMatrixAttributeRatings(hostRating): number[] {
+    static hostMatrixAttributeRatings(hostRating: number): number[] {
         return [0, 1, 2, 3].map(rating => rating + hostRating);
     }
 

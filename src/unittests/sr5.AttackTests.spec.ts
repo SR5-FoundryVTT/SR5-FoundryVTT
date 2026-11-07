@@ -1,12 +1,16 @@
 import { SR5 } from '../module/config';
 import { SR5TestFactory } from './utils';
 import { SR5Actor } from '../module/actor/SR5Actor';
+import { SR5Item } from '../module/item/SR5Item';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CombatRules } from '../module/rules/CombatRules';
 import { DataDefaults } from '../module/data/DataDefaults';
 import { FireModeRules } from '../module/rules/FireModeRules';
 import { TestCreator } from '../module/tests/TestCreator';
 import { PhysicalDefenseTest } from '../module/tests/PhysicalDefenseTest';
+import { MeleeAttackTest } from '../module/tests/MeleeAttackTest';
+import { RangedAttackTest } from '../module/tests/RangedAttackTest';
+import { ThrownAttackTest } from '../module/tests/ThrownAttackTest';
 import { DamageType, DamageTypeType } from 'src/module/types/item/Action';
 type DamageElementType = DamageType['element']['base'];
 
@@ -16,6 +20,35 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
     const assert: Chai.AssertStatic = context.assert;
 
     after(async () => { await factory.destroy(); });
+
+    describe('RangedAttackTest', () => {
+        it('exposes blast templates for equipped explosive ammo', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'weapon',
+                name: 'Explosive Ammo Weapon',
+                system: { category: 'range' },
+            }]);
+            const ammo = await factory.createItem({
+                type: 'ammo',
+                system: {
+                    technology: { equipped: true },
+                    blast: { radius: 4, dropoff: 1 },
+                },
+            });
+
+            await (weapon as SR5Item<'weapon'>).createNestedItem(ammo.toObject());
+            const test = await TestCreator.fromItem(weapon, actor, {
+                showDialog: false,
+                showMessage: false,
+            });
+
+            assert.instanceOf(test, RangedAttackTest);
+            const rangedTest = test;
+            assert.isTrue(rangedTest.canPlaceBlastTemplate);
+            assert.deepEqual(rangedTest.blastTemplateFlow.blastData, { radius: 4, dropoff: 1 });
+        });
+    });
 
     describe('Fire Mode Rules', () => {
         it('apply defense modifier per fire mode', () => {
@@ -158,6 +191,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 full_auto: true
             }), 3); // per default rules only one single shot mode
         })
+
     })
 
     describe('PhysicalDefenseTest', () => {
@@ -512,6 +546,39 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 assert.strictEqual(normalArmor?.value, 6);
                 assert.strictEqual(hardenedArmor?.value, 16);
             });
+        });
+    });
+
+    describe('Attack test verdict', () => {
+        // An attack needs its defense result before showing a success verdict.
+        it('shows hits rather than a Success verdict', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const [weapon] = await attacker.createEmbeddedDocuments('Item', [{
+                name: 'Attack Weapon',
+                type: 'weapon',
+                system: {
+                    category: 'melee',
+                    action: { test: 'MeleeAttackTest', opposed: { test: 'PhysicalDefenseTest' } },
+                    technology: { equipped: true },
+                },
+            }]);
+
+            const attackTest = await TestCreator.fromItem(weapon, attacker, { showDialog: false, showMessage: false });
+            if (!attackTest) return assert.fail('Failed to create melee attack test');
+            await attackTest._prepareExecution();
+
+            attackTest.data.values.hits = DataDefaults.createData('value_field', { label: 'SR5.Hits', base: 4, value: 4 });
+
+            assert.isFalse(attackTest.hasThreshold, 'an attack test has no threshold of its own');
+            assert.isTrue(attackTest.success);
+            assert.isFalse(attackTest.showSuccessLabel);
+        });
+
+        it('leaves showSuccessLabel to the base test for every attack type', () => {
+            for (const Test of [MeleeAttackTest, RangedAttackTest, ThrownAttackTest])
+                assert.isUndefined(
+                    Object.getOwnPropertyDescriptor(Test.prototype, 'showSuccessLabel'),
+                    `${Test.name} must not override showSuccessLabel — see the verdict test above`);
         });
     });
 };

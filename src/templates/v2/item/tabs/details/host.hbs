@@ -1,0 +1,24 @@
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{localize (objValue @root.config.itemTypes item.type)}}</label>
+    </div>
+</div>
+
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label>{{localize "SR5.Rating"}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.rating value=source.system.rating
+                    classes="short" rootId=rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label>{{localize "SR5.Labels.Sheet.Visible"}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.matrix.fields.visible value=source.system.matrix.visible
+                    rootId=rootId disabled=@root.isPlayMode}}
+    </div>
+</div>

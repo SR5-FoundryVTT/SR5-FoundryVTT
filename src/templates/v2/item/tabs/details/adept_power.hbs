@@ -1,0 +1,42 @@
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{localize (objValue @root.config.itemTypes item.type)}}</label>
+    </div>
+</div>
+
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label>{{systemFields.type.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.type value=source.system.type localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.pp.hint}}">{{systemFields.pp.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.pp value=source.system.pp classes="short"
+                    rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.level.hint}}">{{systemFields.level.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.level value=source.system.level
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.drain.hint}}">{{systemFields.drain.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.drain value=source.system.drain
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>

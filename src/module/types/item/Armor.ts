@@ -3,7 +3,7 @@ import { BaseValuePair } from "../template/Base";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TagifyMultiField } from "../fields/TagifyMultiField";
 import { TechnologyPartData } from "../template/Technology";
-const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField } = foundry.data.fields;
 
 export const ArmorValueData = () => ({
     accessory: new BooleanField(),

@@ -48,7 +48,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.lengthOf(vehicles, 1, 'Vehicle not created');
         });
 
-        it('Should have the correct attributes and limits', async () => {
+        it('Should have the correct attributes and limits', () => {
             if (!actor) throw new Error('No actor created');
 
             assert.strictEqual(actor.name, character.name, 'Name');
@@ -68,7 +68,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             }
         });
 
-        it('Should have the correct skills', async () => {
+        it('Should have the correct skills', () => {
             if (!actor) throw new Error('No actor created');
 
             const skills = IH.getArray(character.skills.skill);
@@ -111,6 +111,14 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
                 assert.strictEqual(parsedSkill.value, Number(skill.rating), `Error Knowledge Skill ${skill.name_english}`);
                 assert.lengthOf(parsedSkill.specs, IH.getArray(skill.skillspecializations).length);
             }
+        });
+
+        it('Should only group skills of skill groups the character owns', () => {
+            if (!actor) throw new Error('No actor created');
+
+            assert.strictEqual(actor.system.skills.active.con.group, 'Acting');
+            assert.strictEqual(actor.system.skills.active.blades.group, '');
+            assert.strictEqual(actor.system.skills.active.archery.group, '');
         });
 
         it('Should have the correct item number', async () => {
@@ -186,7 +194,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.items.size, itemCount, 'Item count');
         });
 
-        it('Should have the correct weapon', async () => {
+        it('Should have the correct weapon', () => {
             if (!actor) throw new Error('No actor created');
             const weapon = actor.items.find(i => i.name === 'Ruger Super Warhawk') as SR5Item<'weapon'>;
             if (!weapon) throw new Error('Weapon not found');
@@ -201,6 +209,9 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.action.damage.type.base, 'physical');
             assert.strictEqual(weapon.system.action.limit.base, 5);
             assert.strictEqual(weapon.system.action.type, 'varies');
+            assert.strictEqual(weapon.system.action.test, 'RangedAttackTest');
+            assert.strictEqual(weapon.system.action.opposed.test, 'PhysicalDefenseTest');
+            assert.strictEqual(weapon.system.action.opposed.resist.test, 'PhysicalResistTest');
 
             //category
             assert.strictEqual(weapon.system.category, 'range');
@@ -219,7 +230,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(IH.getArray(weapon.flags.shadowrun5e?.embeddedItems).length, 1);
         });
 
-        it('Should import strength-based weapon damage from raw Chummer damage', async () => {
+        it('Should import strength-based weapon damage from raw Chummer damage', () => {
             if (!actor) throw new Error('No actor created');
             const weapon = actor.items.find(i => i.name === 'Unarmed Attack') as SR5Item<'weapon'>;
             if (!weapon) throw new Error('Weapon not found');
@@ -229,7 +240,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.action.damage.type.base, 'stun');
         });
 
-        it('Should have the correct vehicles', async () => {
+        it('Should have the correct vehicles', () => {
             const vehicle = vehicles[0];
             if (!vehicle) throw new Error('No vehicle created');
 
@@ -245,7 +256,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(vehicle.system.armor.rating.value, 9, 'Armor');
             assert.strictEqual(vehicle.system.vehicle_stats.sensor.value, 1, 'Sensor');
             assert.strictEqual(vehicle.system.vehicle_stats.seats.value, 2, 'Seats');
-            assert.strictEqual(vehicle.system.availability, '0', 'Availability');
+            assert.strictEqual(vehicle.system.availability.value, 0, 'Availability');
+            assert.strictEqual(vehicle.system.availability.label, '0', 'Availability label');
             assert.strictEqual(vehicle.system.cost, 10000, 'Cost');
             assert.strictEqual(vehicle.system.importFlags?.isFreshImport, true, 'Vehicle import flag');
             assert.strictEqual(vehicle.system.importFlags?.category, 'Bikes', 'Vehicle category import flag');

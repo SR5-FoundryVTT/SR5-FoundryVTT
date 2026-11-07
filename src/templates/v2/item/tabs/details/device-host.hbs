@@ -1,0 +1,60 @@
+{{#if (isType item 'device')}}
+    <div class="list-item list-item-header">
+        <div class="list-item-start skinny">
+            <label>{{localize (objValue @root.config.itemTypes item.type)}}</label>
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label data-tooltip="{{systemFields.category.hint}}">{{systemFields.category.label}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput systemFields.category value=source.system.category localize=true
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        </div>
+    </div>
+{{/if}}
+
+{{#if (isType item 'host')}}
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label>{{localize "SR5.Host.CustomAttributes"}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput systemFields.customAttributes value=source.system.customAttributes
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
+        </div>
+    </div>
+{{/if}}
+
+{{#unless (eq system.category 'living_persona')}}
+    {{#each system.atts as |att att_id|}}
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                {{#ifin @root.system.category (toArray "cyberdeck" "host")}}
+                    <select class="short" name="system.atts.{{att_id}}.att" {{#if @root.isPlayMode}}disabled{{/if}}>
+                        {{selectOptions @root.config.matrixAttributes selected=att.att
+                                        localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </select>
+                {{else}}
+                    <label>{{localize (lookup @root.config.matrixAttributes att.att)}}</label>
+                {{/ifin}}
+            </div>
+            <div class="list-item-col">
+                {{formInput (objValue (objValue (objValue @root.systemFields.atts.fields att_id) 'fields') 'value')
+                            classes="short" value=att.value rootId=@root.rootId disabled=(or @root.isPlayMode (not att.editable))}}
+            </div>
+        </div>
+    {{/each}}
+    {{#if (isType item 'device')}}
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label>{{localize "SR5.Programs"}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput systemFields.programs value=source.system.programs classes="short"
+                            rootId=rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+    {{/if}}
+{{/unless}}

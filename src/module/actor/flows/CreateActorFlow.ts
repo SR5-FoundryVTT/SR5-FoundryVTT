@@ -1,6 +1,15 @@
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { SR5Actor } from '../SR5Actor';
 import { SkillSetFlow } from './SkillSetFlow';
+import { UpdateActionFlow } from '@/module/item/flows/UpdateActionFlow';
+
+/**
+ * SR5 specific options understood while an actor document is created.
+ *
+ * They're passed as part of the create operation and reach the document through
+ * its _preCreate options:
+ * `SR5Actor.create(data, { skipDefaultSkills: true })`
+ */
 export interface SR5ActorCreateOptions {
     /** Skip applying the default skill set configured for the created actor type. */
     skipDefaultSkills?: boolean;
@@ -13,6 +22,21 @@ export interface SR5ActorCreateOptions {
  * default embedded data that should exist but can't be part of DataModel schema initials.
  */
 export const CreateActorFlow = {
+    /**
+     * Injects action tests into items embedded in the creation data of an actor.
+     *
+     * These items don't run through SR5Item#_preCreate, which does this for any other created item.
+     *
+     * Updates each item directly, as Actor#updateSource ignores changes to already embedded items.
+     */
+    injectEmbeddedItemActionTests(actor: SR5Actor) {
+        for (const item of actor.items) {
+            const actionChanges = {};
+            UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item.toObject(), actionChanges, item);
+            item.updateSource(actionChanges);
+        }
+    },
+
     /**
      * Applies the first matching default skill set for the actor type being created.
      *
