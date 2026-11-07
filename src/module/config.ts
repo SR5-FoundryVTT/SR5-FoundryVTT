@@ -880,6 +880,7 @@ export const SR5 = {
         soak: 'SR5.ModifierTypes.Soak',
         wounds: 'SR5.ModifierTypes.Wounds',
         recoil: 'SR5.ModifierTypes.Recoil',
+        damage: 'SR5.ModifierTypes.Damage',
     },
 
     /**
@@ -961,6 +962,7 @@ export const SR5 = {
         // packNames keys should match the name of the FLAG
         'GeneralActionsPack': 'sr5e-general-actions',
         'MatrixActionsPack': 'sr5e-matrix-actions',
+        'VehicleActionsPack': 'sr5e-vehicle-actions',
         'ICActionsPack': 'sr5e-ic-actions',
         'SkillsPack': 'sr5e-skills',
         'SkillGroupsPack': 'sr5e-skill-groups',
@@ -971,6 +973,13 @@ export const SR5 = {
         common_program: 'SR5.CommonProgram',
         hacking_program: 'SR5.HackingProgram',
         agent: 'SR5.Agent',
+    },
+
+    controlModes: {
+        autopilot: 'SR5.ControlModes.Autopilot',
+        remote: 'SR5.ControlModes.Remote',
+        rigger: 'SR5.ControlModes.Rigger',
+        manual: 'SR5.ControlModes.Manual',
     },
 
     icTypes: {

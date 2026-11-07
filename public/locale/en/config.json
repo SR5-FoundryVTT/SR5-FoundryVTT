@@ -79,7 +79,9 @@
         "UseDamageConditionDescription": "System marks tokens according to their condition monitor",
         "UseDamageConditionName": "Use system handling for token status effects",
         "UseImportIconOverridesDescription": "When importing items, use the same icons for some different item types when it makes sense. Uncheck if using custom icons.",
-        "UseImportIconOverridesName": "Use Default Importer Icon Overrides"
+        "UseImportIconOverridesName": "Use Default Importer Icon Overrides",
+        "RequireRiggerInterfaceName": "Enforce Rigger Interface Requirement",
+        "RequireRiggerInterfaceDescription": "When enabled, jumping into a vehicle without an installed Rigger Interface is hard-blocked. When disabled (default), G.O.D. issues an in-game alert chat message."
     },
     "SR5": {
         "AP": "AP",
@@ -860,7 +862,11 @@
                 "hint": "This compendium will be used for skill sets.",
                 "label": "Skill Sets"
             },
-            "Title": "System compendiums"
+            "Title": "System compendiums",
+            "VehicleActionsPack": {
+                "hint": "This compendium will be used for all vehicle actions.",
+                "label": "Vehicle Actions"
+            }
         },
         "CompendiumBrowser": {
             "Filters": {
@@ -1277,7 +1283,9 @@
             "NoAvailableActorFound": "No available actor was found for this action",
             "SkillWithoutAttribute": "The skill has no attribute configured.",
             "TestExpectsVehicleOnly": "This test can only be made with a vehicle type actor",
-            "TooManyActionsWithCategory": "You should have exactly one action with the category {category} on your actor"
+            "TooManyActionsWithCategory": "You should have exactly one action with the category {category} on your actor",
+            "NoVehicleOwnership": "You do not own this vehicle.",
+            "NoDriverSelectedForJumpIn": "No driver selected or assigned for Jump In."
         },
         "EssenceCost": "Essence",
         "Expand": "Expand",
@@ -1538,7 +1546,9 @@
         "Infos": {
             "CantModifyHostContent": "Can't change host data from within an IC actor.",
             "ConsumedEquippedAmmo": "Consumed rounds from equipped ammunition",
-            "ResetProgressiveRecoil": "Reset progressive recoil to zero bullets fired"
+            "ResetProgressiveRecoil": "Reset progressive recoil to zero bullets fired",
+            "NoMatrixDamageToRepair": "Device has no matrix damage to repair.",
+            "MatrixDamageRepaired": "{device} repaired for {hits} matrix damage."
         },
         "InitCatAstral": "Astral",
         "InitCatMatrix": "Matrix",
@@ -1850,7 +1860,8 @@
             "Sin": "SIN",
             "Spell": "Spell",
             "SpritePower": "Sprite Power",
-            "Weapon": "Weapon"
+            "Weapon": "Weapon",
+            "Vehicle": "Vehicle"
         },
         "Karma": "Karma",
         "KarmaManager": {
@@ -2195,6 +2206,10 @@
                 "type": {
                     "hint": "Type of Modification",
                     "label": "Mod Type"
+                },
+                "isRiggerInterface": {
+                    "hint": "Whether this modification functions as a Rigger Interface",
+                    "label": "Rigger Interface"
                 }
             }
         },
@@ -2263,7 +2278,8 @@
             "TwoMarks": "Two Marks",
             "Walk": "Walk",
             "WoundTolerance": "Wound Tolerance",
-            "Wounds": "Wounds"
+            "Wounds": "Wounds",
+            "Damage": "Damage"
         },
         "MountPoint": "Mount Point",
         "MoveInventoryDialog": {
@@ -3076,7 +3092,9 @@
         },
         "StatusEffects": {
             "Running": "Running",
-            "Sprinting": "Sprinting"
+            "Sprinting": "Sprinting",
+            "JumpedIn": "Jumped-In (Movement Locked)",
+            "RiggedVehicle": "Rigged Vehicle (Rigger Active)"
         },
         "Stock": "Stock",
         "StreetCred": "Street Cred",
@@ -3183,7 +3201,9 @@
             "SpiritSummonSuccess": "Spirit summoned!",
             "SpriteCompilationFailure": "Sprite fled!",
             "SpriteCompilationSuccess": "Sprite compiled!",
-            "Success": "Success!"
+            "Success": "Success!",
+            "ActiveSensorLockFailure": "Active Sensor Lock failed!",
+            "ActiveSensorLockSuccess": "Active Sensor Lock successful!"
         },
         "Tests": {
             "AttributeOnlyTest": "Attribute-Only Test",
@@ -3226,7 +3246,9 @@
             "SuccessTest": "Success Test",
             "SummonSpiritTest": "Summon Spirit",
             "SuppressionDefenseTest": "Suppression Defense",
-            "ThrownAttackTest": "Thrown Weapon Attack"
+            "ThrownAttackTest": "Thrown Weapon Attack",
+            "OpposedActiveSensorLockTest": "Opposed Active Sensor Lock",
+            "OpposedVehicleTest": "Opposed Vehicle Test"
         },
         "Threshold": "Threshold",
         "TimeControl": {
@@ -3531,7 +3553,9 @@
             "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
             "SkillSetDefaultTypeOutsideCompendium": "Only skillsets in the configured skillset compendium will affect actor creation",
             "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
-            "TokenSelectionNeeded": "One or more tokens need to be selected"
+            "TokenSelectionNeeded": "One or more tokens need to be selected",
+            "HardwareSkillRequired": "Hardware skill > 0 is required for matrix repairs.",
+            "TokenMovementLockedJumpedIn": "{vehicle} is currently rigged. Your token can't move while you're jumped in."
         },
         "Weapon": {
             "AmmoCount": "Ammo Count",
@@ -3743,7 +3767,48 @@
         "Wireless": "Wireless",
         "WirelessOffline": "Offline",
         "WirelessOnline": "Online",
-        "WirelessUnavailable": "Unavailable"
+        "WirelessUnavailable": "Unavailable",
+        "ControlMode": "Control Mode",
+        "ControlModes": {
+            "Autopilot": "Autopilot",
+            "Remote": "Remote Control",
+            "Rigger": "Jumped-In",
+            "Manual": "Manual"
+        },
+        "Rigger": {
+            "RiggerInterface": "Rigger Interface",
+            "JumpIn": "Jump In",
+            "JumpOut": "Jump Out",
+            "JumpedIn": "Jumped In",
+            "JumpedInVehicleHint": "Jumped into vehicle. Click to open sheet, double-click to view token on canvas.",
+            "JumpedInDriverHint": "Jumped in by rigger. Click to open sheet, double-click to view token on canvas.",
+            "JumpedInSuccess": "{rigger} jumped into {vehicle}",
+            "JumpedOutSuccess": "Jumped out of {vehicle}",
+            "JumpInTestRequired": "Jumping into unowned vehicle {vehicle} requires a test.",
+            "JumpedInEffectName": "Jumped-In ({rigger})",
+            "RiggerMovingVehicle": "{rigger} is piloting {vehicle}",
+            "GODRiggerInterfaceWarning": "<div class='sr5-god-alert'><div class='god-header'>⚡ GRID OVERWATCH DIVISION // SYSTEM ALERT</div><div class='god-body'><p><strong>WARNING:</strong> Vehicle <em>{vehicle}</em> lacks a verified Rigger Interface connection. Direct Neural Interface connection established without hardware link.</p></div></div>",
+            "ResistBiofeedback": "Resist Biofeedback Damage",
+            "BiofeedbackSuffered": "Vehicle {vehicle} took {damage} physical damage. {driver} must resist Biofeedback damage!",
+            "ResistDumpShock": "Resist Dump Shock",
+            "DumpShockSuffered": "{driver} suffered forced ejection from {vehicle} ({reason}).",
+            "DumpShockDeviceDestroyed": "Device Destroyed",
+            "DumpShockConnectionSevered": "Connection Severed",
+            "MissingRiggerInterface": "Vehicle {vehicle} does not have an installed Rigger Interface!",
+            "RepairMatrixDamage": "Repair Matrix Damage",
+            "ActiveSensorLock": "Active Sensor Lock",
+            "ActiveSensorLockSuccess": "{attacker} locked sensors onto {target} (+{netHits} target defense penalty)",
+            "Disoriented": "Disoriented",
+            "SpunOut": "Spun Out",
+            "SpunOutInfo": "{target} has spun out!",
+            "EWarNoiseReductionSuccess": "{actor} gained +{hits} Noise Reduction for 1 round.",
+            "RammingSuccess": "{attacker} rammed {target} dealing {damage} physical damage!",
+            "ResistRammingDamage": "Resist Ramming Damage",
+            "RammingBothDamaged": "{attacker} rammed {target} for {damage} physical damage! {attacker} resists {selfDamage} recoil damage.",
+            "EmergencyExitFailure": "{actor} failed emergency exit and suffers {damage} impact damage!",
+            "EWarNoiseReductionEffect": "E-War Noise Reduction",
+            "JumpInTestFailed": "Failed test to jump into vehicle."
+        }
     },
     "TYPES": {
         "Actor": {

@@ -79,7 +79,9 @@
         "TokenMovementHistoryReset": "Zeitpunkt zum Zurücksetzen des Bewegungsverlaufs",
         "TokenMovementHistoryResetDescription": "Legt fest, wann der Bewegungsverlauf von Kämpfenden im Kampf gelöscht wird",
         "TokenMovementHistoryResetFirstActionPhase": "Bei meiner ersten Handlungsphase",
-        "TokenMovementHistoryResetTurnStart": "Zu Beginn des Zuges zurücksetzen"
+        "TokenMovementHistoryResetTurnStart": "Zu Beginn des Zuges zurücksetzen",
+        "RequireRiggerInterfaceName": "Erfordere Rigger-Interface Pflicheinstellung",
+        "RequireRiggerInterfaceDescription": "Wenn aktiviert, wird das Hineinspringen in ein Fahrzeug ohne Rigger-Interface blockiert. Wenn deaktiviert (Standard), sendet G.O.D. eine Ingame-Warnung im Chat."
     },
     "SR5": {
         "AP": "DK",
@@ -1262,7 +1264,9 @@
             "NoAvailableActorFound": "Es wurde kein verfügbarer Akteur für diese Aktion gefunden",
             "SkillWithoutAttribute": "Die Fertigkeit hat kein konfiguriertes Attribut.",
             "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug-Akteur geworfen werden",
-            "TooManyActionsWithCategory": "Es darf nur eine Aktion mit der Kategorie {category} pro Akteur geben."
+            "TooManyActionsWithCategory": "Es darf nur eine Aktion mit der Kategorie {category} pro Akteur geben.",
+            "NoVehicleOwnership": "Du besitzt dieses Fahrzeug nicht.",
+            "NoDriverSelectedForJumpIn": "Kein Fahrer für das Hineinspringen ausgewählt oder zugewiesen."
         },
         "EssenceCost": "Essenz",
         "Expand": "Ausklappen",
@@ -1513,7 +1517,9 @@
         "Infos": {
             "CantModifyHostContent": "Hostdaten können nicht von einem IC-Akteur aus verändert werden",
             "ConsumedEquippedAmmo": "Kugeln von ausgerüsteter Munition abgezogen",
-            "ResetProgressiveRecoil": "Kummulativer Rückstoß zurückgesetzt auf 0 abgefeuerte Kugeln"
+            "ResetProgressiveRecoil": "Kummulativer Rückstoß zurückgesetzt auf 0 abgefeuerte Kugeln",
+            "NoMatrixDamageToRepair": "Gerät hat keinen zu reparierenden Matrixschaden.",
+            "MatrixDamageRepaired": "{device} um {hits} Matrixschaden repariert."
         },
         "InitCatAstral": "Astrale Initiative",
         "InitCatMatrix": "Matrix-Initiative",
@@ -2163,6 +2169,10 @@
                 "type": {
                     "hint": "Art der Modifikation",
                     "label": "Art"
+                },
+                "isRiggerInterface": {
+                    "hint": "Ob diese Modifikation als Rigger-Interface (Riggeranpassung) fungiert",
+                    "label": "Rigger-Interface"
                 }
             }
         },
@@ -3071,7 +3081,9 @@
             "SpiritSummonSuccess": "Geist beschworen!",
             "SpriteCompilationFailure": "Sprite entkommen!",
             "SpriteCompilationSuccess": "Sprite kompiliert!",
-            "Success": "Erfolg!"
+            "Success": "Erfolg!",
+            "ActiveSensorLockFailure": "Aktive Zielerfassung fehlgeschlagen!",
+            "ActiveSensorLockSuccess": "Aktive Zielerfassung erfolgreich!"
         },
         "Tests": {
             "AttributeOnlyTest": "Attributsprobe",
@@ -3111,7 +3123,9 @@
             "SuccessTest": "Erfolgsprobe",
             "SummonSpiritTest": "Geist Herbeirufen",
             "SuppressionDefenseTest": "Sperrfeuer-Verteidigung",
-            "ThrownAttackTest": "Wurfwaffen-Angriff"
+            "ThrownAttackTest": "Wurfwaffen-Angriff",
+            "OpposedActiveSensorLockTest": "Widerstehe aktiver Zielerfassung",
+            "OpposedVehicleTest": "Vergleichende Fahrzeugprobe"
         },
         "Threshold": "Schwellenwert",
         "TimeControl": {
@@ -3450,7 +3464,9 @@
             "SkillSetDefaultTypeOutsideCompendium": "Nur Skillsets im konfigurierten Skillset Kompendium beeinflussen neue Akteure.",
             "SummoningNotConcluded": "Herbeirufung unvollständig. Warte auf Gegenprobe des Geists, um Entzug zu bestimmen.",
             "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein",
-            "NoActorCreatePermission": "Du hast keine Berechtigung, Akteure zu erstellen."
+            "NoActorCreatePermission": "Du hast keine Berechtigung, Akteure zu erstellen.",
+            "HardwareSkillRequired": "Hardware-Fertigkeit > 0 ist für Matrix-Reparaturen erforderlich.",
+            "TokenMovementLockedJumpedIn": "{vehicle} ist aktuell geriggt! Metamensch-Tokenbewegung ist gesperrt."
         },
         "Weapon": {
             "AmmoCount": "Munition",
@@ -3665,7 +3681,50 @@
         "WirelessUnavailable": "Kabel",
         "StatusEffects": {
             "Running": "Laufen",
-            "Sprinting": "Sprint"
+            "Sprinting": "Sprint",
+            "JumpedIn": "Hineingesprungen (Bewegung gesperrt)",
+            "RiggedVehicle": "Geriggtes Fahrzeug (Rigger aktiv)"
+        },
+        "ControlMode": "Steuerungsmodus",
+        "ControlModes": {
+            "Autopilot": "Autopilot",
+            "Remote": "Fernsteuerung",
+            "Rigger": "Hineingesprungen",
+            "Manual": "Manuell"
+        },
+        "Rigger": {
+            "RiggerInterface": "Riggeranpassung",
+            "JumpIn": "Hineinspringen",
+            "JumpOut": "Hinausspringen",
+            "JumpedIn": "Hineingesprungen",
+            "JumpedInVehicleHint": "In Fahrzeug hineingesprungen. Klick öffnet Bogen, Doppelklick zeigt Token.",
+            "JumpedInDriverHint": "Von Rigger gesteuert. Klick öffnet Bogen, Doppelklick zeigt Token.",
+            "JumpedInSuccess": "{rigger} ist in {vehicle} hineingesprungen",
+            "JumpedOutSuccess": "Aus {vehicle} hinausgesprungen",
+            "JumpInTestRequired": "Das Hineinspringen in das fremde Fahrzeug {vehicle} erfordert eine Probe.",
+            "JumpedInEffectName": "Hineingesprungen ({rigger})",
+            "RiggerMovingVehicle": "{rigger} steuert {vehicle}",
+            "GODRiggerInterfaceWarning": "<div class='sr5-god-alert'><div class='god-header'>⚡ GRID OVERWATCH DIVISION // SYSTEMALERT</div><div class='god-body'><p><strong>WARNUNG:</strong> Fahrzeug <em>{vehicle}</em> verfügt über keine verifizierte Rigger-Interface-Verbindung. Direct Neural Interface Verbindung ohne Hardware-Link hergestellt.</p></div></div>",
+            "ResistBiofeedback": "Biofeedback-Schaden widerstehen",
+            "BiofeedbackSuffered": "Fahrzeug {vehicle} hat {damage} körperlichen Schaden erlitten. {driver} muss Biofeedback-Schaden widerstehen!",
+            "ResistDumpShock": "Auswurfschock widerstehen",
+            "DumpShockSuffered": "{driver} erlitt Notauswurf aus {vehicle} ({reason}).",
+            "DumpShockDeviceDestroyed": "Gerät zerstört",
+            "DumpShockConnectionSevered": "Verbindung getrennt",
+            "MissingRiggerInterface": "Fahrzeug {vehicle} besitzt kein installiertes Rigger-Interface!",
+            "RepairMatrixDamage": "Matrix-Schaden reparieren",
+            "ActiveSensorLock": "Aktive Zielerfassung",
+            "ActiveSensorLockSuccess": "{attacker} hat Sensoren auf {target} aufgeschaltet (+{netHits} Ziel-Verteidigungsmalus)",
+            "Disoriented": "Orientierungslos",
+            "SpunOut": "Ins Schleudern Geraten",
+            "SpunOutInfo": "{target} ist ins Schleudern geraten!",
+            "EWarNoiseReductionSuccess": "{actor} erhält +{hits} Rauschunterdrückung für 1 Runde.",
+            "RammingSuccess": "{attacker} hat {target} gerammt und {damage} körperlichen Schaden verursacht!",
+            "ResistRammingDamage": "Rammschaden widerstehen",
+            "RammingBothDamaged": "{attacker} hat {target} gerammt ({damage} körperlicher Schaden)! {attacker} widersteht {selfDamage} Rückstoßschaden.",
+            "EmergencyExitFailure": "{actor} Notausstieg fehlgeschlagen und erleidet {damage} Aufprallschaden!",
+            "EWarNoiseReductionEffect": "E-War Rauschunterdrückung",
+            "JumpInTestFailed": "Probe zum Hineinspringen ins Fahrzeug fehlgeschlagen."
         }
     },
     "TYPES": {

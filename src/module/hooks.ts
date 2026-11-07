@@ -27,6 +27,7 @@ import { ExtendedTestManager } from './apps/ExtendedTestManager';
 import { ExtendedTestFlow } from './flows/ExtendedTestFlow';
 import { ExtendedTestDueFlow } from './flows/ExtendedTestDueFlow';
 import { PreparationDecayFlow } from './flows/PreparationDecayFlow';
+import { RiggerFlow } from './flows/RiggerFlow';
 import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
 import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
 import { CharacterImporter } from './apps/actorImport/characterImporter/CharacterImporter';
@@ -77,6 +78,8 @@ import { MatrixTest } from './tests/MatrixTest';
 import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
 import { CheckOverwatchScoreTest } from '@/module/tests/CheckOverwatchScoreTest';
 import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
+import { OpposedActiveSensorLockTest } from '@/module/tests/OpposedActiveSensorLockTest';
+import { OpposedVehicleTest } from '@/module/tests/OpposedVehicleTest';
 
 import { createItemMacro, rollItemMacro, rollSkillMacro } from './macros';
 
@@ -100,6 +103,7 @@ import { IconAssign } from './apps/iconAssigner/IconAssign';
 import { initDiceSoNice } from './rolls/DiceSoNice';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
+import { SR5TokenHUD } from '@/module/token/SR5TokenHUD';
 
 import { CombatDM } from './types/combat/Combat';
 import { CombatantDM } from './types/combat/Combatant';
@@ -144,6 +148,7 @@ import { MatrixNetworkFlow } from './item/flows/MatrixNetworkFlow';
 import { SocketMessage } from './sockets';
 import { TagifyHooks } from '@/module/tagify/TagifyHooks';
 import { RiggingHooks } from '@/module/tests/hooks/RiggingHooks';
+import { TokenLockHooks } from '@/module/token/TokenLockHooks';
 import { SocketMessageFlow } from './flows/SocketMessageFlow';
 import { CompendiumBrowser } from './apps/compendiumBrowser/CompendiumBrowser';
 import { Skill } from './types/item/Skill';
@@ -194,6 +199,7 @@ export class HooksManager {
 
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();
+        TokenLockHooks.registerHooks();
         TagifyHooks.registerHooks();
 
         RenderSettings.listen();
@@ -240,6 +246,12 @@ ___________________
              * You want to open the compendium browser?
              */
             CompendiumBrowser,
+
+            /**
+             * Rigger & Vehicle workflow API (jumpIn, jumpOut, ejectDriver, toggleJumpIn).
+             */
+            rigger: RiggerFlow,
+            RiggerFlow,
 
             /**
              * You want to create a test from whatever source?
@@ -299,7 +311,9 @@ ___________________
                 BiofeedbackResistTest,
                 CheckOverwatchScoreTest,
                 OpposedCheckOverwatchScoreTest,
-                OpposedMatrixTest
+                OpposedMatrixTest,
+                OpposedActiveSensorLockTest,
+                OpposedVehicleTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -354,7 +368,9 @@ ___________________
                 OpposedBruteForceTest,
                 OpposedHackOnTheFlyTest,
                 OpposedCheckOverwatchScoreTest,
-                OpposedMatrixTest
+                OpposedMatrixTest,
+                OpposedActiveSensorLockTest,
+                OpposedVehicleTest
             },
             /**
              * Subset of tests meant to be used as resist tests.
@@ -406,6 +422,7 @@ ___________________
         CONFIG.Token.objectClass = SR5Token;
         CONFIG.Token.documentClass = SR5TokenDocument;
         CONFIG.Token.rulerClass = SR5TokenRuler;
+        CONFIG.Token.hudClass = SR5TokenHUD as any;
         CONFIG.Token.movement.actions['run'] = {
             label: 'SR5.MovementTypes.Run',
             icon: 'fa-solid fa-person-running',

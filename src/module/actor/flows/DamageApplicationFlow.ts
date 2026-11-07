@@ -9,6 +9,8 @@ import { ConditionType } from "@/module/types/template/Condition";
 import { CombatRules } from "@/module/rules/CombatRules";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { ResonsanceRules } from "@/module/rules/ResonanceRules";
+import { RiggerFlow } from "@/module/flows/RiggerFlow";
+import { SYSTEM_NAME } from "@/module/constants";
 
 type DamageElement = Item.SystemOfType<'weapon'>['action']['damage']['element']['base'];
 
@@ -81,13 +83,26 @@ export class DamageApplicationFlow {
 
         const value = Number(applyDamage.data('damageValue'));
         const type = String(applyDamage.data('damageType')) as DamageType['type']['value'];
-        const ap = Number(applyDamage.data('damageAp'));
-        const element = String(applyDamage.data('damageElement')) as DamageElement;
-        const biofeedback = String(applyDamage.data('damageBiofeedback')) as BiofeedbackDamageType;
+        const apRaw = applyDamage.data('damageAp');
+        const ap = apRaw !== undefined && !Number.isNaN(Number(apRaw)) ? Number(apRaw) : 0;
+        const elementRaw = applyDamage.data('damageElement');
+        const element = (elementRaw && elementRaw !== 'undefined' ? String(elementRaw) : '') as DamageElement;
+        const bioRaw = applyDamage.data('damageBiofeedback');
+        const biofeedback = (bioRaw && bioRaw !== 'undefined' && bioRaw !== 'false' ? String(bioRaw) : '') as BiofeedbackDamageType;
         const normalWeapon = String(applyDamage.data('damageNormalWeapon')) === 'true';
         const damage = Helpers.createDamageData(value, type, ap, element, biofeedback, normalWeapon);
 
-        const targets: (SR5Item | SR5Actor)[] = Helpers.getSelectedActorsOrCharacter();
+        const targets: (SR5Item | SR5Actor)[] = [];
+        const targetUuid = applyDamage.data('targetUuid');
+        if (targetUuid) {
+            const targetDoc = fromUuidSync(String(targetUuid));
+            if (targetDoc && (targetDoc instanceof SR5Actor || targetDoc instanceof SR5Item)) {
+                targets.push(targetDoc);
+            }
+        }
+        if (targets.length === 0) {
+            targets.push(...Helpers.getSelectedActorsOrCharacter());
+        }
 
         // Should no selection be available try guessing.
         if (targets.length === 0) {
@@ -201,6 +216,14 @@ export class DamageApplicationFlow {
 
         await DamageApplicationFlow._addDamageToTrack(actor, rest, track);
         await DamageApplicationFlow._addDamageToOverflow(actor, overflow, track);
+
+        if (actor.isType('vehicle') && actor.system.controlMode === 'rigger') {
+            const updatedTrack = actor.getPhysicalTrack();
+            if (updatedTrack && updatedTrack.value >= updatedTrack.max) {
+                await RiggerFlow.ejectDriver(actor, true);
+            }
+        }
+
         return undefined;
     }
 
@@ -226,10 +249,29 @@ export class DamageApplicationFlow {
 
         const { rest } = DamageApplicationFlow._calcDamageOverflow(damage, track);
 
-        if (device)
+        if (device) {
             await DamageApplicationFlow._addDamageToDeviceTrack(rest, device);
-        if (actor.isType('ic', 'sprite'))
+            const condition = device.getCondition();
+            if (condition && condition.value >= condition.max) {
+                const jumpedUuid = actor.getFlag(SYSTEM_NAME, 'jumpedInVehicleUuid') as string | undefined;
+                if (jumpedUuid) {
+                    const vehicle = (await fromUuid(jumpedUuid)) as SR5Actor | null;
+                    if (vehicle && vehicle.isType('vehicle')) {
+                        await RiggerFlow.ejectDriver(vehicle, true);
+                    }
+                }
+            }
+        }
+
+        if (actor.isType('ic', 'sprite', 'vehicle')) {
             await DamageApplicationFlow._addDamageToTrack(actor, rest, track);
+            if (actor.isType('vehicle') && actor.system.controlMode === 'rigger') {
+                const updatedTrack = actor.getMatrixTrack();
+                if (updatedTrack && updatedTrack.value >= updatedTrack.max) {
+                    await RiggerFlow.ejectDriver(actor, true);
+                }
+            }
+        }
         return undefined;
     }
 
@@ -354,8 +396,7 @@ export class DamageApplicationFlow {
 
         track.value += damage.value;
         if (track.value > track.max) {
-            // dev error, not really meant to be ever seen by users. Therefore no localization.
-            console.error("Damage did overflow the track, which shouldn't happen at this stage. Damage has been set to max. Please use applyDamage.")
+            console.error("Damage did overflow the track, which shouldn't happen at this stage. Damage has been set to max. Please use applyDamage.");
             track.value = track.max;
         }
 
@@ -363,7 +404,7 @@ export class DamageApplicationFlow {
     }
 
     /**
-     * Add damage to a device's condition monitor.
+     * Add damage to a device's condition monitor. Support negative damage for matrix repair/healing.
      * 
      * @param damage 
      * @param device 
@@ -376,9 +417,11 @@ export class DamageApplicationFlow {
         if (!condition) return damage;
 
         if (damage.value === 0) return;
-        if (condition.value === condition.max) return;
+        if (damage.value > 0 && condition.value === condition.max) return;
+        if (damage.value < 0 && condition.value === 0) return;
 
-        condition = DamageApplicationFlow._addDamageToTrackValue(damage, condition);
+        condition = foundry.utils.duplicate(condition) as ConditionType;
+        condition.value = Math.max(0, Math.min(condition.max, condition.value + damage.value));
 
         await device.update({ system: { technology: { condition_monitor: condition } } });
         return undefined;

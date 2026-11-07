@@ -523,7 +523,8 @@
         "Errors": {
             "LinkLockedReboot": "Un acteur verrouillé par lien ne peut pas être redémarré",
             "MissingSkill": "Le personnage n'a pas la compétence demandée",
-            "SkillWithoutAttribute": "La compétence n'a pas d'attribut assigné"
+            "SkillWithoutAttribute": "La compétence n'a pas d'attribut assigné",
+            "NoDriverSelectedForJumpIn": "Aucun conducteur sélectionné ou assigné pour le saut."
         },
         "EssenceCost": "Essence",
         "Expand": "Étendre",
@@ -1515,7 +1516,8 @@
             "SkillAlreadyExists": "La compétence {name} existe déjà sur l'acteur {actorName} ({actorUuid}). Utilisez chaque nom de compétence une seule fois par catégorie.",
             "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
             "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés",
-            "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs."
+            "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs.",
+            "TokenMovementLockedJumpedIn": "{vehicle} est actuellement contrôlé par un rigger ! Déplacement verrouillé."
         },
         "Tooltips": {
             "RangedAttack": {
@@ -1615,7 +1617,25 @@
         "Wounds": "Blessures",
         "StatusEffects": {
             "Running": "Course",
-            "Sprinting": "Sprint"
+            "Sprinting": "Sprint",
+            "sr5jumpedIn": "En commande directe (Déplacement verrouillé)",
+            "sr5riggedVehicle": "Véhicule commandé (Rigger actif)",
+            "sr5sensorLock": "Cible verrouillée (Capteur actif)",
+            "sr5spunOut": "En tête-à-queue (Pénalité de maniabilité)"
+        },
+        "Rigger": {
+            "RiggerInterface": "Interface rigger",
+            "JumpIn": "Sauter dans le véhicule",
+            "JumpOut": "Quitter le véhicule",
+            "JumpedInSuccess": "{rigger} a sauté dans {vehicle}",
+            "JumpedOutSuccess": "A quitté {vehicle}",
+            "JumpInTestRequired": "Le saut dans le véhicule non possédé {vehicle} nécessite un test.",
+            "JumpedInEffectName": "En commande directe ({rigger})",
+            "RiggerMovingVehicle": "{rigger} pilote {vehicle}",
+            "GODRiggerInterfaceWarning": "<div class='sr5-god-alert'><div class='god-header'>⚡ GRID OVERWATCH DIVISION // ALERTE SYSTÈME</div><div class='god-body'><p><strong>AVERTISSEMENT:</strong> Le véhicule <em>{vehicle}</em> ne possède pas de connexion d'interface rigger vérifiée.</p></div></div>",
+            "MissingRiggerInterface": "Le véhicule {vehicle} n'a pas d'interface rigger installée !",
+            "ActiveSensorLock": "Verrouillage Capteur Actif",
+            "ActiveSensorLockSuccess": "{attacker} a verrouillé les capteurs sur {target} (+{netHits} pénalité de défense)"
         }
     }
 }
