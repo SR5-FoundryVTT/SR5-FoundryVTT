@@ -33,6 +33,7 @@ export const preloadHandlebarsTemplates = async () => {
             'item/spell-summary',
             'item/footer/preparation',
             'item/footer/skill',
+            'item/footer/metatype',
             'item/tabs/details/action',
             'item/tabs/details/adept_power',
             'item/tabs/details/ammo',

@@ -21,6 +21,9 @@ export const AttributeField = (
         ...(limit ? { initial: limit } : {}),
         choices: limit ? { [limit]: SR5.limits[limit] } : SR5.limits,
     }),
+    min: new NumberField({ nullable: true, integer: true }),
+    max: new NumberField({ nullable: true, integer: true }),
+    aug_max: new NumberField({ nullable: true, integer: true }),
 });
 
 const EdgeAttributeField = () => ({

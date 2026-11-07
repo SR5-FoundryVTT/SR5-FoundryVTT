@@ -57,6 +57,14 @@ import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetect
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
 import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
+import { Metatype } from "./item/Metatype";
+import { SR5 } from "../config";
+
+declare global {
+    interface CONFIG {
+        SR5: typeof SR5;
+    }
+}
 
 /**
  * TODO: fvtt-types v14 - Update global module declarations to match updated types in fvtt-types.
@@ -188,6 +196,7 @@ declare module "fvtt-types/configuration" {
             spell: typeof Spell;
             sprite_power: typeof SpritePower;
             weapon: typeof Weapon;
+            metatype: typeof Metatype;
         }
     }
 
@@ -214,12 +223,18 @@ declare module "fvtt-types/configuration" {
             };
         };
         Item: {
+            core?: {
+                sourceId?: string;
+            };
             shadowrun5e: {
                 lastFireMode?: FireModeType;
                 lastSpellForce?: SpellForceType;
                 lastComplexFormLevel?: ComplexFormLevelType;
                 lastFireRange?: FireRangeType;
                 embeddedItems: Item.Source[];
+                grantedByMetatype?: string;
+                grantedCategory?: string;
+                metaTypesItems?: Array<{ id?: string; name: string; type?: string; chummerId?: string; foundryUuid?: string; category?: string; power?: string; select?: string; }>;
             };
         };
         Macro: {

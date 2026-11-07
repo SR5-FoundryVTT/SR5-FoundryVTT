@@ -16,6 +16,7 @@ export const ActorSkills = () => ({
 });
 
 export const MagicData = () => ({
+    type: new StringField({ required: false, initial: "" }),
     attribute: new StringField({
         required: true,
         initial: "logic",

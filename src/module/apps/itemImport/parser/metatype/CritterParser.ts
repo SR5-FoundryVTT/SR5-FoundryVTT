@@ -3,6 +3,7 @@ import { Metatype } from "../../schema/MetatypeSchema";
 import { CompendiumKey } from "../../importer/Constants";
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { MetatypeParserBase } from './MetatypeParserBase';
+import { MetatypeItemParser } from './MetatypeItemParser';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { KnowledgeSkillCategory } from "src/module/types/template/Skills";
 
@@ -43,6 +44,10 @@ export class CritterParser extends MetatypeParserBase<'character'> {
     protected override getSystem(jsonData: Metatype) {
         const system = this.getBaseSystem();
 
+        const metatypeId = IH.guidToId(jsonData.id._TEXT);
+        system.metatype = jsonData.name._TEXT;
+        system.metatypeUuid = `Compendium.world.${Constants.MAP_COMPENDIUM_CONFIG.Metatype.pack}.Item.${metatypeId}`;
+
         system.attributes.body.base = Number(jsonData.bodmin._TEXT) || 0;
         system.attributes.agility.base = Number(jsonData.agimin._TEXT) || 0;
         system.attributes.reaction.base = Number(jsonData.reamin._TEXT) || 0;
@@ -72,6 +77,7 @@ export class CritterParser extends MetatypeParserBase<'character'> {
 
     protected override async getItems(jsonData: Metatype): Promise<Item.Source[]> {
         const { name, powers, skills, biowares, complexforms } = jsonData;
+        const metatypeId = IH.guidToId(jsonData.id._TEXT);
 
         const qualities = this.mergeLists(
             jsonData.qualities?.positive?.quality,
@@ -106,13 +112,47 @@ export class CritterParser extends MetatypeParserBase<'character'> {
             this.mergeLists(powers?.power, optionalPowers), { actorName: critterName }
         );
 
+        // Metatype item for this critter
+        const metatypeParser = new MetatypeItemParser();
+        const metatypeItem = await metatypeParser.Parse(jsonData, 'Metatype') as Item.Source;
+        const embeddedMetatypeId = foundry.utils.randomID();
+        metatypeItem._id = embeddedMetatypeId;
+        delete (metatypeItem as any).folder;
+        if (!metatypeItem.img) {
+            const subtype = (metatypeItem.system as Item.SystemOfType<'metatype'> | undefined)?.subtype;
+            metatypeItem.img = subtype === 'infected'
+                ? 'systems/shadowrun5e/dist/icons/importer/critter/infected.svg'
+                : 'systems/shadowrun5e/dist/icons/importer/critter/mundane-critters.svg';
+        }
+
+        const tagGranted = (items: Item.Source[], category: 'qualities' | 'weapons' | 'items' = 'qualities') => {
+            for (const item of items) {
+                item.flags = {
+                    ...(item.flags || {}),
+                    shadowrun5e: {
+                        ...(item.flags?.shadowrun5e || {}),
+                        grantedByMetatype: embeddedMetatypeId,
+                        grantedCategory: category,
+                    },
+                };
+            }
+            return items;
+        };
+
+        const grantedPowers = tagGranted([
+            ...this.getMetatypeItems(allPowers, optionalPowers, { type: 'Optional Power', critter: critterName }),
+            ...this.getMetatypeItems(allPowers, powers?.power, { type: 'Power', critter: critterName }),
+        ]);
+        const grantedQualities = tagGranted(this.getMetatypeItems(allQualities, qualities, { type: 'Quality', critter: critterName }));
+        const grantedWeapons = tagGranted(naturalWeapons, 'weapons');
+
         return [
-            ...naturalWeapons,
+            metatypeItem,
+            ...grantedWeapons,
             ...knowledgeSkillItems,
             ...this.getMetatypeItems(allSpells, spellsData, { type: 'Spell', critter: critterName }),
-            ...this.getMetatypeItems(allPowers, optionalPowers, { type: 'Power', critter: critterName }),
-            ...this.getMetatypeItems(allQualities, qualities, { type: 'Quality', critter: critterName }),
-            ...this.getMetatypeItems(allPowers, powers?.power, { type: 'Power', critter: critterName }),
+            ...grantedPowers,
+            ...grantedQualities,
             ...this.getMetatypeItems(allSkills, skills?.skill, { type: 'Skill', critter: critterName }),
             ...this.getMetatypeItems(allSkills, skills?.group, { type: 'Skill Group', critter: critterName }),
             ...this.getMetatypeItems(allBiowares, biowares?.bioware, { type: 'Bioware', critter: critterName }),

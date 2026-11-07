@@ -1,0 +1,55 @@
+<div>
+    <div class="sheet-header metatype-sheet-header">
+        <img class="sheet-image" src="{{item.img}}" data-tooltip="{{#if @root.isEditMode}}{{item.img}}{{else}}{{displayName}}{{/if}}"
+             {{#if @root.isEditMode}}
+                 data-edit="img"
+                 data-action="editImage"
+             {{/if}}
+        />
+        <div class="sheet-header-labels metatype-sheet-header-body">
+            <div class="metatype-sheet-header-main">
+                <div class="metatype-sheet-header-center">
+                    <div class="sheet-header-name">
+                        <span class="sheet-header-name-input">
+                            {{#if @root.isEditMode}}
+                                {{formInput fields.name value=item.name classes="sheet-name"
+                                            placeholder=(localize "SR5.Name") rootId=rootId}}
+                            {{else}}
+                                <input type="text" class="sheet-name" value="{{displayName}}" disabled>
+                            {{/if}}
+                        </span>
+                    </div>
+                    <div class="sheet-header-source metatype-sheet-header-source">
+                        <label>{{localize "SR5.Source"}}</label>
+                        {{#if @root.isEditMode}}
+                            {{formInput systemFields.description.fields.source value=source.system.description.source
+                                        classes="short" placeholder=(localize "SR5.Source") rootId=rootId}}
+                        {{else}}
+                            {{> 'systems/shadowrun5e/dist/templates/v2/common/document-source-icon.hbs' system.description.source }}
+                        {{/if}}
+                    </div>
+                </div>
+                <div class="item-type-container metatype-header-meta">
+                    {{#if (or (eq system.subtype 'metahuman') (eq system.subtype 'infected'))}}
+                        {{#if @root.isEditMode}}
+                            <div class="metatype-header-meta-row">
+                                <label>{{localize "SR5.Metatype.BaseMetatype"}}</label>
+                                <span>
+                                    <select name="system.metatype" class="short" rootId=rootId data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">
+                                        {{#each localizedMetatypes}}
+                                            <option value="{{@key}}" {{#if (eq @key @root.system.metatype)}}selected{{/if}}>{{this}}</option>
+                                        {{/each}}
+                                    </select>
+                                </span>
+                            </div>
+                        {{else}}
+                            {{#if (ne displayName (lookup localizedMetatypes system.metatype))}}
+                                <label class="metatype-header-value" data-tooltip="{{localize 'SR5.Metatype.BaseMetatype'}}">{{lookup localizedMetatypes system.metatype}}</label>
+                            {{/if}}
+                        {{/if}}
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

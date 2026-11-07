@@ -1,0 +1,99 @@
+{
+  "name": "Ork",
+  "type": "metatype",
+  "flags": {
+    "shadowrun5e": {
+      "metaTypesItems": [
+        {
+          "foundryUuid": "Compendium.world.sr5trait.Item.i61WxQUa89ZPeHCf",
+          "chummerId": "8ec5c9bb-aeb9-42f2-a436-a60f764adfe4",
+          "name": "Low-Light Vision",
+          "category": "quality"
+        }
+      ]
+    }
+  },
+  "img": "icons/svg/mystery-man.svg",
+  "effects": [],
+  "_id": "FqTiOij2ZSUaVd7Y",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": "SR5"
+    },
+    "importFlags": null,
+    "metatype": "ork",
+    "subtype": "metahuman",
+    "subsubtype": null,
+    "karma": 50,
+    "attributes": {
+      "body": {
+        "min": 4,
+        "max": 9,
+        "aug_max": 13
+      },
+      "agility": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "reaction": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "strength": {
+        "min": 3,
+        "max": 8,
+        "aug_max": 12
+      },
+      "willpower": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "logic": {
+        "min": 1,
+        "max": 5,
+        "aug_max": 7
+      },
+      "intuition": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "charisma": {
+        "min": 1,
+        "max": 5,
+        "aug_max": 7
+      },
+      "edge": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      }
+    },
+    "qualities": [
+      "Compendium.world.sr5trait.Item.i61WxQUa89ZPeHCf"
+    ],
+    "weapons": [],
+    "items": []
+  },
+  "ownership": {
+    "default": 0
+  },
+  "folder": null,
+  "sort": 0,
+  "_stats": {
+    "systemId": "shadowrun5e",
+    "systemVersion": null,
+    "coreVersion": "14",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!FqTiOij2ZSUaVd7Y"
+}

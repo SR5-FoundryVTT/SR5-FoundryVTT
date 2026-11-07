@@ -46,8 +46,10 @@ export const TechnologyPrep = {
      * 
      */
     prepareMentalAttributes(system: SR5Item['system']) {
-        const attributes = system.attributes!;
-        const technology = system.technology!;
+        if (!('attributes' in system) || !('technology' in system)) return;
+        const attributes = system.attributes;
+        const technology = system.technology;
+        if (!attributes || !technology || !('firewall' in attributes)) return;
 
         for (const name of SR5.mentalAttributes) {
             // Rating can be undefined...
@@ -66,8 +68,10 @@ export const TechnologyPrep = {
      * See SR5#234 'Devices'.
      */
     prepareMatrixAttributes(system: SR5Item['system']) {
-        const attributes = system.attributes!;
-        const technology = system.technology!;
+        if (!('attributes' in system) || !('technology' in system)) return;
+        const attributes = system.attributes;
+        const technology = system.technology;
+        if (!attributes || !technology || !('firewall' in attributes)) return;
         const attributesWithRating = ['data_processing', 'firewall'];
 
         for (const name of Object.keys(SR5.matrixAttributes)) {
@@ -83,8 +87,10 @@ export const TechnologyPrep = {
 
         // Add device rating as attribute to allow for rolls with it.
         const rating = Number(technology.rating ?? 0);
-        const parts = new ModifiableValue(attributes.rating);
-        parts.add('SR5.Host.Rating', rating);
+        if ('rating' in attributes && attributes.rating && 'base' in attributes.rating) {
+            const parts = new ModifiableValue(attributes.rating);
+            parts.add('SR5.Host.Rating', rating);
+        }
     },
 
     /**

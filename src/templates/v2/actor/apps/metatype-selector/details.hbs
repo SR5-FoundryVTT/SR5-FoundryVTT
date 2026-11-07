@@ -1,0 +1,23 @@
+<div class="metatype-selector-container fill-container">
+    <div class="metatype-search-bar">
+        <i class="fas fa-search"></i>
+        <input type="search" placeholder="{{localize 'SR5.MetatypeSelector.Search'}}" name="metatype-search" autocomplete="off" />
+    </div>
+    <div class="metatype-card-grid">
+        {{#each items}}
+            <div class="metatype-card {{#if this.isSelected}}selected{{/if}}" data-action="selectCard" data-uuid="{{this.uuid}}" data-original-name="{{this.originalName}}">
+                <img class="metatype-card-img" src="{{this.img}}" alt="{{this.name}}" />
+                <div class="metatype-card-info">
+                    <span class="metatype-card-title">{{this.name}}</span>
+                    <span class="metatype-card-meta">
+                        {{#if this.karma}}<span class="metatype-karma">{{this.karma}} {{localize "SR5.Karma"}}</span>{{/if}}
+                        <span class="metatype-badge {{this.sourceLabel}}">{{this.sourceLabel}}</span>
+                    </span>
+                </div>
+            </div>
+        {{else}}
+            <p class="metatype-no-results">{{localize "SR5.MetatypeSelector.NoResults"}}</p>
+        {{/each}}
+        <p class="metatype-no-results" style="display: none;">{{localize "SR5.MetatypeSelector.NoResults"}}</p>
+    </div>
+</div>

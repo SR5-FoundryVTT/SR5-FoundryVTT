@@ -9,7 +9,7 @@ export class AttributesPrep {
     /**
      * Prepare actor data for attributes
      */
-    static prepareAttributes(system: SR5Actor['system'], ranges?: Record<string, {min: number, max?: number}>) {
+    static prepareAttributes(system: Actor.SystemOfType<'character'> | SR5Actor['system'], ranges?: Record<string, {min?: number, max?: number, aug_max?: number}>) {
         const {attributes} = system;
 
         // hide magic and resonance based on the actor's special property
@@ -23,10 +23,11 @@ export class AttributesPrep {
         // set the value for the attributes
         for (const [name, attribute] of Object.entries(attributes)) {
             AttributesPrep.prepareAttribute(name, attribute, ranges);
+        }
 
-            if ('max' in attribute) {
-                attribute.max = attribute.value;
-            }
+        // Keep edge.max reflecting current edge pool for edge uses
+        if (attributes.edge && 'max' in attributes.edge) {
+            attributes.edge.max = attributes.edge.value;
         }
     }
 
@@ -35,12 +36,11 @@ export class AttributesPrep {
      * @param name The key field (and name) of the attribute given
      * @param attribute The AttributeField to prepare
      */
-    static prepareAttribute(name: string, attribute: AttributeFieldType, ranges?: Record<string, {min: number, max?: number}>) {
+    static prepareAttribute(name: string, attribute: AttributeFieldType, ranges?: Record<string, {min?: number, max?: number, aug_max?: number}>) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
         if (!Object.hasOwn(SR5.attributes, name) || !attribute) return;
 
         // Each attribute can have a unique value range.
-        // TODO:  Implement metatype attribute value ranges for character actors.
         AttributesPrep.calculateAttribute(name, attribute, ranges);
 
         // add i18n labels.
@@ -53,14 +53,27 @@ export class AttributesPrep {
      * @param name The attributes name / id
      * @param attribute The attribute will be modified in place
      */
-    static calculateAttribute(name: string, attribute: AttributeFieldType, ranges?: Record<string, {min: number, max?: number}>) {
+    static calculateAttribute(name: string, attribute: AttributeFieldType, ranges?: Record<string, {min?: number, max?: number, aug_max?: number}>) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
         if (!Object.hasOwn(SR5.attributes, name) || !attribute) return;
 
-        // Each attribute can have a unique value range.
-        // TODO:  Implement metatype attribute value ranges for character actors.
-        const range = ranges ? ranges[name] : SR.attributes.ranges[name];
-        ModifiableValue.calcTotal(attribute, range);
+        // Each attribute can have a unique value range from metatype reference data.
+        const range = ranges?.[name] ?? SR.attributes.ranges[name];
+        if (range) {
+            if (range.min != null) {
+                attribute.min = range.min;
+            }
+            if (range.max != null) {
+                attribute.max = range.max;
+            }
+            const augMax = range.aug_max ?? (range.max != null ? Math.floor(range.max * 1.5) : undefined);
+            if (augMax != null) {
+                attribute.aug_max = augMax;
+            }
+        }
+
+        // Calculate total without artificially enforcing/clamping min or max
+        ModifiableValue.calcTotal(attribute);
     }
 
     /**

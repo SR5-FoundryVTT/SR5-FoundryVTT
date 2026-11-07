@@ -1,0 +1,99 @@
+{
+  "name": "Elf",
+  "type": "metatype",
+  "flags": {
+    "shadowrun5e": {
+      "metaTypesItems": [
+        {
+          "foundryUuid": "Compendium.world.sr5trait.Item.i61WxQUa89ZPeHCf",
+          "chummerId": "8ec5c9bb-aeb9-42f2-a436-a60f764adfe4",
+          "name": "Low-Light Vision",
+          "category": "quality"
+        }
+      ]
+    }
+  },
+  "img": "icons/svg/mystery-man.svg",
+  "effects": [],
+  "_id": "8h12SU264mj8RveP",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": "SR5"
+    },
+    "importFlags": null,
+    "metatype": "elf",
+    "subtype": "metahuman",
+    "subsubtype": null,
+    "karma": 40,
+    "attributes": {
+      "body": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "agility": {
+        "min": 2,
+        "max": 7,
+        "aug_max": 10
+      },
+      "reaction": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "strength": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "willpower": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "logic": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "intuition": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "charisma": {
+        "min": 3,
+        "max": 8,
+        "aug_max": 12
+      },
+      "edge": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      }
+    },
+    "qualities": [
+      "Compendium.world.sr5trait.Item.i61WxQUa89ZPeHCf"
+    ],
+    "weapons": [],
+    "items": []
+  },
+  "ownership": {
+    "default": 0
+  },
+  "folder": null,
+  "sort": 0,
+  "_stats": {
+    "systemId": "shadowrun5e",
+    "systemVersion": null,
+    "coreVersion": "14",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!8h12SU264mj8RveP"
+}

@@ -27,3 +27,4 @@ foundryconfig.json
 packs/*
 !packs/_source
 !packs/_source/**
+.env

@@ -34,6 +34,7 @@ export class Constants {
 
         // Miscs
         'Misc':             { pack: 'sr5misc',            type: 'Item', folder: null, subFolder: null }, // Actions and skills
+        'Metatype':         { pack: 'sr5metatype',        type: 'Item', folder: null, subFolder: null }, // Metatypes
     } as const satisfies Record<string, CompendiumConfig>;
 
     public static readonly MAP_COMPENDIUM_KEY = {
@@ -46,6 +47,7 @@ export class Constants {
         // --- Character Traits ---
         Quality:        this.MAP_COMPENDIUM_CONFIG.Trait,
         Ware:           this.MAP_COMPENDIUM_CONFIG.Ware,
+        Metatype:       this.MAP_COMPENDIUM_CONFIG.Metatype,
 
         // --- Vehicles ---
         Drone:          this.MAP_COMPENDIUM_CONFIG.Drone,

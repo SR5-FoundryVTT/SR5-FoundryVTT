@@ -1,0 +1,13 @@
+<footer class="sheet-footer">
+    {{#if hasCurrentMetatype}}
+        <button class="sr5-button sr5-remove" type="button" data-action="removeMetatype" data-tooltip="{{localize 'SR5.MetatypeSelector.RemoveTooltip'}}">
+            <i class="fas fa-trash"></i> {{localize "SR5.MetatypeSelector.Remove"}}
+        </button>
+    {{/if}}
+    <button class="sr5-submit sr5-button" type="button" data-action="submitChanges" {{#unless selectedUuid}}disabled{{/unless}}>
+        <i class="fas fa-check"></i> {{localize "SR5.MetatypeSelector.Confirm"}}
+    </button>
+    <button class="sr5-cancel sr5-button" type="button" data-action="cancel">
+        <i class="fas fa-ban"></i> {{localize "SR5.MetatypeSelector.Cancel"}}
+    </button>
+</footer>

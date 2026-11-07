@@ -1819,7 +1819,35 @@
             "Sin": "SIN",
             "Spell": "주문",
             "SpritePower": "스프라이트 능력",
-            "Weapon": "무기"
+            "Weapon": "무기",
+            "Metatype": "메타인종"
+        },
+        "Metatype": {
+            "label": "메타인종",
+            "BaseMetatype": "주 메타인종",
+            "Category": "카테고리",
+            "Subtype": "하위 유형",
+            "Subsubtype": "하위 변종",
+            "KarmaCost": "카르마 비용",
+            "GrantedQualities": "부여된 특징",
+            "GrantedWeapons": "부여된 무기",
+            "GrantedItems": "부여된 아이템",
+            "DropToGrant": "이 메타인종에 부여할 아이템을 여기에 드롭하세요",
+            "AttributeRanges": "능력치 범위",
+            "Min": "최소",
+            "Max": "최대",
+            "AugMax": "강화 최대",
+            "ChangeMetatype": "메타인종 변경"
+        },
+        "MetaSubtypes": {
+            "metahuman": "메타휴먼",
+            "metasapient": "메타새피언트",
+            "shapeshifter": "셰이프시프터",
+            "infected": "감염자",
+            "critter": "크리터",
+            "spirit": "정령",
+            "sprite": "스프라이트",
+            "other": "기타"
         },
         "Karma": "카르마",
         "KarmaManager": {
@@ -1832,6 +1860,18 @@
             "StartingKarma": "시작 카르마",
             "Submit": "적용",
             "Title": "카르마 관리"
+        },
+        "MetatypeSelector": {
+            "Cancel": "취소",
+            "Compendium": "컴펜디엄",
+            "Confirm": "확인",
+            "Current": "현재",
+            "NoResults": "검색과 일치하는 메타타입이 없습니다.",
+            "Remove": "메타타입 제거",
+            "RemoveTooltip": "현재 메타타입 및 해당 혜택 제거",
+            "Search": "메타타입 검색...",
+            "Title": "메타타입 선택",
+            "World": "월드"
         },
         "Keybinding": {
             "AddRemoveManyQty": {
@@ -2103,7 +2143,6 @@
         },
         "Metamagic": "메타 마법",
         "Metamagics": "메타마법",
-        "Metatype": "메타인종",
         "MigrationComplete": "마이그레이션 완료",
         "MigrationUpdateCompendiumNoUpdateActor": "FoundryVTT의 기술적인 한계로 지금은 액터 팩을 업데이트할 수 없습니다. 이러한 팩은 수동으로 업데이트해야 합니다.",
         "MigrationUpdateCompendiumUpdateMessage": "월드에 있는 모든 컴펜디움도 함께 업데이트 됨",
@@ -3658,7 +3697,8 @@
             "spell": "주문",
             "sprite_power": "스프라이트 능력",
             "vehicle": "탑승물",
-            "weapon": "무기"
+            "weapon": "무기",
+            "metatype": "메타인종"
         }
     }
 }

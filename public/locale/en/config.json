@@ -1850,7 +1850,92 @@
             "Sin": "SIN",
             "Spell": "Spell",
             "SpritePower": "Sprite Power",
-            "Weapon": "Weapon"
+            "Weapon": "Weapon",
+            "Metatype": "Metatype"
+        },
+        "Metatype": {
+            "label": "Metatype",
+            "BaseMetatype": "Base Metatype",
+            "Category": "Category",
+            "Subtype": "Subtype",
+            "Subsubtype": "Subvariant",
+            "KarmaCost": "Karma Cost",
+            "GrantedQualities": "Granted Qualities",
+            "GrantedWeapons": "Granted Weapons",
+            "GrantedItems": "Granted Items",
+            "DropToGrant": "Drop item here to grant with this metatype",
+            "AttributeRanges": "Attribute Ranges",
+            "Min": "Min",
+            "Max": "Max",
+            "AugMax": "Aug Max",
+            "ChangeMetatype": "Change Metatype",
+            "FIELDS": {
+                "metatype": {
+                    "label": "Base Metatype",
+                    "hint": "Baseline metatype"
+                },
+                "subtype": {
+                    "label": "Category",
+                    "hint": "Metatype category"
+                },
+                "subsubtype": {
+                    "label": "Subvariant",
+                    "hint": "Specific species, strain, or animal form"
+                },
+                "karma": {
+                    "label": "Karma Cost",
+                    "hint": "Karma cost to purchase this metatype"
+                },
+                "attributes": {
+                    "label": "Attribute Ranges",
+                    "hint": "Min, Max, and Augmented Max attribute ratings"
+                }
+            }
+        },
+        "MetaSubtypes": {
+            "metahuman": "Metahuman",
+            "metasapient": "Metasapient",
+            "shapeshifter": "Shapeshifter",
+            "infected": "Infected",
+            "critter": "Critter",
+            "spirit": "Spirit",
+            "sprite": "Sprite",
+            "other": "Other"
+        },
+        "MetasapientTypes": {
+            "Centaur": "Centaur",
+            "Naga": "Naga",
+            "Pixie": "Pixie",
+            "Sasquatch": "Sasquatch"
+        },
+        "ShapeshifterTypes": {
+            "Bovine": "Bovine",
+            "Canine": "Canine",
+            "Equine": "Equine",
+            "Falconine": "Falconine",
+            "Leonine": "Leonine",
+            "Lupine": "Lupine",
+            "Pantherine": "Pantherine",
+            "Tigrine": "Tigrine",
+            "Ursine": "Ursine",
+            "Vulpine": "Vulpine"
+        },
+        "InfectedTypes": {
+            "Bandersnatch": "Bandersnatch",
+            "Banshee": "Banshee",
+            "DzooNooQua": "Dzoo-Noo-Qua",
+            "Fomoraig": "Fomoraig",
+            "Ghoul": "Ghoul",
+            "Gnawer": "Gnawer",
+            "Goblin": "Goblin",
+            "Grendel": "Grendel",
+            "Harvester": "Harvester",
+            "LoupGarou": "Loup-Garou",
+            "Mutaqua": "Mutaqua",
+            "Nosferatu": "Nosferatu",
+            "Sukuyan": "Sukuyan",
+            "Vampire": "Vampire",
+            "Wendigo": "Wendigo"
         },
         "Karma": "Karma",
         "KarmaManager": {
@@ -1863,6 +1948,18 @@
             "StartingKarma": "Starting Karma",
             "Submit": "Submit",
             "Title": "Karma Manager"
+        },
+        "MetatypeSelector": {
+            "Cancel": "Cancel",
+            "Compendium": "Compendium",
+            "Confirm": "Confirm",
+            "Current": "Current",
+            "NoResults": "No metatypes found matching your search.",
+            "Remove": "Remove Metatype",
+            "RemoveTooltip": "Remove current metatype and its benefits",
+            "Search": "Search metatypes...",
+            "Title": "Select Metatype",
+            "World": "World"
         },
         "Keybinding": {
             "AddRemoveManyQty": {
@@ -2136,7 +2233,6 @@
         },
         "Metamagic": "Metamagic",
         "Metamagics": "Metamagics",
-        "Metatype": "Metatype",
         "MigrationComplete": "Migration Complete",
         "MigrationUpdateCompendiumNoUpdateActor": "Due to technical limitations within FoundryVTT, actor compendium packs are unable to be updated at this time. You will have to manually update these packs.",
         "MigrationUpdateCompendiumUpdateMessage": "Any world compendium packs that exist in the world were also updated",
@@ -3781,7 +3877,8 @@
             "spell": "Spell",
             "sprite_power": "Sprite Power",
             "vehicle": "Vehicle",
-            "weapon": "Weapon"
+            "weapon": "Weapon",
+            "metatype": "Metatype"
         }
     }
 }

@@ -1,0 +1,106 @@
+{
+  "name": "Dwarf",
+  "type": "metatype",
+  "flags": {
+    "shadowrun5e": {
+      "metaTypesItems": [
+        {
+          "foundryUuid": "Compendium.world.sr5trait.Item.vtuieKxvSSfRyB2N",
+          "chummerId": "02e76a38-304e-4a0e-93a3-ad2938306afc",
+          "name": "Thermographic Vision",
+          "category": "quality"
+        },
+        {
+          "foundryUuid": "Compendium.world.sr5trait.Item.RLIafbng3xgFpxEr",
+          "chummerId": "139ca69c-e9d3-4540-a4c6-b8c778e70185",
+          "name": "Resistance to Pathogens/Toxins",
+          "category": "quality"
+        }
+      ]
+    }
+  },
+  "img": "icons/svg/mystery-man.svg",
+  "effects": [],
+  "_id": "k0doU8BSHbT9uBiR",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": "SR5"
+    },
+    "importFlags": null,
+    "metatype": "dwarf",
+    "subtype": "metahuman",
+    "subsubtype": null,
+    "karma": 50,
+    "attributes": {
+      "body": {
+        "min": 3,
+        "max": 8,
+        "aug_max": 12
+      },
+      "agility": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "reaction": {
+        "min": 1,
+        "max": 5,
+        "aug_max": 7
+      },
+      "strength": {
+        "min": 3,
+        "max": 8,
+        "aug_max": 12
+      },
+      "willpower": {
+        "min": 2,
+        "max": 7,
+        "aug_max": 10
+      },
+      "logic": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "intuition": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "charisma": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      },
+      "edge": {
+        "min": 1,
+        "max": 6,
+        "aug_max": 9
+      }
+    },
+    "qualities": [
+      "Compendium.world.sr5trait.Item.vtuieKxvSSfRyB2N",
+      "Compendium.world.sr5trait.Item.RLIafbng3xgFpxEr"
+    ],
+    "weapons": [],
+    "items": []
+  },
+  "ownership": {
+    "default": 0
+  },
+  "folder": null,
+  "sort": 0,
+  "_stats": {
+    "systemId": "shadowrun5e",
+    "systemVersion": null,
+    "coreVersion": "14",
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null,
+    "compendiumSource": null,
+    "duplicateSource": null
+  },
+  "_key": "!items!k0doU8BSHbT9uBiR"
+}

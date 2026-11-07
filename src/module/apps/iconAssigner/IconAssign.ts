@@ -92,11 +92,10 @@ export class IconAssign {
         const iconSet = IconAssign.getIconFiles();
         const system = doc.system;
 
-        if (!iconSet?.size)
-            return doc.img ?? null;
-
         const importFlags = system?.importFlags;
-        const fallbackCategory = system && 'category' in system ? system.category ?? "" : "";
+        const fallbackCategory = system && 'category' in system && system.category
+            ? system.category
+            : (system && 'subtype' in system && system.subtype ? system.subtype : "");
 
         const imgType = doc.type;
         const imgFolder = IconAssign.getIconFolder();
@@ -107,12 +106,23 @@ export class IconAssign {
         let override = '';
         if (useOverrides) {
             const typeOverrides = SR5.itemCategoryIconOverrides[imgType];
-            if (typeof typeOverrides === 'object' && typeOverrides[imgCategory]) {
-                override = typeOverrides[imgCategory];
+            if (typeof typeOverrides === 'object') {
+                const subsubtypeSlug = system && 'subsubtype' in system && system.subsubtype ? IH.formatAsSlug(system.subsubtype) : '';
+                const subtypeSlug = system && 'subtype' in system && system.subtype ? IH.formatAsSlug(system.subtype) : '';
+                if (subsubtypeSlug && typeOverrides[subsubtypeSlug]) {
+                    override = typeOverrides[subsubtypeSlug];
+                } else if (imgCategory && typeOverrides[imgCategory]) {
+                    override = typeOverrides[imgCategory];
+                } else if (subtypeSlug && typeOverrides[subtypeSlug]) {
+                    override = typeOverrides[subtypeSlug];
+                }
             } else if (typeof typeOverrides === 'string') {
                 override = typeOverrides;
             }
         }
+
+        if (!iconSet?.size)
+            return override ? `${imgFolder}${override}.svg` : (doc.img ?? null);
 
         // Build a prioritized list of possible icon file paths
         const fileNamePriority: (string | null)[] = [

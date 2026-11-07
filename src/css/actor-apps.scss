@@ -1,4 +1,4 @@
-@use "config/variables";
+@use "config/variables" as vars;
 
 .sr5v2 {
     &.karma-manager, &.nuyen-manager, &.reputation-manager, &.inventory-rename {
@@ -43,6 +43,194 @@
             display: flex;
             flex-flow: row nowrap;
             gap: .5rem;
+        }
+    }
+
+    &.metatype-selector {
+        .sheet-footer {
+            border-color: transparent;
+            display: flex;
+            flex-flow: row nowrap;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0.5rem 0.75rem;
+
+            .sr5-button {
+                flex: none;
+                width: auto;
+                min-width: 100px;
+                padding: 0.4rem 0.8rem;
+                cursor: pointer;
+
+                &.sr5-remove {
+                    background: vars.$remove-btn-bg;
+                    color: var(--sr5v2-link);
+                    margin-right: auto;
+
+                    &:hover {
+                        background: vars.$remove-btn-hover-bg;
+                        color: var(--sr5v2-link-hover);
+                    }
+                }
+            }
+        }
+
+        .window-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            overflow: hidden;
+        }
+
+        .metatype-selector-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            flex: 1;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .metatype-search-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: vars.$search-bar-bg;
+            border: 1px solid vars.$yellow-glow-strong;
+            border-radius: 6px;
+            padding: 0.35rem 0.65rem;
+            box-shadow: 0 0 6px vars.$yellow-glow-subtle;
+
+            i {
+                color: vars.$yellow;
+                font-size: 0.85rem;
+            }
+
+            input {
+                flex: 1;
+                background: transparent;
+                border: none;
+                color: var(--sr5v2-text-primary);
+                font-size: 0.9rem;
+                padding: 0;
+
+                &:focus {
+                    outline: none;
+                }
+
+                &::placeholder {
+                    color: var(--sr5v2-text-muted);
+                }
+            }
+        }
+
+        .metatype-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 0.75rem;
+            overflow-y: auto;
+            flex: 1;
+            padding: 0.35rem;
+            max-height: 380px;
+        }
+
+        .metatype-card {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.75rem;
+            background: vars.$card-dark-bg;
+            border: 1px solid vars.$yellow;
+            border-radius: 8px;
+            box-shadow: 0 0 8px vars.$yellow-glow;
+            padding: 0.55rem 0.75rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.15s ease-in-out;
+            color: var(--sr5v2-text-primary);
+            user-select: none;
+
+            &:hover {
+                background: vars.$card-hover-bg;
+                border-color: vars.$yellow-light;
+                box-shadow: 0 0 12px vars.$yellow-glow-strong;
+                transform: translateY(-1px);
+            }
+
+            &.selected {
+                border-color: vars.$fDarkRed;
+                box-shadow: 0 0 12px vars.$red-glow;
+                background: vars.$card-selected-bg;
+            }
+
+            .metatype-card-img {
+                width: 38px;
+                height: 38px;
+                border-radius: 6px;
+                border: 1px solid vars.$yellow-glow;
+                object-fit: cover;
+                flex-shrink: 0;
+            }
+
+            .metatype-card-info {
+                flex: 1;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 0.2rem;
+
+                .metatype-card-title {
+                    font-size: 1rem;
+                    font-weight: bold;
+                    color: var(--sr5v2-text-primary);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .metatype-card-meta {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.4rem;
+                    font-size: 0.75rem;
+
+                    .metatype-karma {
+                        color: vars.$yellow;
+                        font-weight: bold;
+                    }
+
+                    .metatype-badge {
+                        font-size: 0.65rem;
+                        padding: 0.1rem 0.35rem;
+                        border-radius: 3px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        letter-spacing: 0.05em;
+
+                        &.Compendium {
+                            background: vars.$compendium-badge-bg;
+                            color: vars.$compendium-badge-text;
+                            border: 1px solid vars.$compendium-badge-border;
+                        }
+
+                        &.World {
+                            background: vars.$world-badge-bg;
+                            color: vars.$world-badge-text;
+                            border: 1px solid vars.$world-badge-border;
+                        }
+                    }
+                }
+            }
+        }
+
+        .metatype-no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 2rem;
+            color: var(--sr5v2-text-muted);
+            font-style: italic;
         }
     }
 }

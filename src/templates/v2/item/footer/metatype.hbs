@@ -1,0 +1,41 @@
+{{#if @root.isEditMode}}
+    <div class="basic-row">
+        <label data-tooltip="{{systemFields.subtype.hint}}">{{localize "SR5.Metatype.Category"}}</label>
+        <span>
+            <select name="system.subtype" class="short" rootId=@root.rootId data-tooltip="{{localize 'SR5.Metatype.Category'}}">
+                {{#each @root.localizedMetaSubtypes}}
+                    <option value="{{@key}}" {{#if (eq @key @root.system.subtype)}}selected{{/if}}>{{this}}</option>
+                {{/each}}
+            </select>
+        </span>
+    </div>
+    {{#if (or @root.hasSubsubtypes system.subsubtype)}}
+        <div class="basic-row">
+            <label data-tooltip="{{systemFields.subsubtype.hint}}">{{localize "SR5.Metatype.Subsubtype"}}</label>
+            <span>
+                {{#if @root.hasSubsubtypes}}
+                    <select name="system.subsubtype" class="short" rootId=@root.rootId data-tooltip="{{localize 'SR5.Metatype.Subsubtype'}}">
+                        <option value="">—</option>
+                        {{#each @root.subsubtypes}}
+                            <option value="{{@key}}" {{#if (eq @key @root.system.subsubtype)}}selected{{/if}}>{{this}}</option>
+                        {{/each}}
+                    </select>
+                {{else}}
+                    <input type="text" name="system.subsubtype" class="short" value="{{system.subsubtype}}" />
+                {{/if}}
+            </span>
+        </div>
+    {{/if}}
+    <div class="basic-row">
+        <label data-tooltip="{{systemFields.karma.hint}}">{{localize "SR5.Karma"}}</label>
+        <span>
+            <input type="number" name="system.karma" value="{{source.system.karma}}" class="short skinny" min="0" />
+        </span>
+    </div>
+{{else}}
+    <label data-tooltip="{{localize 'SR5.Metatype.Category'}}">{{lookup @root.localizedMetaSubtypes system.subtype}}</label>
+    {{#if (and (or @root.hasSubsubtypes system.subsubtype) (ne system.subsubtype ""))}}
+        <label data-tooltip="{{localize 'SR5.Metatype.Subsubtype'}}">{{#if @root.hasSubsubtypes}}{{lookup @root.subsubtypes system.subsubtype}}{{else}}{{system.subsubtype}}{{/if}}</label>
+    {{/if}}
+    <label data-tooltip="{{localize 'SR5.Metatype.KarmaCost'}}">{{localize "SR5.Karma"}}&nbsp;{{system.karma}}</label>
+{{/if}}

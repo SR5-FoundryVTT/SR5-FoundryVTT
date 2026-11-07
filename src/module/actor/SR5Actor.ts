@@ -118,6 +118,27 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return OverwatchStorage.setOverwatchScore(this, value);
     }
 
+    /**
+     * Get the resolved Metatype item for this actor, either embedded or via runtime UUID resolution.
+     */
+    get metatypeItem(): SR5Item<'metatype'> | null {
+        if (!this.isType('character')) return null;
+        const embedded = this.items.find(i => i.isType('metatype'));
+        if (embedded) return embedded;
+        const uuid = this.system.metatypeUuid || this.system.raceUuid;
+        if (uuid) {
+            const doc = fromUuidSync(uuid);
+            if (doc instanceof SR5Item && doc.isType('metatype')) {
+                return doc;
+            }
+        }
+        return null;
+    }
+
+    get raceItem(): SR5Item<'metatype'> | null {
+        return this.metatypeItem;
+    }
+
     static override migrateData(source: any) {
         Migrator.migrate("Actor", source);
         return super.migrateData(source);
@@ -154,11 +175,33 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const [data, options] = args;
         await super._preCreate(...args);
 
-        // Abort skill creation data injection when duplicating
+        // Abort default item injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
 
         // Inject after duplication, leaving duplicated tests
         CreateActorFlow.injectEmbeddedItemActionTests(this);
+
+        // Auto-embed metatype item from metatypeUuid if not already embedded
+        if (this.isType('character')) {
+            const hasMetatype = this.items.some(i => i.isType('metatype'));
+            if (!hasMetatype) {
+                const metatypeUuid = this.system.metatypeUuid || (foundry.utils.getProperty(data, 'system.metatypeUuid') as string | undefined);
+                if (metatypeUuid && typeof metatypeUuid === 'string') {
+                    try {
+                        const metatypeDoc = await fromUuid(metatypeUuid);
+                        if (metatypeDoc instanceof SR5Item && metatypeDoc.isType('metatype')) {
+                            const itemData = metatypeDoc.toObject() as Item.Source;
+                            delete (itemData as Partial<Item.Source>)._id;
+                            delete (itemData as Partial<Item.Source>).folder;
+                            const existingItems = this.items.map(i => i.toObject());
+                            this.updateSource({ items: [...existingItems, itemData] });
+                        }
+                    } catch (err) {
+                        console.warn('SR5 | Failed to auto-embed metatype item during actor creation:', err);
+                    }
+                }
+            }
+        }
 
         // Abort if a skillset was already assigned (e.g. during Chummer import)
         if (foundry.utils.getProperty(data, 'system.skillset')) return;

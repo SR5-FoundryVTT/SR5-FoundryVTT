@@ -1,4 +1,43 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    {{#if itemType.metatype.length}}
+        <div class="metatype-banner">
+            {{#each itemType.metatype}}
+                <div class="metatype-banner-info" data-action="openMetatypeSheet" data-item-id="{{this.id}}" data-tooltip="SR5.EditItem">
+                    <img src="{{this.img}}" />
+                    <div>
+                        <div class="metatype-banner-title">
+                            <span>{{localizeMetatype this}}</span>
+                            {{#if (and this.system.metatype (ne (localizeMetatype this) (localizeTypeOr this.system.metatype @root.config.metatypes)))}}
+                                <span class="metatype-base-type">({{localizeTypeOr this.system.metatype @root.config.metatypes}})</span>
+                            {{/if}}
+                        </div>
+                        <div class="metatype-banner-details">
+                            <span>{{localize "SR5.Metatype.Category"}}: {{localize (concat 'SR5.MetaSubtypes.' this.system.subtype)}}</span>
+                            {{#if (and this.system.subsubtype (ne this.system.subsubtype ""))}}
+                                <span>{{localize "SR5.Metatype.Subsubtype"}}: {{this.system.subsubtype}}</span>
+                            {{/if}}
+                            {{#if (ne this.system.karma undefined)}}
+                                <span>{{localize "SR5.Metatype.KarmaCost"}}: {{this.system.karma}}</span>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+                {{#if @root.isEditMode}}
+                    <div class="metatype-banner-actions" data-item-id="{{this.id}}">
+                        <a data-action="removeMetatype" data-tooltip="{{localize 'SR5.MetatypeSelector.Title'}}">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                {{/if}}
+            {{/each}}
+        </div>
+    {{else}}
+        <div class="metatype-banner metatype-banner-empty">
+            <a data-action="openMetatypeSelector" class="select-metatype-prompt">
+                <i class="fas fa-user-plus"></i> {{localize "SR5.MetatypeSelector.Title"}}
+            </a>
+        </div>
+    {{/if}}
     <div class="split-container">
         <div>
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/quality/header.hbs'

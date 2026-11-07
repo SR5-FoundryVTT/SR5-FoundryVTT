@@ -97,6 +97,9 @@
             "metamagic": {
                 "htmlFields": ["description.value"]
             },
+            "metatype": {
+                "htmlFields": ["description.value"]
+            },
             "modification": {
                 "htmlFields": ["description.value"]
             },
@@ -243,6 +246,18 @@
             },
             "type": "Item",
             "system": "shadowrun5e"
+        },
+        {
+            "name": "sr5e-metatypes",
+            "label": "SR5e Metatypes",
+            "path": "packs/sr5e-metatypes",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "TRUSTED": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "type": "Item",
+            "system": "shadowrun5e"
         }
     ],
     "packFolders": [
@@ -257,7 +272,8 @@
                 "sr5e-matrix-actions",
                 "sr5e-skills",
                 "sr5e-skill-groups",
-                "sr5e-skill-sets"
+                "sr5e-skill-sets",
+                "sr5e-metatypes"
             ]
         }
     ],

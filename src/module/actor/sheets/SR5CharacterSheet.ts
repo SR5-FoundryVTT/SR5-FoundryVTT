@@ -4,7 +4,9 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { NuyenManager } from '@/module/apps/actor/NuyenManager';
 import { KarmaManager } from '@/module/apps/actor/KarmaManager';
 import { ReputationManager } from '@/module/apps/actor/ReputationManager';
+import { MetatypeSelector } from '@/module/apps/actor/MetatypeSelector';
 import { isElementInstance } from '@/module/utils/dom';
+import { SR5Item } from '@/module/item/SR5Item';
 
 
 export interface CharacterSheetData extends MatrixActorSheetData {
@@ -40,7 +42,8 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             'call_in_action',
             'sprite_power',
             'ritual',
-            'preparation'
+            'preparation',
+            'metatype'
         ];
     }
 
@@ -69,6 +72,13 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             openNuyenManager: SR5CharacterSheet.#openNuyenManager,
             openKarmaManager: SR5CharacterSheet.#openKarmaManager,
             openReputationManager: SR5CharacterSheet.#openReputationManager,
+            manageKarma: SR5CharacterSheet.#openKarmaManager,
+            manageReputation: SR5CharacterSheet.#openReputationManager,
+            openMetatypeSelector: SR5CharacterSheet.#openMetatypeSelector,
+            openMetatypeSheet: SR5CharacterSheet.#openMetatypeSheet,
+            removeMetatype: SR5CharacterSheet.#openMetatypeSelector,
+            openRaceSheet: SR5CharacterSheet.#openMetatypeSheet,
+            removeRace: SR5CharacterSheet.#openMetatypeSelector,
         }
     }
 
@@ -238,4 +248,26 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         await app.render({ force: true });
     }
 
+    static async #openMetatypeSelector(this: SR5CharacterSheet, event?: PointerEvent) {
+        event?.preventDefault();
+        const app = new MetatypeSelector(this.actor);
+        await app.render(true);
+    }
+
+    static async #openMetatypeSheet(this: SR5CharacterSheet, event: PointerEvent, target?: HTMLElement) {
+        event.preventDefault();
+        let metatypeItem = this.actor.metatypeItem;
+        if (!metatypeItem && target) {
+            const itemId = target.closest<HTMLElement>('[data-item-id]')?.dataset.itemId;
+            if (itemId) {
+                const item = this.actor.items.get(itemId);
+                if (item?.isType('metatype')) {
+                    metatypeItem = item;
+                }
+            }
+        }
+        if (metatypeItem?.sheet) {
+            metatypeItem.sheet.render(true);
+        }
+    }
 }

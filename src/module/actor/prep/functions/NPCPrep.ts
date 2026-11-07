@@ -18,7 +18,8 @@ export class NPCPrep {
         // Extract needed data.
         const { attributes, metatype } = system;
         // Fallback to empty object if no metatype modifiers exist.
-        const metatypeModifier = SR.grunt.metatype_modifiers[metatype as keyof typeof SR.grunt.metatype_modifiers] || {};
+        const metatypeKey = metatype?.toLowerCase() as keyof typeof SR.grunt.metatype_modifiers;
+        const metatypeModifier = SR.grunt.metatype_modifiers[metatypeKey] || {};
 
         for (const [name, attribute] of Object.entries(attributes)) {
             // Apply NPC modifiers
