@@ -287,11 +287,15 @@ export class BulkImporter extends BaseClass {
                                 const key = nameNode.textContent?.trim();
                                 const text = translateNode.textContent?.trim();
                                 if (key && text) {
-                                    ImportHelper.translationMap.files[fileName].names[key] = text;
+                                    const altPageNode = parent.getElementsByTagName("altpage")[0];
+                                    const translationData = { name: text, page: altPageNode?.textContent?.trim()};
+
+                                    ImportHelper.translationMap.files[fileName].names[key] = translationData;
+
                                     const idNode = parent.getElementsByTagName("id")[0];
                                     const id = idNode?.textContent?.trim();
                                     if (id) {
-                                        ImportHelper.translationMap.files[fileName].ids[id] = text;
+                                        ImportHelper.translationMap.files[fileName].ids[id] = translationData;
                                     }
                                     dataKeysCount++;
                                 }
