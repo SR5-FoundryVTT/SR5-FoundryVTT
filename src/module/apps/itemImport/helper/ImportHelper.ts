@@ -5,6 +5,8 @@ export type OneOrMany<T> = T | T[];
 export type ArrayItem<T> = T extends (infer U)[] ? U : never;
 export type NotEmpty<T> = T extends object ? NonNullable<T> : never;
 export type RetrievedItem = Item.Source & { name_english: string };
+export type TranslatableValue = "name" | "page";
+type TranslationData = Record<TranslatableValue, string>;
 
 /**
  * A utility class providing helper methods for importing and managing data in Foundry VTT.
@@ -18,8 +20,8 @@ export class ImportHelper {
     static idToName: Partial<Record<CompendiumKey, Record<string, string>>> = {};
     static translationMap: {
         files: Record<string, {
-            names: Record<string, string>;
-            ids: Record<string, string>;
+            names: Record<string, TranslationData>;
+            ids: Record<string, TranslationData>;
         }>;
     } = {
         files: {}
@@ -27,24 +29,29 @@ export class ImportHelper {
     static currentFile: string | null = null;
     static isTranslationEnabled = false;
 
-    public static translate(text: string | null | undefined, id?: string | null): string {
+    public static getTranslatedValue(
+        key: TranslatableValue,
+        defaultValue: string,
+        text: string | null | undefined,
+        id?: string | null,
+    ): string {
         if (!text) return "";
         if (!this.isTranslationEnabled) {
             return text;
         }
         if (id && this.currentFile && this.translationMap.files[this.currentFile]?.ids?.[id]) {
-            return this.translationMap.files[this.currentFile].ids[id];
+            return this.translationMap.files[this.currentFile].ids[id][key] ?? defaultValue;
         }
         if (this.currentFile && this.translationMap.files[this.currentFile]?.names?.[text]) {
-            return this.translationMap.files[this.currentFile].names[text];
+            return this.translationMap.files[this.currentFile].names[text][key] ?? defaultValue;
         }
         // Fallback: Check other file translation maps for a match on the name
         for (const file of Object.keys(this.translationMap.files)) {
             if (file !== this.currentFile && this.translationMap.files[file]?.names?.[text]) {
-                return this.translationMap.files[file].names[text];
+                return this.translationMap.files[file].names[text][key] ?? defaultValue;
             }
         }
-        return text;
+        return defaultValue;
     }
 
 
@@ -165,12 +172,12 @@ export class ImportHelper {
 
     /**
      * Finds or creates a folder within a compendium in Foundry VTT.
-     * 
+     *
      * @param ctype - The compendium key identifying the target compendium.
      * @param name - The name of the folder to find or create.
      * @param parent - The parent folder, or `null` if the folder is at the root level.
      * @returns A promise that resolves to the found or newly created folder.
-     * 
+     *
      * @remarks
      * This function first attempts to locate an existing folder in the specified compendium
      * that matches the given name and parent. If no such folder exists, it creates a new one.
@@ -238,7 +245,7 @@ export class ImportHelper {
     /**
      * Ensures a folder hierarchy exists based on provided names.
      * Uses caching to minimize redundant operations.
-     * 
+     *
      * @param ctype - Compendium key for folder categorization.
      * @param folder1 - First-level folder name.
      * @param folder2 - (Optional) Second-level folder name.
