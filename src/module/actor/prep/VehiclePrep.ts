@@ -13,13 +13,16 @@ import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { ItemPrep } from './functions/ItemPrep';
 import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
+import { RiggingRules } from '@/module/rules/RiggingRules';
+import { DataDefaults } from '@/module/data/DataDefaults';
+import type { SR5Actor } from '@/module/actor/SR5Actor';
 
 export class VehiclePrep {
     static prepareBaseData(system: Actor.SystemOfType<'vehicle'>) {
         ModifiableFieldPrep.resetAllModifiers(system);
     }
 
-    static prepareDerivedData(system: Actor.SystemOfType<'vehicle'>, items: SR5Item[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'vehicle'>, items: SR5Item[], actor?: SR5Actor) {
         VehiclePrep.prepareVehicleStats(system);
         VehiclePrep.prepareDeviceAttributes(system);
         VehiclePrep.prepareLimits(system);
@@ -29,6 +32,7 @@ export class VehiclePrep {
         VehiclePrep.prepareAttributesWithBody(system);
         VehiclePrep.prepareAttributeRanges(system);
         
+        VehiclePrep.prepareAutosoftSkills(system, items, actor);
         SkillsPrep.prepareSkills(system);
 
         LimitsPrep.prepareLimits(system);
@@ -48,6 +52,79 @@ export class VehiclePrep {
         ItemAvailabilityFlow.calculateValue(system.availability);
     }
 
+    /**
+     * Populate and enhance vehicle active skills with running autosoft ratings.
+     * Follows SR5 CRB p. 267: if any local autosoft is running, all RCC shared autosofts are ignored.
+     */
+    static prepareAutosoftSkills(system: Actor.SystemOfType<'vehicle'>, items: SR5Item[], actor?: SR5Actor) {
+        if (!actor) return;
+
+        for (const [key, skill] of Object.entries(system.skills.active)) {
+            ModifiableValue.remove(skill, 'SR5.Autosoft');
+            if ((skill as any)._autosoftSynthetic) {
+                delete system.skills.active[key];
+            } else {
+                ModifiableValue.calcTotal(skill);
+            }
+        }
+
+        const effectiveAutosofts = RiggingRules.getAllEffectiveAutosofts(actor);
+        if (effectiveAutosofts.length === 0) return;
+
+        const allWeapons = (items?.length ? items : Array.from(actor.items ?? [])).filter(i => i.isType('weapon'));
+        const equippedWeapons = allWeapons.filter(w => w.isEquipped());
+        const candidateWeapons = equippedWeapons.length > 0 ? equippedWeapons : allWeapons;
+
+        for (const autosoft of effectiveAutosofts) {
+            const skillKey = RiggingRules.getSkillForAutosoft(autosoft, actor);
+            if (!skillKey) continue;
+
+            const autosoftType = autosoft.system.autosoftType || '';
+            let rating = 0;
+
+            if (autosoftType === 'targeting' && autosoft.system.targetWeapon) {
+                for (const weapon of candidateWeapons) {
+                    const effective = RiggingRules.getEffectiveAutosoft(actor, 'targeting', {
+                        weapon: weapon.name || '',
+                        weaponUuid: weapon.uuid || '',
+                        skill: skillKey,
+                    });
+                    if (effective.rating > rating) {
+                        rating = effective.rating;
+                    }
+                }
+            } else {
+                const effective = RiggingRules.getEffectiveAutosoft(actor, autosoftType, { skill: skillKey });
+                rating = effective.rating;
+            }
+
+            if (rating <= 0) continue;
+
+            const existingSkill = system.skills.active[skillKey];
+            if (existingSkill) {
+                const currentAutoRating = new ModifiableValue(existingSkill).get('SR5.Autosoft') ?? 0;
+                ModifiableValue.addUnique(existingSkill, 'SR5.Autosoft', Math.max(currentAutoRating, rating), { type: 'upgrade' });
+                ModifiableValue.calcTotal(existingSkill);
+            } else {
+                const skillName = SR5.activeSkills[skillKey] || skillKey;
+                const skillField = DataDefaults.createData('skill_field', {
+                    id: autosoft.id || skillKey,
+                    key: skillKey,
+                    name: skillName,
+                    img: autosoft.img || 'icons/svg/item-bag.svg',
+                    label: game.i18n.localize(skillName),
+                    base: 0,
+                    attribute: 'pilot',
+                    canDefault: true,
+                    specs: [],
+                });
+                (skillField as any)._autosoftSynthetic = true;
+                ModifiableValue.addUnique(skillField, 'SR5.Autosoft', rating, { type: 'upgrade' });
+                ModifiableValue.calcTotal(skillField);
+                system.skills.active[skillKey] = skillField;
+            }
+        }
+    }
     static prepareVehicleStats(system: Actor.SystemOfType<'vehicle'>) {
         const { vehicle_stats, isDrone } = system;
 

@@ -3531,7 +3531,10 @@
             "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
             "SkillSetDefaultTypeOutsideCompendium": "Only skillsets in the configured skillset compendium will affect actor creation",
             "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
-            "TokenSelectionNeeded": "One or more tokens need to be selected"
+            "TokenSelectionNeeded": "One or more tokens need to be selected",
+            "RCCOverAllocated": "RCC Sharing + Noise Reduction exceeds Device Rating",
+            "OverAutosoftSlots": "Autosoft program slots exceeded for this drone",
+            "OverSharingLimit": "Loaded autosofts exceed RCC Sharing capacity"
         },
         "Weapon": {
             "AmmoCount": "Ammo Count",
@@ -3743,7 +3746,40 @@
         "Wireless": "Wireless",
         "WirelessOffline": "Offline",
         "WirelessOnline": "Online",
-        "WirelessUnavailable": "Unavailable"
+        "WirelessUnavailable": "Unavailable",
+        "Autosoft": "Autosoft",
+        "AutosoftType": "Autosoft Type",
+        "AutosoftConfigManager": {
+            "Title": "Configure Autosoft",
+            "TargetActor": "Target Drone / Vehicle",
+            "TargetWeapon": "Target Weapon (Gunnery)",
+            "TargetModel": "Target Model",
+            "NoWeapons": "No weapons mounted on target",
+            "NoDrones": "No owned drones or vehicles found",
+            "Submit": "Save Configuration",
+            "Cancel": "Cancel",
+            "Configured": "Autosoft {name} configuration saved."
+        },
+        "TargetModel": "Target Model",
+        "TargetWeapon": "Target Weapon",
+        "AutosoftTypes": {
+            "Clearsight": "Clearsight",
+            "Evasion": "Evasion",
+            "Maneuvering": "Maneuvering",
+            "Stealth": "Stealth",
+            "Targeting": "Targeting",
+            "ElectronicWarfare": "Electronic Warfare"
+        },
+        "RCC": {
+            "Sharing": "Sharing",
+            "NoiseReduction": "Noise Reduction",
+            "SharedAutosofts": "Shared RCC Autosofts",
+            "SharedFromRCC": "Shared from RCC",
+            "ReconfigureTitle": "RCC Reconfigured",
+            "ReconfiguredMessage": "reconfigured RCC attribute array",
+            "SimpleAction": "Simple Action",
+            "SimpleActionInCombat": "Combat Simple Action"
+        }
     },
     "TYPES": {
         "Actor": {

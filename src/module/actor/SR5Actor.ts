@@ -310,7 +310,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         else if (this.isType('sprite'))
             SpritePrep.prepareDerivedData(this.system, items);
         else if (this.isType('vehicle'))
-            VehiclePrep.prepareDerivedData(this.system, items);
+            VehiclePrep.prepareDerivedData(this.system, items, this);
         else if (this.isType('ic'))
             ICPrep.prepareDerivedData(this.system, items);
     }

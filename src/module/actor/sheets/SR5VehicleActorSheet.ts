@@ -1,9 +1,10 @@
-import {SR5Actor} from "../SR5Actor";
+import { SR5Actor } from "../SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
 import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { Helpers } from '@/module/helpers';
 import { MatrixRules } from '@/module/rules/MatrixRules';
+import { RiggingRules } from '@/module/rules/RiggingRules';
 import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { isElementInstance } from '@/module/utils/dom';
@@ -13,8 +14,23 @@ interface VehicleSheetDataFields extends MatrixActorSheetData {
     vehicle: {
         driver: SR5Actor|undefined,
         master: SR5Item | undefined
-    }
+    };
     modifications: SR5Item<'modification'>[];
+    autosoftInfo: {
+        maxSlots: number;
+        runningCount: number;
+        isOverSlots: boolean;
+        runningAutosofts: SR5Item[];
+    };
+    rccInfo?: {
+        deviceRating: number;
+        sharing: number;
+        noiseReduction: number;
+        isOverAllocated: boolean;
+        loadedAutosoftsCount: number;
+        isOverSharingLimit: boolean;
+        loadedAutosofts: SR5Item[];
+    };
 }
 
 export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFields> {
@@ -42,7 +58,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             removeMaster: SR5VehicleActorSheet.#removeMaster,
             removeVehicleDriver: SR5VehicleActorSheet.#removeVehicleDriver,
             toggleChaseEnvironment: SR5VehicleActorSheet.#toggleChaseEnvironment,
-            toggleOffRoad: SR5VehicleActorSheet.#toggleOffRoad,
+            toggleOffRoad: SR5VehicleActorSheet.#toggleOffRoad
         }
     }
 
@@ -65,7 +81,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             'cyberware',
             'device',
             'equipment',
-            'modification'
+            'modification',
         ];
     }
 
@@ -76,6 +92,25 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         data.vehicle = this._prepareVehicleFields();
         data.modifications = this._prepareEquippedModifications();
         data.isVehicle = true;
+
+        const maxSlots = RiggingRules.getMaxAutosoftSlots(this.actor);
+        const runningAutosofts = RiggingRules.getRunningLocalAutosofts(this.actor);
+        const runningCount = runningAutosofts.length;
+
+        data.autosoftInfo = {
+            maxSlots,
+            runningCount,
+            isOverSlots: runningCount > maxSlots,
+            runningAutosofts
+        };
+
+        if (data.vehicle.master && data.vehicle.master.isType('device') && data.vehicle.master.system.category === 'rcc') {
+            const info = RiggingRules.getRCCSharingInfo(data.vehicle.master);
+            data.rccInfo = {
+                ...info,
+                loadedAutosofts: RiggingRules.getLoadedRCCAutosofts(data.vehicle.master)
+            };
+        }
 
         return data;
     }
