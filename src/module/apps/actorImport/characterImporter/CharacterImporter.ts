@@ -55,6 +55,21 @@ export class CharacterImporter {
         return ActorSkillImport.parseSkillName(skillName);
     }
 
+    /**
+     * Maps a Chummer magic user to its magical type.
+     * Chummer flags mystic adepts as both magician and adept, and aspected magicians only by their quality.
+     */
+    static parseMagicalType(chummerChar: ActorSchema) {
+        const magician = chummerChar.magician === 'True';
+        const adept = chummerChar.adept === 'True';
+        if (magician && adept) return 'mystic_adept';
+        if (adept) return 'adept';
+
+        const aspected = IH.getArray(chummerChar.qualities?.quality)
+            .some(quality => quality.name_english === 'Aspected Magician');
+        return aspected ? 'aspected_magician' : 'magician';
+    }
+
     // --------------------------------------------------------------------------
     // Public Methods
     // --------------------------------------------------------------------------
@@ -151,6 +166,7 @@ export class CharacterImporter {
             system.technomancer.submersion = Math.max(0, ...technoGrades);
         } else if (chummerChar.magician === 'True' || chummerChar.adept === 'True') {
             system.special = 'magic';
+            system.magic.type = this.parseMagicalType(chummerChar);
 
             let attr: string[] = [];
             // @ts-expect-error legacy chummer attribute

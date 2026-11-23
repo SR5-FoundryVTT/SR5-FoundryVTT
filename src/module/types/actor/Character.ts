@@ -8,7 +8,7 @@ import { VisibilityChecks } from "../template/Visibility";
 import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValueSchema, ValueMaxPair } from "../template/Base";
 import { Attributes, AttributeField, MatrixActorAttributes } from '../template/Attributes';
-import { CommonData, CharacterLimits, CreateModifiers, MagicData, ActorBase, CharacterValues, } from "./Common";
+import { CommonData, CharacterLimits, CreateModifiers, CharacterMagicData, ActorBase, CharacterValues, } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const CharacterAttributes = () => ({
@@ -60,14 +60,14 @@ const CharacterData = () => ({
         matrix: { attributeA: 'intuition', attributeB: 'data_processing', constant: 0, dice: 3 },
     })),
 
-    visibilityChecks: new SchemaField(VisibilityChecks('astral', 'matrix', 'meatspace')),
+    visibilityChecks: new SchemaField(VisibilityChecks({ body: true, heat: 'warm', aura: true, icon: true })),
 
     // === Condition & Movement ===
     track: new SchemaField(Tracks('physical', 'stun')),
     movement: new SchemaField(Movement()),
 
     // === Magic & Matrix ===
-    magic: new SchemaField(MagicData()),
+    magic: new SchemaField(CharacterMagicData()),
     matrix: new SchemaField(MatrixData()),
     technomancer: new SchemaField({
         attribute: new StringField({

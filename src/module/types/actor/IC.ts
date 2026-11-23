@@ -38,7 +38,7 @@ const ICData = () => ({
     initiative: new SchemaField(Initiative({
         matrix: { attributeA: 'rating', attributeB: 'rating', constant: 0, dice: 4 },
     })),
-    visibilityChecks: new SchemaField(VisibilityChecks('matrix')),
+    visibilityChecks: new SchemaField(VisibilityChecks({ icon: true })),
 
     // === Modifiers ===
     modifiers: new SchemaField(CreateModifiers(
