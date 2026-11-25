@@ -681,12 +681,16 @@
             "NextPhase": "다음 페이즈",
             "NextTurn": "다음 턴",
             "NoHistoryAvailable": "사용 가능한 전투 히스토리 스냅샷이 없습니다.",
+            "PanToCombatant": "전투원에게 이동",
+            "PingCombatant": "전투원 핑",
             "PreviousPass": "이전 패스",
             "PreviousPhase": "이전 페이즈",
             "PreviousTurn": "이전 턴",
             "SeizeInitiative": "선제권 잡기",
             "SeizedInitiative": "선제권 확보",
             "ToggleActedStatusGMOnly": "행동 완료 상태 전환 (GM 전용)",
+            "ToggleDead": "전투원 격파 상태 전환",
+            "ToggleVis": "전투원 표시 여부 전환",
             "TrackerTitle": "턴 {round} (패스 {pass})"
         },
         "CallInAction": {

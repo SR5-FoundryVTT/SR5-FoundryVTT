@@ -372,12 +372,16 @@
             "NextPhase": "Proxima Fase",
             "NextTurn": "Proximo Turno",
             "NoHistoryAvailable": "Nenhum snapshot de historico de combate esta disponivel.",
+            "PanToCombatant": "Mover para o Combatente",
+            "PingCombatant": "Sinalizar Combatente",
             "PreviousPass": "Passagem Anterior",
             "PreviousPhase": "Fase Anterior",
             "PreviousTurn": "Turno Anterior",
             "SeizeInitiative": "Tomar a Iniciativa",
             "SeizedInitiative": "Iniciativa Tomada",
             "ToggleActedStatusGMOnly": "Alternar status de Ja Agiu (Somente GM)",
+            "ToggleDead": "Alternar Combatente Derrotado",
+            "ToggleVis": "Alternar Visibilidade do Combatente",
             "TrackerTitle": "Turno {round} (Passagem {pass})"
         },
         "CallInAction": {
