@@ -676,4 +676,8 @@ body.theme-light .application.sr5v2.form-dialog:not(.theme-dark),
       background-color: var(--sr5v2-option-bg) !important;
     }
   }
+
+  .dialog-content-common .document img[src$='.svg'] {
+    filter: var(--sr5v2-icon-filter-light);
+  }
 }
