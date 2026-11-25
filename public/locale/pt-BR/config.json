@@ -382,7 +382,8 @@
             "ToggleActedStatusGMOnly": "Alternar status de Ja Agiu (Somente GM)",
             "ToggleDead": "Alternar Combatente Derrotado",
             "ToggleVis": "Alternar Visibilidade do Combatente",
-            "TrackerTitle": "Turno {round} (Passagem {pass})"
+            "TrackerTitle": "Turno {round} (Passagem {pass})",
+            "TrackerTitleReview": "Turno {round} (Revisão)"
         },
         "CallInAction": {
             "ActorType": "Tipo de Ator",

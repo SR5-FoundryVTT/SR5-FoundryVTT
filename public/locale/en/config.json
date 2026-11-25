@@ -693,7 +693,8 @@
             "ToggleActedStatusGMOnly": "Toggle Acted Status (GM Only)",
             "ToggleDead": "Toggle Combatant Defeated",
             "ToggleVis": "Toggle Combatant Visibility",
-            "TrackerTitle": "Turn {round} (Pass {pass})"
+            "TrackerTitle": "Turn {round} (Pass {pass})",
+            "TrackerTitleReview": "Turn {round} (Review)"
         },
         "CallInAction": {
             "ActorType": "Actor Type",
