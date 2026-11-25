@@ -682,12 +682,16 @@
             "NextPhase": "Naechste Phase",
             "NextTurn": "Naechster Zug",
             "NoHistoryAvailable": "Kein Kampfverlauf-Snapshot verfuegbar.",
+            "PanToCombatant": "Zum Kombattanten schwenken",
+            "PingCombatant": "Kombattanten anpingen",
             "PreviousPass": "Vorheriger Durchgang",
             "PreviousPhase": "Vorherige Phase",
             "PreviousTurn": "Vorheriger Zug",
             "SeizeInitiative": "Initiative ergreifen",
             "SeizedInitiative": "Initiative ergriffen",
             "ToggleActedStatusGMOnly": "Gehandelt-Status umschalten (nur SL)",
+            "ToggleDead": "Besiegt-Status des Kombattanten umschalten",
+            "ToggleVis": "Sichtbarkeit des Kombattanten umschalten",
             "TrackerTitle": "Zug {round} (Durchgang {pass})"
         },
         "CallInAction": {

@@ -683,12 +683,16 @@
             "NextPhase": "Next Phase",
             "NextTurn": "Next Turn",
             "NoHistoryAvailable": "No combat history snapshot is available.",
+            "PanToCombatant": "Pan to Combatant",
+            "PingCombatant": "Ping Combatant",
             "PreviousPass": "Previous Pass",
             "PreviousPhase": "Previous Phase",
             "PreviousTurn": "Previous Turn",
             "SeizeInitiative": "Seize Initiative",
             "SeizedInitiative": "Seized Initiative",
             "ToggleActedStatusGMOnly": "Toggle Acted Status (GM Only)",
+            "ToggleDead": "Toggle Combatant Defeated",
+            "ToggleVis": "Toggle Combatant Visibility",
             "TrackerTitle": "Turn {round} (Pass {pass})"
         },
         "CallInAction": {
