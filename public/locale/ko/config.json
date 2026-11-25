@@ -691,7 +691,8 @@
             "ToggleActedStatusGMOnly": "행동 완료 상태 전환 (GM 전용)",
             "ToggleDead": "전투원 격파 상태 전환",
             "ToggleVis": "전투원 표시 여부 전환",
-            "TrackerTitle": "턴 {round} (패스 {pass})"
+            "TrackerTitle": "턴 {round} (패스 {pass})",
+            "TrackerTitleReview": "턴 {round} (검토)"
         },
         "CallInAction": {
             "ActorType": "액터 유형",

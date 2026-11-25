@@ -692,7 +692,8 @@
             "ToggleActedStatusGMOnly": "Gehandelt-Status umschalten (nur SL)",
             "ToggleDead": "Besiegt-Status des Kombattanten umschalten",
             "ToggleVis": "Sichtbarkeit des Kombattanten umschalten",
-            "TrackerTitle": "Zug {round} (Durchgang {pass})"
+            "TrackerTitle": "Zug {round} (Durchgang {pass})",
+            "TrackerTitleReview": "Zug {round} (Abnahme)"
         },
         "CallInAction": {
             "ActorType": "Akteur-Typ",

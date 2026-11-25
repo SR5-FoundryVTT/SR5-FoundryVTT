@@ -293,7 +293,8 @@
             "ToggleActedStatusGMOnly": "Basculer le statut a agi (MJ uniquement)",
             "ToggleDead": "Basculer l'état vaincu du combattant",
             "ToggleVis": "Basculer la visibilité du combattant",
-            "TrackerTitle": "Tour {round} (Passe {pass})"
+            "TrackerTitle": "Tour {round} (Passe {pass})",
+            "TrackerTitleReview": "Tour {round} (Révision)"
         },
         "CanDefault": "Par défaut",
         "Capacity": "Capacité",
