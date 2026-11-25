@@ -677,7 +677,7 @@ body.theme-light .application.sr5v2.form-dialog:not(.theme-dark),
     }
   }
 
-  .dialog-content-common .document img[src$='.svg'] {
+  .document img[src$='.svg'] {
     filter: var(--sr5v2-icon-filter-light);
   }
 }
