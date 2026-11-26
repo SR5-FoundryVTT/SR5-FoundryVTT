@@ -99,6 +99,7 @@
             "Addiction": "Abhängigkeits-Handlungen",
             "AddictionMental": "Abhängigkeit Geistig",
             "AddictionPhysical": "Abhängigkeit Physisch",
+            "Alchemy": "Alchemie-Handlungen",
             "Attack": "Angriffs-Handlungen",
             "AttackMatrix": "Matrixangriff",
             "AttackMelee": "Nahkampf-Handlungen",
@@ -152,13 +153,13 @@
             "ApplyTos": {
                 "TestTargetingThisActor": "Probe, die diesen Akteur als Ziel hat",
                 "TargetedActor": "Anvisierten Akteur",
-                "TestItem": "Probe aus Item"
+                "TestItem": "Probe aus Item",
+                "ParentItem": "Übergeordnetes Item"
             },
             "CannotAddTestViaItemToActor": "Einem Akteur kann kein Active Effect vom Typ 'Probe aus Item' hinzugefügt werden.",
             "ValueEditor": "Wert der Änderung bearbeiten",
             "FIELDS": {
                 "appliedByTest": {
-                    "hint": "Anwenden auf Test des Items",
                     "label": "Anwenden auf Test"
                 },
                 "conditionMode": {
@@ -182,6 +183,10 @@
                 "onlyForWireless": {
                     "hint": "Nur auf drahtlose online-Items anwenden",
                     "label": "Nur online"
+                },
+                "rating": {
+                    "hint": "Die Stärke dieses Effekts. Änderungen können sich daran orientieren, daher aktualisiert eine Erhöhung alle gleichzeitig.",
+                    "label": "Stufe"
                 },
                 "selection_attributes": {
                     "hint": "Nur für Tests mit diesen Attribute",
@@ -661,6 +666,17 @@
         "Attribute": "Attribut",
         "Attributes": "Attribute",
         "Availability": "Verf.",
+        "AvailabilityRestriction": "Verfügbarkeit",
+        "AvailabilityRestrictions": {
+            "Forbidden": "Verboten",
+            "None": "Keine",
+            "Restricted": "Beschränkt"
+        },
+        "AvailabilityRestrictionSuffixes": {
+            "Forbidden": "F",
+            "None": "",
+            "Restricted": "R"
+        },
         "Awakened": "Erwacht",
         "AwakenedEmerged": "Magie/Resonanz",
         "Barrel": "Laufmontiert",
@@ -1435,6 +1451,7 @@
         "HackingProgram": "Hackingprogramm",
         "Help": "Hilfe",
         "Hits": "Erfolge",
+        "HitsBought": "Gekaufte Erfolge",
         "Host": {
             "Attributes": "Attribute",
             "CustomAttributes": "Eigene Attributsaufteilung",
@@ -1492,7 +1509,15 @@
                 "Title": "Akteur Import"
             },
             "BulkImporter": {
-                "Title": "Massen Import"
+                "Title": "Massen Import",
+                "Mode": "Importmodus:",
+                "TranslationLanguage": "Übersetzungssprache:",
+                "Modes": {
+                    "Add": "Fehlende Items hinzufügen",
+                    "Update": "Items aktualisieren (Beschreibung behalten)",
+                    "Replace": "Items ersetzen",
+                    "Clean": "Leeren und neu importieren"
+                }
             },
             "ImporterSourcesConfig": {
                 "Title": "Import Quell Konfiguration"
@@ -1773,6 +1798,10 @@
                         "hint": "Master zu dem dieses Gerät als Teil eines PAN/WAN geslaved ist.",
                         "label": "Master"
                     },
+                    "max_rating": {
+                        "hint": "Die höchste Stufe, zu der dieses Item gekauft werden kann. Null bedeutet, dass das Item keine Stufenobergrenze hat.",
+                        "label": "Max. Stufe"
+                    },
                     "quantity": {
                         "hint": "Welche Anzahl dieses Gegenstands ist im Inventar?",
                         "label": "Anzahl"
@@ -1814,6 +1843,7 @@
             "Lifestyle": "Lebensstil",
             "Metamagic": "Metamagic",
             "Modification": "Modifikation",
+            "Preparation": "Vorbereitung",
             "Program": "Programm",
             "Quality": "Vor-/Nachteil",
             "Ritual": "Ritual",
@@ -1920,6 +1950,7 @@
                 "Persona": "Persona",
                 "PersonalInventory": "Am Körper",
                 "PhysicalTrack": "Physischer Monitor",
+                "Preparations": "Vorbereitungen",
                 "PublicAwarenessShort": "BR",
                 "RemoveOneMark": "Entferne eine Marke",
                 "ResetActorForNewRun": "Reset für neuen Run",
@@ -1947,7 +1978,8 @@
                 "AvailabilityAdjustment": "Skaliere Verfügbarkeit mit Stufe",
                 "CostAdjustment": "Skaliere Kosten mit Stufe",
                 "EssenceAdjustment": "Skaliere Essenz mit Stufe",
-                "Network": "Netzwerk"
+                "Network": "Netzwerk",
+                "Properties": "Item-Eigenschaften"
             },
             "MarkPlacement": {
                 "PlaceOnDevice": "Platziere auf Gerät",
@@ -2297,6 +2329,7 @@
         "OpposedType": "Typ",
         "OpposingHits": "Gegn. Erfolge",
         "OpposingNetHits": "Gegn. Nettoerfolge",
+        "Options": "Optionen",
         "OriginalDicePool": "Originaler Würfelpool",
         "OutOfRange": "Außer Reichweite",
         "Overflow": "Überschuss",
@@ -2327,6 +2360,75 @@
         "PowerPoints": "Kraftpunkte",
         "PowerType": "Typ",
         "Powers": "Kräfte",
+        "Preparation": {
+            "Alchemical": "Alchemisch",
+            "CraftingTime": "Herstellungszeit",
+            "CraftingTimeMinutes": "{minutes} Minuten",
+            "Create": "Vorbereitung erstellen",
+            "CreationTimeDialog": {
+                "Edit": "Erstellungszeit bearbeiten",
+                "Invalid": "Gib ein gültiges Erstellungsdatum und eine gültige Uhrzeit ein.",
+                "Title": "Erstellungszeit der Vorbereitung",
+                "UseCurrent": "Aktuelle Zeit verwenden"
+            },
+            "Expired": "Abgelaufen",
+            "ExpiredAt": "Abgelaufen um {time}",
+            "ExpiredMessage": "{name} hat seine Wirkkraft verloren. Der gespeicherte Zauber ist verloren.",
+            "Expires": "Läuft ab",
+            "ExpiresIn": "Läuft ab in {duration}",
+            "FIELDS": {
+                "created": {
+                    "hint": "Wann die Vorbereitung erstellt wurde.",
+                    "label": "Erstellt",
+                    "worldTime": {
+                        "hint": "Weltzeit, zu der die Vorbereitung erstellt wurde.",
+                        "label": "Erstellungszeit"
+                    }
+                },
+                "force": {
+                    "hint": "Die Stärke, mit der die Vorbereitung erstellt wurde.",
+                    "label": "Stärke"
+                },
+                "potency": {
+                    "base": {
+                        "hint": "Bei der Erstellung der Vorbereitung erzielte Nettoerfolge.",
+                        "label": "Erstellte Wirkkraft"
+                    },
+                    "hint": "Stärke des gespeicherten Zaubers.",
+                    "label": "Wirkkraft",
+                    "value": {
+                        "hint": "Verbleibende Wirkkraft nach dem Verfall.",
+                        "label": "Aktuelle Wirkkraft"
+                    }
+                },
+                "spellUuid": {
+                    "hint": "Der Zauber, aus dem diese Vorbereitung erstellt wurde.",
+                    "label": "Quellzauber"
+                },
+                "trigger": {
+                    "hint": "Die Bedingung, die den gespeicherten Zauber auslöst.",
+                    "label": "Auslöser"
+                },
+                "triggerTime": {
+                    "hint": "Countdown, bis ein Zeitauslöser den Zauber auslöst, in der gewählten Einheit.",
+                    "label": "Auslösezeit"
+                }
+            },
+            "Formulae": "Alchemistische Formeln",
+            "FullPotencyUntil": "Volle Wirkkraft bis",
+            "Lynchpin": "Angelpunkt",
+            "Potency": "Wirkkraft",
+            "Spent": "Verbraucht",
+            "Trigger": {
+                "Command": "Befehl",
+                "Contact": "Kontakt",
+                "Time": "Zeit"
+            },
+            "TriggerDueMessage": {
+                "Header": "Zeitauslöser erreicht",
+                "Roll": "Vorbereitung würfeln"
+            }
+        },
         "Program": {
             "FIELDS": {
                 "type": {
@@ -2685,6 +2787,7 @@
         "Specialization": "Spezialisierung",
         "Specializations": "Spezialisierungen",
         "Spell": {
+            "AlchemicalFormula": "Alchemistische Formel",
             "Attack": "Zauberangriff",
             "Cast": "Zaubern",
             "CatCombat": "Kampf",
@@ -2702,6 +2805,7 @@
             "DetectionArea": "Ungerichtet",
             "DetectionDirectional": "Gerichtet",
             "DetectionPsychic": "Übersinnlich",
+            "Elemental": "Elementar",
             "FIELDS": {
                 "alchemical": {
                     "hint": "This spell was learned as an alchemical formula and can be made into a preparation.",
@@ -2782,6 +2886,7 @@
                     "label": "Zauberart"
                 }
             },
+            "HealthEssence": "Essenz",
             "IllusionMultiSense": "Vollsensorisch",
             "IllusionObvious": "Offensichtlich",
             "IllusionRealistic": "Realistisch",
@@ -3061,12 +3166,15 @@
             "Failure": "Misserfolg!",
             "HackOnTheFlyFailure": "Eiliges Hacken fehlgeschlagen!",
             "HackOnTheFlySuccess": "Eiliges Hacken erfolgreich!",
+            "PreparationFailure": "Der Zauber entweicht dem Angelpunkt",
+            "PreparationSuccess": "Die Vorbereitung hält den Zauber",
             "ResistedAllDamage": "Kein Schaden!",
             "ResistedSomeDamage": "Schaden!",
             "Results": "Ergebnis",
             "RitualFailure": "Das Ritual war zu stark für dich",
             "RitualSuccess": "Das Ritual ist besiegelt",
             "SoakBlockedByHardenedArmor": "Durch verstärkte Rüstung abgewehrt",
+            "SpellResisted": "Zauber widerstanden",
             "SpiritSummonFailure": "Geist entkommen!",
             "SpiritSummonSuccess": "Geist beschworen!",
             "SpriteCompilationFailure": "Sprite entkommen!",
@@ -3098,12 +3206,15 @@
             "OpposedCompileSpriteTest": "Widerstehe Kompilierung",
             "OpposedHackOnTheFlyTest": "Widerstehe Eiliges Hacken",
             "OpposedMatrixTest": "Vergleichende Matrix-Probe",
+            "OpposedPreparationForceTest": "Widerstehe mit Stärke",
             "OpposedRitualTest": "Besiegel das Ritual",
             "OpposedSummonSpiritTest": "Widerstehe Herbeirufung",
             "OpposedTest": "Vergleichende Probe",
             "PhysicalDefenseTest": "Physische Verteidigung",
             "PhysicalResistTest": "Physischer Schadenswiderstand",
             "PilotVehicleTest": "Manövrieren",
+            "PreparationCreationTest": "Vorbereitung erstellen",
+            "PreparationTriggerTest": "Vorbereitung auslösen",
             "RangedAttackTest": "Fernkampfangriff",
             "RitualSpellcastingTest": "Ritualzauber",
             "SkillTest": "Fertigkeitenprobe",
@@ -3157,7 +3268,6 @@
                 "DefaultCategoryVisibility": "Zeige Artikelkategorien an, auch wenn keine Artikel hinzugefügt wurden",
                 "Description": "Beschreibung",
                 "DisconnectNetwork": "Verlasse Host/ Gitter",
-                "Grunt": "Nutze Schergen-Regeln für Akteur",
                 "MarkTarget": "Platziere Marken auf diesem Ziel",
                 "MatrixConnectionToggle": "Ändere den Matrix-Verbindung: Erweiterte Realität, Kalte Sim oder Heiße Sim",
                 "RemoveAllNetworks": "Alle Netzwerke entfernen",
@@ -3218,8 +3328,6 @@
                 "ActionRollMode": "Standard Würfelmodus für diese Aktion. Überschreibt globale Chat Einstellung",
                 "AddQuantity": "Füge zu 1. {qtySome}: Füge zu 5. {qtyMany}: Füge zu 20.",
                 "AmmoReplaceDamage": "Setzen um Waffenschaden zu ersetzen anstatt zu modifizieren",
-                "AvailabilityAdjustment": "Berechne Verfügbarkeit abhängig von der Stufe.",
-                "CostAdjustment": "Berechne die tatsächlichen Kosten basierend auf der Stufe",
                 "DisabledForPreparedActor": "Deaktiviert da ein vorbereiteter Akteur verwendet wird",
                 "EssenceAdjustment": "Berechne die tatsächlichen Essenzkosten basierend auf der Stufe",
                 "RemoveQuantity": "Entferne 1. {qtySome}: Entferne 5. {qtyMany}: Entferne 20.",
@@ -3229,49 +3337,13 @@
             "MatrixTest": {
                 "SameGridDisabled": "Da sowohl das aktive als auch anvisierte Icon Gitter verwenden, wird diese Konfiguration automatisch bestimmt"
             },
-            "Modifiers": {
-                "armor": "Modifiziert den Panzerungswert",
-                "astral_initiative": "Modifiziert die Basis der Astralen Initiative",
-                "astral_initiative_dice": "Modifiziert die Würfel der Astralen Initiative",
-                "astral_limit": "Modifiziert das astrale Limit",
-                "composure": "Modifiziert den Würfelpool von Selbstherrschungsproben",
-                "defense": "Modifiziert den Würfelpool von Verteidigungsproben",
-                "defense_block": "Modifiziert den Verteidungsmodifikator wenn aktiv geblockt wird",
-                "defense_dodge": "Modifiziert den Verteidungsmodifikator wenn aktiv ausgewichen wird",
-                "defense_melee": "Modifiziert den Verteidungsmodifikator gegen Nahkampfangriffe",
-                "defense_parry": "Modifiziert den Verteidungsmodifikator wenn aktiv parriert wird",
-                "defense_ranged": "Modifiziert den Verteidungsmodifikator gegen Fernkampfangriffe",
-                "drain": "Modifiziert den Würfelpool von Entzugsproben",
-                "essence": "Modifiziert das Essenz Attribut",
-                "fade": "Modifiziert den Würfelpool von Schwundproben",
-                "global": "Modifiziert den Würfelpool aller Proben, außer Schaden reduzierender Proben",
-                "judge_intentions": "Modifiziert den Würfelpool von Menschenkenntnisproben",
-                "lift_carry": "Modifiziert den Würfelpool von Tragen&Heben-Proben",
-                "mark_damage": "Modifiziert die zugefügte Schadensmenge pro Marke",
-                "matrix_initiative": "Modifiziert die Basis der Matrix Initiative",
-                "matrix_initiative_dice": "Modifiziert die Würfel der Matrix Initiative",
-                "matrix_track": "Modifiziert den Matrix-Monitor",
-                "meat_initiative": "Modifiziert die Basis der Fleischwelt-Initiative",
-                "meat_initiative_dice": "Modifiziert die Würfel der Fleischwelt-Initiative",
-                "memory": "Modifiziert den Würfelpool von Erinnerungsproben",
-                "mental_limit": "Modifiziert das Geistige Limit",
-                "multi_defense": "Modifiziert physische Verteidigungsproben nach mehreren Angriffen pro Kampfrunde",
-                "pain_tolerance_physical": "Modifiziert ignorierbaren körperlichen Schaden bevor der erste Wundenmodifikator entsteht",
-                "pain_tolerance_stun": "Modifiziert ignorierbaren geistigen Schaden bevor der erste Wundenmodifikator entsteht",
-                "physical_limit": "Modifiziert das Körperliche Limit",
-                "physical_overflow_track": "Modifiziert den Körperlichen Überschuss-Monitor",
-                "physical_track": "Modifiziert den Körperlichen Monitor",
-                "place_three_marks": "Modifiziert den Modifikator um drei Marken gleichzeitig zu setzen",
-                "place_two_marks": "Modifiziert den Modifikator um zwei Marken gleichzeitig zu setzen",
-                "public_grid": "Modifiziert den Öffentlichen Gitter Modifikator",
-                "reach": "Modifiziert die Reichweite von Nahkampfangriffen",
-                "recoil": "Modifiziert Rückstoß",
-                "run": "Modifiziert die Laufreichweite um das Vielfache des Geschicklichkeits-Attributs",
-                "soak": "Modifiziert den Würfelpool von Schadenswiderstandsproben",
-                "social_limit": "Modifiziert das Soziale Limit",
-                "stun_track": "Modifiziert den Geistigen Monitor",
-                "walk": "Modifiziert die Gehreichweite um das Vielfache des Geschicklichkeits-Attributs",
-                "wound_tolerance": "Modifiziert die Schadensmenge pro Wundenmodifikator"
+            "Preparation": {
+                "Craft": "Ununterbrochene Herstellungszeit, die vor dem Würfeln benötigt wird",
+                "Force": "Stärke der Vorbereitung, bis zum Doppelten deiner Magie-Stufe",
+                "Potency": "Nettoerfolge der Erstellungsprobe. Verfällt mit der Zeit und ersetzt Zauberei, wenn sie ausgelöst wird",
+                "ReagentDrams": "Verbrauchte Drams Reagenzien, die anstelle der Stärke als Grenze dienen",
+                "Trigger": "Die Bedingung, die den gespeicherten Zauber auslöst",
+                "TriggerTime": "Countdown, bis der Zauber freigegeben wird, begrenzt durch die resultierende Wirkkraft in Stunden"
             },
             "RangedAttack": {
                 "Recoil": "Kumulativer Rückstoß",
@@ -3303,6 +3375,7 @@
                 "Extended": "Die Probe wird als ausgedehnte Probe geworfen, bis der Schwellenwert erreicht ist. Setze das Intervall auf null, um sie als normale Probe zu werfen.",
                 "ExtendedInterval": "Spielzeit zwischen den Würfen. Null wirft die Probe als normale, nicht ausgedehnte Probe.",
                 "Limit": "Vollständiger Limitwert",
+                "LimitIgnored": "Das Limit wird für diese Probe aktuell ignoriert",
                 "Modifier": "Summe aller auf den Pool angewendenten Modifikatoren",
                 "Pool": "Anzahl zu werfender Würfel",
                 "PushTheLimit": "Verwende Edge Regel 'Grenzen sprengen'",
@@ -3442,6 +3515,10 @@
             "NegativeLimitValue": "Limit-Werte müssen über Null liegen",
             "NoFireModeConfigured": "Fernwaffe hat keinen Feuermodus konfiguriert. Verwende Einzelfeuer.",
             "OnlyGMCanDoThis": "Nur ein GM-Benutzer kann dies tun",
+            "PreparationDepleted": "Diese Vorbereitung hat keine Wirkkraft mehr. Der Zauber ist verloren.",
+            "PreparationForceTooHigh": "Stärke der Vorbereitung ist ungültig oder größer als das Doppelte deiner Magie-Stufe.",
+            "PreparationNotConcluded": "Die Vorbereitung ist noch nicht abgeschlossen. Lass zuerst ihre Stärke widerstehen.",
+            "PreparationTriggerTimeTooLong": "Der Zeitauslöser liegt weiter in der Zukunft als die Wirkkraft in Stunden. Er wird vorzeitig aktiviert.",
             "RitualInvalidForce": "Ritual-Kraft ist zu klein oder größer als die des Refugiums",
             "RitualNotConcluded": "Ritual unvollständig. Warte auf Gegenprobe des Rituals, um Entzug zu bestimmen.",
             "RitualNotEnoughReagents": "nicht genug Reagenzien geopfert.",
@@ -3695,6 +3772,7 @@
             "lifestyle": "Lebensstil",
             "metamagic": "Metamagie",
             "modification": "Modifikation",
+            "preparation": "Vorbereitung",
             "program": "Programm",
             "quality": "Vor-/Nachteil",
             "ritual": "Ritual",
