@@ -47,6 +47,7 @@
         "package": "npm run build:prod && npm run build:db",
         "build:db": "node ./utils/packs.mjs package pack",
         "validate:packs": "node ./utils/validate-packs.mjs",
+        "validate:locales": "node ./utils/validate-locales.mjs",
         "update:pack-sources": "node scripts/update-pack-sources.mjs",
         "unpack:db": "node ./utils/packs.mjs package unpack",
         "locale:check": "node ./utils/check-localization.mjs",

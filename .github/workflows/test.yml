@@ -43,3 +43,6 @@ jobs:
 
             - name: Validate compendium sources
               run: npm run validate:packs
+
+            - name: Validate locales (syntax errors fail, differences to en only warn)
+              run: npm run validate:locales
