@@ -1,7 +1,25 @@
 #!/usr/bin/env node
 
 /**
- * NOTE: This file and READM-LOCALIZATION.md is fully AI generated.
+ * Locale checker (informational report, never fails).
+ *
+ * Compares every locale folder in public/locale against the base locale (en) and prints, per locale:
+ *  - translation progress (keys translated / total keys in en)
+ *  - missing keys: present in en, absent in the locale
+ *  - identical keys: string value equals the en value (possibly untranslated, but often legitimate, e.g. "Nuyen")
+ *  - extra keys: present in the locale, absent in en (obsolete or renamed, should be removed)
+ * Keys are compared as flattened dot paths (e.g. SR5.Actor.FIELDS.name.label), so a key that moved
+ * to another place shows up as one missing and one extra key.
+ *
+ * Read only: no file is modified and the exit code is 0 even when differences are found, except for an
+ * unknown locale, a missing en file or an unreadable directory. An unparsable locale file is reported
+ * and skipped. Use utils/validate-locales.mjs for the CI check.
+ *
+ * Usage:
+ *   npm run locale:check            # all locales
+ *   npm run locale:check -- de      # a single locale
+ *
+ * NOTE: This file and README-LOCALIZATION-CHECK.md is fully AI generated.
  * Please review carefully before use and modify as needed.
  */
 

@@ -1,7 +1,29 @@
 #!/usr/bin/env node
 
 /**
- * NOTE: This file and READM-LOCALIZATION.md is fully AI generated.
+ * Missing key injector (WRITES to the given locale file).
+ *
+ * Adds every key that exists in the base locale (en) but not in the given target locale. Each added leaf gets
+ * the placeholder value "[MISSING]" (the English text is deliberately not copied), so untranslated entries are
+ * easy to find with a text search and cannot be mistaken for finished translations.
+ *
+ * Behavior:
+ *  - Existing translations are kept unchanged. Nothing is removed, so extra (obsolete) keys must still be
+ *    deleted by hand or via locale:check output. Moved keys therefore end up duplicated until the old one is removed.
+ *  - Keys where en has an object but the locale a string (or vice versa) are not touched, only listed as
+ *    type conflicts that need manual review.
+ *  - The file is rewritten completely via JSON.stringify with 4 space indentation. Existing key order is
+ *    kept (new keys are appended at the end of their object, not sorted) and no trailing newline is written.
+ *  - Nothing is written when no keys are missing. Exit code is 1 for a missing argument, the base locale
+ *    or an unknown or unreadable locale.
+ *
+ * After running, translate every "[MISSING]" value and re-run npm run locale:check -- <locale>.
+ *
+ * Usage:
+ *   npm run locale:base-inject-missing -- <locale>
+ *   npm run locale:base-inject-missing -- de
+ *
+ * NOTE: This file and README-INJECT-MISSING-LOCALE.md is fully AI generated.
  * Please review carefully before use and modify as needed.
  */
 

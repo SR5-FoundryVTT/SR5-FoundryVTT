@@ -1,7 +1,24 @@
 #!/usr/bin/env node
 
 /**
- * NOTE: This file and READM-BASE-LOCALE-USAGE.md is fully AI generated.
+ * Base locale usage checker (informational report, never fails).
+ *
+ * Finds localization keys in the base locale (public/locale/en/config.json) that are probably unused.
+ * Every leaf key is flattened to its full dot path (e.g. SR5.Actor.FIELDS.name.label) and searched as a plain
+ * substring in all .js, .ts, .hbs and .html files below src/ (node_modules, dist and .git are skipped).
+ * Keys without a single match are listed, grouped by top-level namespace, together with a total count.
+ *
+ * Limitations: keys that are assembled at runtime (e.g. `SR5.Spirit.Types.${type}`) or referenced only from
+ * outside src/ (system.json, packs, macros) are reported as unused. Treat the result as a list of candidates
+ * to review before removing anything from en, not as a list of keys that are safe to delete.
+ *
+ * Read only: no file is modified. Other locales are not looked at; remove unused keys from en first and then
+ * sync the other locales (npm run locale:check).
+ *
+ * Usage:
+ *   npm run locale:base-usage
+ *
+ * NOTE: This file and README-BASE-LOCALE-USAGE.md is fully AI generated.
  * Please review carefully before use and modify as needed.
  */
 
