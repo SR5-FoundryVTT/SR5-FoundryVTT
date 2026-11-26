@@ -72,7 +72,7 @@ declare module "fvtt-types/configuration" {
         Item: typeof SR5Item<Item.ConfiguredSubType>;
         Token: typeof SR5TokenDocument;
         Roll: typeof SR5Roll;
-        Sheet: typeof foundry.appv1.api.FormApplication;
+        Sheet: typeof foundry.applications.api.DocumentSheetV2;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -499,7 +499,6 @@ ___________________
 
         // Register sheets for collection documents.
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
-        foundry.documents.collections.Actors.unregisterSheet('core', foundry.appv1.sheets.ActorSheet);
         foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5CharacterSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
@@ -527,7 +526,6 @@ ___________________
         });
 
 
-        foundry.documents.collections.Items.unregisterSheet('core', foundry.appv1.sheets.ItemSheet);
         foundry.documents.collections.Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, {
             label: "SR5.SheetItem",
             makeDefault: true
@@ -574,7 +572,7 @@ ___________________
             await PreparationDecayFlow.onWorldTimeChange();
 
             if (ChangelogApplication.showApplication)
-                new ChangelogApplication().render(true);
+                await new ChangelogApplication().render({ force: true });
         }
 
         Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks.bind(JournalEnrichers));

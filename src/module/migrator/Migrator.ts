@@ -266,22 +266,24 @@ export class Migrator {
         const localizedWarningBackup = game.i18n.localize('SR5.MIGRATION.WarningBackup');
         const localizedWarningBegin = game.i18n.localize('SR5.MIGRATION.BeginMigration');
 
-        const d = new foundry.appv1.api.Dialog({
-            title: localizedWarningTitle,
+        void foundry.applications.api.DialogV2.wait({
+            window: { title: localizedWarningTitle },
             content:
                 `<h2 style="color: red; text-align: center">${localizedWarningHeader} (${this.pendingMigrationCount})</h2>` +
                 `<p style="text-align: center"><i>${localizedWarningRequired}</i></p>` +
                 `<p>${localizedWarningDescription}</p>` +
                 `<h3 style="color: red">${localizedWarningBackup}</h3>`,
-            buttons: {
-                ok: {
+            buttons: [
+                {
+                    action: 'ok',
                     label: localizedWarningBegin,
-                    callback: async () => this.updateAllMigratableDocuments(),
+                    default: true,
+                    callback: () => {
+                        void this.updateAllMigratableDocuments();
+                    },
                 },
-            },
-            default: 'ok',
+            ],
         });
-        d.render(true);
     }
 
     // Track migration progress
@@ -409,23 +411,24 @@ export class Migrator {
         await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, this.migrationVersion);
         this.pendingMigrationCount = 0;
 
-        new foundry.appv1.api.Dialog({
-            title: "Migration Complete",
+        await foundry.applications.api.DialogV2.wait({
+            window: { title: 'Migration Complete' },
             content: `
                 <h2 style="color: red; text-align: center">Migration Complete</h2>
                 <p style="text-align: center">It took ${this.formatElapsedTime(performance.now() - start)}.</p>
             `,
-            buttons: {
-                ok: {
-                    label: "OK",
+            buttons: [
+                {
+                    action: 'ok',
+                    label: 'OK',
+                    default: true,
                     callback: () => {
                         this.progressbar?.remove();
-                        ui.notifications.info("Documents have been migrated!");
-                    }
-                }
-            },
-            default: "ok"
-        }).render(true);
+                        ui.notifications.info('Documents have been migrated!');
+                    },
+                },
+            ],
+        });
     }
 
     /**
