@@ -130,7 +130,7 @@
         "ActionType": {
             "Complex": "Komplexe",
             "Free": "Freie",
-            "Interrupt": "Interrupt",
+            "Interrupt": "Unterbrechungshandlung",
             "Label": "Handlung",
             "None": "Keine",
             "Simple": "Einfache",
@@ -283,7 +283,7 @@
                 "attributes": {
                     "edge": {
                         "base": {
-                            "hint": "Edge is das Glück des Characters, der unerklärbare Faktor, der ihm hilft, in kritischen Situationen zu bestehen.",
+                            "hint": "Edge ist das Glück des Charakters, die Gunst der Götter, jener unerklärliche Faktor, der ihm erlaubt, die Widrigkeiten zu überwinden.",
                             "label": "Edge"
                         }
                     }
@@ -411,11 +411,11 @@
                         "label": "Mehrfachverteidigung"
                     },
                     "pain_tolerance_physical": {
-                        "hint": "Modifiziert ignorierten Schaden for dem ersten Wundenmodifikator",
+                        "hint": "Modifiziert den Schaden, der vor dem ersten Wundenmodifikator ignoriert wird",
                         "label": "Schmerzresistenz (Physisch)"
                     },
                     "pain_tolerance_stun": {
-                        "hint": "Modifiziert ignorierten Schaden for dem ersten Wundenmodifikator",
+                        "hint": "Modifiziert den Schaden, der vor dem ersten Wundenmodifikator ignoriert wird",
                         "label": "Schmerzresistenz (Geistig)"
                     },
                     "physical_limit": {
@@ -510,8 +510,8 @@
                     "label": "Entzug"
                 },
                 "level": {
-                    "hint": "Level der Adeptenkraft",
-                    "label": "Level"
+                    "hint": "Stufe der Adeptenkraft",
+                    "label": "Stufe"
                 },
                 "pp": {
                     "hint": "Kosten in Kraftpunkten",
@@ -603,16 +603,16 @@
                         "label": "Verstärkt"
                     },
                     "immunities": {
-                        "hint": "Damage sources this armor grants Immunity against",
-                        "label": "Immunities"
+                        "hint": "Schadensquellen, gegen die diese Panzerung Immunität gewährt",
+                        "label": "Immunitäten"
                     },
                     "is_hardened": {
                         "hint": "Wenn diese Panzerung verstärkten Schutz gewährt",
                         "label": "Verstärkt Aktiv"
                     },
                     "pollutant": {
-                        "hint": "Extra Armor against attacks with Pollutant",
-                        "label": "Chemical Protection"
+                        "hint": "Zusätzlicher Schutz gegen Angriffe mit Schadstoffen",
+                        "label": "Chemischer Schutz"
                     },
                     "radiation": {
                         "hint": "Extra Panzerung gegen Strahlenschaden",
@@ -623,13 +623,13 @@
                         "label": "Panzerung"
                     },
                     "water": {
-                        "hint": "Extra Armor against attacks with Water",
-                        "label": "Water Protection"
+                        "hint": "Zusätzlicher Schutz gegen Angriffe mit Wasser",
+                        "label": "Wasserschutz"
                     }
                 }
             },
             "Immunity": {
-                "NormalWeapons": "Normal Weapons"
+                "NormalWeapons": "Normale Waffen"
             },
             "Resistances": "Resistenzen",
             "label": "Panzerung"
@@ -753,7 +753,7 @@
             "LatestChangelog": "Aktueller Changelog",
             "Reason": "Du hast die aktuellste Version installiert!",
             "ReportIssues": "Bitte Fehler und gewünschte Funktionen hier melden",
-            "Title": "Shadowrun5e Update"
+            "Title": "Shadowrun5e Aktualisierung"
         },
         "Character": {
             "FIELDS": {
@@ -833,7 +833,7 @@
                 "hint": "Dieses Kompendium wird für IC-Proben verwendet, gefiltert nach IC-Typ",
                 "label": "IC Handlungen"
             },
-            "Label": "Compendium Packs",
+            "Label": "Kompendiumpakete",
             "MatrixActionsPack": {
                 "hint": "Dieses Kompendium wird für alle Matrix-Handlungen verwendet.",
                 "label": "Matrix Handlungen"
@@ -889,7 +889,7 @@
         "ComplexForm": {
             "Durations": {
                 "Immediate": "Sofort",
-                "Permanent": "Permanent",
+                "Permanent": "Dauerhaft",
                 "Sustained": "Aufrechterhalten"
             },
             "FIELDS": {
@@ -988,7 +988,7 @@
                 "JackOut": "Ausstöpseln",
                 "JamSignals": "Signale Stören",
                 "JudgeIntentions": "Menschenkenntnis",
-                "JumpIntoRiggedDevice": "In Ein Gerät Springen",
+                "JumpIntoRiggedDevice": "In ein manipuliertes Gerät springen",
                 "LiftCarry": "Heben & Tragen",
                 "MatrixDamageResist": "Matrix-Schadenswiderstand",
                 "MatrixDefenseTest": "Matrix-Verteidigung",
@@ -1044,7 +1044,7 @@
             "Durations": {
                 "Always": "Immer",
                 "Instant": "Sofort",
-                "Permanent": "Permanent",
+                "Permanent": "Dauerhaft",
                 "Special": "Speziell",
                 "Sustained": "Aufrechterhalten"
             },
@@ -1154,7 +1154,7 @@
         "DeviceType": "Typ",
         "Dialogs": {
             "Common": {
-                "Cancel": "Cancel",
+                "Cancel": "Abbrechen",
                 "Ok": "OK"
             },
             "RangedWeaponTest": {
@@ -1179,7 +1179,7 @@
         "DuckOrCover": "Deckung oder am Boden",
         "Duration": "Dauer",
         "DurationInstant": "Sofort",
-        "DurationPermanent": "Permanent",
+        "DurationPermanent": "Dauerhaft",
         "DurationSustained": "Aufrechterhalten",
         "Echo": "Echo",
         "Echoes": "Echos",
@@ -1196,9 +1196,9 @@
             "Electricity": "Elektrizität",
             "Fire": "Feuer",
             "Label": "Element",
-            "Pollutant": "Pollutant",
+            "Pollutant": "Schadstoff",
             "Radiation": "Strahlung",
-            "Water": "Water"
+            "Water": "Wasser"
         },
         "Emerged": "Resonanz",
         "EnforcedMaximum": "Erzwungenes Maximum",
@@ -1362,7 +1362,7 @@
                 "month": "Letzter Monat",
                 "week": "Letzte Woche"
             },
-            "PoolUsed": "Pool",
+            "PoolUsed": "Würfelpool",
             "RealTime": "Echtzeit",
             "Rolls": "Durchgeführte Würfe",
             "SaveTest": "Speichern",
@@ -1417,11 +1417,11 @@
         "FullDefenseAttribute": "Attribut für Volle Abwehr",
         "FullMatrixDefense": "Volle Matrixabwehr",
         "GMRequest": {
-            "General": "Your GM wants you to do a",
-            "RollAttribute": "Attribute Check",
-            "RollSkill": "Skill Check",
-            "Teamwork": "Teamwork Test",
-            "Threshold": " with a threshold of "
+            "General": "Der SL verlangt eine",
+            "RollAttribute": "Attributsprobe",
+            "RollSkill": "Fertigkeitsprobe",
+            "Teamwork": "Teamwork-Probe",
+            "Threshold": " mit einem Schwellenwert von "
         },
         "Gear": "Ausrüstung",
         "General": "Allgemein",
@@ -1446,7 +1446,7 @@
         "Host": {
             "Attributes": "Attribute",
             "CustomAttributes": "Eigene Attributsaufteilung",
-            "DropICActor": "Drag&Drop IC Acteure in gewünschter Reihenfolge",
+            "DropICActor": "Drag&Drop IC-Akteure in gewünschter Reihenfolge",
             "ICOrder": "IC-Reihenfolge",
             "MissingIC": "Fehlende IC",
             "Rating": "Host-Stufe"
@@ -1607,8 +1607,8 @@
                             }
                         },
                         "normal_weapon": {
-                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
-                            "label": "Normal Weapon"
+                            "hint": "Ob dieser Schaden als normaler (nicht magischer) Waffenangriff gilt",
+                            "label": "Normale Waffe"
                         },
                         "type": {
                             "base": {
@@ -1748,7 +1748,7 @@
                         "label": "Beschreibung"
                     },
                     "source": {
-                        "hint": "Referenz als PDF#Page, URL oder Journal Eintrag ",
+                        "hint": "Referenz als PDF#Page, URL oder Journal Eintrag",
                         "label": "Referenz"
                     }
                 },
@@ -1812,8 +1812,8 @@
                 }
             }
         },
-        "ItemMod": "Item Mod",
-        "ItemName": "Item Name",
+        "ItemMod": "Item-Modifikation",
+        "ItemName": "Item-Name",
         "ItemTypes": {
             "Action": "Aktion",
             "AdeptPower": "Adeptenkraft",
@@ -1832,7 +1832,7 @@
             "Host": "Host",
             "License": "Lizenz",
             "Lifestyle": "Lebensstil",
-            "Metamagic": "Metamagic",
+            "Metamagic": "Metamagie",
             "Modification": "Modifikation",
             "Preparation": "Vorbereitung",
             "Program": "Programm",
@@ -1853,7 +1853,7 @@
             "FinalKarma": "Karma",
             "StartingKarma": "Start Karma",
             "Submit": "Bestätigen",
-            "Title": "Karma Manager"
+            "Title": "Karma-Manager"
         },
         "Keybinding": {
             "AddRemoveManyQty": {
@@ -1984,11 +1984,11 @@
                 "Local": "Lokal",
                 "Public": "Öffentlich",
                 "SleazeShort": "S",
-                "TargetDevice": "Target Device",
-                "TargetMainIcon": "Target Main Icon"
+                "TargetDevice": "Zielgerät",
+                "TargetMainIcon": "Haupt-Icon des Ziels"
             },
             "Message": {
-                "ClickToSelect": "Klicke um in Szene auszuwählen",
+                "ClickToSelect": "Klicken, um in der Szene auszuwählen",
                 "FailedAttackAction": "Fehlgeschlagene Matrix-Angriffsaktion",
                 "OverwatchConvergence": "Overwatch-Fokusierung",
                 "TargetedIcon": "Ziel-Icon",
@@ -2010,7 +2010,7 @@
                 "WAN": "WAN"
             },
             "Sidebar": {
-                "Changelog": "Changelog",
+                "Changelog": "Änderungsprotokoll",
                 "Issues": "Issues",
                 "Wiki": "Wiki"
             }
@@ -2040,7 +2040,7 @@
                 },
                 "permanent": {
                     "hint": "Ist dieser Lebensstil permanent?",
-                    "label": "Permanent"
+                    "label": "Dauerhaft"
                 },
                 "security": {
                     "hint": "Sicherheitsstufe des Lebensstils",
@@ -2136,8 +2136,8 @@
                 "Line1": "Ab Version 0.18.0 werden Effekte auf Akteur Gegenständen direkt angewendet, ohne auf den Akteur kopiert zu werden.",
                 "Line2": "Bisher kopierte Effekte müssen gelöscht oder kopiert werden, um zu verhindern, dass diese Effekte doppelt angewendet werden. Das betrifft alle Effekte mit einem Item im Origin Feld.",
                 "Line3": "Direkt auf dem Akteur erstellte Effekte bleiben bestehen.",
-                "Line4": "Solltest du viele Effekte nutzen, vor allem zusammen mit Effekt-Modulen, and bist unsicher welche Effekte einen Item-Origin haben, setzte die Migration auf Deaktivieren. Dadurch werden betroffene Effekte deaktiviert und umbenannt, wodurch diese leicht zu prüfen sind.",
-                "Line5": "Achte außerdem auf aktivierte Effekte in Akteur Gegenständen, die jetzt angewendet werden. Du kannst alle angewendeten Effekte eines Akteurs im Effekts-Tab sehen.",
+                "Line4": "Solltest du viele Effekte nutzen, vor allem zusammen mit Effekt-Modulen, und bist unsicher welche Effekte einen Item-Origin haben, setze die Migration auf Deaktivieren. Dadurch werden betroffene Effekte deaktiviert und umbenannt, wodurch diese leicht zu prüfen sind.",
+                "Line5": "Achte außerdem auf aktivierte Effekte in Akteur-Gegenständen, die jetzt angewendet werden. Du kannst alle angewendeten Effekte eines Akteurs im Effekte-Tab sehen.",
                 "OnlyDisable": "Effekte nur deaktivieren!",
                 "Warning": "Warnung!"
             }
@@ -2188,7 +2188,7 @@
                 }
             }
         },
-        "ModificationCategories": "Modification Categories",
+        "ModificationCategories": "Modifikationskategorien",
         "ModificationCategory": "Modification Category",
         "ModificationSlots": "Modification Slots",
         "ModificationTypes": {
@@ -2276,7 +2276,7 @@
             "AvailableNetworks": "Verfügbare Netzwerke",
             "BruteForce": "Brute Force",
             "ConnectedTo": "Verbunden mit",
-            "HackOnTheFly": "Hack on the Fly",
+            "HackOnTheFly": "Eiliges Hacken",
             "InviteMark": "Marke einladen",
             "NetworkType": "Netzwerktyp",
             "NoNetwork": "Kein Netzwerk",
@@ -2312,7 +2312,7 @@
             "CurrentNuyen": "Aktuell verfügbares Nuyen",
             "FinalNuyen": "Zukünftiges verfügbares Nuyen",
             "Submit": "Bestätigen",
-            "Title": "Nuyen Manager"
+            "Title": "Nuyen-Manager"
         },
         "OpenNetworkManager": "Öffne Netzwerkmanager",
         "OpenOrigin": "Öffne Item",
@@ -2324,7 +2324,7 @@
         "OriginalDicePool": "Originaler Würfelpool",
         "OutOfRange": "Außer Reichweite",
         "Overflow": "Überschuss",
-        "Override": "Override",
+        "Override": "Überschreibung",
         "OverwatchScore": "Overwatch-Wert",
         "OverwatchScoreTracker": {
             "AddSelect": "Füge den verbundenen Actor des ausgewählten und Tokens hinzu",
@@ -2427,7 +2427,7 @@
                     "label": "Art"
                 }
             },
-            "label": "Program"
+            "label": "Programm"
         },
         "ProgramType": "Typ",
         "Programs": "Programme",
@@ -2767,10 +2767,10 @@
             "Survival": "Überleben",
             "Swimming": "Schwimmen",
             "Teamwork": {
-                "Glitched": "Glitched",
-                "ParticipantActor": "Choose actor",
-                "RollIt": "Roll it",
-                "TakePart": "Take part"
+                "Glitched": "Gepatzt",
+                "ParticipantActor": "Akteur wählen",
+                "RollIt": "Würfeln",
+                "TakePart": "Teilnehmen"
             },
             "ThrowingWeapons": "Wurfwaffen",
             "Tracking": "Spurenlesen",
@@ -2816,8 +2816,8 @@
             "Elemental": "Elementar",
             "FIELDS": {
                 "alchemical": {
-                    "hint": "This spell was learned as an alchemical formula and can be made into a preparation.",
-                    "label": "Alchemical"
+                    "hint": "Dieser Zauber wurde als alchemische Formel erlernt und kann in eine Vorbereitung umgewandelt werden.",
+                    "label": "Alchemisch"
                 },
                 "category": {
                     "hint": "Zauberkategorie",
@@ -3060,7 +3060,7 @@
             "Durations": {
                 "Always": "Immer",
                 "Instant": "Sofort",
-                "Permanent": "Permanent",
+                "Permanent": "Dauerhaft",
                 "Special": "Speziell",
                 "Sustained": "Aufrechterhalten"
             },
@@ -3138,7 +3138,7 @@
                 "Description": "Beschreibung",
                 "Details": "Details",
                 "Effects": "Effekte",
-                "Mods": "Mods",
+                "Mods": "Modifikationen",
                 "Network": "Netzwerk",
                 "SinLicenses": "Lizenzen",
                 "SinNetworks": "Netzwerke",
@@ -3317,7 +3317,7 @@
                 "DeleteEffect": "Lösche Effekt",
                 "DocumentEffects": "Auswirkungen direkt auf dieses Dokument.",
                 "EditEffect": "Bearbeite Effekt",
-                "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "HelpLinkEnglishOnly": "Hilfe (externer Link, nur Englisch)",
                 "ItemEffects": "Effekte, die von Items auf diesem Dokument gesammelt werden.",
                 "OnlyAllFilteredUsed": "Dieser Effekt gilt nur für Proben, die allen Auswahlen entsprechen.",
                 "OnlyFilteredUsed": "Dieser Effekt gilt nur für Proben, die mindestens einer Auswahl entsprechen.",
@@ -3448,12 +3448,12 @@
             "Maneuvering": "Manövrieren",
             "MissingDriver": "Fahrer per Drag&Drop zufügen",
             "ModificationCategoryTypes": {
-                "body": "Body",
-                "cosmetic": "Cosmetic",
-                "electromagnetic": "Electromagnetic",
-                "powertrain": "Powertrain",
-                "protection": "Protection",
-                "weapons": "Weapons"
+                "body": "Karosserie",
+                "cosmetic": "Kosmetik",
+                "electromagnetic": "Elektromagnetik",
+                "powertrain": "Antriebsstrang",
+                "protection": "Schutz",
+                "weapons": "Waffen"
             },
             "OffRoad": "Off-Road",
             "OnRoad": "Auf Straße",
@@ -3486,7 +3486,7 @@
         "VehicleStunImmunity": "Fahrzeugimmunität gegen Betäubungsschaden",
         "Vision": {
             "AstralPerception": "Astrale Wahrnehmung",
-            "AugmentedReality": "Augmented Reality",
+            "AugmentedReality": "Erweiterte Realität",
             "LowLight": "Restlistverstärkung",
             "ThermographicVision": "Infrarotsicht"
         },
@@ -3657,7 +3657,7 @@
                 }
             },
             "FullReload": "Komplett",
-            "Mod": "Mod",
+            "Mod": "Modifikation",
             "Mode": {
                 "Full": {
                     "BurstFire": "Salvenmodus",
@@ -3686,7 +3686,7 @@
                     "SingleShotShort": "EM"
                 }
             },
-            "Mods": "Mods",
+            "Mods": "Modifikationen",
             "PartialReload": "Teilweise",
             "Range": {
                 "Category": {
@@ -3780,7 +3780,7 @@
             "skill": "Fertigkeit",
             "spell": "Zauberspruch",
             "sprite_power": "Spritekraft",
-            "vehicle": "Vehicle",
+            "vehicle": "Fahrzeug",
             "weapon": "Waffe"
         }
     }

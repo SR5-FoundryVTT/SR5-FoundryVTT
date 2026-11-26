@@ -130,7 +130,7 @@
         "ActionType": {
             "Complex": "Complexa",
             "Free": "Livre",
-            "Interrupt": "Interrupt",
+            "Interrupt": "Interrupção",
             "Label": "Tipo",
             "None": "Nenhuma",
             "Simple": "Simples",
@@ -283,8 +283,8 @@
                 "attributes": {
                     "edge": {
                         "base": {
-                            "hint": "Edge é a sorte de um personagem, o favor dos deuses, aquele fator inexplicável que permite vencer as probabilidades.",
-                            "label": "Edge"
+                            "hint": "Trunfo é a sorte de um personagem, o favor dos deuses, aquele fator inexplicável que permite vencer as probabilidades.",
+                            "label": "Trunfo"
                         }
                     }
                 },
@@ -300,8 +300,8 @@
                 },
                 "magic": {
                     "attribute": {
-                        "hint": "Atributo que o Mago/Adepto usa ao resistir a Drain",
-                        "label": "Atributo de Drain"
+                        "hint": "Atributo que o Mago/Adepto usa ao resistir ao Dreno",
+                        "label": "Atributo de Dreno"
                     },
                     "label": "Magia"
                 },
@@ -352,7 +352,7 @@
                     },
                     "drain": {
                         "hint": "Modifica a reserva de dados de testes de drenagem",
-                        "label": "Drain"
+                        "label": "Dreno"
                     },
                     "essence": {
                         "hint": "Modifica o atributo essência",
@@ -360,7 +360,7 @@
                     },
                     "fade": {
                         "hint": "Modifica a reserva de dados de testes de enfraquecimento",
-                        "label": "Fade"
+                        "label": "Enfraquecimento"
                     },
                     "global": {
                         "hint": "Modifica todos os pools de teste, excluindo testes de redução de dano",
@@ -481,8 +481,8 @@
                 },
                 "technomancer": {
                     "attribute": {
-                        "hint": "Atributo que o Tecnomante usa ao resistir a Fade",
-                        "label": "Atributo de Fade"
+                        "hint": "Atributo que o Tecnomante usa ao resistir ao Enfraquecimento",
+                        "label": "Atributo de Enfraquecimento"
                     },
                     "label": "Tecnomante"
                 }
@@ -506,8 +506,8 @@
         "AdeptPower": {
             "FIELDS": {
                 "drain": {
-                    "hint": "Se este Poder de Adepto gera Drain após o uso",
-                    "label": "Drain"
+                    "hint": "Se este Poder de Adepto gera Dreno após o uso",
+                    "label": "Dreno"
                 },
                 "level": {
                     "hint": "Nível deste Poder de Adepto (se aplicável)",
@@ -629,7 +629,7 @@
                 }
             },
             "Immunity": {
-                "NormalWeapons": "Normal Weapons"
+                "NormalWeapons": "Armas Normais"
             },
             "Resistances": "Resistências",
             "label": "Armadura"
@@ -673,7 +673,7 @@
         "Base": "Base",
         "BaseValue": "Valor Base",
         "BiofeedbackDamage": "Dano de Biofeedback",
-        "Biography": "Bio",
+        "Biography": "Biografia",
         "BlastRadius": "Raio de Explosão",
         "Blitz": "Blitz",
         "Block": "Bloquear",
@@ -813,7 +813,7 @@
                 "Dwarf": "Anão",
                 "Elf": "Elfo",
                 "Human": "Humano",
-                "Ork": "Ork",
+                "Ork": "Orc",
                 "Troll": "Troll"
             }
         },
@@ -1121,7 +1121,7 @@
         "DefenderNetHits": "Acertos Excedentes do Defensor",
         "Defense": "Defesa",
         "DefenseTest": "Teste de Defesa",
-        "Del": "Del",
+        "Del": "Excl.",
         "Delete": "Excluir",
         "DeleteAmmo": "Excluir Munição",
         "DeleteConfirmationApplication": {
@@ -1196,9 +1196,9 @@
             "Electricity": "Elétrico",
             "Fire": "Fogo",
             "Label": "Elemento",
-            "Pollutant": "Pollutant",
+            "Pollutant": "Poluente",
             "Radiation": "Radiação",
-            "Water": "Water"
+            "Water": "Água"
         },
         "Emerged": "Emergido",
         "EnforcedMaximum": "Máximo imposto",
@@ -2142,7 +2142,7 @@
                 "Warning": "ATENÇÃO!"
             }
         },
-        "Miscellaneous": "Misc",
+        "Miscellaneous": "Diversos",
         "MissingItemForOpposedTest": "O teste de oposição não pode ser rolado devido ao item de atuação agora estar ausente",
         "MissingRessource": {
             "Ammo": "Munição insuficiente para atirar",
@@ -2740,7 +2740,7 @@
             "Negotiation": "Negociação",
             "Palming": "Empalmar",
             "Perception": "Percepção",
-            "Performance": "Performance",
+            "Performance": "Atuação",
             "PilotAerospace": "Pilotar Espaçonaves",
             "PilotAircraft": "Pilotar Aeronaves",
             "PilotExoticVehicle": "Pilotar Veículos Exóticos",
@@ -3264,7 +3264,7 @@
         "Tooltips": {
             "Actor": {
                 "AddOneService": "Adicionar Um Serviço",
-                "Blitz": "Use um ponto de Vantagem para rolar o número máximo (5) de dados na iniciativa",
+                "Blitz": "Use um ponto de Trunfo para rolar o número máximo (5) de dados na iniciativa",
                 "ConnectNetwork": "Entrar neste host/grade",
                 "Critter": "Permitir o uso de poderes de criatura",
                 "DefaultCategoryVisibility": "Mostrar categorias de itens mesmo que nenhum item tenha sido adicionado a eles",
@@ -3290,7 +3290,7 @@
                 "RemoveNetwork": "Remover rede",
                 "RemoveOneService": "Remover Um Serviço",
                 "RemoveSkillSet": "Remover o conjunto de perícias atual, bem como todas as perícias e grupos de perícias originados dele",
-                "ResetActorForNewRun": "Redefinir dano, vantagem, etc. para uma nova corrida",
+                "ResetActorForNewRun": "Redefinir dano, trunfo, etc. para uma nova corrida",
                 "RollInitiative": "Rolar Iniciativa",
                 "SetupPAN": "Adicionar todos os Dispositivos Sem Fio equipados à Persona deste personagem"
             },
@@ -3315,7 +3315,7 @@
                 "DeleteEffect": "Excluir Efeito",
                 "DocumentEffects": "Efeitos diretamente neste documento",
                 "EditEffect": "Editar Efeito",
-                "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "HelpLinkEnglishOnly": "Ajuda (link externo, apenas em inglês)",
                 "ItemEffects": "Efeitos coletados de itens neste documento",
                 "OnlyAllFilteredUsed": "Este efeito só se aplicará para testes que correspondam a todas as seleções",
                 "OnlyFilteredUsed": "Este efeito só se aplicará para testes que correspondam a pelo menos uma seleção",
@@ -3367,7 +3367,7 @@
             "SummoningTest": {
                 "DragOnCanvas": "Arraste o espírito no canvas",
                 "Force": "Força do espírito invocado",
-                "OptionalPowerCount": "Contagem informativa de poderes opcionais do espírito (piso(força / 3)).",
+                "OptionalPowerCount": "Contagem informativa de poderes opcionais do espírito (piso(Força / 3)).",
                 "PreparedSpirit": "Use um ator espírito preparado em vez de criar um genérico",
                 "ReagentDrams": "Dracmas de reagentes usados para alterar o limite de invocação",
                 "SpiritType": "Tipo do espírito invocado"
@@ -3380,7 +3380,7 @@
                 "LimitIgnored": "O limite está atualmente ignorado neste teste",
                 "Modifier": "Soma de todos os modificadores aplicados à reserva de dados",
                 "Pool": "Quantidade de dados para rolar",
-                "PushTheLimit": "Aplicar regras de vantagem ao limite",
+                "PushTheLimit": "Aplicar regras de trunfo ao Forçar o Limite",
                 "ResultOverrideGlitches": "Substitui as falhas para este resultado de teste.",
                 "ResultOverrideHits": "Substitui os acertos para este resultado de teste.",
                 "RollMode": "Visibilidade da mensagem de rolagem do chat FoundryVTT",
@@ -3411,7 +3411,7 @@
             }
         },
         "UnderBarrel": "Sob o Cano",
-        "UseEdgeForInitiativeRoll": "Use a regra de vantagem blitz para iniciativa",
+        "UseEdgeForInitiativeRoll": "Use a regra de trunfo blitz para iniciativa",
         "Value": "Valor",
         "Vehicle": {
             "Categories": {
@@ -3512,7 +3512,7 @@
             "HostItemOnlyAcceptIC": "Apenas atores GELOs podem ser adicionados aos hosts",
             "InvalidCompilationLevel": "Atributo de ressonância muito baixo para este nível de sprite",
             "InvalidMarksCount": "Você está tentando colocar um número estranho de marcas",
-            "InvalidSummoningForce": "O valor da força escolhido não adere às regras",
+            "InvalidSummoningForce": "O valor de Força escolhido não respeita as regras",
             "InvalidWeaponRanges": "Os alcances da arma devem estar em ordem crescente e terminar acima de zero.",
             "NegativeLimitValue": "Os valores do limite devem ser números positivos",
             "NoActorCreatePermission": "Você não tem permissão para criar atores.",
@@ -3522,7 +3522,7 @@
             "PreparationForceTooHigh": "A Força do preparado é inválida ou maior que o dobro do seu atributo Magia.",
             "PreparationNotConcluded": "O preparado ainda não está pronto. Deixe a Força dele resistir primeiro.",
             "PreparationTriggerTimeTooLong": "O gatilho de tempo está além da potência do preparado em horas. Ele será ativado antes do previsto.",
-            "RitualInvalidForce": "A força do ritual é inválida ou maior do que a nível do seu alojamento.",
+            "RitualInvalidForce": "A Força do ritual é inválida ou maior do que o Nível da sua Loja.",
             "RitualNotConcluded": "Ritual incompleto. Aguarde o ritual se opor à conjuração para determinar o dreno.",
             "RitualNotEnoughReagents": "Não foram oferecidos reagentes suficientes.",
             "SkillAlreadyExists": "A perícia {name} já existe no ator {actorName} ({actorUuid}). Use cada nome de perícia apenas uma vez por categoria.",

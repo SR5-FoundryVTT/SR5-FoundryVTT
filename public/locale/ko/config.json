@@ -130,7 +130,7 @@
         "ActionType": {
             "Complex": "복잡",
             "Free": "자유",
-            "Interrupt": "Interrupt",
+            "Interrupt": "인터럽트",
             "Label": "유형",
             "None": "없음",
             "Simple": "단순",
@@ -603,16 +603,16 @@
                         "label": "강화 방어구"
                     },
                     "immunities": {
-                        "hint": "Damage sources this armor grants Immunity against",
-                        "label": "Immunities"
+                        "hint": "이 방어구가 면역을 부여하는 피해 출처",
+                        "label": "면역"
                     },
                     "is_hardened": {
                         "hint": "이 방어구가 강화 방어를 제공하는지 여부",
                         "label": "강화 적용"
                     },
                     "pollutant": {
-                        "hint": "Extra Armor against attacks with Pollutant",
-                        "label": "Chemical Protection"
+                        "hint": "오염물질 공격에 대한 추가 방어도 제공",
+                        "label": "화학 보호"
                     },
                     "radiation": {
                         "hint": "방사선 공격에 대한 추가 방어도 제공",
@@ -623,13 +623,13 @@
                         "label": "방어도 수치"
                     },
                     "water": {
-                        "hint": "Extra Armor against attacks with Water",
-                        "label": "Water Protection"
+                        "hint": "물 공격에 대한 추가 방어도 제공",
+                        "label": "물 보호"
                     }
                 }
             },
             "Immunity": {
-                "NormalWeapons": "Normal Weapons"
+                "NormalWeapons": "일반 무기"
             },
             "Resistances": "저항",
             "label": "방어구"
@@ -763,7 +763,7 @@
                 },
                 "is_npc": {
                     "hint": "액터를 NPC로 표시하여 추가 기능 제공",
-                    "label": "NPC"
+                    "label": "NPC 여부"
                 },
                 "karma": {
                     "max": {
@@ -994,7 +994,7 @@
                 "MatrixDefenseTest": "매트릭스 방어 판정",
                 "MatrixPerception": "매트릭스 인식",
                 "MatrixSearch": "매트릭스 검색",
-                "Memory": "기억\n",
+                "Memory": "기억",
                 "NaturalRecoveryPhysical": "자연적 물리 회복",
                 "NaturalRecoveryStun": "자연적 기절 회복",
                 "PhysicalDamageResist": "물리적 피해 저항",
@@ -1196,9 +1196,9 @@
             "Electricity": "전기",
             "Fire": "화염",
             "Label": "속성",
-            "Pollutant": "Pollutant",
+            "Pollutant": "오염물질",
             "Radiation": "방사능",
-            "Water": "Water"
+            "Water": "물"
         },
         "Emerged": "공명자",
         "EnforcedMaximum": "최댓값 강제",
@@ -1581,7 +1581,7 @@
                             },
                             "base_formula_operator": {
                                 "hint": "기본 AP 수치가 특성치에 영향을 주는 방식",
-                                "label": "Operator"
+                                "label": "연산자"
                             }
                         },
                         "attribute": {
@@ -1594,7 +1594,7 @@
                         },
                         "base_formula_operator": {
                             "hint": "기본 피해량이 특성치에 영향을 주는 방식",
-                            "label": "Operator"
+                            "label": "연산자"
                         },
                         "biofeedback": {
                             "hint": "해당 행동이 생체반응 피해를 함께 입히는지 여부. 해당 항목은 활성 효과의 대상으로 지정될 수 있음",
@@ -1607,8 +1607,8 @@
                             }
                         },
                         "normal_weapon": {
-                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
-                            "label": "Normal Weapon"
+                            "hint": "이 피해가 일반(비마법) 무기 공격으로 간주되는 경우",
+                            "label": "일반 무기"
                         },
                         "type": {
                             "base": {
@@ -2136,7 +2136,7 @@
                 "Line1": "0.18.0 버전부터 보유한 물품에 있는 지속 효과는 액터에 복사되지 않고, 직접 적용됨.",
                 "Line2": "변경 사항을 적용하기 위해서는 이전에 복사된 효과를 반드시 지우거나 비활성화하여 물품과 액터 모두에 효과가 적용되는 것을 피할 수 있습니다. 기본적으로 물품을 기반으로 한 모든 효과는 삭제될 것입니다.",
                 "Line3": "액터에 직접 생성된 효과는 영향을 받지 않습니다.",
-                "Line4": "효과와 효과 모듈을 많이 사용하지만 '물품 소유 효과'에 대해 잘 모르는 경우,  이 마이그레이션을 설정하여 비활성화하고 비활성화된 효과를 검토하세요. 비활성화된 효과는 표시됩니다.",
+                "Line4": "효과와 효과 모듈을 많이 사용하지만 '물품 소유 효과'에 대해 잘 모르는 경우, 이 마이그레이션을 설정하여 비활성화하고 비활성화된 효과를 검토하세요. 비활성화된 효과는 표시됩니다.",
                 "Line5": "또한 이제 액터 항목에 활성화된 효과가 적용된다는 점에 유의하세요. 적용된 모든 효과는 액터 효과 탭에서 확인할 수 있습니다.",
                 "OnlyDisable": "비활성한 효과만",
                 "Warning": "기록!"
@@ -2234,7 +2234,7 @@
             "MatrixTrack": "매트릭스 상태 추적기",
             "MeatSpaceDice": "현실 우선권 주사위",
             "MeatSpaceInit": "현실 우선권",
-            "Memory": "기억\n",
+            "Memory": "기억",
             "MentalLimit": "정신 한계치",
             "Noise": "노이즈",
             "PainTolerancePhysical": "통증 내성 물리",
@@ -2515,7 +2515,7 @@
         "RollFade": "페이드",
         "RollJudgeIntentions": "의심",
         "RollLiftCarry": "들기&운반",
-        "RollMemory": "기억\n",
+        "RollMemory": "기억",
         "RollMode": "굴림 방식",
         "RollOneDie": "1개 미만의 주사위는 굴릴 수 없어, 처머",
         "RollSoak": "피해 저항",
@@ -2816,8 +2816,8 @@
             "Elemental": "원소",
             "FIELDS": {
                 "alchemical": {
-                    "hint": "This spell was learned as an alchemical formula and can be made into a preparation.",
-                    "label": "Alchemical"
+                    "hint": "이 주문은 연금술 공식으로 습득되었으며 조제물로 만들 수 있습니다.",
+                    "label": "연금술적"
                 },
                 "category": {
                     "hint": "주문이 속한 범주",
@@ -3207,12 +3207,12 @@
             "NaturalRecoveryStunTest": "기절 자연 회복",
             "OpposedBruteForceTest": "브루트 포스 대항",
             "OpposedCheckOverwatchScoreTest": "감시 점수 확인 대항",
-            "OpposedCompileSpriteTest": "컴파일 경쟁\n",
+            "OpposedCompileSpriteTest": "컴파일 경쟁",
             "OpposedHackOnTheFlyTest": "즉석 해킹 대항",
             "OpposedMatrixTest": "매트릭스 경쟁 판정",
             "OpposedPreparationForceTest": "강도로 저항",
             "OpposedRitualTest": "의식 봉인",
-            "OpposedSummonSpiritTest": "소환 경쟁\n",
+            "OpposedSummonSpiritTest": "소환 경쟁",
             "OpposedTest": "경쟁 판정",
             "PhysicalDefenseTest": "물리 방어",
             "PhysicalResistTest": "물리 피해 저항",
@@ -3317,7 +3317,7 @@
                 "DeleteEffect": "효과 삭제",
                 "DocumentEffects": "이 문서에 직접 적용",
                 "EditEffect": "효과 수정",
-                "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "HelpLinkEnglishOnly": "도움 (외부 링크, 영어 전용)",
                 "ItemEffects": "이 문서의 항목에서 수집한 효과",
                 "OnlyAllFilteredUsed": "전체 선택 사항과 맞는 판정에만 효과가 적용됨",
                 "OnlyFilteredUsed": "최소 하나 이상의 선택 사항과 맞는 판정에만 효과가 적용됨",
@@ -3379,7 +3379,7 @@
                 "Extended": "요구 성공횟수에 도달할 때까지 연장 판정으로 굴립니다. 간격을 0으로 두면 일반 판정으로 굴립니다.",
                 "ExtendedInterval": "굴림 사이의 게임 시간입니다. 0이면 연장 판정이 아닌 일반 판정으로 굴립니다.",
                 "Limit": "계산된 한계치",
-                "LimitIgnored": "현재 해당 판정에 대하여 한계가 무시됨Limit is currently ignored for this test",
+                "LimitIgnored": "현재 해당 판정에 대하여 한계가 무시됨",
                 "Modifier": "주사위 풀에 적용되는 모든 수정치의 합계",
                 "Pool": "굴릴 수 있는 주사위 개수",
                 "PushTheLimit": "한계 돌파 엣지 규칙 적용",
@@ -3451,7 +3451,7 @@
                 "body": "몸체",
                 "cosmetic": "외장",
                 "electromagnetic": "전자기품",
-                "powertrain": "Powertrain",
+                "powertrain": "동력 장치",
                 "protection": "보호",
                 "weapons": "무기"
             },
@@ -3507,7 +3507,7 @@
             "CantReloadPartialDueToAmmo": "복잡한 재장전 행동에 필요한 탄약이 부족합니다!",
             "CantReloadWithoutSpareClip": "남은 탄창이 없습니다!",
             "CantSecondChanceAGlitch": "해당 판정에는 두 번째 기회가 없습니다. 판정 결과는 글리치입니다.",
-            "CantSecondChanceWithoutNoneHits": "해당 판정에는 두 번째 기회가 없습니다.  성공 주사위만 남았습니다.",
+            "CantSecondChanceWithoutNoneHits": "해당 판정에는 두 번째 기회가 없습니다. 성공 주사위만 남았습니다.",
             "CantSpendMulitplePointsOfEdge": "한 번의 판정 또는 행동에 엣지를 여러 번 소비할 수 없습니다.",
             "CompilationNotConcluded": "컴파일이 완료되지 않았습니다. 페이드 결정을 위해 스프라이트가 컴파일 경쟁 판정을 완료하길 기다려야 합니다.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "액터 없이 판정에서 엣지 점수를 소비할 수 없습니다.",
@@ -3515,7 +3515,7 @@
             "InvalidCompilationLevel": "공명 특성치가 스프라이트의 단계보다 낮음",
             "InvalidMarksCount": "잘못된 수의 마커를 배치하려고 함",
             "InvalidSummoningForce": "선택한 강도의 수치가 규칙을 위반",
-            "InvalidWeaponRanges": "Weapon ranges must be in ascending order and end above zero.",
+            "InvalidWeaponRanges": "무기 사거리는 오름차순이어야 하며 마지막 값은 0보다 커야 합니다.",
             "NegativeLimitValue": "한계치는 반드시 양수여야 함",
             "NoActorCreatePermission": "액터를 생성할 권한이 없습니다.",
             "NoFireModeConfigured": "원거리 무기에 사격방식 설정이 없습니다. 단발로 사격합니다.",
@@ -3711,7 +3711,7 @@
                     "MediumHeavyMachinegun": "다목적/중 기관총",
                     "MissileLauncher": "미사일 발사기",
                     "Net": "그물",
-                    "SMG": "SMG",
+                    "SMG": "기관단총",
                     "ShotgunFlechette": "산탄총 (플레셰트)",
                     "ShotgunSlug": "산탄총 (슬러그)",
                     "Shuriken": "표창",
