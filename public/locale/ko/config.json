@@ -99,6 +99,7 @@
             "Addiction": "중독 행동",
             "AddictionMental": "정신적 중독",
             "AddictionPhysical": "신체적 중독",
+            "Alchemy": "연금술 행동",
             "Attack": "공격 행동",
             "AttackMatrix": "매트릭스 공격",
             "AttackMelee": "근접 공격",
@@ -151,6 +152,7 @@
             "ApplyTo": "적용 대상",
             "ApplyTos": {
                 "TestTargetingThisActor": "이 액터를 대상으로 하는 판정",
+                "ParentItem": "상위 물품",
                 "TargetedActor": "목표 액터",
                 "TestItem": "물품을 통한 판정"
             },
@@ -181,6 +183,10 @@
                 "onlyForWireless": {
                     "hint": "무선이 활성화된 물품에만 적용",
                     "label": "무선이 활성화된 물품에만"
+                },
+                "rating": {
+                    "hint": "이 효과의 강도입니다. 변경 사항이 이 값에 따라 조정될 수 있으므로, 값을 올리면 모두 한 번에 갱신됩니다.",
+                    "label": "등급"
                 },
                 "selection_attributes": {
                     "hint": "사용된 특성에 따라 판정을 필터링",
@@ -660,6 +666,17 @@
         "Attribute": "특성치",
         "Attributes": "특성치",
         "Availability": "희귀도",
+        "AvailabilityRestriction": "희귀도 제한",
+        "AvailabilityRestrictionSuffixes": {
+            "Forbidden": "F",
+            "None": "",
+            "Restricted": "R"
+        },
+        "AvailabilityRestrictions": {
+            "Forbidden": "금지됨",
+            "None": "없음",
+            "Restricted": "제한됨"
+        },
         "Awakened": "각성자",
         "AwakenedEmerged": "각성자/공명자",
         "Barrel": "총열",
@@ -1434,6 +1451,7 @@
         "HackingProgram": "해킹 프로그램",
         "Help": "도움",
         "Hits": "성공횟수",
+        "HitsBought": "구매한 성공횟수",
         "Host": {
             "Attributes": "호스트 특성치",
             "CustomAttributes": "커스텀 특성치",
@@ -1491,7 +1509,15 @@
                 "Title": "액터 불러오기"
             },
             "BulkImporter": {
-                "Title": "일괄 불러오기"
+                "Mode": "불러오기 모드:",
+                "Modes": {
+                    "Add": "누락된 물품 추가",
+                    "Clean": "비우고 다시 불러오기",
+                    "Replace": "물품 교체",
+                    "Update": "물품 업데이트 (설명 유지)"
+                },
+                "Title": "일괄 불러오기",
+                "TranslationLanguage": "번역 언어:"
             },
             "ImporterSourcesConfig": {
                 "Title": "가져오기 출처 설정"
@@ -1772,6 +1798,10 @@
                         "hint": "해당 물품이 종속화되어 PAN 또는 WAN이 구성된 마스터 장치",
                         "label": "마스터 장치"
                     },
+                    "max_rating": {
+                        "hint": "이 물품을 구입할 수 있는 최고 등급입니다. 0이면 등급 상한이 없습니다.",
+                        "label": "최대 등급"
+                    },
                     "quantity": {
                         "hint": "물품의 보유 수량",
                         "label": "수량"
@@ -1813,6 +1843,7 @@
             "Lifestyle": "생활방식",
             "Metamagic": "메타마법",
             "Modification": "개조품",
+            "Preparation": "조제물",
             "Program": "프로그램",
             "Quality": "특징",
             "Ritual": "의식",
@@ -1919,6 +1950,7 @@
                 "Persona": "페르소나",
                 "PersonalInventory": "개인 소지 중",
                 "PhysicalTrack": "물리 추적기",
+                "Preparations": "조제물",
                 "PublicAwarenessShort": "PA",
                 "RemoveOneMark": "마크 하나 제거",
                 "ResetActorForNewRun": "신규 런을 위한 초기화",
@@ -1946,7 +1978,8 @@
                 "AvailabilityAdjustment": "등급별 희귀도 비례 적용",
                 "CostAdjustment": "등급별 가격 비례 적용",
                 "EssenceAdjustment": "등급별 에센스 비례 적용",
-                "Network": "네트워크"
+                "Network": "네트워크",
+                "Properties": "물품 속성"
             },
             "MarkPlacement": {
                 "PlaceOnDevice": "장치에 배치",
@@ -2296,6 +2329,7 @@
         "OpposedType": "유형",
         "OpposingHits": "경쟁 성공횟수",
         "OpposingNetHits": "경쟁 순 성공",
+        "Options": "옵션",
         "OriginalDicePool": "기존 주사위 풀",
         "OutOfRange": "사거리 밖",
         "Overflow": "치명상",
@@ -2326,6 +2360,75 @@
         "PowerPoints": "PP",
         "PowerType": "유형",
         "Powers": "능력",
+        "Preparation": {
+            "Alchemical": "연금술적",
+            "CraftingTime": "제작 시간",
+            "CraftingTimeMinutes": "{minutes}분",
+            "Create": "조제물 생성",
+            "CreationTimeDialog": {
+                "Edit": "생성 시간 편집",
+                "Invalid": "올바른 생성 날짜와 시간을 입력하세요.",
+                "Title": "조제물 생성 시간",
+                "UseCurrent": "현재 시간 사용"
+            },
+            "Expired": "만료됨",
+            "ExpiredAt": "{time}에 만료됨",
+            "ExpiredMessage": "{name}의 효력이 사라졌습니다. 저장된 주문도 함께 사라졌습니다.",
+            "Expires": "만료",
+            "ExpiresIn": "{duration} 후 만료",
+            "FIELDS": {
+                "created": {
+                    "hint": "조제물이 생성된 시점입니다.",
+                    "label": "생성됨",
+                    "worldTime": {
+                        "hint": "조제물이 생성된 월드 시간입니다.",
+                        "label": "생성 시간"
+                    }
+                },
+                "force": {
+                    "hint": "조제물을 생성할 때의 강도입니다.",
+                    "label": "강도"
+                },
+                "potency": {
+                    "base": {
+                        "hint": "조제물을 생성할 때 얻은 순 성공횟수입니다.",
+                        "label": "생성 시 효력"
+                    },
+                    "hint": "저장된 주문의 효력입니다.",
+                    "label": "효력",
+                    "value": {
+                        "hint": "감쇠 후 남은 효력입니다.",
+                        "label": "현재 효력"
+                    }
+                },
+                "spellUuid": {
+                    "hint": "이 조제물을 만든 주문입니다.",
+                    "label": "원본 주문"
+                },
+                "trigger": {
+                    "hint": "저장된 주문을 발동시키는 조건입니다.",
+                    "label": "트리거"
+                },
+                "triggerTime": {
+                    "hint": "선택한 단위로 시간 트리거가 주문을 발동하기까지의 카운트다운입니다.",
+                    "label": "트리거 시간"
+                }
+            },
+            "Formulae": "연금술 공식",
+            "FullPotencyUntil": "최대 효력 유지 기한",
+            "Lynchpin": "린치핀",
+            "Potency": "효력",
+            "Spent": "소모됨",
+            "Trigger": {
+                "Command": "명령",
+                "Contact": "접촉",
+                "Time": "시간"
+            },
+            "TriggerDueMessage": {
+                "Header": "시간 트리거 도달",
+                "Roll": "조제물 판정"
+            }
+        },
         "Program": {
             "FIELDS": {
                 "type": {
@@ -2684,6 +2787,7 @@
         "Specialization": "전문화",
         "Specializations": "전문화",
         "Spell": {
+            "AlchemicalFormula": "연금술 공식",
             "Attack": "주문 공격",
             "Cast": "주문 시전",
             "CatCombat": "전투",
@@ -2701,6 +2805,7 @@
             "DetectionArea": "범위형",
             "DetectionDirectional": "지향형",
             "DetectionPsychic": "초자연",
+            "Elemental": "원소",
             "FIELDS": {
                 "alchemical": {
                     "hint": "This spell was learned as an alchemical formula and can be made into a preparation.",
@@ -2781,6 +2886,7 @@
                     "label": "주문 유형"
                 }
             },
+            "HealthEssence": "에센스",
             "IllusionMultiSense": "다중 감각",
             "IllusionObvious": "명백함",
             "IllusionRealistic": "현실적",
@@ -3064,12 +3170,15 @@
             "Failure": "실패!",
             "HackOnTheFlyFailure": "즉석 해킹 실패!",
             "HackOnTheFlySuccess": "즉성 해킹 성공!",
+            "PreparationFailure": "주문이 린치핀에서 빠져나갔다",
+            "PreparationSuccess": "조제물이 주문을 붙잡고 있다",
             "ResistedAllDamage": "피해받지 않음!",
             "ResistedSomeDamage": "피해 받음!",
             "Results": "결과",
             "RitualFailure": "의식이 시전자보다 강함",
             "RitualSuccess": "의식이 봉인됨",
             "SoakBlockedByHardenedArmor": "단단한 방어구에 의해 막힘",
+            "SpellResisted": "주문 저항됨",
             "SpiritSummonFailure": "영혼이 사라졌다!",
             "SpiritSummonSuccess": "영혼이 소환되었다!",
             "SpriteCompilationFailure": "스프라이트가 사라졌다!",
@@ -3101,12 +3210,15 @@
             "OpposedCompileSpriteTest": "컴파일 경쟁\n",
             "OpposedHackOnTheFlyTest": "즉석 해킹 대항",
             "OpposedMatrixTest": "매트릭스 경쟁 판정",
+            "OpposedPreparationForceTest": "강도로 저항",
             "OpposedRitualTest": "의식 봉인",
             "OpposedSummonSpiritTest": "소환 경쟁\n",
             "OpposedTest": "경쟁 판정",
             "PhysicalDefenseTest": "물리 방어",
             "PhysicalResistTest": "물리 피해 저항",
             "PilotVehicleTest": "탑승물 조종 판정",
+            "PreparationCreationTest": "조제물 생성",
+            "PreparationTriggerTest": "조제물 발동",
             "RangedAttackTest": "원거리 무기 공격",
             "RitualSpellcastingTest": "의식 주문 시전",
             "SkillTest": "기술 판정",
@@ -3220,8 +3332,6 @@
                 "ActionRollMode": "이 행동을 시전 할 때 무리한 굴림 방식을 사용함. 전체 채팅 설정에 덮어 써짐.",
                 "AddQuantity": "1개 추가. {qtySome}: 5개 추가. {qtyMany}: 20개 추가.",
                 "AmmoReplaceDamage": "무기 피해를 수정하는 대신 대체하도록 설정",
-                "AvailabilityAdjustment": "물품 등급에 따라 현재 희귀도 조정",
-                "CostAdjustment": "물품 등급에 따라 현재 가격 조정",
                 "DisabledForPreparedActor": "준비된 액터를 사용 중이므로 비활성화됨",
                 "EssenceAdjustment": "해당 물품의 등급에 따라 실제 에센스 비용을 조절",
                 "RemoveQuantity": "1개 삭제. {qtySome}: 5개 삭제. {qtyMany}: 20개 삭제.",
@@ -3230,6 +3340,14 @@
             },
             "MatrixTest": {
                 "SameGridDisabled": "활성 아이콘과 목표 아이콘 모두 그리드를 사용하므로 자동으로 결정됨"
+            },
+            "Preparation": {
+                "Craft": "판정을 굴리기 전 필요한 중단 없는 제작 시간",
+                "Force": "조제물의 강도, 마법 등급의 최대 2배까지",
+                "Potency": "생성 판정의 순 성공횟수입니다. 시간이 지나면 감소하며, 발동 시 주문 시전 기술을 대신합니다.",
+                "ReagentDrams": "사용된 시약의 드램 수입니다. 강도 대신 상한이 됩니다.",
+                "Trigger": "저장된 주문을 발동시키는 조건",
+                "TriggerTime": "주문이 발동될 때까지의 카운트다운이며, 결과 효력(시간 단위)으로 제한됩니다."
             },
             "RangedAttack": {
                 "Recoil": "점진적 반동",
@@ -3401,6 +3519,10 @@
             "NegativeLimitValue": "한계치는 반드시 양수여야 함",
             "NoFireModeConfigured": "원거리 무기에 사격방식 설정이 없습니다. 단발로 사격합니다.",
             "OnlyGMCanDoThis": "GM 유저만 가능",
+            "PreparationDepleted": "이 조제물의 효력이 남아 있지 않습니다. 저장된 주문은 사라졌습니다.",
+            "PreparationForceTooHigh": "조제물 강도가 유효하지 않거나 마법 등급의 2배를 초과합니다.",
+            "PreparationNotConcluded": "조제물이 아직 완성되지 않았습니다. 먼저 강도로 저항 판정을 굴리세요.",
+            "PreparationTriggerTimeTooLong": "시간 트리거가 조제물의 효력(시간 단위)보다 멀리 설정되어 있습니다. 조기에 발동됩니다.",
             "RitualInvalidForce": "의식 강도가 유효하지 않거나 오두막 등급보다 높습니다.",
             "RitualNotConcluded": "의식이 완료되지 않았습니다. 드레인 결정을 위해 의식 경쟁 판정이 완료되길 기다려야 합니다.",
             "RitualNotEnoughReagents": "시약이 충분하지 않습니다.",
@@ -3650,6 +3772,7 @@
             "lifestyle": "생활방식",
             "metamagic": "메타마법",
             "modification": "장비 개조품",
+            "preparation": "조제물",
             "program": "프로그램",
             "quality": "특징",
             "ritual": "의식",
