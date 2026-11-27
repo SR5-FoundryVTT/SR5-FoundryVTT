@@ -1,6 +1,7 @@
 import { SR5Combat } from "./SR5Combat";
 import { SR5Die } from "../rolls/SR5Die";
 import { SR5Roll } from "../rolls/SR5Roll";
+import { diceSoNiceAudience } from "../rolls/DiceSoNice";
 import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
@@ -272,7 +273,6 @@ export class SR5Combatant extends Combatant<"base"> {
             sound: hasDiceRoll ? CONFIG.sounds.dice : undefined,
         } as ChatMessage.CreateData;
 
-        const rollMode = this.hidden ? 'gm' : 'public';
         if (this.hidden) {
             messageData.whisper = this._hiddenCardWhisperTargets();
         } else {
@@ -281,30 +281,26 @@ export class SR5Combatant extends Combatant<"base"> {
 
         const message = await foundry.documents.ChatMessage.implementation.create(messageData);
         if (message && hasDiceRoll && data.diceRoll)
-            void this.playDSNInitiativeAnimation(data.diceRoll, rollMode, message);
+            void this.playDSNInitiativeAnimation(data.diceRoll, message);
     }
 
     async playDSNInitiativeAnimation(
         roll: Roll,
-        rollMode: ChatMessage.MessageMode,
-        message: Pick<ChatMessage, 'id' | 'speaker' | 'whisper'>,
+        message: Pick<ChatMessage, 'id' | 'speaker' | 'whisper' | 'isContentVisible'>,
     ): Promise<boolean> {
-        if (!game.modules.get('dice-so-nice')?.active || !game.dice3d) return false;
+        if (!game.dice3d) return false;
         // @ts-expect-error Accessing a setting from another module; no types available.
         if (game.settings.get('dice-so-nice', 'disabledForInitiative') === true) return false;
 
-        const users = (message.whisper ?? []).filter((w): w is string => !!w);
-        const whisper = users.length > 0 ? users : null;
-        const synchronize = rollMode === 'public' || !!whisper;
-        const blind = rollMode === 'blind';
+        const { users, blind } = diceSoNiceAudience(message);
         const activePlayers = this.players.find((user) => user.active);
         const rollUser = activePlayers ?? this.players[0] ?? game.user;
 
-        return game.dice3d?.showForRoll(
+        return game.dice3d.showForRoll(
             roll,
             rollUser,
-            synchronize,
-            whisper,
+            true,
+            users,
             blind,
             message.id,
             message.speaker,

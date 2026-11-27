@@ -4,6 +4,7 @@ import { Helpers } from "../helpers";
 import { SR5Die } from "../rolls/SR5Die";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Roll } from "../rolls/SR5Roll";
+import { diceSoNiceAudience } from "../rolls/DiceSoNice";
 import { TestCreator } from "./TestCreator";
 import { SR5Actor } from "../actor/SR5Actor";
 import { TestRules } from "../rules/TestRules";
@@ -1744,35 +1745,24 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * 
      * https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/Integration
      */
-    rollDiceSoNice() {
-        const dice3d = game.dice3d;
-        if (!dice3d) return;
+    rollDiceSoNice(message: ChatMessage) {
+        if (!game.dice3d) return;
 
         // Only roll the last dice rolled.
         // This necessary when a test has been recast with second chance,
         // and should only the re-rolled dice instead of all.
         const roll = this.rolls[this.rolls.length - 1];
 
-        // Limit users to show dice to...
-        let whisper: User[] | null = null;
+        // Bought hits and empty pools roll no dice.
+        const hasRolledDice = !!roll?.dice.some(die => die.results.length > 0);
+        if (!hasRolledDice) return;
 
-        // ...for gmOnlyContent check permissions
-        if (this.actor && GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor)) {
-            whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER') === true);
-        }
+        const owners = GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor)
+            ? game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER') === true).map(user => user.id)
+            : null;
+        const { users, blind } = diceSoNiceAudience(message, owners);
 
-        const rollMode = this.data.options?.rollMode;
-
-        // ...for rollMode include GM when GM roll
-        if (rollMode === 'gm' || rollMode === "blind") {
-            whisper = [...game.users.filter(user => user.isGM), ...(whisper || [])];
-        }
-
-        // Don't show dice to a user casting blind.
-        const blind = rollMode === 'blind';
-        const synchronize = rollMode === 'public' || rollMode === 'ic';
-
-        void dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
+        void game.dice3d.showForRoll(roll, game.user, true, users, blind, message.id, message.speaker);
     }
 
     /**
@@ -1797,7 +1787,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.data.messageUuid = message.uuid;
         await this.saveToMessage();
 
-        this.rollDiceSoNice();
+        this.rollDiceSoNice(message);
 
         return message;
     }
@@ -1959,6 +1949,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Either get the linked token by collection or synthetic actor.
         // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
         const linkedTokens = this.actor?.getActiveTokens(true) || [];
+
+        // Only the latest roll is shown and animated; bought hits and empty pools roll no dice.
+        const hasRolledDice = !!this.rolls.at(-1)?.dice.some(die => die.results.length > 0);
         const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
 
         const actor = this.actor?.id;
@@ -1986,7 +1979,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
                 [SYSTEM_NAME]: {[FLAGS.Test]: this.toJSON()},
                 'core.canPopout': true
             },
-            sound: CONFIG.sounds.dice,
+            sound: hasRolledDice ? CONFIG.sounds.dice : CONFIG.sounds.notification,
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.

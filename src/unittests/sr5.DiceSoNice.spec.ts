@@ -1,5 +1,6 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import {
+    diceSoNiceAudience,
     mirrorD6Preset,
     mirrorD6Presets,
     DiceSoNiceLoadedPreset,
@@ -114,6 +115,36 @@ export const shadowrunDiceSoNiceTesting = (context: QuenchBatchContext) => {
             for (const [, system] of systems) {
                 for (const [type, preset] of system.dice) assert.equal(preset.type, type);
             }
+        });
+
+        describe('roll audience', () => {
+            const owners = ['gm', 'player'];
+
+            it('sends an unwhispered roll to everyone', () => {
+                assert.deepEqual(diceSoNiceAudience({ whisper: [], isContentVisible: true }), { users: null, blind: false });
+            });
+
+            it('limits an unwhispered roll to owners when content is restricted', () => {
+                assert.deepEqual(diceSoNiceAudience({ whisper: [], isContentVisible: true }, owners), { users: owners, blind: false });
+            });
+
+            it('sends a whispered roll to its recipients only', () => {
+                assert.deepEqual(diceSoNiceAudience({ whisper: ['gm', null], isContentVisible: true }, owners), { users: ['gm'], blind: false });
+            });
+
+            it('hides the dice from an author who cannot read the content', () => {
+                assert.deepEqual(diceSoNiceAudience({ whisper: ['gm'], isContentVisible: false }), { users: ['gm'], blind: true });
+            });
+
+            it('sends gm and blind rolls to every GM', () => {
+                const gmIds = game.users.filter(user => user.isGM).map(user => user.id);
+                for (const mode of ['gm', 'blind'] as const) {
+                    const messageData: ChatMessage.CreateData = {};
+                    ChatMessage.applyMode(messageData, mode);
+                    const message = { whisper: messageData.whisper as string[], isContentVisible: true };
+                    assert.sameMembers(diceSoNiceAudience(message).users ?? [], gmIds, mode);
+                }
+            });
         });
     });
 };
