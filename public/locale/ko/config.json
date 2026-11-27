@@ -17,34 +17,34 @@
         "AutomateProgressiveRecoilDescription": "초기화 전까지 캐릭터에게 점진적 반동이 누적됨",
         "CompendiumBrowserBlacklist": "컨펜디움 탐색기 블랙리스트",
         "CompendiumBrowserBlacklistDescription": "컨펜디움 탐색기에서 숨긴 컨펜디움 목록",
-        "EnforceExtendedTestIntervalDescription": "연장 판정의 간격만큼 게임 시간이 지난 뒤에만 다음 굴림을 허용합니다.",
-        "EnforceExtendedTestIntervalName": "연장 판정 간격 강제",
-        "ExtendedTestDueMessageDescription": "다음 굴림에 필요한 게임 시간이 지나면 판정 상태와 굴림 버튼이 담긴 귀속말을 굴릴 수 있는 모든 사용자에게 보냅니다.",
-        "ExtendedTestDueMessageName": "확장 판정 재개 알림",
-        "ModifyRollExpanded": "굴림 수정 섹션 상태 기억",
-        "ModifyRollExpandedDescription": "마지막에 굴림 수정 섹션이 펼쳐져 있었는지 저장하고 다음 테스트 대화창에서 그 상태를 복원합니다.",
         "DefaultOpposedTestActorSelection": "경쟁 판정 토큰 선택 덮어쓰기",
         "DefaultOpposedTestActorSelectionDescription": "항상 선택한 토큰을 판정에 사용된 대상으로 덮어씀",
         "DiagonalMovementDescription": "격자판 사용 시 대각선 이동 처리 방식",
         "DiagonalMovementName": "대각선 이동",
         "DisplayDefaultRollCardDescription": "기본 굴림 카드와 함께 섀도우런 굴림 카드 표시 여부",
         "DisplayDefaultRollCardName": "기본 굴림 카드 표시",
+        "EnforceExtendedTestIntervalDescription": "연장 판정의 간격만큼 게임 시간이 지난 뒤에만 다음 굴림을 허용합니다.",
+        "EnforceExtendedTestIntervalName": "연장 판정 간격 강제",
         "EstimateDiagonal": "대각선 이동 계산 (1-2-1)",
         "Euclidean": "유클리드",
+        "ExtendedTestDueMessageDescription": "다음 굴림에 필요한 게임 시간이 지나면 판정 상태와 굴림 버튼이 있는 채팅 메세지를 굴림이 가능한 모든 사용자에게 귓속말로 보냅니다.",
+        "ExtendedTestDueMessageName": "연장 판정 재개 알림",
         "FreshColor": "텍스트 색상으로만 강조 표시",
         "FreshColorAndIcon": "텍스트 색상과 아이콘으로 강조 표시",
         "FreshIcon": "아이콘으로만 강조 표시",
         "HideGMOnlyChatContent": "GM 판정에서 중요한 정보 숨기기",
         "HideGMOnlyChatContentDescription": "사용된 액터를 소유한 플레이어어만 GM 판정 메시지에서 모든 정보를 볼 수 있음",
-        "InitiativeModeUpdateStrategyName": "우선권 모드 갱신 방식",
-        "InitiativeModeUpdateStrategyDescription": "전투 중 우선권 모드를 전환할 때 우선권을 갱신하는 방법",
-        "InitiativeModeUpdateStrategyDeltaDice": "주사위 차이 굴림",
-        "InitiativeModeUpdateStrategyReroll": "전체 다시 굴림",
         "IgnoreDiagonal": "대각선 이동 무시 (1-1-1)",
         "ImportIconFolderDescription": "불러오기 도구 폴더에서 아이콘 파일을 찾을 수 있음. 기본 위치: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "아이콘 폴더 불러오기 도구",
+        "InitiativeModeUpdateStrategyDeltaDice": "델타 주사위 (차이 굴림)",
+        "InitiativeModeUpdateStrategyDescription": "전투 중 우선권 유형 전환 시 우선권을 갱신하는 방식",
+        "InitiativeModeUpdateStrategyName": "우선권 유형 갱신 방식",
+        "InitiativeModeUpdateStrategyReroll": "전체 재굴림",
         "MarkImportsDescription": "액터 시트에 새로 불러온 물품을 표시하여 검토해야 함을 강조",
         "MarkImportsName": "새로 불러온 물품 표시",
+        "ModifyRollExpanded": "굴림 수정 항목 상태 기억",
+        "ModifyRollExpandedDescription": "이전에 굴림 수정 항목을 펼쳐 놓았는지 여부를 저장하고, 다음 판정 확인 상자에서 해당 상태를 복원합니다.",
         "MustHaveRessourcesOnTest": "찾을 수 없는 자원을 사용하는 판정 중단",
         "MustHaveRessourcesOnTestDescription": "필요한 모든 자원을 가진 액터에게만 판정 허용",
         "NoMarking": "새로 불러온 물품을 표시하지 않음",
@@ -58,14 +58,20 @@
         "ShowSkillsWithDetailsDescription": "설정 시 기술 목록 표시가 코어 룰북 형태(이탤릭체, 짧은 특성치)로 미러링 됨",
         "ShowTokenNameForChatOutputDescription": "가능한 경우 액터 이름 대신 토큰 이름을 굴림 카드에 표시",
         "ShowTokenNameForChatOutputName": "굴림 카드에 토큰 이름 사용",
+        "TokenAutoRunning": "달리기 움직임 자동 감지",
+        "TokenAutoRunningDescription": "측정된 거리가 걷기 속도를 초과하면 자동으로 토큰 이동 유형을 달리기로 전환합니다.",
         "TokenHealthBars": "토큰 체력 표시줄",
         "TokenHealthBarsDescription": "미러링 대신 토큰의 전체 피해 추적기에 빈 체력 막대가 표시됨",
+        "TokenMovementHistoryReset": "이동 기록 초기화 시점",
+        "TokenMovementHistoryResetDescription": "전투 중 전투원의 이동 기록을 언제 초기화할지 선택",
+        "TokenMovementHistoryResetFirstActionPhase": "본인의 첫 행동 단계",
+        "TokenMovementHistoryResetTurnStart": "턴 시작 시",
+        "TokenRulerColorPhaseMarker": "토큰 이동 단계 표식 색상",
+        "TokenRulerColorPhaseMarkerDescription": "행동 단계의 끝을 표시하는 경유점의 색상입니다.",
         "TokenRulerColorRunning": "토큰 이동 달리기 색상",
         "TokenRulerColorRunningDescription": "달리기 범위 내에서의 색상.",
         "TokenRulerColorSprinting": "토큰 이동 전력질주 색상",
         "TokenRulerColorSprintingDescription": "달리기 범위를 초과하고 전력 질주가 필요한 범위의 색상.",
-        "TokenRulerColorPhaseMarker": "토큰 이동 단계 표식 색상",
-        "TokenRulerColorPhaseMarkerDescription": "행동 단계의 끝을 표시하는 경유점의 색상입니다.",
         "TokenRulerColorWalking": "토큰 이동 걷기 색상",
         "TokenRulerColorWalkingDescription": "걷기 범위 내에서의 색상.",
         "TokenRulerOpacity": "토큰 이동 투명도",
@@ -73,25 +79,10 @@
         "UseDamageConditionDescription": "시스템이 상태 측정기에 따라 토큰을 표시",
         "UseDamageConditionName": "토큰 상태 효과에 시스템 처리 사용",
         "UseImportIconOverridesDescription": "물품 불러오기 시 서로 다른 물품 유형에 동일한 아이콘을 사용하는 것이 합리적일 경우 사용. 사용자 지정 아이콘을 사용하는 경우 체크 해제.",
-        "UseImportIconOverridesName": "기본 불러오기 아이콘 덮어쓰기 사용",
-        "TokenAutoRunning": "달리기 움직임 자동 감지",
-        "TokenAutoRunningDescription": "측정된 거리가 걷기 속도를 초과하면 자동으로 토큰 이동 모드를 달리기로 전환합니다.",
-        "TokenMovementHistoryReset": "이동 기록 초기화 시점",
-        "TokenMovementHistoryResetDescription": "전투 중 전투원의 이동 기록을 언제 초기화할지 선택합니다",
-        "TokenMovementHistoryResetFirstActionPhase": "내 첫 행동 단계에서",
-        "TokenMovementHistoryResetTurnStart": "턴 시작 시 초기화"
+        "UseImportIconOverridesName": "기본 불러오기 아이콘 덮어쓰기 사용"
     },
     "SR5": {
         "AP": "AP",
-        "Scatter": {
-            "Title": "흩어짐",
-            "Grenade": "수류탄 흩어짐",
-            "Spell": "간접 전투 주문 흩어짐",
-            "Rolls": "흩어짐 굴림",
-            "Direction": "방향",
-            "Distance": "거리",
-            "RolledDistance": "굴린 거리"
-        },
         "Accessory": "부착물",
         "Accuracy": "정확도",
         "Action": "행동",
@@ -99,6 +90,7 @@
             "Addiction": "중독 행동",
             "AddictionMental": "정신적 중독",
             "AddictionPhysical": "신체적 중독",
+            "Alchemy": "연금술 행동",
             "Attack": "공격 행동",
             "AttackMatrix": "매트릭스 공격",
             "AttackMelee": "근접 공격",
@@ -136,10 +128,10 @@
             "Summoning": "소환 행동"
         },
         "ActionType": {
-            "Label": "유형",
             "Complex": "복잡",
             "Free": "자유",
-            "Interrupt": "Interrupt",
+            "Interrupt": "방해",
+            "Label": "유형",
             "None": "없음",
             "Simple": "단순",
             "Varies": "다양"
@@ -148,27 +140,81 @@
         "Active": "활성형",
         "ActiveDefense": "능동 방어",
         "ActiveEffect": {
+            "AddCondition": "조건 추가",
+            "AddTarget": "대상 추가",
             "ApplyTo": "적용 대상",
             "ApplyTos": {
-                "TestTargetingThisActor": "이 액터를 대상으로 하는 판정",
+                "ParentItem": "상위 물품",
                 "TargetedActor": "목표 액터",
-                "TestItem": "물품을 통한 판정"
+                "TestItem": "물품을 통한 판정",
+                "TestTargetingThisActor": "이 액터를 대상으로 하는 판정"
             },
-            "CannotAddTestViaItemToActor": "액터에 '물품을 통한 판정' 종류의 액티브 이펙트 추가 불가",
-            "ValueEditor": "변경 값 편집",
+            "AtLeastOneTarget": "효과에는 하나 이상의 대상이 있어야 합니다.",
+            "CannotAddTestViaItemToActor": "액터에 '물품을 통한 판정' 유형의 액티브 이펙트 추가 불가",
+            "Duration": {
+                "Active": "활성",
+                "ActiveDetail": "지속 시간이 활성화되어 있습니다.",
+                "AwaitingCombatEnd": "전투 종료까지",
+                "AwaitingCombatEndDetail": "현재 전투가 끝나면 만료됩니다.",
+                "AwaitingCombatStart": "전투 시작까지",
+                "AwaitingCombatStartDetail": "다음 전투가 시작되면 만료됩니다.",
+                "AwaitingMyActionEnd": "소유자의 행동 단계 종료까지",
+                "AwaitingMyActionEndDetail": "소유자가 현재 행동 단계를 마치면 만료됩니다.",
+                "AwaitingMyActionStart": "소유자의 행동 단계 시작까지",
+                "AwaitingMyActionStartDetail": "소유자의 다음 행동 단계 시작 시 만료됩니다.",
+                "AwaitingTrigger": "만료 트리거 대기 중",
+                "AwaitingTriggerDetail": "지속 시간이 완료되었으며 설정된 트리거에서 만료됩니다.",
+                "AwaitingTurnEnd": "전투 턴 종료까지",
+                "AwaitingTurnEndDetail": "현재 전투 턴 종료 시 만료됩니다.",
+                "AwaitingTurnStart": "전투 턴 시작까지",
+                "AwaitingTurnStartDetail": "다음 전투 턴 시작 시 만료됩니다.",
+                "Combat": "전투",
+                "CombatStart": "전투 턴 {turn}, 우선권 {initiative}",
+                "CombatStartNoInitiative": "전투 턴 {turn}",
+                "CombatTurn": "전투 턴 {turns}",
+                "CombatTurns": "전투 턴 {turns}",
+                "DoesNotExpire": "만료되지 않음",
+                "Expired": "만료됨",
+                "ExpiredDetail": "이 효과의 지속 시간을 다시 시작하려면 효과를 재시작하세요.",
+                "ExpiredOpenEditor": "만료됨 — 효과 편집기 열기",
+                "ExpiryAction": "만료 작업",
+                "ExpiryActionDefault": "기본값 ({action})",
+                "ExpiryActionDelete": "삭제",
+                "ExpiryActionUpdate": "업데이트",
+                "ExpiryTrigger": "만료 트리거",
+                "GroupCombat": "전투",
+                "GroupTime": "시간",
+                "Remaining": "남은 시간",
+                "RemainingDetail": "{remaining} 남음",
+                "Restart": "지속 시간 재시작",
+                "RestartPending": "재시작 준비됨",
+                "RestartPendingDetail": "변경 사항을 제출하면 지속 시간이 재시작됩니다.",
+                "Status": "상태",
+                "UnitTurns": "전투 턴",
+                "Units": "지속 시간 단위",
+                "Value": "지속 시간"
+            },
+            "ExpiryTriggers": {
+                "CombatEnd": "전투 종료",
+                "CombatStart": "전투 시작",
+                "MyActionEnd": "내 행동 단계 종료",
+                "MyActionStart": "내 행동 단계 시작",
+                "TurnEnd": "턴 종료",
+                "TurnStart": "턴 시작"
+            },
             "FIELDS": {
                 "appliedByTest": {
                     "label": "물품을 통한 판정에 적용"
+                },
+                "applyTo": {
+                    "hint": "다른 목표에 적용",
+                    "label": "적용 대상"
                 },
                 "conditionMode": {
                     "hint": "포함: 판정이 이 값들과 일치해야 합니다. 제외: 판정이 이 값들과 일치하면 안 됩니다."
                 },
                 "conditionType": {
                     "hint": "이 조건이 필터링할 판정의 부분입니다."
-                },
-                "applyTo": {
-                    "hint": "다른 목표에 적용",
-                    "label": "적용 대상"
                 },
                 "onlyForEquipped": {
                     "hint": "장착한 물품에만 적용",
@@ -181,6 +227,10 @@
                 "onlyForWireless": {
                     "hint": "무선이 활성화된 물품에만 적용",
                     "label": "무선이 활성화된 물품에만"
+                },
+                "rating": {
+                    "hint": "이 효과의 강도입니다. 변경 사항이 이 값에 따라 조정될 수 있으므로, 값을 올리면 모두 한 번에 갱신됩니다.",
+                    "label": "등급"
                 },
                 "selection_attributes": {
                     "hint": "사용된 특성에 따라 판정을 필터링",
@@ -206,60 +256,6 @@
                     "label": "대상 이름"
                 }
             },
-            "AddCondition": "조건 추가",
-            "AddTarget": "대상 추가",
-            "AtLeastOneTarget": "효과에는 하나 이상의 대상이 있어야 합니다.",
-            "ExpiryTriggers": {
-                "CombatStart": "전투 시작",
-                "CombatEnd": "전투 종료",
-                "TurnStart": "턴 시작",
-                "TurnEnd": "턴 종료",
-                "MyActionStart": "내 행동 단계 시작",
-                "MyActionEnd": "내 행동 단계 종료"
-            },
-            "Duration": {
-                "Active": "활성",
-                "ActiveDetail": "지속 시간이 활성화되어 있습니다.",
-                "AwaitingCombatStart": "전투 시작까지",
-                "AwaitingCombatStartDetail": "다음 전투가 시작되면 만료됩니다.",
-                "AwaitingCombatEnd": "전투 종료까지",
-                "AwaitingCombatEndDetail": "현재 전투가 끝나면 만료됩니다.",
-                "AwaitingTurnStart": "전투 턴 시작까지",
-                "AwaitingTurnStartDetail": "다음 전투 턴 시작 시 만료됩니다.",
-                "AwaitingTurnEnd": "전투 턴 종료까지",
-                "AwaitingTurnEndDetail": "현재 전투 턴 종료 시 만료됩니다.",
-                "AwaitingMyActionStart": "소유자의 행동 단계 시작까지",
-                "AwaitingMyActionStartDetail": "소유자의 다음 행동 단계 시작 시 만료됩니다.",
-                "AwaitingMyActionEnd": "소유자의 행동 단계 종료까지",
-                "AwaitingMyActionEndDetail": "소유자가 현재 행동 단계를 마치면 만료됩니다.",
-                "AwaitingTrigger": "만료 트리거 대기 중",
-                "AwaitingTriggerDetail": "지속 시간이 완료되었으며 설정된 트리거에서 만료됩니다.",
-                "Combat": "전투",
-                "GroupCombat": "전투",
-                "GroupTime": "시간",
-                "UnitTurns": "전투 턴",
-                "CombatStart": "전투 턴 {turn}, 우선권 {initiative}",
-                "CombatStartNoInitiative": "전투 턴 {turn}",
-                "CombatTurn": "전투 턴 {turns}",
-                "CombatTurns": "전투 턴 {turns}",
-                "DoesNotExpire": "만료되지 않음",
-                "Expired": "만료됨",
-                "ExpiredDetail": "이 효과의 지속 시간을 다시 시작하려면 효과를 재시작하세요.",
-                "ExpiredOpenEditor": "만료됨 — 효과 편집기 열기",
-                "ExpiryTrigger": "만료 트리거",
-                "Remaining": "남은 시간",
-                "RemainingDetail": "{remaining} 남음",
-                "Restart": "지속 시간 재시작",
-                "RestartPending": "재시작 준비됨",
-                "RestartPendingDetail": "변경 사항을 제출하면 지속 시간이 재시작됩니다.",
-                "ExpiryAction": "만료 작업",
-                "ExpiryActionDefault": "기본값 ({action})",
-                "ExpiryActionDelete": "삭제",
-                "ExpiryActionUpdate": "업데이트",
-                "Status": "상태",
-                "Units": "지속 시간 단위",
-                "Value": "지속 시간"
-            },
             "FilterTypes": {
                 "Attributes": "특성치",
                 "Categories": "행동 범주",
@@ -278,7 +274,8 @@
                 "Include": "포함"
             },
             "Target": "대상",
-            "Targets": "대상"
+            "Targets": "대상",
+            "ValueEditor": "변경 값 편집"
         },
         "ActiveSkills": "활성형 기술",
         "Actor": {
@@ -605,17 +602,17 @@
                         "hint": "해당 방어구는 강화됨",
                         "label": "강화 방어구"
                     },
+                    "immunities": {
+                        "hint": "이 방어구가 면역을 부여하는 피해 출처",
+                        "label": "면역"
+                    },
                     "is_hardened": {
                         "hint": "이 방어구가 강화 방어를 제공하는지 여부",
                         "label": "강화 적용"
                     },
-                    "immunities": {
-                        "hint": "Damage sources this armor grants Immunity against",
-                        "label": "Immunities"
-                    },
                     "pollutant": {
-                        "hint": "Extra Armor against attacks with Pollutant",
-                        "label": "Chemical Protection"
+                        "hint": "오염물질 공격에 대한 추가 방어도 제공",
+                        "label": "화학 보호"
                     },
                     "radiation": {
                         "hint": "방사선 공격에 대한 추가 방어도 제공",
@@ -626,20 +623,19 @@
                         "label": "방어도 수치"
                     },
                     "water": {
-                        "hint": "Extra Armor against attacks with Water",
-                        "label": "Water Protection"
+                        "hint": "물 공격에 대한 추가 방어도 제공",
+                        "label": "물 보호"
                     }
                 }
             },
             "Immunity": {
-                "NormalWeapons": "Normal Weapons"
+                "NormalWeapons": "일반 무기"
             },
             "Resistances": "저항",
             "label": "방어구"
         },
         "ArmorHardened": "단단함",
         "ArmorHardenedFull": "단단한 갑옷",
-        "HardenedArmor": "단단한 갑옷",
         "ArmorValue": "방어구 수치",
         "Attack": "공격",
         "Attacker": "공격자",
@@ -660,6 +656,17 @@
         "Attribute": "특성치",
         "Attributes": "특성치",
         "Availability": "희귀도",
+        "AvailabilityRestriction": "희귀도 제한",
+        "AvailabilityRestrictionSuffixes": {
+            "Forbidden": "F",
+            "None": "",
+            "Restricted": "R"
+        },
+        "AvailabilityRestrictions": {
+            "Forbidden": "금지됨",
+            "None": "없음",
+            "Restricted": "제한됨"
+        },
         "Awakened": "각성자",
         "AwakenedEmerged": "각성자/공명자",
         "Barrel": "총열",
@@ -678,27 +685,27 @@
         "Bullets": "발",
         "BuyHits": "성공 구매",
         "COMBAT": {
-            "CannotSeizeAgain": "다음 턴 시작 전까지 다시 선제권을 잡을 수 없습니다.",
-            "InitiativeChangedLabel": "선제권 갱신됨",
-            "InitiativeDecreased": "선제권 감소",
-            "InitiativeIncreased": "선제권 증가",
+            "CannotSeizeAgain": "다음 턴 시작 전까지 다시 우선권을 장악할 수 없습니다.",
+            "InitiativeChangedLabel": "우선권 갱신됨",
+            "InitiativeDecreased": "우선권 감소",
+            "InitiativeIncreased": "우선권 증가",
             "ModeAstral": "아스트랄",
-            "ModeChangedLabel": "우선권 모드 변경",
             "ModeChangeNewInitiative": "새 우선권",
             "ModeChangePreviousInitiative": "이전 우선권",
+            "ModeChangedLabel": "우선권 유형 변경",
             "ModeMatrix": "매트릭스",
             "ModeMeatspace": "현실",
-            "ModeTitle": "모드: {mode}",
+            "ModeTitle": "유형: {mode}",
             "ModeUnknown": "알 수 없음",
             "NextPass": "다음 패스",
             "NextPhase": "다음 페이즈",
             "NextTurn": "다음 턴",
-            "NoHistoryAvailable": "사용 가능한 전투 히스토리 스냅샷이 없습니다.",
+            "NoHistoryAvailable": "사용 가능한 전투 기록 정보가 없습니다.",
             "PreviousPass": "이전 패스",
             "PreviousPhase": "이전 페이즈",
             "PreviousTurn": "이전 턴",
-            "SeizeInitiative": "선제권 잡기",
-            "SeizedInitiative": "선제권 확보",
+            "SeizeInitiative": "우선권 장악",
+            "SeizedInitiative": "우선권 장악함",
             "ToggleActedStatusGMOnly": "행동 완료 상태 전환 (GM 전용)",
             "TrackerTitle": "턴 {round} (패스 {pass})"
         },
@@ -816,6 +823,7 @@
         "CollapseAll": "전체 접기",
         "CommonProgram": "일반 프로그램",
         "CompendiaSettings": {
+            "ActionsPacksSection": "행동 컨펜디움",
             "Description": "이 팩들은 시스템에 사용됩니다. 사용자 정의 팩으로 오버라이드 할 수 있지만, 원본 팩을 삭제해서는 안 됩니다.",
             "GeneralActionsPack": {
                 "hint": "이 컨펜디움은 모든 일반, 특성치 전용 행동에 사용됩니다.",
@@ -830,12 +838,6 @@
                 "hint": "이 컨펜디움은 모든 매트릭스 행동에 사용됩니다.",
                 "label": "매트릭스 행동"
             },
-            "SkillsPacksSection": "기술 컨펜디움",
-            "ActionsPacksSection": "행동 컨펜디움",
-            "SkillsPack": {
-                "hint": "이 컨펜디움은 모든 기술에 적용됩니다.",
-                "label": "기술"
-            },
             "SkillGroupsPack": {
                 "hint": "이 컨펜디움은 모든 기술 묶음에 적용됩니다.",
                 "label": "기술 묶음"
@@ -844,6 +846,11 @@
                 "hint": "이 컨펜디움은 기술 설정에 적용됩니다.",
                 "label": "기술 설정"
             },
+            "SkillsPack": {
+                "hint": "이 컨펜디움은 모든 기술에 적용됩니다.",
+                "label": "기술"
+            },
+            "SkillsPacksSection": "기술 컨펜디움",
             "Title": "시스템 컨펜디움"
         },
         "CompendiumBrowser": {
@@ -987,7 +994,7 @@
                 "MatrixDefenseTest": "매트릭스 방어 판정",
                 "MatrixPerception": "매트릭스 인식",
                 "MatrixSearch": "매트릭스 검색",
-                "Memory": "기억\n",
+                "Memory": "기억",
                 "NaturalRecoveryPhysical": "자연적 물리 회복",
                 "NaturalRecoveryStun": "자연적 기절 회복",
                 "PhysicalDamageResist": "물리적 피해 저항",
@@ -1070,6 +1077,7 @@
                 "EnabledOption": "추가 능력, 사용 가능",
                 "Standard": "기본"
             },
+            "OptionalSelectionCount": "선택 능력",
             "Range": "사거리",
             "Ranges": {
                 "LineOfSight": "시야 범위 내",
@@ -1082,8 +1090,7 @@
             "Types": {
                 "Mana": "마나",
                 "Physical": "물리"
-            },
-            "OptionalSelectionCount": "선택 능력"
+            }
         },
         "Cyberware": "사이버웨어",
         "CyberwareGrade": "등급",
@@ -1110,12 +1117,12 @@
         "DamageValue": "피해량",
         "DefaultCategoryVisibility": "비어있는 범주 보기",
         "Defaulting": "무리",
-        "Delete": "삭제",
         "Defender": "방어자",
         "DefenderNetHits": "방어자 순 성공횟수",
         "Defense": "방어",
         "DefenseTest": "방어 판정",
         "Del": "삭제",
+        "Delete": "삭제",
         "DeleteAmmo": "탄약 삭제",
         "DeleteConfirmationApplication": {
             "Cancel": "아니요",
@@ -1157,12 +1164,12 @@
         "DicePool": "주사위 풀",
         "DicePoolModifier": "주사위 풀 수정치",
         "DirectConnection": "직접 연결",
-        "DmgTypeMatrix": "매트릭스",
-        "DmgTypePhysical": "물리",
-        "DmgTypeStun": "기절",
         "DmgCodeMatrix": "M",
         "DmgCodePhysical": "P",
         "DmgCodeStun": "S",
+        "DmgTypeMatrix": "매트릭스",
+        "DmgTypePhysical": "물리",
+        "DmgTypeStun": "기절",
         "Dodge": "회피",
         "DontApplyWounds": "부상 적용 안함",
         "Drain": "드레인",
@@ -1188,10 +1195,10 @@
             "Cold": "냉기",
             "Electricity": "전기",
             "Fire": "화염",
-            "Pollutant": "Pollutant",
+            "Label": "속성",
+            "Pollutant": "오염물질",
             "Radiation": "방사능",
-            "Water": "Water",
-            "Label": "속성"
+            "Water": "물"
         },
         "Emerged": "공명자",
         "EnforcedMaximum": "최댓값 강제",
@@ -1249,9 +1256,9 @@
             "CantEditAppliedItemEffects": "물품에 의해 적용된 활성 효과는 편집할 수 없습니다.",
             "CantExecuteTest": "해당 판정을 실행할 수 없습니다. 이는 사용자가 플레이어이거나 권한이 부족하기 때문일 수 있습니다.",
             "DefaultInventoryCantBeRemoved": "기본 소지품 위치는 삭제할 수 없습니다.",
-            "LinkLockedReboot": "링크 잠금 상태의 액터는 재부팅할 수 없습니다.",
             "InventoryAlreadyExists": "해당 이름의 소지품 위치가 이미 존재합니다.",
             "KeyNotModifyableByActiveEffect": "활성 효과 모드 '수정'은 모드 속성에만 영향을 미칠 수 있습니다.",
+            "LinkLockedReboot": "링크 잠금 상태의 액터는 재부팅할 수 없습니다.",
             "MarkCouldNotBePlaced": "내부 오류: 당신의 마커는 배치될 수 없습니다.",
             "MarksCantBePlacedBy": "활성화된 액터는 마커를 배치할 수 없습니다.",
             "MarksCantBePlacedOn": "선택된 유형의 액터는 마커를 받을 수 없습니다.",
@@ -1277,33 +1284,33 @@
                 "Delete": "삭제",
                 "Edit": "편집",
                 "Pause": "일시 중지",
-                "Reactivate": "테스트 재활성화",
+                "Reactivate": "판정 재활성화",
                 "Resume": "재개",
                 "Roll": "굴리기"
             },
             "ActivityLog": "활동 기록",
             "Actor": "액터",
-            "AdvanceTime": "굴릴 때 게임 시간 진행",
+            "AdvanceTime": "굴림 시 게임 시간 진행",
             "AdvanceTimeTooltip": "굴림을 할 때마다 판정 간격만큼 월드 시간을 진행합니다.",
+            "BaseThreshold": "기본 요구 성공횟수",
             "CanEdit": "편집",
             "CanRoll": "굴리기",
             "CanView": "보기",
-            "BaseThreshold": "기본 임계값",
-            "ConfirmCancel": "확장 테스트 \"{name}\"을(를) 취소할까요? 테스트가 종료되지만 GM이 나중에 재활성화할 수 있습니다.",
+            "ConfirmCancel": "연장 판정 \"{name}\"을(를) 취소하시겠습니까? 판정은 종료되지만 이후에 GM이 재활성화할 수 있습니다.",
             "ConfirmDelete": "연장 판정 \"{name}\"을(를) 삭제하시겠습니까?",
             "CreateTest": "새 연장 판정",
-            "Creator": "만든 사람",
+            "Creator": "생성자",
             "CumulativeModifier": "누적 −1 주사위 풀 수정치",
             "CumulativeModifierTooltip": "굴림을 할 때마다 주사위 풀을 1씩 줄입니다. SR5 48쪽.",
             "CumulativeRollCount": "이전 굴림",
-            "Due": "예정",
-            "DueTooltip": "마지막 굴림 이후 경과한 게임 시간 간격",
+            "Due": "경과된 시간 (간격 단위)",
             "DueMessage": {
-                "Header": "확장 판정을 이어갈 수 있습니다",
+                "Header": "연장 판정 진행 가능",
                 "OpenManager": "관리자 열기",
-                "Overdue": "{count}개 간격 경과",
+                "Overdue": "{count} 간격 경과",
                 "Rolls": "굴림"
             },
+            "DueTooltip": "마지막 굴림 이후 경과한 게임 시간 간격",
             "EditTest": "연장 판정 편집",
             "Filters": {
                 "Actor": "액터",
@@ -1312,7 +1319,7 @@
                 "AllStatuses": "모든 상태",
                 "AllVisibilities": "공개 및 비공개",
                 "Created": "생성 기간",
-                "Mine": "내 것만",
+                "Mine": "내 판정",
                 "Private": "비공개",
                 "Search": "이름 또는 메모 검색...",
                 "Status": "상태",
@@ -1337,13 +1344,13 @@
             "NoActor": "없음",
             "NoTests": "표시할 연장 판정이 없습니다.",
             "Notes": "메모",
-            "NotesPlaceholder": "이 테스트에 대한 자유 입력. 검색 가능합니다.",
+            "NotesPlaceholder": "해당 판정에 대해 자유롭게 입력 가능. 검색 할 수 있음.",
             "Notifications": {
                 "Completed": "연장 판정 \"{name}\"이(가) 완료되었습니다!",
                 "Failed": "연장 판정 \"{name}\" 실패: 주사위 풀이 모두 소진되었습니다.",
                 "NoEditPermission": "이 연장 판정을 편집할 권한이 없습니다.",
                 "NoRollPermission": "이 연장 판정을 굴릴 권한이 없습니다.",
-                "NotActive": "이 확장 테스트는 활성 상태가 아닙니다. 먼저 재개하거나 재활성화하세요.",
+                "NotActive": "이 연장 판정은 활성 상태가 아닙니다. 먼저 재개하거나 재활성화하세요.",
                 "NotDue": "이 연장 판정을 다시 굴리기에는 게임 시간이 충분히 지나지 않았습니다.",
                 "Registered": "연장 판정 \"{name}\"이(가) 이제 연장 판정 관리자에서 추적됩니다."
             },
@@ -1432,8 +1439,10 @@
         },
         "Grids": "그리드",
         "HackingProgram": "해킹 프로그램",
+        "HardenedArmor": "단단한 갑옷",
         "Help": "도움",
         "Hits": "성공횟수",
+        "HitsBought": "구매한 성공횟수",
         "Host": {
             "Attributes": "호스트 특성치",
             "CustomAttributes": "커스텀 특성치",
@@ -1491,7 +1500,15 @@
                 "Title": "액터 불러오기"
             },
             "BulkImporter": {
-                "Title": "일괄 불러오기"
+                "Mode": "불러오기 모드:",
+                "Modes": {
+                    "Add": "누락된 물품 추가",
+                    "Clean": "비우고 다시 불러오기",
+                    "Replace": "물품 교체",
+                    "Update": "물품 업데이트 (설명 유지)"
+                },
+                "Title": "일괄 불러오기",
+                "TranslationLanguage": "번역 언어:"
             },
             "ImporterSourcesConfig": {
                 "Title": "가져오기 출처 설정"
@@ -1564,7 +1581,7 @@
                             },
                             "base_formula_operator": {
                                 "hint": "기본 AP 수치가 특성치에 영향을 주는 방식",
-                                "label": "Operator"
+                                "label": "연산자"
                             }
                         },
                         "attribute": {
@@ -1577,7 +1594,7 @@
                         },
                         "base_formula_operator": {
                             "hint": "기본 피해량이 특성치에 영향을 주는 방식",
-                            "label": "Operator"
+                            "label": "연산자"
                         },
                         "biofeedback": {
                             "hint": "해당 행동이 생체반응 피해를 함께 입히는지 여부. 해당 항목은 활성 효과의 대상으로 지정될 수 있음",
@@ -1590,8 +1607,8 @@
                             }
                         },
                         "normal_weapon": {
-                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
-                            "label": "Normal Weapon"
+                            "hint": "이 피해가 일반(비마법) 무기 공격으로 간주되는 경우",
+                            "label": "일반 무기"
                         },
                         "type": {
                             "base": {
@@ -1772,6 +1789,10 @@
                         "hint": "해당 물품이 종속화되어 PAN 또는 WAN이 구성된 마스터 장치",
                         "label": "마스터 장치"
                     },
+                    "max_rating": {
+                        "hint": "이 물품을 구입할 수 있는 최고 등급입니다. 0이면 등급 상한이 없습니다.",
+                        "label": "최대 등급"
+                    },
                     "quantity": {
                         "hint": "물품의 보유 수량",
                         "label": "수량"
@@ -1813,6 +1834,7 @@
             "Lifestyle": "생활방식",
             "Metamagic": "메타마법",
             "Modification": "개조품",
+            "Preparation": "조제물",
             "Program": "프로그램",
             "Quality": "특징",
             "Ritual": "의식",
@@ -1919,6 +1941,7 @@
                 "Persona": "페르소나",
                 "PersonalInventory": "개인 소지 중",
                 "PhysicalTrack": "물리 추적기",
+                "Preparations": "조제물",
                 "PublicAwarenessShort": "PA",
                 "RemoveOneMark": "마크 하나 제거",
                 "ResetActorForNewRun": "신규 런을 위한 초기화",
@@ -1946,7 +1969,8 @@
                 "AvailabilityAdjustment": "등급별 희귀도 비례 적용",
                 "CostAdjustment": "등급별 가격 비례 적용",
                 "EssenceAdjustment": "등급별 에센스 비례 적용",
-                "Network": "네트워크"
+                "Network": "네트워크",
+                "Properties": "물품 속성"
             },
             "MarkPlacement": {
                 "PlaceOnDevice": "장치에 배치",
@@ -1981,7 +2005,7 @@
                 "RebootDevice": "재부팅",
                 "RemoveImprovisedDevices": "즉석 장치 제거",
                 "SubtractOne": "제외",
-                "Type": "종류",
+                "Type": "유형",
                 "Visible": "보임",
                 "WAN": "WAN"
             },
@@ -2112,7 +2136,7 @@
                 "Line1": "0.18.0 버전부터 보유한 물품에 있는 지속 효과는 액터에 복사되지 않고, 직접 적용됨.",
                 "Line2": "변경 사항을 적용하기 위해서는 이전에 복사된 효과를 반드시 지우거나 비활성화하여 물품과 액터 모두에 효과가 적용되는 것을 피할 수 있습니다. 기본적으로 물품을 기반으로 한 모든 효과는 삭제될 것입니다.",
                 "Line3": "액터에 직접 생성된 효과는 영향을 받지 않습니다.",
-                "Line4": "효과와 효과 모듈을 많이 사용하지만 '물품 소유 효과'에 대해 잘 모르는 경우,  이 마이그레이션을 설정하여 비활성화하고 비활성화된 효과를 검토하세요. 비활성화된 효과는 표시됩니다.",
+                "Line4": "효과와 효과 모듈을 많이 사용하지만 '물품 소유 효과'에 대해 잘 모르는 경우, 이 마이그레이션을 설정하여 비활성화하고 비활성화된 효과를 검토하세요. 비활성화된 효과는 표시됩니다.",
                 "Line5": "또한 이제 액터 항목에 활성화된 효과가 적용된다는 점에 유의하세요. 적용된 모든 효과는 액터 효과 탭에서 확인할 수 있습니다.",
                 "OnlyDisable": "비활성한 효과만",
                 "Warning": "기록!"
@@ -2127,7 +2151,6 @@
             "SomeAmmo": "선택된 사격 방식으로 사격하기에 탄약이 충분하지 않음, 사격 방식 수정치가 감소",
             "SomeAmmoMelee": "근거리 공격 수행을 위한 탄약이 충분하지 않음"
         },
-        "ModifyRoll": "굴림 수정",
         "ModPoints": "개조 점수",
         "Modification": {
             "FIELDS": {
@@ -2211,7 +2234,7 @@
             "MatrixTrack": "매트릭스 상태 추적기",
             "MeatSpaceDice": "현실 우선권 주사위",
             "MeatSpaceInit": "현실 우선권",
-            "Memory": "기억\n",
+            "Memory": "기억",
             "MentalLimit": "정신 한계치",
             "Noise": "노이즈",
             "PainTolerancePhysical": "통증 내성 물리",
@@ -2232,6 +2255,7 @@
             "WoundTolerance": "부상 내성",
             "Wounds": "부상"
         },
+        "ModifyRoll": "굴림 수정",
         "MountPoint": "장착 위치",
         "MoveInventoryDialog": {
             "Cancel": "취소",
@@ -2296,6 +2320,7 @@
         "OpposedType": "유형",
         "OpposingHits": "경쟁 성공횟수",
         "OpposingNetHits": "경쟁 순 성공",
+        "Options": "설정",
         "OriginalDicePool": "기존 주사위 풀",
         "OutOfRange": "사거리 밖",
         "Overflow": "치명상",
@@ -2326,6 +2351,75 @@
         "PowerPoints": "PP",
         "PowerType": "유형",
         "Powers": "능력",
+        "Preparation": {
+            "Alchemical": "연금술",
+            "CraftingTime": "제작 시간",
+            "CraftingTimeMinutes": "{minutes}분",
+            "Create": "조제물 생성",
+            "CreationTimeDialog": {
+                "Edit": "생성 시간 편집",
+                "Invalid": "올바른 생성 날짜와 시간을 입력하세요.",
+                "Title": "조제물 생성 시간",
+                "UseCurrent": "현재 시간 사용"
+            },
+            "Expired": "만료됨",
+            "ExpiredAt": "{time}에 만료됨",
+            "ExpiredMessage": "{name}의 효력이 사라졌습니다. 저장된 주문도 함께 사라졌습니다.",
+            "Expires": "만료",
+            "ExpiresIn": "{duration} 후 만료",
+            "FIELDS": {
+                "created": {
+                    "hint": "조제물이 생성된 시점.",
+                    "label": "생성됨",
+                    "worldTime": {
+                        "hint": "조제물이 생성된 월드 시간.",
+                        "label": "생성 시간"
+                    }
+                },
+                "force": {
+                    "hint": "조제물을 생성할 때의 강도.",
+                    "label": "강도"
+                },
+                "potency": {
+                    "base": {
+                        "hint": "조제물을 생성할 때 기록한 순 성공횟수.",
+                        "label": "생성 시 효력"
+                    },
+                    "hint": "저장된 주문의 효력.",
+                    "label": "효력",
+                    "value": {
+                        "hint": "감쇠 후 남은 효력.",
+                        "label": "현재 효력"
+                    }
+                },
+                "spellUuid": {
+                    "hint": "이 조제물을 만든 주문.",
+                    "label": "원본 주문"
+                },
+                "trigger": {
+                    "hint": "저장된 주문을 발동시키는 조건.",
+                    "label": "작동방식"
+                },
+                "triggerTime": {
+                    "hint": "선택한 단위를 기준으로 주문이 발동하기까지의 남은 시간.",
+                    "label": "작동시간"
+                }
+            },
+            "Formulae": "연금술 공식",
+            "FullPotencyUntil": "최대 효력 유지 기한",
+            "Lynchpin": "핵심 물품",
+            "Potency": "효력",
+            "Spent": "소모됨",
+            "Trigger": {
+                "Command": "제어",
+                "Contact": "접촉",
+                "Time": "시간"
+            },
+            "TriggerDueMessage": {
+                "Header": "설정 시간 도달",
+                "Roll": "조제물 판정"
+            }
+        },
         "Program": {
             "FIELDS": {
                 "type": {
@@ -2391,9 +2485,9 @@
         },
         "Resist": "저항",
         "RestoreDefaultSkills": "기본 기술 복구",
+        "ResultOverride": "결과 오버라이드",
         "ResultOverrideGlitches": "글리치",
         "ResultOverrideHits": "성공",
-        "ResultOverride": "결과 오버라이드",
         "RightClickToClear": "비우려면 우클릭",
         "Ritual": {
             "Anchored": "고정형",
@@ -2421,7 +2515,7 @@
         "RollFade": "페이드",
         "RollJudgeIntentions": "의심",
         "RollLiftCarry": "들기&운반",
-        "RollMemory": "기억\n",
+        "RollMemory": "기억",
         "RollMode": "굴림 방식",
         "RollOneDie": "1개 미만의 주사위는 굴릴 수 없어, 처머",
         "RollSoak": "피해 저항",
@@ -2434,6 +2528,15 @@
         "RunningSpeed": "달리기",
         "SIN": "SIN",
         "SameGrid": "동일한 그리드",
+        "Scatter": {
+            "Direction": "방향",
+            "Distance": "거리",
+            "Grenade": "수류탄 빗나감",
+            "RolledDistance": "굴린 거리",
+            "Rolls": "빗나감 굴림",
+            "Spell": "간접 전투 주문 빗나감",
+            "Title": "빗나감"
+        },
         "SecondAttribute": "두 번째 특성치",
         "SecondChance": "두 번째 기회",
         "SelectMatrixNetworkDialog": {
@@ -2445,6 +2548,14 @@
         "SelectedTargets": "선택된 목표",
         "SheetActor": "액터 시트",
         "SheetItem": "물품 시트",
+        "Shotgun": {
+            "Choke": {
+                "Medium": "중간",
+                "Narrow": "좁음",
+                "Wide": "넓음"
+            },
+            "Label": "산탄총 초크"
+        },
         "Side": "옆면",
         "SituationalModifier": "상황 수정치",
         "SituationalModifiersApplication": {
@@ -2465,124 +2576,6 @@
             "Total": "결과"
         },
         "Skill": {
-            "FIELDS": {
-                "type": {
-                    "label": "유형",
-                    "hint": "사용 가능한 기술 구성 유형을 정의"
-                },
-                "skill": {
-                    "category": {
-                        "label": "범주",
-                        "hint": "해당 기술의 범주"
-                    },
-                    "knowledgeType": {
-                        "label": "지식 유형",
-                        "hint": "지식 기술의 유형"
-                    },
-                    "rating": {
-                        "label": "등급",
-                        "hint": "해당 항목의 등급"
-                    },
-                    "defaulting": {
-                        "label": "무리한 시도",
-                        "hint": "해당 기술의 무리한 시도 가능 여부"
-                    },
-                    "attribute": {
-                        "label": "특성치",
-                        "hint": "해당 기술이 사용하는 특성치"
-                    },
-                    "limit": {
-                        "attribute": {
-                            "label": "한계치",
-                            "hint": "해당 기술 행동이 사용하는 한계치. 비워둘 경우 기본 특성 한계치를 사용."
-                        }
-                    },
-                    "specializations": {
-                        "label": "전문화",
-                        "hint": "해당하는 경우 해당 기술의 전문화"
-                    },
-                    "language": {
-                        "isNative": {
-                            "label": "모국어",
-                            "hint": "해당 언어를 모국어로 표시"
-                        }
-                    },
-                    "requirement": {
-                        "label": "요구 사항",
-                        "hint": "해당 기술 사용에 액터가 충족해야 하는 조건"
-                    }
-                },
-                "group": {
-                    "label": "기술 묶음",
-                    "hint": "기술 묶음 구성",
-                    "skills": {
-                        "label": "기술",
-                        "hint": "해당 묶음에 속하는 기술"
-                    },
-                    "rating": {
-                        "label": "등급",
-                        "hint": "해당 기술 묶음의 등급"
-                    }
-                },
-                "set": {
-                    "label": "기술 설정",
-                    "hint": "기술 설정에 속하는 기술",
-                    "default": {
-                        "label": "새로운 액터에게 적용",
-                        "hint": "해당 기술 설정을 새롭게 만들어진 액터에 추가"
-                    },
-                    "skills": {
-                        "label": "기술",
-                        "hint": "해당 설정에 포함된 기술들",
-                        "name": {
-                            "label": "이름",
-                            "hint": "해당 기술의 이름"
-                        },
-                        "rating": {
-                            "label": "등급",
-                            "hint": "해당 기술의 등급"
-                        },
-                        "specializations": {
-                            "label": "전문화",
-                            "hint": "해당 설정을 적용했을 때 이 기술에 적용되는 전문화"
-                        }
-                    },
-                    "groups": {
-                        "label": "기술 묶음",
-                        "hint": "해당 설정에 포함된 기술 묶음",
-                        "name": {
-                            "label": "이름",
-                            "hint": "해당 기술 묶음의 이름"
-                        },
-                        "rating": {
-                            "label": "등급",
-                            "hint": "해당 기술 묶음의 등급"
-                        }
-                    }
-                }
-            },
-            "Types": {
-                "Skill": "기술",
-                "Group": "기술 묶음",
-                "Set": "기술 설정"
-            },
-            "Category": {
-                "Active": "활성형",
-                "Knowledge": "지식",
-                "Language": "언어"
-            },
-            "KnowledgeType": {
-                "Academic": "학술적",
-                "Professional": "전문적",
-                "Interests": "흥미",
-                "Street": "길거리"
-            },
-            "Groups": {},
-            "Sets": {},
-            "Set": {
-                "LogActorDifferences": "액터간 차이 기록",
-                "DifferencesLoggedInConsole": "차이점을 보기 위해 사용자의 브라우저 콘솔 열기"
-            },
             "AeronauticsMechanic": "항공정비",
             "Alchemy": "연금술",
             "AnimalHandling": "동물 조련",
@@ -2599,6 +2592,11 @@
             "Binding": "속박",
             "Biotechnology": "생명공학",
             "Blades": "도검류",
+            "Category": {
+                "Active": "활성형",
+                "Knowledge": "지식",
+                "Language": "언어"
+            },
             "Chemistry": "화학",
             "Clubs": "둔기류",
             "Compiling": "컴파일링",
@@ -2617,10 +2615,107 @@
             "Etiquette": "예법",
             "ExoticMeleeWeapon": "희귀 근거리 무기",
             "ExoticRangedWeapon": "희귀 원거리 무기",
+            "FIELDS": {
+                "group": {
+                    "hint": "기술 묶음 구성",
+                    "label": "기술 묶음",
+                    "rating": {
+                        "hint": "해당 기술 묶음의 등급",
+                        "label": "등급"
+                    },
+                    "skills": {
+                        "hint": "해당 묶음에 속하는 기술",
+                        "label": "기술"
+                    }
+                },
+                "set": {
+                    "default": {
+                        "hint": "해당 기술 설정을 새롭게 만들어진 액터에 추가",
+                        "label": "새로운 액터에게 적용"
+                    },
+                    "groups": {
+                        "hint": "해당 설정에 포함된 기술 묶음",
+                        "label": "기술 묶음",
+                        "name": {
+                            "hint": "해당 기술 묶음의 이름",
+                            "label": "이름"
+                        },
+                        "rating": {
+                            "hint": "해당 기술 묶음의 등급",
+                            "label": "등급"
+                        }
+                    },
+                    "hint": "기술 설정에 속하는 기술",
+                    "label": "기술 설정",
+                    "skills": {
+                        "hint": "해당 설정에 포함된 기술들",
+                        "label": "기술",
+                        "name": {
+                            "hint": "해당 기술의 이름",
+                            "label": "이름"
+                        },
+                        "rating": {
+                            "hint": "해당 기술의 등급",
+                            "label": "등급"
+                        },
+                        "specializations": {
+                            "hint": "해당 설정을 적용했을 때 이 기술에 적용되는 전문화",
+                            "label": "전문화"
+                        }
+                    }
+                },
+                "skill": {
+                    "attribute": {
+                        "hint": "해당 기술이 사용하는 특성치",
+                        "label": "특성치"
+                    },
+                    "category": {
+                        "hint": "해당 기술의 범주",
+                        "label": "범주"
+                    },
+                    "defaulting": {
+                        "hint": "해당 기술의 무리한 시도 가능 여부",
+                        "label": "무리한 시도"
+                    },
+                    "knowledgeType": {
+                        "hint": "지식 기술의 유형",
+                        "label": "지식 유형"
+                    },
+                    "language": {
+                        "isNative": {
+                            "hint": "해당 언어를 모국어로 표시",
+                            "label": "모국어"
+                        }
+                    },
+                    "limit": {
+                        "attribute": {
+                            "hint": "해당 기술 행동이 사용하는 한계치. 비워둘 경우 기본 특성 한계치를 사용.",
+                            "label": "한계치"
+                        }
+                    },
+                    "rating": {
+                        "hint": "해당 항목의 등급",
+                        "label": "등급"
+                    },
+                    "requirement": {
+                        "hint": "해당 기술 사용에 액터가 충족해야 하는 조건",
+                        "label": "요구 사항"
+                    },
+                    "specializations": {
+                        "hint": "해당하는 경우 해당 기술의 전문화",
+                        "label": "전문화"
+                    }
+                },
+                "type": {
+                    "hint": "사용 가능한 기술 구성 유형을 정의",
+                    "label": "유형"
+                }
+            },
             "FirstAid": "응급 치료",
             "Flight": "비행",
             "Forgery": "위조",
             "FreeFall": "자유 낙하",
+            "Groups": {},
             "Gunnery": "거치 무기",
             "Gymnastics": "체조",
             "Hacking": "해킹",
@@ -2630,6 +2725,12 @@
             "IndustrialMechanic": "산업 정비",
             "Instruction": "교육",
             "Intimidation": "협박",
+            "KnowledgeType": {
+                "Academic": "학술적",
+                "Interests": "흥미",
+                "Professional": "전문적",
+                "Street": "길거리"
+            },
             "Leadership": "지도력",
             "Locksmith": "자물쇠 따기",
             "Longarms": "장총류",
@@ -2651,6 +2752,11 @@
             "Registering": "레지스터링",
             "RitualSpellcasting": "의식 주문 시전",
             "Running": "달리기",
+            "Set": {
+                "DifferencesLoggedInConsole": "차이점을 보기 위해 사용자의 브라우저 콘솔 열기",
+                "LogActorDifferences": "액터간 차이 기록"
+            },
+            "Sets": {},
             "Skill": "기술",
             "SkillGroup": "기술 묶음",
             "Skills": "기술",
@@ -2668,6 +2774,11 @@
             },
             "ThrowingWeapons": "투척용 무기",
             "Tracking": "추적",
+            "Types": {
+                "Group": "기술 묶음",
+                "Set": "기술 설정",
+                "Skill": "기술"
+            },
             "UnarmedCombat": "비무장 전투",
             "abbr": {
                 "Native": "N"
@@ -2684,6 +2795,7 @@
         "Specialization": "전문화",
         "Specializations": "전문화",
         "Spell": {
+            "AlchemicalFormula": "연금술 공식",
             "Attack": "주문 공격",
             "Cast": "주문 시전",
             "CatCombat": "전투",
@@ -2701,10 +2813,11 @@
             "DetectionArea": "범위형",
             "DetectionDirectional": "지향형",
             "DetectionPsychic": "초자연",
+            "Elemental": "원소",
             "FIELDS": {
                 "alchemical": {
-                    "hint": "This spell was learned as an alchemical formula and can be made into a preparation.",
-                    "label": "Alchemical"
+                    "hint": "이 주문은 연금술 공식으로 습득되었으며 조제물로 만들 수 있습니다.",
+                    "label": "연금술"
                 },
                 "category": {
                     "hint": "주문이 속한 범주",
@@ -2781,6 +2894,7 @@
                     "label": "주문 유형"
                 }
             },
+            "HealthEssence": "에센스",
             "IllusionMultiSense": "다중 감각",
             "IllusionObvious": "명백함",
             "IllusionRealistic": "현실적",
@@ -2971,8 +3085,8 @@
         "StatusEffects": {
             "Running": "달리기",
             "Sprinting": "전력 질주"
-        },																 
-	      "Stock": "개머리판",
+        },
+        "Stock": "개머리판",
         "StreetCred": "길거리 명성",
         "StunTrack": "기절 추적기",
         "Submersion": "몰닉",
@@ -2989,14 +3103,6 @@
             "Modes": {
                 "Enhanced": "강화 (5 m)",
                 "Normal": "일반 (10 m)"
-            }
-        },
-        "Shotgun": {
-            "Label": "산탄총 초크",
-            "Choke": {
-                "Narrow": "좁음",
-                "Medium": "중간",
-                "Wide": "넓음"
             }
         },
         "Tabs": {
@@ -3064,12 +3170,15 @@
             "Failure": "실패!",
             "HackOnTheFlyFailure": "즉석 해킹 실패!",
             "HackOnTheFlySuccess": "즉성 해킹 성공!",
+            "PreparationFailure": "주문이 핵심 물품에서 빠져나감",
+            "PreparationSuccess": "조제물이 주문을 담고 있음",
             "ResistedAllDamage": "피해받지 않음!",
             "ResistedSomeDamage": "피해 받음!",
             "Results": "결과",
             "RitualFailure": "의식이 시전자보다 강함",
             "RitualSuccess": "의식이 봉인됨",
             "SoakBlockedByHardenedArmor": "단단한 방어구에 의해 막힘",
+            "SpellResisted": "주문 저항됨",
             "SpiritSummonFailure": "영혼이 사라졌다!",
             "SpiritSummonSuccess": "영혼이 소환되었다!",
             "SpriteCompilationFailure": "스프라이트가 사라졌다!",
@@ -3098,15 +3207,18 @@
             "NaturalRecoveryStunTest": "기절 자연 회복",
             "OpposedBruteForceTest": "브루트 포스 대항",
             "OpposedCheckOverwatchScoreTest": "감시 점수 확인 대항",
-            "OpposedCompileSpriteTest": "컴파일 경쟁\n",
+            "OpposedCompileSpriteTest": "컴파일 경쟁",
             "OpposedHackOnTheFlyTest": "즉석 해킹 대항",
             "OpposedMatrixTest": "매트릭스 경쟁 판정",
+            "OpposedPreparationForceTest": "강도로 저항",
             "OpposedRitualTest": "의식 봉인",
-            "OpposedSummonSpiritTest": "소환 경쟁\n",
+            "OpposedSummonSpiritTest": "소환 경쟁",
             "OpposedTest": "경쟁 판정",
             "PhysicalDefenseTest": "물리 방어",
             "PhysicalResistTest": "물리 피해 저항",
             "PilotVehicleTest": "탑승물 조종 판정",
+            "PreparationCreationTest": "조제물 생성",
+            "PreparationTriggerTest": "조제물 발동",
             "RangedAttackTest": "원거리 무기 공격",
             "RitualSpellcastingTest": "의식 주문 시전",
             "SkillTest": "기술 판정",
@@ -3146,11 +3258,11 @@
             "Unit": "단위",
             "Year": "년"
         },
-        "ToggleBreakdown": "세부 내역 전환",
         "ToggleActive": "활성 전환",
+        "ToggleBreakdown": "세부 내역 전환",
         "ToggleEquip": "장착 전환",
-        "ToggleWireless": "무선 전환",
         "ToggleSection": "섹션 전환",
+        "ToggleWireless": "무선 전환",
         "Tooltips": {
             "Actor": {
                 "AddOneService": "봉사 횟수 1회 추가",
@@ -3162,8 +3274,6 @@
                 "DisconnectNetwork": "해당 호스트/그리드 퇴장",
                 "MarkTarget": "해당 목표에 추가 마크 배치",
                 "MatrixConnectionToggle": "매트릭스 연결 상태 변경: 증강 현실, 콜드 심, 핫 심",
-                "RemoveAllNetworks": "모든 네트워크 제거",
-                "RemoveNetwork": "네트워크 제거",
                 "MatrixRunningSilentToggle": "자신의 매트릭스 장치를 정숙 실행이나 페르소나 표시로 전환",
                 "Metatype": "NPC로서 메타인종은 특성치 빠른 수정치도 적용함",
                 "MiscConfig": "기타 설정 & 수정치",
@@ -3177,12 +3287,14 @@
                 "PickControlledTokenAsTechnomancer": "현재 조작 중인 토큰 액터를 컴파일러 (테크노맨서)로 선택",
                 "PlaceMark": "이미 마크된 목표에게 마크 배치 사용",
                 "RebootPersonaAndClearAllMarks": "페르소나를 재부팅하여 자신에게 배치된 모든 마커 제거",
+                "RemoveAllNetworks": "모든 네트워크 제거",
                 "RemoveFavorite": "즐겨찾기 바에서 해당 항목을 제거",
+                "RemoveNetwork": "네트워크 제거",
                 "RemoveOneService": "봉사 횟수 1회 제외",
+                "RemoveSkillSet": "현재 기술 설정과 해당 기술 설정에서 파생된 모든 기술 및 기술 묶음을 제거",
                 "ResetActorForNewRun": "신규 런을 위해 피해, 엣지 등을 초기화",
                 "RollInitiative": "우선권 굴림",
-                "SetupPAN": "해당 캐릭터의 페르소나에 모든 장착된 무선 장치들을 추가",
-                "RemoveSkillSet": "현재 기술 설정과 해당 기술 설정에서 파생된 모든 스킬 및 스킬 그룹을 제거합니다"
+                "SetupPAN": "해당 캐릭터의 페르소나에 장착된 모든 무선 장치들을 추가"
             },
             "CallInAction": {
                 "ActorType": "호출할 액터 유형",
@@ -3199,19 +3311,19 @@
             "Effect": {
                 "AlterApplyToWithChanges": "효과를 적용하는 대상을 변경하기 전에 변경 사항을 제거합니다.",
                 "ApplyTo": "해당 효과의 변경 사항은 이 대상에만 적용됨",
+                "ApplyValueEditor": "값 편집 적용",
+                "CancelValueEditor": "값 편집 취소",
                 "CreateEffect": "효과 생성",
                 "DeleteEffect": "효과 삭제",
                 "DocumentEffects": "이 문서에 직접 적용",
                 "EditEffect": "효과 수정",
+                "HelpLinkEnglishOnly": "도움 (외부 링크, 영어 전용)",
                 "ItemEffects": "이 문서의 항목에서 수집한 효과",
-                "HelpLinkEnglishOnly": "Help (External link, English only)",
-                "OpenValueEditor": "값 편집기 열기",
-                "ApplyValueEditor": "값 편집 적용",
-                "CancelValueEditor": "값 편집 취소",
                 "OnlyAllFilteredUsed": "전체 선택 사항과 맞는 판정에만 효과가 적용됨",
                 "OnlyFilteredUsed": "최소 하나 이상의 선택 사항과 맞는 판정에만 효과가 적용됨",
                 "OnlyForItemTest": "상위 항목의 판정에만 영향",
                 "OnlyForWireless": "무선 활성화 된 물품에만 효과가 적용됨",
+                "OpenValueEditor": "값 편집기 열기",
                 "PriorityFieldDisabled": "현재 사용자 지정 우선순위는 지원되지 않음"
             },
             "Item": {
@@ -3220,8 +3332,6 @@
                 "ActionRollMode": "이 행동을 시전 할 때 무리한 굴림 방식을 사용함. 전체 채팅 설정에 덮어 써짐.",
                 "AddQuantity": "1개 추가. {qtySome}: 5개 추가. {qtyMany}: 20개 추가.",
                 "AmmoReplaceDamage": "무기 피해를 수정하는 대신 대체하도록 설정",
-                "AvailabilityAdjustment": "물품 등급에 따라 현재 희귀도 조정",
-                "CostAdjustment": "물품 등급에 따라 현재 가격 조정",
                 "DisabledForPreparedActor": "준비된 액터를 사용 중이므로 비활성화됨",
                 "EssenceAdjustment": "해당 물품의 등급에 따라 실제 에센스 비용을 조절",
                 "RemoveQuantity": "1개 삭제. {qtySome}: 5개 삭제. {qtyMany}: 20개 삭제.",
@@ -3231,14 +3341,22 @@
             "MatrixTest": {
                 "SameGridDisabled": "활성 아이콘과 목표 아이콘 모두 그리드를 사용하므로 자동으로 결정됨"
             },
+            "Preparation": {
+                "Craft": "판정을 굴리기 전 필요한 중단 없는 제작 시간",
+                "Force": "조제물의 강도, 마법 등급의 최대 2배까지",
+                "Potency": "생성 판정의 순 성공횟수. 시간이 지나면 감소하며, 발동 시 주문 시전 기술을 대체",
+                "ReagentDrams": "강도 대신 한계값으로 적용되는 시약의 사용량(드램 단위)",
+                "Trigger": "저장된 주문을 발동시키는 조건",
+                "TriggerTime": "주문 발동까지 남은 시간이며 최종 효력(시간 단위)을 초과할 수 없음"
+            },
             "RangedAttack": {
                 "Recoil": "점진적 반동",
                 "RecoilAfterAttack": "이번 공격을 포함한 점진적 반동",
                 "RecoilBeforeAttack": "공격 전, 현재 점진적 반동",
                 "RecoilCompensation": "액터와 아이템을 포함한 총 RC",
                 "ResetRecoil": "점진적 반동을 없음으로 초기화",
-                "ShowSuppressiveFireTemplate": "제압 사격 원뿔 배치",
                 "ShowShotgunTemplate": "산탄 원뿔 배치",
+                "ShowSuppressiveFireTemplate": "제압 사격 원뿔 배치",
                 "ShowWeaponRanges": "무기 사거리 미리보기"
             },
             "Ritual": {
@@ -3250,18 +3368,18 @@
             },
             "SummoningTest": {
                 "DragOnCanvas": "캔버스에 영혼 놓기",
-                "Force": "소환될 영혼의 강도",
+                "Force": "소환할 영혼의 강도",
+                "OptionalPowerCount": "영혼의 선택 능력 수량 ((강도 / 3)(내림)).",
                 "PreparedSpirit": "신규 영혼을 생성하는 대신 준비된 영혼을 사용",
                 "ReagentDrams": "소환 한계 수정에 사용된 시약 드램",
-                "SpiritType": "소환될 영혼의 유형",
-                "OptionalPowerCount": "선택적 정령 능력의 수량 정보 (내림(포스 / 3))."
+                "SpiritType": "소환할 영혼의 유형"
             },
             "Test": {
                 "BuyHits": "주사위를 굴리지 않습니다. ⌊주사위 풀 / 4⌋로 성공을 구매합니다.",
                 "Extended": "요구 성공횟수에 도달할 때까지 연장 판정으로 굴립니다. 간격을 0으로 두면 일반 판정으로 굴립니다.",
                 "ExtendedInterval": "굴림 사이의 게임 시간입니다. 0이면 연장 판정이 아닌 일반 판정으로 굴립니다.",
                 "Limit": "계산된 한계치",
-                "LimitIgnored": "현재 해당 판정에 대하여 한계가 무시됨Limit is currently ignored for this test",								
+                "LimitIgnored": "현재 판정에서 한계값 미적용",
                 "Modifier": "주사위 풀에 적용되는 모든 수정치의 합계",
                 "Pool": "굴릴 수 있는 주사위 개수",
                 "PushTheLimit": "한계 돌파 엣지 규칙 적용",
@@ -3297,7 +3415,6 @@
         "UnderBarrel": "총열 하부",
         "UseEdgeForInitiativeRoll": "우선권에 대한 블리츠 엣지 규칙 사용",
         "Value": "수치",
-        "VehicleStunImmunity": "탑승물의 기절 피해 면역",
         "Vehicle": {
             "Categories": {
                 "Anthro": "인간형",
@@ -3319,8 +3436,8 @@
                 "Remote": "원격 조종",
                 "Rigger": "리거 조종"
             },
-            "Driver": "조종자",
             "DamagedVehicle": "손상된 탑승물",
+            "Driver": "조종자",
             "Drone": "드론",
             "Environments": {
                 "Handling": "조작력",
@@ -3334,7 +3451,7 @@
                 "body": "몸체",
                 "cosmetic": "외장",
                 "electromagnetic": "전자기품",
-                "powertrain": "Powertrain",
+                "powertrain": "동력 장치",
                 "protection": "보호",
                 "weapons": "무기"
             },
@@ -3366,6 +3483,7 @@
         "VehicleImport": {
             "MissingPermission": "액터 생성 권한이 없음"
         },
+        "VehicleStunImmunity": "탑승물의 기절 피해 면역",
         "Vision": {
             "AstralPerception": "아스트랄 인식",
             "AugmentedReality": "증강 현실",
@@ -3376,10 +3494,10 @@
         "WalkingSpeed": "걷기",
         "Warnings": {
             "ActorMissingRequirements": "액터는 ‘각성’ 또는 ‘공명’ 기술 요건과 일치해야 함",
-            "InvalidWeaponRanges": "Weapon ranges must be in ascending order and end above zero.",
             "AlreadyExistingInventory": "해당 이름의 소지품 위치가 이미 존재",
             "AlreadyJoinedNetwork": "{name} 은/는 이미 네트워크에 접속함",
             "BulkImportPerformanceWarning": "한 번에 다수의 물품을 불러올 경우 브라우저를 새로고침 하기 전까지 Foundry가 느려질 수 있습니다. 즉시 새로고침 하는 것을 추천합니다.",
+            "CantCombineBuyHitsWithEdge": "성공 구매는 두 번째 기회와 함께 사용할 수 없습니다.",
             "CantEditDefaultInventory": "기본 소지품 위치의 이름은 변경할 수 없음",
             "CantExtendTest": "연장 할 수 없는 판정 유형",
             "CantExtendTestFurther": "주사위가 남거나 요구 성공횟수 도달 시 판정을 연장할 수 없음",
@@ -3389,18 +3507,23 @@
             "CantReloadPartialDueToAmmo": "복잡한 재장전 행동에 필요한 탄약이 부족합니다!",
             "CantReloadWithoutSpareClip": "남은 탄창이 없습니다!",
             "CantSecondChanceAGlitch": "해당 판정에는 두 번째 기회가 없습니다. 판정 결과는 글리치입니다.",
-            "CantSecondChanceWithoutNoneHits": "해당 판정에는 두 번째 기회가 없습니다.  성공 주사위만 남았습니다.",
+            "CantSecondChanceWithoutNoneHits": "해당 판정에는 두 번째 기회가 없습니다. 성공 주사위만 남았습니다.",
             "CantSpendMulitplePointsOfEdge": "한 번의 판정 또는 행동에 엣지를 여러 번 소비할 수 없습니다.",
-            "CantCombineBuyHitsWithEdge": "성공 구매는 두 번째 기회와 함께 사용할 수 없습니다.",
             "CompilationNotConcluded": "컴파일이 완료되지 않았습니다. 페이드 결정을 위해 스프라이트가 컴파일 경쟁 판정을 완료하길 기다려야 합니다.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "액터 없이 판정에서 엣지 점수를 소비할 수 없습니다.",
             "HostItemOnlyAcceptIC": "호스트에는 IC 액터만 추가할 수 있음",
             "InvalidCompilationLevel": "공명 특성치가 스프라이트의 단계보다 낮음",
             "InvalidMarksCount": "잘못된 수의 마커를 배치하려고 함",
             "InvalidSummoningForce": "선택한 강도의 수치가 규칙을 위반",
+            "InvalidWeaponRanges": "무기 사거리는 오름차순이어야 하며 마지막 값은 0보다 커야 합니다.",
             "NegativeLimitValue": "한계치는 반드시 양수여야 함",
+            "NoActorCreatePermission": "액터를 생성할 권한이 없습니다.",
             "NoFireModeConfigured": "원거리 무기에 사격방식 설정이 없습니다. 단발로 사격합니다.",
             "OnlyGMCanDoThis": "GM 유저만 가능",
+            "PreparationDepleted": "이 조제물의 효력이 남아 있지 않습니다. 저장된 주문은 사라졌습니다.",
+            "PreparationForceTooHigh": "조제물 강도가 유효하지 않거나 마법 등급의 2배를 초과합니다.",
+            "PreparationNotConcluded": "조제물이 아직 완성되지 않았습니다. 먼저 강도로 저항 판정을 굴리세요.",
+            "PreparationTriggerTimeTooLong": "설정 시간이 조제물의 효력(시간 단위)을 초과하여 설정되어 있습니다. 조기에 발동됩니다.",
             "RitualInvalidForce": "의식 강도가 유효하지 않거나 오두막 등급보다 높습니다.",
             "RitualNotConcluded": "의식이 완료되지 않았습니다. 드레인 결정을 위해 의식 경쟁 판정이 완료되길 기다려야 합니다.",
             "RitualNotEnoughReagents": "시약이 충분하지 않습니다.",
@@ -3408,8 +3531,7 @@
             "SkillCantBeDefault": "해당 기술은 무리한 시도를 할 수 없음",
             "SkillSetDefaultTypeOutsideCompendium": "설정된 기술 설정 컨펜디움에 포함된 기술 설정만 액터 생성에 영향을 줌",
             "SummoningNotConcluded": "소환이 완료되지 않았습니다. 드레인 결정을 위해 영혼 경쟁 판정이 완료되길 기다려야 합니다.",
-            "TokenSelectionNeeded": "하나 이상의 토큰이 선택되어야 함",
-            "NoActorCreatePermission": "액터를 생성할 권한이 없습니다."
+            "TokenSelectionNeeded": "하나 이상의 토큰이 선택되어야 함"
         },
         "Weapon": {
             "AmmoCount": "탄약 수량",
@@ -3492,10 +3614,6 @@
                     }
                 },
                 "thrown": {
-                    "thrown_type": {
-                        "hint": "산란 거리에 사용할 투척 무기 유형입니다. 폭발 효과가 없는 투척 무기는 비워 두세요.",
-                        "label": "투척 무기 유형"
-                    },
                     "blast": {
                         "dropoff": {
                             "hint": "폭발 지점으로부터 미터당 적용되는 피해 감소량",
@@ -3531,12 +3649,28 @@
                             "hint": "해당 무기의 단거리 판정 거리 (미터)",
                             "label": "단거리"
                         }
+                    },
+                    "thrown_type": {
+                        "hint": "빗나감 거리 계산에 사용할 투척 무기 유형입니다. 폭발 효과가 없는 투척 무기라면 비워 둡니다.",
+                        "label": "투척 무기 유형"
                     }
                 }
             },
             "FullReload": "완전 장전",
             "Mod": "부착물",
             "Mode": {
+                "Full": {
+                    "BurstFire": "점사",
+                    "BurstFireLong": "긴 점사",
+                    "FullAuto": "완전 자동",
+                    "FullAutoLong": "완전 자동 (복잡)",
+                    "FullAutoShort": "완전 자동 (단순)",
+                    "SemiAuto": "반자동",
+                    "SemiAutoBurst": "반자동 점사",
+                    "SemiAutoShort": "반자동",
+                    "SingleShot": "단발",
+                    "Suppressing": "제압 사격"
+                },
                 "Mode": "사격방식",
                 "Short": {
                     "BurstFire": "BF",
@@ -3550,18 +3684,6 @@
                     "SemiAutoShort": "SA",
                     "SingleShot": "SS",
                     "SingleShotShort": "SS"
-                },
-                "Full": {
-                    "BurstFire": "점사",
-                    "BurstFireLong": "긴 점사",
-                    "FullAuto": "완전 자동",
-                    "FullAutoLong": "완전 자동 (복잡)",
-                    "FullAutoShort": "완전 자동 (단순)",
-                    "SemiAuto": "반자동",
-                    "SemiAutoBurst": "반자동 점사",
-                    "SemiAutoShort": "반자동",
-                    "SingleShot": "단발",
-                    "Suppressing": "제압 사격"
                 }
             },
             "Mods": "부착물",
@@ -3589,7 +3711,7 @@
                     "MediumHeavyMachinegun": "다목적/중 기관총",
                     "MissileLauncher": "미사일 발사기",
                     "Net": "그물",
-                    "SMG": "SMG",
+                    "SMG": "기관단총",
                     "ShotgunFlechette": "산탄총 (플레셰트)",
                     "ShotgunSlug": "산탄총 (슬러그)",
                     "Shuriken": "표창",
@@ -3650,6 +3772,7 @@
             "lifestyle": "생활방식",
             "metamagic": "메타마법",
             "modification": "장비 개조품",
+            "preparation": "조제물",
             "program": "프로그램",
             "quality": "특징",
             "ritual": "의식",

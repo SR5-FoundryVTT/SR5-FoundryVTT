@@ -17,27 +17,34 @@
         "AutomateProgressiveRecoilDescription": "Personagens acumulam recuo progressivo até serem reiniciados",
         "CompendiumBrowserBlacklist": "Lista Negra do Navegador de Compêndio",
         "CompendiumBrowserBlacklistDescription": "Lista de compêndios a serem ocultados no navegador de compêndios",
-        "EnforceExtendedTestIntervalDescription": "Só permite a próxima rolagem de um teste estendido depois que seu intervalo tiver passado no tempo de jogo.",
-        "EnforceExtendedTestIntervalName": "Impor intervalos de testes estendidos",
-        "ExtendedTestDueMessageDescription": "Sussurra uma mensagem com o estado do teste e um botão de rolagem para todos que podem rolar, assim que passar tempo de jogo suficiente para a próxima rolagem.",
-        "ExtendedTestDueMessageName": "Mensagens de teste estendido pendente",
-        "ModifyRollExpanded": "Lembrar estado da seção Modificar Rolagem",
-        "ModifyRollExpandedDescription": "Salva se a seção Modificar Rolagem estava expandida na última vez e restaura esse estado na próxima janela de teste.",
         "DefaultOpposedTestActorSelection": "Sobrescrever seleções de token de testes de oposição",
         "DefaultOpposedTestActorSelectionDescription": "Sempre sobrescrever tokens selecionados com alvos usados para testes",
+        "DiagonalMovementDescription": "Como o movimento diagonal deve ser tratado ao usar uma grade",
+        "DiagonalMovementName": "Movimento Diagonal",
+        "DisplayDefaultRollCardDescription": "O cartão de rolagem padrão deve ser exibido junto com o cartão de rolagem do Shadowrun",
+        "DisplayDefaultRollCardName": "Exibir Cartão de Rolagem Padrão",
+        "EnforceExtendedTestIntervalDescription": "Só permite a próxima rolagem de um teste estendido depois que seu intervalo tiver passado no tempo de jogo.",
+        "EnforceExtendedTestIntervalName": "Impor intervalos de testes estendidos",
+        "EstimateDiagonal": "Estimar Movimento Diagonal (1-2-1)",
+        "Euclidean": "Euclidiana",
+        "ExtendedTestDueMessageDescription": "Sussurra uma mensagem com o estado do teste e um botão de rolagem para todos que podem rolar, assim que passar tempo de jogo suficiente para a próxima rolagem.",
+        "ExtendedTestDueMessageName": "Mensagens de teste estendido pendente",
         "FreshColor": "Destacar Apenas com Cor do Texto",
         "FreshColorAndIcon": "Destacar com Cor do Texto e Ícone",
         "FreshIcon": "Destacar Apenas com Ícone",
         "HideGMOnlyChatContent": "Ocultar informações críticas no teste para o GM",
         "HideGMOnlyChatContentDescription": "As mensagens de teste para o GM só mostrarão todas as informações para os jogadores que possuem o ator usado",
-        "InitiativeModeUpdateStrategyName": "Estrategia de atualizacao do modo de iniciativa",
-        "InitiativeModeUpdateStrategyDescription": "Como a iniciativa e atualizada ao trocar o modo de iniciativa em combate",
-        "InitiativeModeUpdateStrategyDeltaDice": "Diferenca de dados",
-        "InitiativeModeUpdateStrategyReroll": "Nova rolagem completa",
+        "IgnoreDiagonal": "Ignorar Movimento Diagonal (1-1-1)",
         "ImportIconFolderDescription": "A pasta onde o importador pode encontrar arquivos de ícone. Localização padrão: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "Pasta de Ícones do Importador",
+        "InitiativeModeUpdateStrategyDeltaDice": "Diferenca de dados",
+        "InitiativeModeUpdateStrategyDescription": "Como a iniciativa e atualizada ao trocar o modo de iniciativa em combate",
+        "InitiativeModeUpdateStrategyName": "Estrategia de atualizacao do modo de iniciativa",
+        "InitiativeModeUpdateStrategyReroll": "Nova rolagem completa",
         "MarkImportsDescription": "Demarcar itens recém-importados nas fichas de ator para destacar que eles devem ser revisados",
         "MarkImportsName": "Marcar Importações Recentes",
+        "ModifyRollExpanded": "Lembrar estado da seção Modificar Rolagem",
+        "ModifyRollExpandedDescription": "Salva se a seção Modificar Rolagem estava expandida na última vez e restaura esse estado na próxima janela de teste.",
         "MustHaveRessourcesOnTest": "Parar Testes com recursos faltando",
         "MustHaveRessourcesOnTestDescription": "Permitir apenas atores com todos os recursos necessários para rolar um teste",
         "NoMarking": "Não Marcar Importações Recentes",
@@ -53,18 +60,18 @@
         "ShowTokenNameForChatOutputName": "Usar Nome do Token para Cartão de Rolagem",
         "TokenAutoRunning": "Detectar Corrida Automaticamente",
         "TokenAutoRunningDescription": "Alterna automaticamente o modo de movimento do token para corrida quando a distância medida excede a velocidade de caminhada.",
+        "TokenHealthBars": "Barras de saúde do token",
+        "TokenHealthBarsDescription": "Um monitor de dano completa será mostrada como uma barra de saúde vazia em um Token em vez de espelhar",
         "TokenMovementHistoryReset": "Momento de Reinício do Histórico de Movimento",
         "TokenMovementHistoryResetDescription": "Escolha quando o histórico de movimento é limpo para combatentes durante o combate",
         "TokenMovementHistoryResetFirstActionPhase": "Na Minha Primeira Fase de Ação",
         "TokenMovementHistoryResetTurnStart": "Reiniciar no Início do Turno",
-        "TokenHealthBars": "Barras de saúde do token",
-        "TokenHealthBarsDescription": "Um monitor de dano completa será mostrada como uma barra de saúde vazia em um Token em vez de espelhar",
+        "TokenRulerColorPhaseMarker": "Cor do marcador de fase de movimento do Token",
+        "TokenRulerColorPhaseMarkerDescription": "A cor do ponto de passagem que marca o fim de uma fase de ação.",
         "TokenRulerColorRunning": "Cor de Movimento de Corrida do Token",
         "TokenRulerColorRunningDescription": "A cor para a distância dentro da taxa de corrida.",
         "TokenRulerColorSprinting": "Cor de Movimento de Arrancada do Token",
         "TokenRulerColorSprintingDescription": "A cor para a distância acima da taxa de corrida, onde o arrancada é necessário.",
-        "TokenRulerColorPhaseMarker": "Cor do marcador de fase de movimento do Token",
-        "TokenRulerColorPhaseMarkerDescription": "A cor do ponto de passagem que marca o fim de uma fase de ação.",
         "TokenRulerColorWalking": "Cor de Movimento de Caminhada do Token",
         "TokenRulerColorWalkingDescription": "A cor para a distância dentro da taxa de caminhada.",
         "TokenRulerOpacity": "Opacidade do Movimento do Token",
@@ -76,15 +83,6 @@
     },
     "SR5": {
         "AP": "PA",
-        "Scatter": {
-            "Title": "Dispersão",
-            "Grenade": "Dispersão de granada",
-            "Spell": "Dispersão de feitiço de combate indireto",
-            "Rolls": "Rolagens de dispersão",
-            "Direction": "Direção",
-            "Distance": "Distância",
-            "RolledDistance": "Distância rolada"
-        },
         "Accessory": "Acessório",
         "Accuracy": "Precisão",
         "Action": "Ação",
@@ -94,6 +92,7 @@
             "AddictionPhysical": "Vício Físico",
             "Alchemy": "Ações de Alquimia",
             "Attack": "Ações de Ataque",
+            "AttackMatrix": "Ataque à Matriz",
             "AttackMelee": "Ataque Corpo a Corpo",
             "AttackRanged": "Ataque à Distância",
             "AttackThrown": "Ataque de Arremesso",
@@ -102,6 +101,7 @@
             "Compiling": "Ações de Compilação",
             "ComplexForm": "Ações de Forma Complexa",
             "Defense": "Ações de Defesa",
+            "DefenseMatrix": "Defesa da Matriz",
             "DefenseSuppression": "Supressão de Defesa",
             "Drain": "Ações de Dreno",
             "Fade": "Ações de Enfraquecimento",
@@ -112,7 +112,9 @@
             "RecoveryPhysical": "Recuperação Física",
             "RecoveryStun": "Recuperação de Atordoamento",
             "Resist": "Ações de Resistência",
+            "ResistBiofeedback": "Resistir a Biofeedback",
             "ResistDisease": "Resistindo à Doença",
+            "ResistMatrix": "Resistir na Matriz",
             "ResistToxin": "Resistindo à Toxina",
             "Resonance": "Ações de Ressonância",
             "Rigging": "Ações de Fusor",
@@ -126,10 +128,10 @@
             "Summoning": "Ações de Invocação"
         },
         "ActionType": {
-            "Label": "Tipo",
             "Complex": "Complexa",
             "Free": "Livre",
-            "Interrupt": "Interrupt",
+            "Interrupt": "Interrupção",
+            "Label": "Tipo",
             "None": "Nenhuma",
             "Simple": "Simples",
             "Varies": "Variada"
@@ -138,65 +140,35 @@
         "Active": "Ativo",
         "ActiveDefense": "Defesa Ativa",
         "ActiveEffect": {
-            "ApplyTo": "Aplicar a",
-            "ApplyTos": {
-                "TestTargetingThisActor": "Teste que Tem Este Ator como Alvo",
-                "TargetedActor": "Ator Alvo",
-                "TestItem": "Testar via Item",
-                "ParentItem": "Item Pai"
-            },
-            "CannotAddTestViaItemToActor": "Não é possível adicionar um Efeito Ativo do tipo 'Testar via Item' a um Ator",
-            "ValueEditor": "Editar valor da mudança",
-            "FIELDS": {
-                "appliedByTest": {
-                    "label": "Aplicado por teste"
-                },
-                "conditionMode": {
-                    "hint": "Incluir: o teste deve corresponder a estes valores. Excluir: o teste não deve corresponder a estes valores."
-                },
-                "conditionType": {
-                    "hint": "A parte do teste que esta condição filtra."
-                },
-                "rating": {
-                    "hint": "O nível deste efeito. As mudanças podem se basear nele, então aumentá-lo atualiza todas de uma vez.",
-                    "label": "Nível"
-                },
-                "targetName": {
-                    "label": "Nome do Alvo"
-                }
-            },
             "AddCondition": "Adicionar Condição",
             "AddTarget": "Adicionar Alvo",
-            "AtLeastOneTarget": "Um efeito deve manter pelo menos um alvo.",
-            "ExpiryTriggers": {
-                "CombatStart": "Início do Combate",
-                "CombatEnd": "Fim do Combate",
-                "TurnStart": "Início do Turno",
-                "TurnEnd": "Fim do Turno",
-                "MyActionStart": "Início da Minha Fase de Ação",
-                "MyActionEnd": "Fim da Minha Fase de Ação"
+            "ApplyTo": "Aplicar a",
+            "ApplyTos": {
+                "ParentItem": "Item Pai",
+                "TargetedActor": "Ator Alvo",
+                "TestItem": "Testar via Item",
+                "TestTargetingThisActor": "Teste que Tem Este Ator como Alvo"
             },
+            "AtLeastOneTarget": "Um efeito deve manter pelo menos um alvo.",
+            "CannotAddTestViaItemToActor": "Não é possível adicionar um Efeito Ativo do tipo 'Testar via Item' a um Ator",
             "Duration": {
                 "Active": "Ativo",
                 "ActiveDetail": "A duração está ativa.",
-                "AwaitingCombatStart": "Até o início do combate",
-                "AwaitingCombatStartDetail": "Expira quando o próximo combate começar.",
                 "AwaitingCombatEnd": "Até o fim do combate",
                 "AwaitingCombatEndDetail": "Expira quando o combate atual terminar.",
-                "AwaitingTurnStart": "Até o início do turno de combate",
-                "AwaitingTurnStartDetail": "Expira no início do próximo turno de combate.",
-                "AwaitingTurnEnd": "Até o fim do turno de combate",
-                "AwaitingTurnEndDetail": "Expira no fim do turno de combate atual.",
-                "AwaitingMyActionStart": "Até o início da fase de ação do proprietário",
-                "AwaitingMyActionStartDetail": "Expira no início da próxima fase de ação do proprietário.",
+                "AwaitingCombatStart": "Até o início do combate",
+                "AwaitingCombatStartDetail": "Expira quando o próximo combate começar.",
                 "AwaitingMyActionEnd": "Até o fim da fase de ação do proprietário",
                 "AwaitingMyActionEndDetail": "Expira quando o proprietário termina a fase de ação atual.",
+                "AwaitingMyActionStart": "Até o início da fase de ação do proprietário",
+                "AwaitingMyActionStartDetail": "Expira no início da próxima fase de ação do proprietário.",
                 "AwaitingTrigger": "Aguardando gatilho de expiração",
                 "AwaitingTriggerDetail": "A duração terminou e expirará no gatilho configurado.",
+                "AwaitingTurnEnd": "Até o fim do turno de combate",
+                "AwaitingTurnEndDetail": "Expira no fim do turno de combate atual.",
+                "AwaitingTurnStart": "Até o início do turno de combate",
+                "AwaitingTurnStartDetail": "Expira no início do próximo turno de combate.",
                 "Combat": "Combate",
-                "GroupCombat": "Combate",
-                "GroupTime": "Tempo",
-                "UnitTurns": "Turnos de Combate",
                 "CombatStart": "Turno de Combate {turn}, Iniciativa {initiative}",
                 "CombatStartNoInitiative": "Turno de Combate {turn}",
                 "CombatTurn": "{turns} Turno de Combate",
@@ -205,19 +177,84 @@
                 "Expired": "Expirado",
                 "ExpiredDetail": "Reinicie este efeito para começar sua duração novamente.",
                 "ExpiredOpenEditor": "Expirado — abrir editor do efeito",
+                "ExpiryAction": "Ação ao Expirar",
+                "ExpiryActionDefault": "Padrão ({action})",
+                "ExpiryActionDelete": "Excluir",
+                "ExpiryActionUpdate": "Atualizar",
                 "ExpiryTrigger": "Gatilho de Expiração",
+                "GroupCombat": "Combate",
+                "GroupTime": "Tempo",
                 "Remaining": "Restante",
                 "RemainingDetail": "{remaining} restante",
                 "Restart": "Reiniciar Duração",
                 "RestartPending": "Reinício pronto",
                 "RestartPendingDetail": "A duração será reiniciada quando as alterações forem enviadas.",
-                "ExpiryAction": "Ação ao Expirar",
-                "ExpiryActionDefault": "Padrão ({action})",
-                "ExpiryActionDelete": "Excluir",
-                "ExpiryActionUpdate": "Atualizar",
                 "Status": "Status",
+                "UnitTurns": "Turnos de Combate",
                 "Units": "Unidades de duração",
                 "Value": "Duração"
+            },
+            "ExpiryTriggers": {
+                "CombatEnd": "Fim do Combate",
+                "CombatStart": "Início do Combate",
+                "MyActionEnd": "Fim da Minha Fase de Ação",
+                "MyActionStart": "Início da Minha Fase de Ação",
+                "TurnEnd": "Fim do Turno",
+                "TurnStart": "Início do Turno"
+            },
+            "FIELDS": {
+                "appliedByTest": {
+                    "label": "Aplicado por teste"
+                },
+                "applyTo": {
+                    "hint": "Aplicar a diferentes Alvos",
+                    "label": "Aplicar a"
+                },
+                "conditionMode": {
+                    "hint": "Incluir: o teste deve corresponder a estes valores. Excluir: o teste não deve corresponder a estes valores."
+                },
+                "conditionType": {
+                    "hint": "A parte do teste que esta condição filtra."
+                },
+                "onlyForEquipped": {
+                    "hint": "Aplicar somente para o item equipado",
+                    "label": "Aplicar apenas para item equipado"
+                },
+                "onlyForItemTest": {
+                    "hint": "Aplicar somente para o teste do item pai",
+                    "label": "Aplicar apenas para teste do item acoplador"
+                },
+                "onlyForWireless": {
+                    "hint": "Aplicar somente quando o modo sem fio estiver ativo",
+                    "label": "Aplicar apenas para conexão sem fio ativo"
+                },
+                "rating": {
+                    "hint": "O nível deste efeito. As mudanças podem se basear nele, então aumentá-lo atualiza todas de uma vez.",
+                    "label": "Nível"
+                },
+                "selection_attributes": {
+                    "hint": "Filtra o teste com base nos Atributos usados",
+                    "label": "Filtro de Atributos"
+                },
+                "selection_categories": {
+                    "hint": "Filtra o teste com base na Categoria de Ação usada",
+                    "label": "Filtro de Categorias de Ação"
+                },
+                "selection_limits": {
+                    "hint": "Filtra o teste com base no Limite usado",
+                    "label": "Filtro de Limites"
+                },
+                "selection_skills": {
+                    "hint": "Filtra o teste com base nas Perícias usadas",
+                    "label": "Filtro de Perícias"
+                },
+                "selection_tests": {
+                    "hint": "Filtra o teste com base nos Testes usados",
+                    "label": "Filtro de Testes"
+                },
+                "targetName": {
+                    "label": "Nome do Alvo"
+                }
             },
             "FilterTypes": {
                 "Attributes": "Atributos",
@@ -230,16 +267,6 @@
                 "Modify": "Modificar"
             },
             "New": "Novo Efeito",
-            "OnlyForEquipped": "Aplicar apenas para item equipado",
-            "OnlyForItemTest": "Aplicar apenas para teste do item acoplador",
-            "OnlyForWireless": "Aplicar apenas para conexão sem fio ativo",
-            "Test": {
-                "ActionCategories": "Filtro de Categorias de Ação",
-                "Attributes": "Filtro de Atributos",
-                "Limits": "Filtro de Limites",
-                "Skills": "Filtro de Perícias",
-                "Tests": "Filtro de Testes"
-            },
             "RemoveCondition": "Remover Condição",
             "RemoveTarget": "Remover Alvo",
             "SelectionModes": {
@@ -247,9 +274,221 @@
                 "Include": "Incluir"
             },
             "Target": "Alvo",
-            "Targets": "Alvos"
+            "Targets": "Alvos",
+            "ValueEditor": "Editar valor da mudança"
         },
         "ActiveSkills": "Perícias Ativas",
+        "Actor": {
+            "FIELDS": {
+                "attributes": {
+                    "edge": {
+                        "base": {
+                            "hint": "Trunfo é a sorte de um personagem, o favor dos deuses, aquele fator inexplicável que permite vencer as probabilidades.",
+                            "label": "Trunfo"
+                        }
+                    }
+                },
+                "category_visibility": {
+                    "default": {
+                        "hint": "Se vazias, as Abas e Categorias de Inventário devem ficar visíveis",
+                        "label": "Mostrar Categorias Vazias"
+                    }
+                },
+                "full_defense_attribute": {
+                    "hint": "Atributo a usar ao realizar a ação de interrupção Defesa Total",
+                    "label": "Atributo de Defesa Total"
+                },
+                "magic": {
+                    "attribute": {
+                        "hint": "Atributo que o Mago/Adepto usa ao resistir ao Dreno",
+                        "label": "Atributo de Dreno"
+                    },
+                    "label": "Magia"
+                },
+                "modifiers": {
+                    "armor": {
+                        "hint": "Modifica o valor total da armadura",
+                        "label": "Armadura"
+                    },
+                    "astral_initiative": {
+                        "hint": "Modifica a iniciativa astral base",
+                        "label": "Iniciativa Astral"
+                    },
+                    "astral_initiative_dice": {
+                        "hint": "Modifica os dados de iniciativa astral",
+                        "label": "Dados de Iniciativa Astral"
+                    },
+                    "astral_limit": {
+                        "hint": "Modifica o limite astral",
+                        "label": "Limite Astral"
+                    },
+                    "composure": {
+                        "hint": "Modifica o pool de testes de compostura",
+                        "label": "Compostura"
+                    },
+                    "defense": {
+                        "hint": "Modifica o pool de testes de defesa",
+                        "label": "Defesa"
+                    },
+                    "defense_block": {
+                        "hint": "Adiciona ao modificador de defesa para bloqueio ativo",
+                        "label": "Defesa (Bloqueio)"
+                    },
+                    "defense_dodge": {
+                        "hint": "Adiciona ao modificador de defesa para esquiva ativa",
+                        "label": "Defesa (Esquiva)"
+                    },
+                    "defense_melee": {
+                        "hint": "Adiciona ao modificador de defesa para defesa corpo a corpo",
+                        "label": "Defesa (Corpo a Corpo)"
+                    },
+                    "defense_parry": {
+                        "hint": "Adiciona ao modificador de defesa para aparar ativamente",
+                        "label": "Defesa (Aparar)"
+                    },
+                    "defense_ranged": {
+                        "hint": "Adiciona ao modificador de defesa para ataque à distância",
+                        "label": "Defesa (À Distância)"
+                    },
+                    "drain": {
+                        "hint": "Modifica a reserva de dados de testes de drenagem",
+                        "label": "Dreno"
+                    },
+                    "essence": {
+                        "hint": "Modifica o atributo essência",
+                        "label": "Essência"
+                    },
+                    "fade": {
+                        "hint": "Modifica a reserva de dados de testes de enfraquecimento",
+                        "label": "Enfraquecimento"
+                    },
+                    "global": {
+                        "hint": "Modifica todos os pools de teste, excluindo testes de redução de dano",
+                        "label": "Global"
+                    },
+                    "judge_intentions": {
+                        "hint": "Modifica a reserva de dados de testes de julgar intenções",
+                        "label": "Julgar Intenções"
+                    },
+                    "lift_carry": {
+                        "hint": "Modifica a reserva de dados de testes de levantar e carregar",
+                        "label": "Levantar/Carregar"
+                    },
+                    "mark_damage": {
+                        "hint": "Modifica a quantidade de dano sofrido por cada MARCA feita em você",
+                        "label": "Dano por Marca"
+                    },
+                    "matrix_initiative": {
+                        "hint": "Modifica a iniciativa da matriz base",
+                        "label": "Iniciativa da Matriz"
+                    },
+                    "matrix_initiative_dice": {
+                        "hint": "Modifica os dados de iniciativa da matriz",
+                        "label": "Dados de Iniciativa da Matriz"
+                    },
+                    "matrix_track": {
+                        "hint": "Modifica a monitor de dano da matriz",
+                        "label": "Monitor da Matriz"
+                    },
+                    "meat_initiative": {
+                        "hint": "Modifica a iniciativa física base",
+                        "label": "Iniciativa Física"
+                    },
+                    "meat_initiative_dice": {
+                        "hint": "Modifica os dados de iniciativa física",
+                        "label": "Dados de Iniciativa Física"
+                    },
+                    "memory": {
+                        "hint": "Modifica a reserva de dados de testes de memória",
+                        "label": "Memória"
+                    },
+                    "mental_limit": {
+                        "hint": "Modifica o limite mental",
+                        "label": "Limite Mental"
+                    },
+                    "multi_defense": {
+                        "hint": "Modifica a reserva de dados de testes de defesa para múltiplas defesas por turno de combate",
+                        "label": "Multidefesa"
+                    },
+                    "pain_tolerance_physical": {
+                        "hint": "Modifica o dano a ser ignorado antes do primeiro modificador de ferida",
+                        "label": "Tolerância à Dor (Física)"
+                    },
+                    "pain_tolerance_stun": {
+                        "hint": "Modifica o dano a ser ignorado antes do primeiro modificador de ferida",
+                        "label": "Tolerância à Dor (Atordoamento)"
+                    },
+                    "physical_limit": {
+                        "hint": "Modifica o limite físico",
+                        "label": "Limite Físico"
+                    },
+                    "physical_overflow_track": {
+                        "hint": "Modifica o monitor de dano de excesso de dano",
+                        "label": "Monitor de Excesso Físico"
+                    },
+                    "physical_track": {
+                        "hint": "Modifica o monitor de dano físico",
+                        "label": "Monitor Físico"
+                    },
+                    "place_three_marks": {
+                        "hint": "Modifica o modificador para colocar três marcas ao mesmo tempo",
+                        "label": "Colocar Três Marcas"
+                    },
+                    "place_two_marks": {
+                        "hint": "Modifica o modificador para colocar duas marcas ao mesmo tempo",
+                        "label": "Colocar Duas Marcas"
+                    },
+                    "public_grid": {
+                        "hint": "Modifica o modificador da Grade Pública quando conectado a ela",
+                        "label": "Grade Pública"
+                    },
+                    "reach": {
+                        "hint": "Modifica o alcance dos ataques corpo a corpo",
+                        "label": "Alcance"
+                    },
+                    "recoil": {
+                        "hint": "Modifica o pool de testes de recuo",
+                        "label": "Recuo"
+                    },
+                    "run": {
+                        "hint": "Modifica a distância de corrida por múltiplos do atributo de agilidade",
+                        "label": "Corrida"
+                    },
+                    "soak": {
+                        "hint": "Modifica a reserva de dados de testes de resistência a danos físicos",
+                        "label": "Absorção"
+                    },
+                    "social_limit": {
+                        "hint": "Modifica o limite social",
+                        "label": "Limite Social"
+                    },
+                    "stun_track": {
+                        "hint": "Modifica a monitor de dano atordoante",
+                        "label": "Monitor de Atordoamento"
+                    },
+                    "walk": {
+                        "hint": "Modifica a distância de caminhada por múltiplos do atributo de agilidade",
+                        "label": "Caminhada"
+                    },
+                    "wound_tolerance": {
+                        "hint": "Modifica o dano por modificador de ferida",
+                        "label": "Tolerância a Ferimentos"
+                    }
+                },
+                "special": {
+                    "hint": "Selecione se o personagem é Despertado (mago/adepto) ou Emergido (tecnomante)",
+                    "label": "Despertado/Emergido"
+                },
+                "technomancer": {
+                    "attribute": {
+                        "hint": "Atributo que o Tecnomante usa ao resistir ao Enfraquecimento",
+                        "label": "Atributo de Enfraquecimento"
+                    },
+                    "label": "Tecnomante"
+                }
+            },
+            "NoFavoritesSelected": "Nenhum favorito foi selecionado"
+        },
         "ActorTypes": {
             "Character": "Personagem",
             "IC": "GELO",
@@ -265,13 +504,73 @@
         "AddOneToOverwatch": "+1 para VV",
         "AddSkill": "Adicionar Perícias Personalizada",
         "AdeptPower": {
+            "FIELDS": {
+                "drain": {
+                    "hint": "Se este Poder de Adepto gera Dreno após o uso",
+                    "label": "Dreno"
+                },
+                "level": {
+                    "hint": "Nível deste Poder de Adepto (se aplicável)",
+                    "label": "Nível"
+                },
+                "pp": {
+                    "hint": "Número de Pontos de Poder que este Poder custa",
+                    "label": "Pontos de Poder"
+                },
+                "type": {
+                    "hint": "Tipo de Poder de Adepto",
+                    "label": "Tipo de Poder"
+                }
+            },
             "Types": {
                 "Active": "Ativo",
                 "Passive": "Passivo"
             }
         },
         "Agent": "Agente",
-        "Ammo": "Munição",
+        "Ammo": {
+            "FIELDS": {
+                "accuracy": {
+                    "hint": "Modificador de precisão desta Munição",
+                    "label": "Precisão"
+                },
+                "ap": {
+                    "hint": "Penetração de Armadura desta Munição. Pode ser somada ao PA da Arma ou substituí-lo",
+                    "label": "PA"
+                },
+                "blast": {
+                    "dropoff": {
+                        "hint": "A Queda da Explosão modifica o Dano por Metro",
+                        "label": "Queda da Explosão"
+                    },
+                    "radius": {
+                        "hint": "Raio de Explosão desta Munição, em metros",
+                        "label": "Raio de Explosão"
+                    }
+                },
+                "damage": {
+                    "hint": "Dano causado por esta Munição. Pode ser somado ao Dano da Arma ou substituí-lo",
+                    "label": "Dano"
+                },
+                "damageType": {
+                    "hint": "Tipo de dano causado por esta Munição.",
+                    "label": "Tipo de dano"
+                },
+                "element": {
+                    "hint": "Elemento do dano causado por esta Munição.",
+                    "label": "Elemento"
+                },
+                "replaceAP": {
+                    "hint": "Se esta Munição deve substituir o PA da Arma",
+                    "label": "Substituir"
+                },
+                "replaceDamage": {
+                    "hint": "Se esta Munição deve substituir o Dano da Arma",
+                    "label": "Substituir"
+                }
+            },
+            "label": "Munição"
+        },
         "AmmoFull": "Munição Cheia",
         "AmmoGelRounds": "Munição de Gel",
         "Aoe": "AoE",
@@ -330,13 +629,13 @@
                 }
             },
             "Immunity": {
-                "NormalWeapons": "Normal Weapons"
+                "NormalWeapons": "Armas Normais"
             },
-            "Resistances": "Resistências"
+            "Resistances": "Resistências",
+            "label": "Armadura"
         },
         "ArmorHardened": "Endurecido",
         "ArmorHardenedFull": "Armadura Endurecida",
-        "HardenedArmor": "Armadura Endurecida",
         "ArmorValue": "Valor da Armadura",
         "Attack": "Ataque",
         "Attacker": "Atacante",
@@ -358,26 +657,29 @@
         "Attributes": "Atributos",
         "Availability": "Disponibilidade",
         "AvailabilityRestriction": "Restrição de disponibilidade",
-        "AvailabilityRestrictions": {
-            "Forbidden": "Proibido",
-            "None": "Nenhuma",
-            "Restricted": "Restrito"
-        },
         "AvailabilityRestrictionSuffixes": {
             "Forbidden": "F",
             "None": "",
             "Restricted": "R"
+        },
+        "AvailabilityRestrictions": {
+            "Forbidden": "Proibido",
+            "None": "Nenhuma",
+            "Restricted": "Restrito"
         },
         "Awakened": "Desperto",
         "AwakenedEmerged": "Desperto/Emergido",
         "Barrel": "Cano",
         "Base": "Base",
         "BaseValue": "Valor Base",
-        "Biography": "Bio",
+        "BiofeedbackDamage": "Dano de Biofeedback",
+        "Biography": "Biografia",
         "BlastRadius": "Raio de Explosão",
+        "Blitz": "Blitz",
         "Block": "Bloquear",
         "Bonus": "Bônus",
         "Bonuses": "Bônus",
+        "Broken": "QUEBRADO",
         "Bullet": "Projétil",
         "BulletCount": "Num. Disparos",
         "Bullets": "Projéteis",
@@ -388,9 +690,9 @@
             "InitiativeDecreased": "Iniciativa diminuida",
             "InitiativeIncreased": "Iniciativa aumentada",
             "ModeAstral": "Astral",
-            "ModeChangedLabel": "Modo de Iniciativa Alterado",
             "ModeChangeNewInitiative": "Nova iniciativa",
             "ModeChangePreviousInitiative": "Iniciativa anterior",
+            "ModeChangedLabel": "Modo de Iniciativa Alterado",
             "ModeMatrix": "Matrix",
             "ModeMeatspace": "Mundo fisico",
             "ModeTitle": "Modo: {mode}",
@@ -410,8 +712,36 @@
         "CallInAction": {
             "ActorType": "Tipo de Ator",
             "Compilation": "Compilação",
+            "Compile": "Compilar",
             "CreateCompilation": "Criar ação de compilação",
             "CreateSummoning": "Criar ação de invocação",
+            "FIELDS": {
+                "actor_type": {
+                    "hint": "Tipo de Ator que esta ação invoca",
+                    "label": "Tipo"
+                },
+                "spirit": {
+                    "force": {
+                        "hint": "Força do Espírito a invocar. Desabilitado se um Ator Espírito estiver definido",
+                        "label": "Força"
+                    },
+                    "type": {
+                        "hint": "Tipo de Espírito a invocar. Desabilitado se um Ator Espírito estiver definido",
+                        "label": "Tipo de Espírito"
+                    }
+                },
+                "sprite": {
+                    "level": {
+                        "hint": "Nível do Sprite a invocar. Desabilitado se um Ator Sprite estiver definido",
+                        "label": "Nível"
+                    },
+                    "type": {
+                        "hint": "Tipo de Sprite a compilar. Desabilitado se um Ator Sprite estiver definido",
+                        "label": "Tipo de Sprite"
+                    }
+                }
+            },
+            "Summon": "Invocar",
             "Summoning": "Invocação"
         },
         "CanDefault": "Pode Usar Sem Perícia",
@@ -426,6 +756,56 @@
             "Title": "Atualização Shadowrun5e"
         },
         "Character": {
+            "FIELDS": {
+                "is_critter": {
+                    "hint": "Permite o uso de poderes de criatura",
+                    "label": "É Criatura"
+                },
+                "is_npc": {
+                    "hint": "Marca o ator como NPC para obter recursos adicionais",
+                    "label": "É NPC"
+                },
+                "karma": {
+                    "max": {
+                        "hint": "Quantidade de Carma que este personagem acumulou",
+                        "label": "Carma de Carreira"
+                    },
+                    "value": {
+                        "hint": "Quantidade de Carma disponível para este personagem",
+                        "label": "Carma Atual"
+                    }
+                },
+                "matrix_full_defense_attribute": {
+                    "hint": "Atributo a somar ao realizar uma Ação de Defesa Total na Matriz",
+                    "label": "Atributo de Defesa Total na Matriz"
+                },
+                "metatype": {
+                    "hint": "Metatipo do personagem. Se for um NPC, isto ajustará os atributos",
+                    "label": "Metatipo"
+                },
+                "notoriety": {
+                    "hint": "O lado negativo da reputação do personagem",
+                    "label": "Notoriedade"
+                },
+                "npc": {
+                    "is_grunt": {
+                        "hint": "Aplicar regras de soldado a este ator",
+                        "label": "É Soldado"
+                    }
+                },
+                "nuyen": {
+                    "hint": "Quantidade de Nuyen que este personagem possui",
+                    "label": "Nuyen"
+                },
+                "public_awareness": {
+                    "hint": "O quanto o personagem é conhecido pela mídia, pelas autoridades e pelo público em geral",
+                    "label": "Consciência Pública"
+                },
+                "street_cred": {
+                    "hint": "As realizações de vida do personagem",
+                    "label": "Crédito de Rua"
+                }
+            },
             "Modifiers": {
                 "NPCMetatypeAttribute": "Atributo de Metatipo de NPC"
             },
@@ -433,7 +813,7 @@
                 "Dwarf": "Anão",
                 "Elf": "Elfo",
                 "Human": "Humano",
-                "Ork": "Ork",
+                "Ork": "Orc",
                 "Troll": "Troll"
             }
         },
@@ -442,6 +822,37 @@
         "Collapse": "Recolher",
         "CollapseAll": "Recolher Tudo",
         "CommonProgram": "Programa Comum",
+        "CompendiaSettings": {
+            "ActionsPacksSection": "Compêndios de Ações",
+            "Description": "Estes pacotes serão usados pelo sistema. Você pode substituí-los pelos seus próprios pacotes, mas não deve removê-los.",
+            "GeneralActionsPack": {
+                "hint": "Este compêndio será usado para todas as ações gerais, que dependem apenas de atributos.",
+                "label": "Ações Gerais"
+            },
+            "ICActionsPack": {
+                "hint": "Este compêndio será usado para ações de GELO, filtradas para cada tipo de GELO",
+                "label": "Ações de GELO"
+            },
+            "Label": "Pacotes de Compêndio",
+            "MatrixActionsPack": {
+                "hint": "Este compêndio será usado para todas as ações da Matriz.",
+                "label": "Ações da Matriz"
+            },
+            "SkillGroupsPack": {
+                "hint": "Este compêndio será usado para grupos de perícias.",
+                "label": "Grupos de Perícias"
+            },
+            "SkillSetsPack": {
+                "hint": "Este compêndio será usado para conjuntos de perícias.",
+                "label": "Conjuntos de Perícias"
+            },
+            "SkillsPack": {
+                "hint": "Este compêndio será usado para todas as perícias.",
+                "label": "Perícias"
+            },
+            "SkillsPacksSection": "Compêndios de Perícias",
+            "Title": "Compêndios do sistema"
+        },
         "CompendiumBrowser": {
             "Filters": {
                 "ClearSearch": "Limpar Pesquisa",
@@ -457,39 +868,162 @@
             "Title": "Navegador de Compêndio"
         },
         "Compendiums": {
+            "Folders": {
+                "Root": "Importações SR5e"
+            },
             "sr5critter": "Criaturas & Espíritos & Sprites",
             "sr5drone": "Drones & Veículos",
             "sr5gear": "Armaduras & Equipamentos",
-            "sr5trait": "Qualidades & Poderes",
             "sr5magic": "Magia & Formas Complexas",
+            "sr5misc": "Diversos",
             "sr5modification": "Modificações",
+            "sr5trait": "Qualidades & Poderes",
             "sr5ware": "Biônicos & Cibernéticos",
-            "sr5weapon": "Armas",
-            "Folders": {
-                "Root": "Importações SR5e"
-            }
+            "sr5weapon": "Armas"
         },
         "Compilation": {
             "DropSprite": "Soltar Sprite",
             "FixedSprite": "Prep. Sprite",
             "SpriteType": "Tipo de Sprite"
         },
-        "ComplexForm": "Forma Complexa",
+        "ComplexForm": {
+            "Durations": {
+                "Immediate": "Imediata",
+                "Permanent": "Permanente",
+                "Sustained": "Sustentada"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "Imediata (acontece instantaneamente, sem efeitos duradouros), Sustentada (você pode sustentá-la) ou Permanente (se você a sustentar por seu Nível em Turnos de Combate, seus efeitos permanecem após você parar de sustentá-la).",
+                    "label": "Duração"
+                },
+                "fade": {
+                    "hint": "O Valor de Desgaste é somado ao Nível escolhido ao threading para determinar a quantidade de dano a resistir",
+                    "label": "Desgaste"
+                },
+                "target": {
+                    "hint": "Tipos de alvo válidos para a Forma Complexa",
+                    "label": "Alvo"
+                }
+            }
+        },
         "ComplexForms": "Formas Complexas",
         "Conceal": "Ocultar",
         "ConditionMonitor": "Mon. de Con.",
+        "ConnectToNetwork": "Conectar à Rede",
+        "Connection": "Conexão",
         "Contact": {
             "Blackmail": "Chantagem",
             "Connection": "Conexão",
             "DropActor": "Arraste e solte um ator para vinculá-lo a este contato",
+            "FIELDS": {
+                "blackmail": {
+                    "hint": "Você tem algo que pode ser usado contra o contato para fazê-lo negociar.",
+                    "label": "Chantagem"
+                },
+                "connection": {
+                    "hint": "Mede a influência do contato em uma escala de 1 a 12. Quanto maior o Nível de Conexão, mais poder o contato tem.",
+                    "label": "Conexão"
+                },
+                "family": {
+                    "hint": "Sangue é sempre mais grosso que água; isso vale para ter familiares como contatos.",
+                    "label": "Família"
+                },
+                "group": {
+                    "hint": "O contato é um Grupo; pode ser uma gangue, uma corporação ou alguns nerds",
+                    "label": "Grupo"
+                },
+                "linkedActor": {
+                    "hint": "Ator que este Contato representa",
+                    "label": "Ator"
+                },
+                "loyalty": {
+                    "hint": "Mostra o quanto você pode confiar no contato, medido em uma escala de 1 a 6. Quanto maior o Nível de Lealdade, mais o contato está disposto a fazer por você",
+                    "label": "Lealdade"
+                },
+                "type": {
+                    "hint": "O Tipo de Contato determina que tipo de acesso ele tem a equipamentos, trabalhos, informações etc.",
+                    "label": "Tipo"
+                }
+            },
             "Family": "Família",
             "Group": "Grupo",
             "LinkedActor": "Ator",
             "Loyalty": "Lealdade",
+            "LoyaltyConnectionHelp": "Lealdade / Conexão",
+            "LoyaltyConnectionLabel": "L / C",
             "Type": "Tipo"
         },
+        "ContactType": "Tipo",
         "Contacts": "Contatos",
+        "Content": {
+            "Actions": {
+                "Armor": "Armadura",
+                "BiofeedbackResist": "Resistir a Biofeedback",
+                "BruteForce": "Força Bruta",
+                "ChangeConfiguration": "Alterar Configuração",
+                "ChangeIcon": "Alterar Ícone",
+                "CheckOverwatchScore": "Verificar Pontuação de Vigilância",
+                "Composure": "Compostura",
+                "ControlDevice": "Controlar Dispositivo",
+                "CrackFile": "Quebrar Arquivo",
+                "CrashProgram": "Derrubar Programa",
+                "DataSpike": "Pico de Dados",
+                "DisarmDataBomb": "Desarmar Bomba de Dados",
+                "Drain": "Dreno",
+                "DroneInfiltration": "Infiltração com Drone",
+                "DronePerception": "Percepção com Drone",
+                "DronePilotVehicle": "Pilotar Veículo com Drone",
+                "EditFile": "Editar Arquivo",
+                "EnterexitHost": "Entrar/Sair do Central",
+                "EraseMark": "Apagar Marca",
+                "EraseMatrixSignature": "Apagar Assinatura da Matriz",
+                "Fade": "Desgaste",
+                "FormatDevice": "Formatar Dispositivo",
+                "FullMatrixDefense": "Defesa Total da Matriz",
+                "GridHop": "Salto de Grade",
+                "HackOnTheFly": "Hackear em Tempo Real",
+                "Hide": "Esconder-se",
+                "InviteMark": "Convidar Marca",
+                "JackOut": "Desconectar",
+                "JamSignals": "Bloquear Sinais",
+                "JudgeIntentions": "Avaliar Intenções",
+                "JumpIntoRiggedDevice": "Entrar em Dispositivo com Rig",
+                "LiftCarry": "Levantar e Carregar",
+                "MatrixDamageResist": "Resistir a Dano da Matriz",
+                "MatrixDefenseTest": "Teste de Defesa da Matriz",
+                "MatrixPerception": "Percepção da Matriz",
+                "MatrixSearch": "Busca na Matriz",
+                "Memory": "Memória",
+                "NaturalRecoveryPhysical": "Recuperação Natural Física",
+                "NaturalRecoveryStun": "Recuperação Natural de Atordoamento",
+                "PhysicalDamageResist": "Resistir a Dano Físico",
+                "PhysicalDefense": "Defesa Física",
+                "RebootDevice": "Reiniciar Dispositivo",
+                "SendMessage": "Enviar Mensagem",
+                "SetDataBomb": "Preparar Bomba de Dados",
+                "Snoop": "Espionar",
+                "SpoofCommand": "Falsificar Comando",
+                "SwitchInterfaceMode": "Alternar Modo de Interface",
+                "TraceIcon": "Rastrear GELO"
+            }
+        },
+        "ContextOptions": {
+            "AddAttributeEffect": "Adicionar Efeito para Atributo",
+            "AddSkillEffect": "Adicionar Efeito para Perícia",
+            "DeleteEffect": "Excluir Efeito",
+            "DeleteItem": "Excluir Item",
+            "DeleteSkill": "Excluir Perícia",
+            "EditEffect": "Editar Efeito",
+            "EditItem": "Editar Item",
+            "EditSkill": "Editar Perícia",
+            "MoveItem": "Mover Item",
+            "Source": "Abrir Referência",
+            "View": "Visualizar",
+            "ViewItem": "Visualizar Item"
+        },
         "Continue": "Continuar",
+        "ControlRig": "Rig de Controle",
         "Cost": "Custo",
         "Cover": "Cobertura",
         "Create": "Criar {type}",
@@ -514,6 +1048,28 @@
                 "Special": "Especial",
                 "Sustained": "Sustentado"
             },
+            "FIELDS": {
+                "duration": {
+                    "hint": "Duração do Poder de Criatura",
+                    "label": "Duração"
+                },
+                "karma": {
+                    "hint": "Custo em Karma do Poder de Criatura",
+                    "label": "Karma"
+                },
+                "optional": {
+                    "hint": "Se o Poder de Criatura é Opcional",
+                    "label": "Opcional"
+                },
+                "powerType": {
+                    "hint": "O Tipo do Poder de Criatura",
+                    "label": "Tipo de Poder"
+                },
+                "range": {
+                    "hint": "Alcance do Poder de Criatura",
+                    "label": "Alcance"
+                }
+            },
             "IsOptional": "Opcionalidade",
             "Karma": "Carma",
             "Optional": {
@@ -521,6 +1077,7 @@
                 "EnabledOption": "Opcional, habilitado",
                 "Standard": "Por padrão"
             },
+            "OptionalSelectionCount": "Poderes Opcionais",
             "Range": "Alcance",
             "Ranges": {
                 "LineOfSight": "Linha de Visão",
@@ -533,8 +1090,7 @@
             "Types": {
                 "Mana": "Mana",
                 "Physical": "Físico"
-            },
-            "OptionalSelectionCount": "Poderes Opcionais"
+            }
         },
         "Cyberware": "Cibernético",
         "CyberwareGrade": "Classe",
@@ -561,12 +1117,12 @@
         "DamageValue": "Valor do Dano",
         "DefaultCategoryVisibility": "Mostrar categorias vazias",
         "Defaulting": "Padrão",
-        "Delete": "Excluir",
         "Defender": "Defensor",
         "DefenderNetHits": "Acertos Excedentes do Defensor",
         "Defense": "Defesa",
         "DefenseTest": "Teste de Defesa",
-        "Del": "Del",
+        "Del": "Excl.",
+        "Delete": "Excluir",
         "DeleteAmmo": "Excluir Munição",
         "DeleteConfirmationApplication": {
             "Cancel": "Não",
@@ -583,7 +1139,15 @@
         "Descriptors": "Descritores",
         "Details": "Detalhes",
         "DetectionSpellExtended": "Estendido",
-        "Device": "Dispositivo",
+        "Device": {
+            "FIELDS": {
+                "category": {
+                    "hint": "O tipo de Dispositivo",
+                    "label": "Tipo de Dispositivo"
+                }
+            },
+            "label": "Dispositivo"
+        },
         "DeviceCatCommlink": "Com-link",
         "DeviceCatCyberdeck": "Cyberdeck",
         "DeviceCatRCC": "Console de Comando de Fusor",
@@ -599,12 +1163,13 @@
         },
         "DicePool": "Pilha De Dados",
         "DicePoolModifier": "Mod Pilha De Dados",
-        "DmgTypeMatrix": "Matriz",
-        "DmgTypePhysical": "Físico",
-        "DmgTypeStun": "Atord.",
+        "DirectConnection": "Conexão Direta",
         "DmgCodeMatrix": "M",
         "DmgCodePhysical": "F",
         "DmgCodeStun": "A",
+        "DmgTypeMatrix": "Matriz",
+        "DmgTypePhysical": "Físico",
+        "DmgTypeStun": "Atord.",
         "Dodge": "Esquiva",
         "DontApplyWounds": "Não Aplicar Ferimentos",
         "Drain": "Dreno",
@@ -630,10 +1195,10 @@
             "Cold": "Frio",
             "Electricity": "Elétrico",
             "Fire": "Fogo",
-            "Pollutant": "Pollutant",
+            "Label": "Elemento",
+            "Pollutant": "Poluente",
             "Radiation": "Radiação",
-            "Water": "Water",
-            "Label": "Elemento"
+            "Water": "Água"
         },
         "Emerged": "Emergido",
         "EnforcedMaximum": "Máximo imposto",
@@ -685,19 +1250,25 @@
         "Equipment": "Equipamento",
         "Equipped": "Equipado",
         "Errors": {
-            "CanOnlyAddTechnologyItemsToANetwork": "Apenas itens de tecnologia podem ser adicionados a uma rede.",
+            "CantConnectICToGrid": "Atores IC não podem ser conectados a uma rede de grade",
+            "CantConnectToPAN": "O documento informado não pode ser adicionado à rede PAN",
+            "CantConnectToWAN": "O documento informado não pode ser adicionado à rede WAN",
             "CantEditAppliedItemEffects": "Você não pode editar um efeito ativo que foi aplicado por um item.",
+            "CantExecuteTest": "Você não pode executar este teste. Isso pode estar relacionado ao fato de você ser jogador ou não ter permissões.",
             "DefaultInventoryCantBeRemoved": "O inventário padrão não pode ser removido",
-            "LinkLockedReboot": "Um ator com bloqueio de conexão não pode ser reiniciado",
             "InventoryAlreadyExists": "Um inventário com este nome já existe.",
             "KeyNotModifyableByActiveEffect": "O modo de efeito ativo 'modificar' só pode afetar propriedades de mod.",
+            "LinkLockedReboot": "Um ator com bloqueio de conexão não pode ser reiniciado",
             "MarkCouldNotBePlaced": "Erro Interno: Suas marcas não puderam ser colocadas.",
             "MarksCantBePlacedBy": "O ator ativo não pode colocar marcas.",
             "MarksCantBePlacedOn": "O tipo de ator escolhido não pode receber marcas.",
+            "MarksCantBePlacedWithoutPersona": "O ator escolhido não possui uma persona ativa.",
+            "MasterDeviceIsMissing": "O dispositivo mestre está ausente. Usando os valores do dispositivo local.",
             "MissingSkill": "O ator não possui a pericia solicitada.",
             "NoAvailableActorFound": "Nenhum ator disponível foi encontrado para esta ação",
             "SkillWithoutAttribute": "A pericia não tem um atributo configurado.",
-            "TestExpectsVehicleOnly": "Este teste só pode ser feito com um ator do tipo veículo"
+            "TestExpectsVehicleOnly": "Este teste só pode ser feito com um ator do tipo veículo",
+            "TooManyActionsWithCategory": "Você deve ter exatamente uma ação com a categoria {category} no seu ator"
         },
         "EssenceCost": "Custo de Essência",
         "Expand": "Expandir",
@@ -721,10 +1292,10 @@
             "Actor": "Ator",
             "AdvanceTime": "Avançar o tempo de jogo ao rolar",
             "AdvanceTimeTooltip": "Avança o tempo do mundo pelo intervalo do teste após cada rolagem.",
+            "BaseThreshold": "Limiar base",
             "CanEdit": "Editar",
             "CanRoll": "Rolar",
             "CanView": "Ver",
-            "BaseThreshold": "Limiar base",
             "ConfirmCancel": "Cancelar o teste estendido \"{name}\"? Isso encerra o teste, mas um GM pode reativá-lo depois.",
             "ConfirmDelete": "Excluir o teste estendido \"{name}\"?",
             "CreateTest": "Novo Teste Estendido",
@@ -733,13 +1304,13 @@
             "CumulativeModifierTooltip": "Reduz a pilha de dados em 1 a cada rolagem realizada. SR5 p. 48.",
             "CumulativeRollCount": "Rolagens anteriores",
             "Due": "Vencimento",
-            "DueTooltip": "Intervalos de tempo de jogo decorridos desde a última rolagem",
             "DueMessage": {
                 "Header": "Teste estendido pronto para continuar",
                 "OpenManager": "Abrir gerenciador",
                 "Overdue": "{count} intervalos decorridos",
                 "Rolls": "Rolagens"
             },
+            "DueTooltip": "Intervalos de tempo de jogo decorridos desde a última rolagem",
             "EditTest": "Editar Teste Estendido",
             "Filters": {
                 "Actor": "Ator",
@@ -844,6 +1415,7 @@
         "Force": "Força",
         "FullDefense": "Defesa Total",
         "FullDefenseAttribute": "Atributo de Defesa Total",
+        "FullMatrixDefense": "Defesa Total da Matriz",
         "GMRequest": {
             "General": "Seu/Sua GM quer que você faça um",
             "RollAttribute": "Teste de Atributo",
@@ -852,11 +1424,22 @@
             "Threshold": " com um limite de "
         },
         "Gear": "Equipamento",
+        "General": "Geral",
         "Glitch": "Falha!",
         "GlitchCritical": "Falha Crítica!",
         "Glitches": "Falhas:",
         "GoodCover": "Bom Cobert",
+        "Grid": {
+            "FIELDS": {
+                "category": {
+                    "hint": "Grades Públicas aplicam um modificador negativo enquanto conectado; Grades Locais e Globais não têm modificadores",
+                    "label": "Tipo de Grade"
+                }
+            }
+        },
+        "Grids": "Grades",
         "HackingProgram": "Programa Hacker",
+        "HardenedArmor": "Armadura Endurecida",
         "Help": "Ajuda",
         "Hits": "Acertos",
         "HitsBought": "Acertos Comprados",
@@ -868,8 +1451,23 @@
             "MissingIC": "GELO Faltando",
             "Rating": "Nível do Central"
         },
+        "Hosts": "Centrais",
         "HotSim": "Hot Sim",
         "IC": {
+            "FIELDS": {
+                "host": {
+                    "hint": "Em qual Central este GELO está rodando",
+                    "label": "Central",
+                    "rating": {
+                        "hint": "Nível do Central em que estamos rodando",
+                        "label": "Nível"
+                    }
+                },
+                "icType": {
+                    "hint": "Tipo de GELO",
+                    "label": "Tipo de GELO"
+                }
+            },
             "MissingHost": "Arraste e solte um item central",
             "Type": "Tipo",
             "Types": {
@@ -902,15 +1500,18 @@
                 "Title": "Importador de Ator"
             },
             "BulkImporter": {
-                "Title": "Importador em Massa",
                 "Mode": "Modo de importação:",
-                "TranslationLanguage": "Idioma da tradução:",
                 "Modes": {
                     "Add": "Adicionar itens ausentes",
-                    "Update": "Atualizar itens (manter descrição)",
+                    "Clean": "Limpar e importar novamente",
                     "Replace": "Substituir itens",
-                    "Clean": "Limpar e importar novamente"
-                }
+                    "Update": "Atualizar itens (manter descrição)"
+                },
+                "Title": "Importador em Massa",
+                "TranslationLanguage": "Idioma da tradução:"
+            },
+            "ImporterSourcesConfig": {
+                "Title": "Configuração das Fontes do Importador"
             },
             "Spirit": {
                 "SpiritTypeNotFound": "O tipo de espírito não foi encontrado. Por favor, abra uma questão no github com seu json de exportação chummer."
@@ -937,6 +1538,13 @@
         "Initiative": "Iniciativa",
         "InitiativeMod": "Modificador de Iniciativa",
         "Internal": "Interno",
+        "Intervene": "Intervir",
+        "InventoryRename": {
+            "Cancel": "Cancelar",
+            "NewName": "Novo Nome",
+            "Submit": "Enviar",
+            "Title": "Renomear Inventário"
+        },
         "IsCritter": "Criatura",
         "IsFreshImport": "Este item foi importado do Chummer e precisa de revisão manual.",
         "IsGrunt": "Soldado",
@@ -1114,6 +1722,44 @@
                         "label": "Tipo de Ação"
                     }
                 },
+                "ammo": {
+                    "clip_type": {
+                        "hint": "O tipo de mecanismo de recarga que a arma usa",
+                        "label": "Tipo de Recarga da Arma"
+                    },
+                    "spare_clips": {
+                        "max": {
+                            "hint": "O número máximo de Pentes Reserva que o ator mantém para esta Arma",
+                            "label": "Máximo de Recargas Reserva"
+                        },
+                        "value": {
+                            "hint": "O número de Pentes Reserva que o ator ainda tem",
+                            "label": "Recargas Reserva Atuais"
+                        }
+                    }
+                },
+                "capacity": {
+                    "hint": "Capacidade do Ciberware/Biônico",
+                    "label": "Capacidade"
+                },
+                "description": {
+                    "base": {
+                        "hint": "Descrição do Item",
+                        "label": "Descrição"
+                    },
+                    "source": {
+                        "hint": "Fonte do Item, pode ser uma página de PDF, URL ou Diário",
+                        "label": "Fonte"
+                    }
+                },
+                "essence": {
+                    "hint": "Custo de Essência do Ciberware/Biônico",
+                    "label": "Essência"
+                },
+                "grade": {
+                    "hint": "Grau do Ciberware/Biônico",
+                    "label": "Grau"
+                },
                 "technology": {
                     "availability": {
                         "hint": "O atributo de Disponibilidade do item, que determina o quão fácil é consegui-lo",
@@ -1181,7 +1827,10 @@
             "Device": "Dispositivo",
             "Echo": "Eco",
             "Equipment": "Equipamento",
+            "Gear": "Equipamento",
+            "Grid": "Grade",
             "Host": "Central",
+            "License": "Licença",
             "Lifestyle": "Estilo de Vida",
             "Metamagic": "Metamagia",
             "Modification": "Modificação",
@@ -1195,7 +1844,26 @@
             "Weapon": "Arma"
         },
         "Karma": "Carma",
+        "KarmaManager": {
+            "Cancel": "Cancelar",
+            "CareerKarma": "Quantidade de Carma de Carreira que o Personagem acumulou",
+            "CurrentKarma": "Quantidade de Carma que o Personagem possui atualmente",
+            "FinalCareerKarma": "Carma de Carreira que o Personagem terá ao enviar",
+            "FinalCurrentKarma": "Carma que este Personagem terá ao enviar",
+            "FinalKarma": "Carma Final",
+            "StartingKarma": "Carma Inicial",
+            "Submit": "Enviar",
+            "Title": "Gerenciador de Carma"
+        },
         "Keybinding": {
+            "AddRemoveManyQty": {
+                "Hint": "Adicionar/Remover 20 unidades por vez",
+                "Label": "Adicionar/Remover 20"
+            },
+            "AddRemoveSomeQty": {
+                "Hint": "Adicionar/Remover 5 unidades por vez",
+                "Label": "Adicionar/Remover 5"
+            },
             "HideTestDialog": {
                 "Hint": "Pular diálogo ao rolar testes de qualquer botão",
                 "Label": "Ocultar Diálogo de Teste"
@@ -1211,6 +1879,10 @@
             "ShowSituationModifiers": {
                 "Hint": "Abrir modificadores de situação para seleção",
                 "Label": "Modificadores de Situação"
+            },
+            "SuccessTestPrompt": {
+                "Hint": "Abrir o diálogo para fazer um teste de sucesso padrão",
+                "Label": "Abrir Teste de Sucesso"
             }
         },
         "KnockedDown": "Derrubado",
@@ -1223,35 +1895,68 @@
                 "ActiveTest": "Teste",
                 "Category": "Categoria",
                 "DamageResistanceTest": "Teste de Resistência a Dano",
+                "ForceReboot": "Reinicialização Forçada",
+                "MatrixAction": "Ação de Matriz",
                 "Modifier": "Modificador",
                 "Modifiers": "Modificadores",
                 "OpposedTest": "Teste de Oposição",
                 "SpiritType": "Tipo de Espírito",
                 "SpriteType": "Tipo de Sprite"
             },
+            "Actions": {
+                "BruteForce": "Força Bruta",
+                "HackontheFly": "Hackear na Hora"
+            },
             "ActorSheet": {
+                "AddNetwork": "Rede de Conexão Direta",
+                "AddOneMark": "Adicionar Uma Marca",
+                "ColdSim": "Cold Sim",
+                "Compilations": "Compilações",
                 "ConnectToDriver": "Conectar ao piloto",
+                "ConnectedTo": "Conectado a",
                 "CreateInventory": "Criar local de inventário",
                 "CritterPowers": "Poderes de Criatura",
                 "DeviceRating": "Nível do Dispositivo",
+                "DeviceSetup": "Configuração do Dispositivo",
                 "DisabledOptionCritterPowers": "Poderes de Criatura Opcionais - Desativado",
                 "DisabledOptionSpritePowers": "Poderes de Sprite Opcionais - Desativado",
+                "DisplayingPersona": "Exibindo Persona",
                 "EnabledOptionCritterPowers": "Poderes de Criatura Opcionais - Ativado",
                 "EnabledOptionSpritePowers": "Poderes de Sprite Opcionais - Ativado",
+                "Hacking": "Hackear",
                 "ICConfiguration": "Configuração de GELO",
+                "Icons": "Ícones",
+                "ManageNetwork": "Gerenciar Rede",
+                "MarkNetwork": "Marcar Rede",
+                "MarkedIcons": "Ícones Marcados",
                 "Matrix": "Matriz",
+                "MatrixActions": "Ações da Matriz",
+                "Network": "Rede",
+                "Networks": "Redes",
+                "NoNetwork": "Sem Rede",
+                "NotorietyShort": "N",
+                "Offline": "Offline",
+                "OpenSourceDocument": "Fonte Aberta",
+                "OwnedIcons": "Ícones Possuídos",
+                "Persona": "Persona",
                 "PersonalInventory": "Pessoal",
+                "PhysicalTrack": "Monitor Físico",
                 "Preparations": "Preparados",
+                "PublicAwarenessShort": "CP",
+                "RemoveOneMark": "Remover Uma Marca",
                 "ResetActorForNewRun": "Resetar Ator para Nova Corrida",
                 "Rituals": "Rituais",
                 "RollDroneInfiltration": "Infiltração de Drone",
                 "RollDronePerception": "Percepção de Drone",
                 "RollPilotVehicleTest": "Pilotar Veículo",
                 "SetMonitor": "Monitor deve ser configurado manualmente.",
+                "SetupPAN": "Adicionar Dispositivos à RAP",
                 "Spells": "Feitiços",
                 "SpiritConfiguration": "Configuração de Espírito",
                 "SpriteConfiguration": "Configuração de Sprite",
                 "SpritePowers": "Poderes de Sprite",
+                "StreetCredShort": "CR",
+                "StunTrack": "Monitor de Atordoamento",
                 "TestKBoardModifiers": "{skip}: pular diálogo. {descr}: mostrar apenas descrição.",
                 "VehicleConfiguration": "Configuração de Veículo"
             },
@@ -1261,11 +1966,32 @@
                 "OpenInventory": "Inventário"
             },
             "Item": {
+                "AvailabilityAdjustment": "Escalar Disponibilidade com Nível",
+                "CostAdjustment": "Escalar Custo com Nível",
+                "EssenceAdjustment": "Escalar Essência com Nível",
                 "Network": "Rede",
                 "Properties": "Propriedades do item"
             },
+            "MarkPlacement": {
+                "PlaceOnDevice": "Colocar no dispositivo",
+                "PlaceOnMainIcon": "Colocar na persona/host"
+            },
+            "Matrix": {
+                "AttackShort": "A",
+                "DataProcessingShort": "P",
+                "FirewallShort": "F",
+                "Global": "Global",
+                "Local": "Local",
+                "Public": "Pública",
+                "SleazeShort": "S",
+                "TargetDevice": "Dispositivo Alvo",
+                "TargetMainIcon": "Ícone Principal Alvo"
+            },
             "Message": {
                 "ClickToSelect": "Clique para selecionar na cena",
+                "FailedAttackAction": "Falhou em uma Ação de Ataque na Matriz",
+                "OverwatchConvergence": "Convergência de Vigilância",
+                "TargetedIcon": "Ícone Alvo",
                 "TestEffects": "Efeitos aplicados"
             },
             "Sheet": {
@@ -1273,10 +1999,14 @@
                 "ClearNetwork": "Limpar rede de todos os dispositivos",
                 "ItemEffects": "Efeitos do Item",
                 "MissingNetworkDevices": "Arraste e solte um dispositivo para adicioná-lo",
-                "RemoveImprovisedDevices": "Remover dispositivos improvisados",
                 "NetworkDevices": "Dispositivos em Rede",
+                "NotVisible": "Não Visível",
                 "PAN": "RAP",
+                "RebootDevice": "Reiniciar",
+                "RemoveImprovisedDevices": "Remover dispositivos improvisados",
                 "SubtractOne": "Subtrair Um",
+                "Type": "Tipo",
+                "Visible": "Visível",
                 "WAN": "RAA"
             },
             "Sidebar": {
@@ -1286,12 +2016,43 @@
             }
         },
         "Languages": "Idiomas",
-        "Intervene": "Intervir",
         "LastRoll": "Última Rolagem Solicitada",
         "Level": "Nível",
         "License": "Licença",
         "Licenses": "Licenças",
-        "Lifestyle": "Estilo de Vida",
+        "Lifestyle": {
+            "FIELDS": {
+                "comforts": {
+                    "hint": "Nível de conforto do Estilo de Vida",
+                    "label": "Conforto"
+                },
+                "cost": {
+                    "hint": "Custo do Estilo de Vida por mês",
+                    "label": "Custo do Estilo de Vida"
+                },
+                "guests": {
+                    "hint": "Convidados que ficam no mesmo Estilo de Vida",
+                    "label": "Convidados"
+                },
+                "neighborhood": {
+                    "hint": "Nível de vizinhança do Estilo de Vida",
+                    "label": "Vizinhança"
+                },
+                "permanent": {
+                    "hint": "Se este Estilo de Vida é Permanente",
+                    "label": "Permanente"
+                },
+                "security": {
+                    "hint": "Nível de segurança do Estilo de Vida",
+                    "label": "Segurança"
+                },
+                "type": {
+                    "hint": "Tipo de Estilo de Vida",
+                    "label": "Tipo de Estilo de Vida"
+                }
+            },
+            "label": "Estilo de Vida"
+        },
         "LifestyleComforts": "Confortos",
         "LifestyleGuests": "Convidados",
         "LifestyleHigh": "Alto",
@@ -1313,6 +2074,7 @@
         "LivingPersona": "Persona Viva",
         "Load": "Carregar",
         "Loaded": "Carregado",
+        "Loyalty": "Lealdade",
         "MIGRATION": {
             "BeginMigration": "Iniciar Migração",
             "BeginNotification": "Iniciando migração do sistema Shadowrun da versão",
@@ -1343,12 +2105,26 @@
         "MatrixAttrDataProc": "Datagrama",
         "MatrixAttrFirewall": "Firewall",
         "MatrixAttrSleaze": "Subversão",
+        "MatrixDefense": "Defesa da Matriz",
+        "MatrixFullDefenseAttribute": "Atributo de Defesa Total da Matriz",
+        "MatrixNetworkHackingApplication": {
+            "Icons": "Ícones",
+            "Invite": "Pedir convite",
+            "Title": "Conectar à Rede"
+        },
         "MatrixOpposedDeviceDialog": {
             "Title": "Criar Dispositivo de Matriz"
         },
         "MatrixTarget": "Alvo da Matriz",
         "MeleeWeaponAttack": "Ataque com Arma Corpo-a-corpo",
         "MentalLimit": "Limite Mental",
+        "Messages": {
+            "MarkInvitation": {
+                "AcceptInvite": "Aceitar",
+                "AskForInvite": "Pede um convite de marca para:",
+                "InviteAccepted": "Sinta-se à vontade para entrar em {networkName}, {userName}!"
+            }
+        },
         "Metamagic": "Metamagia",
         "Metamagics": "Metamagias",
         "Metatype": "Metatipo",
@@ -1366,7 +2142,7 @@
                 "Warning": "ATENÇÃO!"
             }
         },
-        "Miscellaneous": "Misc",
+        "Miscellaneous": "Diversos",
         "MissingItemForOpposedTest": "O teste de oposição não pode ser rolado devido ao item de atuação agora estar ausente",
         "MissingRessource": {
             "Ammo": "Munição insuficiente para atirar",
@@ -1375,9 +2151,43 @@
             "SomeAmmo": "Munição insuficiente para disparar no modo selecionado, os modificadores de modo serão reduzidos.",
             "SomeAmmoMelee": "Não há munição suficiente para fazer um ataque corpo a corpo"
         },
-        "ModifyRoll": "Modificar Rolagem",
         "ModPoints": "Pontos de Mod",
-        "Modification": "Modificação",
+        "Modification": {
+            "FIELDS": {
+                "accuracy": {
+                    "hint": "Modificador de Precisão/Limite a aplicar",
+                    "label": "Precisão"
+                },
+                "conceal": {
+                    "hint": "Modificador de Ocultação a aplicar",
+                    "label": "Ocultação"
+                },
+                "dice_pool": {
+                    "hint": "Modificador de Reserva de Dados a aplicar",
+                    "label": "Reserva de Dados"
+                },
+                "modification_category": {
+                    "hint": "Categoria à qual esta Modificação pertence",
+                    "label": "Categoria de Modificação"
+                },
+                "mount_point": {
+                    "hint": "Ponto de Montagem na arma onde isto é acoplado",
+                    "label": "Ponto de Montagem"
+                },
+                "rc": {
+                    "hint": "Modificador de Compensação de Recuo a aplicar",
+                    "label": "Compensação de Recuo"
+                },
+                "slots": {
+                    "hint": "Número de Espaços (Veículos) ou Pontos (Drones) que isto ocupa",
+                    "label": "Espaços"
+                },
+                "type": {
+                    "hint": "Tipo de Modificação",
+                    "label": "Tipo de Modificação"
+                }
+            }
+        },
         "ModificationCategories": "Categorias de Modificação",
         "ModificationCategory": "Categoria de Modificação",
         "ModificationSlots": "Espaços de Modificação",
@@ -1397,6 +2207,7 @@
             "AstralLimit": "Limite Astral",
             "BackgroundCount": "Contagem de Antecedentes",
             "Composure": "Compostura",
+            "ControlRigRating": "Nível do Rig de Controle",
             "Defense": "Defesa",
             "DefenseBlock": "Defesa (Bloqueio)",
             "DefenseDodge": "Defesa (Esquiva)",
@@ -1404,6 +2215,7 @@
             "DefenseMulti": "Defesa (Multi)",
             "DefenseParry": "Defesa (Aparar)",
             "DefenseRanged": "Defesa (Distância)",
+            "DifferentGrid": "Grade Diferente",
             "Drain": "Dreno",
             "Environmental": "Ambiental",
             "EnvironmentalLight": "Ambiental (Luz)",
@@ -1415,6 +2227,8 @@
             "Global": "Global",
             "JudgeIntentions": "J. Intenções",
             "LiftCarry": "Erg/Carreg",
+            "MarkDamage": "Dano por Marca",
+            "Marks": "Marcas",
             "MatrixDice": "Dados de Inic. da Matriz",
             "MatrixInit": "Inic. da Matriz",
             "MatrixTrack": "Monitor da Matriz",
@@ -1428,16 +2242,20 @@
             "PhysicalLimit": "Limite Físico",
             "PhysicalOverflowTrack": "Monitor de Excesso de Dano",
             "PhysicalTrack": "Monitor Físico",
+            "PublicGrid": "Grade Pública",
             "Reach": "Alcance",
             "Recoil": "Recuo",
             "Run": "Correr",
             "Soak": "Absorver Dano",
             "SocialLimit": "Limite Social",
             "StunTrack": "Monitor de Atordoamento",
+            "ThreeMarks": "Três Marcas",
+            "TwoMarks": "Duas Marcas",
             "Walk": "Caminhar",
             "WoundTolerance": "Tolerância à Ferida",
             "Wounds": "Feridas"
         },
+        "ModifyRoll": "Modificar Rolagem",
         "MountPoint": "Ponto de Montagem",
         "MoveInventoryDialog": {
             "Cancel": "Cancelar",
@@ -1453,7 +2271,20 @@
         "Mundane": "Mundano",
         "Name": "Nome",
         "NetHits": "Acertos Excedentes",
+        "Network": "Rede",
+        "NetworkManager": {
+            "AvailableNetworks": "Redes Disponíveis",
+            "BruteForce": "Força Bruta",
+            "ConnectedTo": "Conectado a",
+            "HackOnTheFly": "Hackear em Tempo Real",
+            "InviteMark": "Pedir para Convidar uma Marca",
+            "NetworkType": "Tipo",
+            "NoNetwork": "Não Conectado",
+            "Title": "Gerenciador de Rede"
+        },
+        "Networks": "Redes",
         "New": "Novo",
+        "NewSpecialization": "Nova Especialização",
         "NoCover": "Sem Cobertura",
         "NoSelectableToken": "O ator não tem token selecionável na cena",
         "None": "Nenhum",
@@ -1461,8 +2292,29 @@
         "NormalSkillButton": "Normal",
         "NormalSpellButton": "Normal",
         "NotExtended": "Não estendido",
+        "Notifications": {
+            "AddDevicesToPAN": {
+                "Adding": "Adicionando",
+                "FinishedAddingItems": "Adição de dispositivos à PAN concluída. Feche e reabra as fichas de itens cujas conexões mudaram.",
+                "Starting": "Iniciando a adição de dispositivos equipados à PAN"
+            },
+            "DeletingStorageReferences": {
+                "Finished": "Referências removidas",
+                "Item": "Removendo referências ao item",
+                "Start": "Excluindo referências de Rede e Marca"
+            },
+            "VehicleCannotBeOwnDriver": "Um veículo não pode ser o Condutor de si mesmo (para isso existe o Piloto)"
+        },
         "Notoriety": "Notoriedade",
         "Nuyen": "Nuyen",
+        "NuyenManager": {
+            "Cancel": "Cancelar",
+            "CurrentNuyen": "Quantidade de Nuyen que o personagem possui atualmente",
+            "FinalNuyen": "Quantidade final de Nuyen ao enviar",
+            "Submit": "Enviar",
+            "Title": "Gerenciador de Nuyen"
+        },
+        "OpenNetworkManager": "Abrir Gerenciador de Rede",
         "OpenOrigin": "Abrir item",
         "OpenSource": "Abrir fonte do item como pdfpager pdf ou site",
         "OpposedType": "Tipo",
@@ -1484,14 +2336,15 @@
             "ResetScore": "Redefinir Valor de Vigilância"
         },
         "OverwatchScoreTrackerTitle": "Monitor de Bebê do Sr. Johnson",
+        "Owner": "Proprietário",
         "PP": "PP",
         "Parry": "Aparar",
         "PartialCover": "Cobert Parcial",
         "Passive": "Passivo",
+        "Personas": "Personas",
         "PhysicalLimit": "Limite Físico",
         "PhysicalOverflowTrack": "Monitor de Excesso de Dano",
         "PhysicalTrack": "Monitor Físico",
-        "PlaceMarks": "Colocar Marcas",
         "PlaceTemplate": "Colocar Modelo",
         "PlusFifteenMinutes": "+15min",
         "PowerLevel": "Nível",
@@ -1567,13 +2420,38 @@
                 "Roll": "Rolar Preparado"
             }
         },
-        "Program": "Programa",
+        "Program": {
+            "FIELDS": {
+                "type": {
+                    "hint": "Tipo de Programa, apenas para organização visual",
+                    "label": "Tipo de Programa"
+                }
+            },
+            "label": "Programa"
+        },
         "ProgramType": "Tipo",
         "Programs": "Programas",
         "PublicAwareness": "Consciência Pública",
+        "PublicGrid": "Grade Pública",
         "PushTheLimit": "Forçar o Limite",
         "Qty": "Qtd",
-        "Quality": "Qualidade",
+        "Quality": {
+            "FIELDS": {
+                "karma": {
+                    "hint": "Quantidade de Carma que esta Qualidade vale",
+                    "label": "Carma"
+                },
+                "rating": {
+                    "hint": "Nível desta Qualidade",
+                    "label": "Nível"
+                },
+                "type": {
+                    "hint": "O Tipo de Qualidade que isto representa (Positiva/Negativa/Módulo de Vida)",
+                    "label": "Tipo de Qualidade"
+                }
+            },
+            "label": "Qualidade"
+        },
         "QualityType": "Tipo",
         "QualityTypeLifeModule": "Módulo de Vida",
         "QualityTypeNegative": "Negativa",
@@ -1588,19 +2466,41 @@
         "Rating": "Nível",
         "Reach": "Alcance",
         "Reagent": "Reagentes",
+        "RebootConfirmationDialog": {
+            "Cancel": "Cancelar",
+            "Confirm": "Reiniciar",
+            "Description": "Tem certeza de que deseja reiniciar este dispositivo?",
+            "Title": "Confirmar Reinicialização"
+        },
         "RecklessSpellButton": "Imprudente",
         "Recoil": "Recuo",
         "RecoilCompensation": "CR",
+        "Refresh": "Atualizar",
         "RemoveBonus": "Remover Bônus",
         "RemoveSpecialization": "Remover Especialização",
+        "ReputationManager": {
+            "Cancel": "Cancelar",
+            "Submit": "Enviar",
+            "Title": "Gerenciador de Reputação"
+        },
         "Resist": "Resistir",
         "RestoreDefaultSkills": "Restaurar Perícias Padrão",
+        "ResultOverride": "Substituição de Resultado",
         "ResultOverrideGlitches": "Falhas",
         "ResultOverrideHits": "Acertos",
-        "ResultOverride": "Substituição de Resultado",
         "RightClickToClear": "Botão Direito para Limpar",
         "Ritual": {
             "Anchored": "Ancorado",
+            "FIELDS": {
+                "descriptors": {
+                    "hint": "Descritores do Ritual",
+                    "label": "Descritores"
+                },
+                "type": {
+                    "hint": "Tipo de Ritual a ser executado",
+                    "label": "Tipo de Ritual"
+                }
+            },
             "MaterialLink": "Vínculo material",
             "Minion": "Servo",
             "Spell": "Feitiço",
@@ -1624,14 +2524,38 @@
         "RtgAboveZero": "Nvl > 0",
         "Run": "Correr",
         "RunningSilent": "Silenciosamente",
+        "RunningSilentControlledByDevice": "Operar Silenciosamente é controlado pelo seu Dispositivo de Matriz ativo:",
         "RunningSpeed": "Correndo",
         "SIN": "SIN",
+        "SameGrid": "Mesma Grade",
+        "Scatter": {
+            "Direction": "Direção",
+            "Distance": "Distância",
+            "Grenade": "Dispersão de granada",
+            "RolledDistance": "Distância rolada",
+            "Rolls": "Rolagens de dispersão",
+            "Spell": "Dispersão de feitiço de combate indireto",
+            "Title": "Dispersão"
+        },
         "SecondAttribute": "Segundo Atributo",
         "SecondChance": "Segunda Chance",
+        "SelectMatrixNetworkDialog": {
+            "Cancel": "Cancelar",
+            "Connect": "Conectar",
+            "Title": "Selecione uma Rede"
+        },
         "SelectTokenMessage": "Você deve selecionar um token primeiro",
         "SelectedTargets": "Alvos Selecionados",
         "SheetActor": "Ficha de ator",
         "SheetItem": "Ficha de item",
+        "Shotgun": {
+            "Choke": {
+                "Medium": "Médio",
+                "Narrow": "Estreito",
+                "Wide": "Amplo"
+            },
+            "Label": "Choke da espingarda"
+        },
         "Side": "Lado",
         "SituationalModifier": "Modificador Situacional",
         "SituationalModifiersApplication": {
@@ -1668,6 +2592,11 @@
             "Binding": "Vinculação",
             "Biotechnology": "Bioengenharia",
             "Blades": "Lâminas",
+            "Category": {
+                "Active": "Ativa",
+                "Knowledge": "Conhecimento",
+                "Language": "Idioma"
+            },
             "Chemistry": "Química",
             "Clubs": "Bastões",
             "Compiling": "Compilar",
@@ -1686,6 +2615,102 @@
             "Etiquette": "Etiqueta",
             "ExoticMeleeWeapon": "Arma Corpo a Corpo Exótica",
             "ExoticRangedWeapon": "Arma a Distância Exótica",
+            "FIELDS": {
+                "group": {
+                    "hint": "Configuração para um grupo de perícias",
+                    "label": "Grupo de Perícias",
+                    "rating": {
+                        "hint": "Nível deste grupo de perícias",
+                        "label": "Nível"
+                    },
+                    "skills": {
+                        "hint": "Perícias que fazem parte deste grupo",
+                        "label": "Perícias"
+                    }
+                },
+                "set": {
+                    "default": {
+                        "hint": "Adicionar este conjunto de perícias a atores recém-criados",
+                        "label": "Usar em Novos Atores"
+                    },
+                    "groups": {
+                        "hint": "Grupos de perícias que fazem parte deste conjunto",
+                        "label": "Grupos de Perícias",
+                        "name": {
+                            "hint": "Nome do grupo de perícias",
+                            "label": "Nome"
+                        },
+                        "rating": {
+                            "hint": "Nível deste grupo de perícias",
+                            "label": "Nível"
+                        }
+                    },
+                    "hint": "Configuração para um conjunto de perícias",
+                    "label": "Conjunto de Perícias",
+                    "skills": {
+                        "hint": "Perícias que fazem parte deste conjunto",
+                        "label": "Perícias",
+                        "name": {
+                            "hint": "Nome da perícia",
+                            "label": "Nome"
+                        },
+                        "rating": {
+                            "hint": "Nível desta perícia",
+                            "label": "Nível"
+                        },
+                        "specializations": {
+                            "hint": "Especializações concedidas a esta perícia quando o conjunto é aplicado",
+                            "label": "Especialização"
+                        }
+                    }
+                },
+                "skill": {
+                    "attribute": {
+                        "hint": "Atributo usado por esta perícia",
+                        "label": "Atributo"
+                    },
+                    "category": {
+                        "hint": "Categoria desta perícia",
+                        "label": "Categoria"
+                    },
+                    "defaulting": {
+                        "hint": "Se esta perícia pode ser usada por padrão",
+                        "label": "Uso por Padrão"
+                    },
+                    "knowledgeType": {
+                        "hint": "Tipo de perícia de conhecimento",
+                        "label": "Tipo de Conhecimento"
+                    },
+                    "language": {
+                        "isNative": {
+                            "hint": "Marca este idioma como nativo",
+                            "label": "Nativo"
+                        }
+                    },
+                    "limit": {
+                        "attribute": {
+                            "hint": "Limite a usar nesta ação de perícia. Deixe vazio para usar o limite padrão do atributo.",
+                            "label": "Limite"
+                        }
+                    },
+                    "rating": {
+                        "hint": "Nível desta entrada",
+                        "label": "Nível"
+                    },
+                    "requirement": {
+                        "hint": "O que o ator precisa ser para que esta perícia esteja disponível",
+                        "label": "Requisito"
+                    },
+                    "specializations": {
+                        "hint": "Especialização desta perícia, se houver",
+                        "label": "Especialização"
+                    }
+                },
+                "type": {
+                    "hint": "Define quais configurações de perícia estão disponíveis",
+                    "label": "Tipo"
+                }
+            },
             "FirstAid": "Primeiros Socorros",
             "Flight": "Voo",
             "Forgery": "Falsificação",
@@ -1699,16 +2724,23 @@
             "IndustrialMechanic": "Mecânica Industrial",
             "Instruction": "Instrução",
             "Intimidation": "Intimidação",
+            "KnowledgeType": {
+                "Academic": "Acadêmico",
+                "Interests": "Interesses",
+                "Professional": "Profissional",
+                "Street": "Rua"
+            },
             "Leadership": "Liderança",
             "Locksmith": "Chaveiro",
             "Longarms": "Armas de Cano Longo",
             "Medicine": "Medicina",
+            "Native": "Nativo",
             "NauticalMechanic": "Mecânica Náutica",
             "Navigation": "Navegação",
             "Negotiation": "Negociação",
             "Palming": "Empalmar",
             "Perception": "Percepção",
-            "Performance": "Performance",
+            "Performance": "Atuação",
             "PilotAerospace": "Pilotar Espaçonaves",
             "PilotAircraft": "Pilotar Aeronaves",
             "PilotExoticVehicle": "Pilotar Veículos Exóticos",
@@ -1719,7 +2751,12 @@
             "Registering": "Registrar",
             "RitualSpellcasting": "Conjuração Ritual",
             "Running": "Corrida",
+            "Set": {
+                "DifferencesLoggedInConsole": "Abra o console do navegador para ver as diferenças",
+                "LogActorDifferences": "Registrar Diferenças do Ator"
+            },
             "Skill": "Perícia",
+            "SkillGroup": "Grupo de Perícias",
             "Skills": "Perícias",
             "Sneaking": "Esgueirar",
             "Software": "Software",
@@ -1735,7 +2772,15 @@
             },
             "ThrowingWeapons": "Armas de Arremesso",
             "Tracking": "Rastreamento",
-            "UnarmedCombat": "Combate Desarmado"
+            "Types": {
+                "Group": "Grupo de Perícias",
+                "Set": "Conjunto de Perícias",
+                "Skill": "Perícia"
+            },
+            "UnarmedCombat": "Combate Desarmado",
+            "abbr": {
+                "Native": "N"
+            }
         },
         "Soak": "Resistir Dano",
         "SoakTest": "Teste de Resistência a Danos",
@@ -1756,6 +2801,7 @@
             "CatHealth": "Saúde",
             "CatIllusion": "Ilusão",
             "CatManipulation": "Manipulação",
+            "CatRitual": "Ritual",
             "Category": "Categoria",
             "CombatDirect": "Direto",
             "CombatIndirect": "Indireto",
@@ -1766,6 +2812,86 @@
             "DetectionDirectional": "Direcional",
             "DetectionPsychic": "Psíquico",
             "Elemental": "Elemental",
+            "FIELDS": {
+                "alchemical": {
+                    "hint": "Este feitiço foi aprendido como fórmula alquímica e pode ser transformado em preparação.",
+                    "label": "Alquímico"
+                },
+                "category": {
+                    "hint": "Categoria à qual o feitiço pertence",
+                    "label": "Categoria"
+                },
+                "combat": {
+                    "type": {
+                        "hint": "Se o feitiço é Direto ou Indireto",
+                        "label": "Tipo de Feitiço de Combate"
+                    }
+                },
+                "detection": {
+                    "extended": {
+                        "hint": "Se o feitiço é Estendido",
+                        "label": "Estendido"
+                    },
+                    "passive": {
+                        "hint": "Se o feitiço é Passivo",
+                        "label": "Passivo"
+                    },
+                    "type": {
+                        "hint": "Como o feitiço afeta os alvos",
+                        "label": "Tipo de Feitiço de Detecção"
+                    }
+                },
+                "drain": {
+                    "hint": "Valor de Dreno do feitiço; ele é somado à Força do feitiço para resistir ao Dreno",
+                    "label": "Valor de Dreno"
+                },
+                "duration": {
+                    "hint": "Duração do feitiço",
+                    "label": "Duração"
+                },
+                "illusion": {
+                    "sense": {
+                        "hint": "O sentido que o feitiço afeta",
+                        "label": "Sentido"
+                    },
+                    "type": {
+                        "hint": "Tipo de feitiço de Ilusão",
+                        "label": "Tipo de Feitiço de Ilusão"
+                    }
+                },
+                "manipulation": {
+                    "damaging": {
+                        "hint": "Se o feitiço causa Dano",
+                        "label": "Danoso"
+                    },
+                    "environmental": {
+                        "hint": "Estes feitiços não têm um alvo específico nem afetam alvos diretamente. Eles apenas afetam uma área.",
+                        "label": "Ambiental"
+                    },
+                    "mental": {
+                        "hint": "Se o feitiço afeta os alvos mentalmente",
+                        "label": "Mental"
+                    },
+                    "physical": {
+                        "hint": "Estes feitiços afetam formas físicas e normalmente são resistidos por Defesa",
+                        "label": "Físico"
+                    }
+                },
+                "range": {
+                    "hint": "Alcance do feitiço",
+                    "label": "Alcance"
+                },
+                "ritual": {
+                    "type": {
+                        "hint": "Tipo de Ritual a ser executado",
+                        "label": "Tipo de Ritual"
+                    }
+                },
+                "type": {
+                    "hint": "Se o feitiço é baseado em Físico ou em Mana",
+                    "label": "Tipo de Feitiço"
+                }
+            },
             "HealthEssence": "Essência",
             "IllusionMultiSense": "Multi-Sentido",
             "IllusionObvious": "Óbvio",
@@ -1788,6 +2914,8 @@
         "Spirit": {
             "Bound": "Vinculado",
             "Force": "Força",
+            "ForceAppliesSetting": "Força se Aplica a",
+            "ForceAppliesSettingHint": "Controla quais atributos do espírito recebem o bônus de Força.",
             "HalfValueSkill": "Perícia em Meio Valor",
             "HalfValueSkillHint": "Perícias ativas ligadas usam ⌈Força/2⌉.",
             "InitiativeFormulaAstral": "Fórmula de Iniciativa Astral",
@@ -1821,8 +2949,8 @@
                 "Caretaker": "Cuidador de Insetos",
                 "Ceramic": "Cerâmica",
                 "Chindi": "Chindi",
-                "Corpse": "Cadáver",
                 "CorpsCadavre": "Corps Cadavre",
+                "Corpse": "Cadáver",
                 "Crawler": "Rastejador (Demônio)",
                 "Croki": "Croki",
                 "Detritus": "Detritos",
@@ -1858,8 +2986,8 @@
                 "Nymph": "Ninfa de Inseto",
                 "Palefire": "Fogo Pálido",
                 "Phantom": "Fantasma",
-                "Plant": "Planta",
                 "Plague": "Praga",
+                "Plant": "Planta",
                 "Preta": "Preta",
                 "Queen": "Rainha de Inseto",
                 "Rot": "Podridão",
@@ -1878,17 +3006,37 @@
                 "Unbreakable": "Inquebrável",
                 "Vrygoths": "Vrygoths",
                 "VucubCaquix": "Vucub Caquix",
-                "Water": "Água",
                 "Watcher": "Observador",
+                "Water": "Água",
                 "Worker": "Inseto Trabalhador",
                 "Wraith": "Espectro"
-            },
-            "ForceAppliesSetting": "Força se Aplica a",
-            "ForceAppliesSettingHint": "Controla quais atributos do espírito recebem o bônus de Força."
+            }
         },
         "SpiritType": "Tipo de Espírito",
         "SprintingBonus": "Bônus de corrida",
         "Sprite": {
+            "FIELDS": {
+                "level": {
+                    "hint": "Nível do Sprite",
+                    "label": "Nível"
+                },
+                "registered": {
+                    "hint": "Se o Sprite está Registrado",
+                    "label": "Registrado"
+                },
+                "services": {
+                    "hint": "Número de Serviços que o Sprite possui",
+                    "label": "Serviços"
+                },
+                "spriteType": {
+                    "hint": "Tipo do Sprite",
+                    "label": "Tipo de Sprite"
+                },
+                "technomancerUuid": {
+                    "hint": "Tecnomante que compilou este Sprite",
+                    "label": "Tecnomante"
+                }
+            },
             "Level": "Nível",
             "LevelAppliesSettingHint": "Controla quais atributos de sprite recebem o bônus de Nível.",
             "MissingTechnomancer": "Sem tecnomante ativo",
@@ -1907,6 +3055,23 @@
             }
         },
         "SpritePower": {
+            "Durations": {
+                "Always": "Sempre",
+                "Instant": "Instantânea",
+                "Permanent": "Permanente",
+                "Special": "Especial",
+                "Sustained": "Sustentada"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "Duração do Poder de Sprite",
+                    "label": "Duração"
+                },
+                "optional": {
+                    "hint": "Se o Poder de Sprite é Opcional",
+                    "label": "Opcional"
+                }
+            },
             "IsOptional": "Opcionalidade",
             "Optional": {
                 "DisabledOption": "Opcional, desativado",
@@ -1914,6 +3079,10 @@
                 "Standard": "Por padrão"
             },
             "Type": "Tipo"
+        },
+        "StatusEffects": {
+            "Running": "Correndo",
+            "Sprinting": "Corrida Veloz"
         },
         "Stock": "Estoque",
         "StreetCred": "Crédito de Rua",
@@ -1934,12 +3103,44 @@
                 "Normal": "Normal (10 m)"
             }
         },
-        "Shotgun": {
-            "Label": "Choke da espingarda",
-            "Choke": {
-                "Narrow": "Estreito",
-                "Medium": "Médio",
-                "Wide": "Amplo"
+        "Tabs": {
+            "Actor": {
+                "Actions": "Ações",
+                "Ammo": "Munição",
+                "Bio": "Bio",
+                "Character": "Personagem",
+                "Compilations": "Compilações",
+                "ComplexForms": "Formas Complexas",
+                "CritterPowers": "Poderes",
+                "Details": "Detalhes",
+                "Effects": "Efeitos",
+                "IC": "GELO",
+                "Inventory": "Inventário",
+                "Licenses": "Licenças",
+                "Magic": "Magia",
+                "MarkedIcons": "Marcados",
+                "Matrix": "Matriz",
+                "MatrixActions": "Ações",
+                "Mods": "Mods",
+                "Network": "Rede",
+                "NetworkIcons": "Ícones",
+                "Networks": "Redes",
+                "OwnedIcons": "Possuídos",
+                "Social": "Social",
+                "Spirit": "Espírito",
+                "Sprite": "Sprite",
+                "SpritePowers": "Poderes",
+                "Vehicle": "Veículo"
+            },
+            "Item": {
+                "Description": "Descrição",
+                "Details": "Detalhes",
+                "Effects": "Efeitos",
+                "Mods": "Mods",
+                "Network": "Rede",
+                "SinLicenses": "Licenças",
+                "SinNetworks": "Redes",
+                "WeaponAmmo": "Munição"
             }
         },
         "Target": "Alvo",
@@ -1959,7 +3160,14 @@
             "AttackDodged": "Ataque Esquivado",
             "AttackDoesNoPhysicalDamageToVehicle": "Ataque Acerta Mas Não Causa Dano Físico Ao Veículo",
             "AttackHits": "Ataque Acerta",
+            "AttackResisted": "Ataque Resistido",
+            "BruteForceFailure": "Força Bruta falhou!",
+            "BruteForceSuccess": "Força Bruta bem-sucedida!",
+            "CheckOverwatchScoreFailure": "Verificação de Valor de Vigilância falhou!",
+            "CheckOverwatchScoreSuccess": "Verificação de Valor de Vigilância bem-sucedida!",
             "Failure": "Falha!",
+            "HackOnTheFlyFailure": "Hackear na Hora falhou!",
+            "HackOnTheFlySuccess": "Hackear na Hora bem-sucedido!",
             "PreparationFailure": "O feitiço escapa da âncora",
             "PreparationSuccess": "O preparado retém o feitiço",
             "ResistedAllDamage": "Nenhum Dano Sofrido!",
@@ -1968,6 +3176,7 @@
             "RitualFailure": "O ritual foi forte demais para você",
             "RitualSuccess": "O ritual está selado",
             "SoakBlockedByHardenedArmor": "Bloqueado Por Armadura Endurecida",
+            "SpellResisted": "Feitiço Resistido",
             "SpiritSummonFailure": "Espírito fugiu!",
             "SpiritSummonSuccess": "Espírito invocado!",
             "SpriteCompilationFailure": "Sprite fugiu!",
@@ -1976,6 +3185,9 @@
         },
         "Tests": {
             "AttributeOnlyTest": "Teste Apenas de Atributo",
+            "BiofeedbackResistTest": "Resistir a Biofeedback",
+            "BruteForceTest": "Força Bruta",
+            "CheckOverwatchScoreTest": "Verificar Valor de Vigilância",
             "CombatSpellDefenseTest": "Defesa de Feitiço de Combate",
             "CompileSpriteTest": "Compilar Sprite",
             "ComplexFormTest": "Forma Complexa de Fiação",
@@ -1984,10 +3196,17 @@
             "DronePerceptionTest": "Teste de Percepção de Drone",
             "ExtendedTest": "Teste Estendido",
             "FadeTest": "Teste de Enfraquecimento",
+            "HackOnTheFlyTest": "Hackear na Hora",
+            "MatrixDefenseTest": "Defesa de Matriz",
+            "MatrixResistTest": "Resistência a Dano de Matriz",
+            "MatrixTest": "Teste de Matriz",
             "MeleeAttackTest": "Ataque de Arma Corpo a Corpo",
             "NaturalRecoveryPhysicalTest": "Recuperação Natural Física",
             "NaturalRecoveryStunTest": "Recuperação Natural de Atordoamento",
+            "OpposedBruteForceTest": "Opor à Força Bruta",
+            "OpposedCheckOverwatchScoreTest": "Opor à Verificação de Valor de Vigilância",
             "OpposedCompileSpriteTest": "Opor à Compilação",
+            "OpposedHackOnTheFlyTest": "Opor a Hackear na Hora",
             "OpposedMatrixTest": "Teste Oposto de Matriz",
             "OpposedPreparationForceTest": "Resistir com Força",
             "OpposedRitualTest": "Selar o Ritual",
@@ -2037,25 +3256,47 @@
             "Unit": "Unidade",
             "Year": "Ano"
         },
-        "ToggleBreakdown": "Alternar detalhamento",
         "ToggleActive": "Alternar Ativo",
+        "ToggleBreakdown": "Alternar detalhamento",
         "ToggleEquip": "Alternar Equipamento",
         "ToggleSection": "Alternar seção",
+        "ToggleWireless": "Alternar Sem Fio",
         "Tooltips": {
             "Actor": {
+                "AddOneService": "Adicionar Um Serviço",
+                "Blitz": "Use um ponto de Trunfo para rolar o número máximo (5) de dados na iniciativa",
+                "ConnectNetwork": "Entrar neste host/grade",
                 "Critter": "Permitir o uso de poderes de criatura",
-                "Grunt": "Aplicar regras de soldado a este ator",
+                "DefaultCategoryVisibility": "Mostrar categorias de itens mesmo que nenhum item tenha sido adicionado a eles",
+                "Description": "Descrição deste Ator",
+                "DisconnectNetwork": "Sair deste host/grade",
+                "MarkTarget": "Colocar marcas adicionais neste alvo",
+                "MatrixConnectionToggle": "Alterar o status de conexão com a Matriz: Realidade Aumentada, Sim Frio ou Sim Quente",
+                "MatrixRunningSilentToggle": "Alternar seu dispositivo de Matriz entre Operando Silenciosamente e Exibindo sua Persona",
                 "Metatype": "Como NPC, o metatipo também aplicará modificadores rápidos de atributo",
+                "MiscConfig": "Configurações e Modificadores Diversos",
                 "MissingSummoner": "Arraste e solte o personagem ou use a ação de invocação",
                 "MissingTechnomancer": "Arraste e solte o personagem ou use a ação de compilação",
                 "NPC": "Marque o ator como NPC para obter recursos adicionais",
+                "NetworksTab": "Grades e Centrais",
+                "NoCombatant": "Rolagem de Iniciativa (Deve estar em um Encontro)",
+                "PickControlledTokenAsDriver": "Escolher o ator do token controlado atual como Condutor",
+                "PickControlledTokenAsSummoner": "Escolher o ator do token controlado atual como Invocador",
+                "PickControlledTokenAsTechnomancer": "Escolher o ator do token controlado atual como Compilador (Tecnomante)",
+                "PlaceMark": "Ação usada para colocar marcas em alvos já marcados",
+                "RebootPersonaAndClearAllMarks": "Reiniciar sua Persona e remover todas as Marcas que você colocou",
                 "RemoveAllNetworks": "Remover todas as redes",
+                "RemoveFavorite": "Remover isto da sua barra de favoritos",
                 "RemoveNetwork": "Remover rede",
-                "ResetActorForNewRun": "Redefinir dano, vantagem, etc. para uma nova corrida",
-                "DefaultCategoryVisibility": "Mostrar categorias de itens mesmo que nenhum item tenha sido adicionado a eles"
+                "RemoveOneService": "Remover Um Serviço",
+                "RemoveSkillSet": "Remover o conjunto de perícias atual, bem como todas as perícias e grupos de perícias originados dele",
+                "ResetActorForNewRun": "Redefinir dano, trunfo, etc. para uma nova corrida",
+                "RollInitiative": "Rolar Iniciativa",
+                "SetupPAN": "Adicionar todos os Dispositivos Sem Fio equipados à Persona deste personagem"
             },
             "CallInAction": {
-                "ActorType": "Tipo de ator para chamar"
+                "ActorType": "Tipo de ator para chamar",
+                "LinkActor": "Arraste e solte um ator para chamar"
             },
             "CompilationTest": {
                 "Level": "Nível do sprite compilado",
@@ -2068,62 +3309,35 @@
             "Effect": {
                 "AlterApplyToWithChanges": "Remova as alterações antes de alterar para o que o efeito se aplica.",
                 "ApplyTo": "As alterações deste efeito se aplicarão apenas a este alvo",
-                "DocumentEffects": "Efeitos diretamente neste documento",
-                "ItemEffects": "Efeitos coletados de itens neste documento",
-                "HelpLinkEnglishOnly": "Help (External link, English only)",
-                "OpenValueEditor": "Abrir editor de valor",
                 "ApplyValueEditor": "Aplicar edição do valor",
                 "CancelValueEditor": "Cancelar edição do valor",
+                "CreateEffect": "Criar Efeito",
+                "DeleteEffect": "Excluir Efeito",
+                "DocumentEffects": "Efeitos diretamente neste documento",
+                "EditEffect": "Editar Efeito",
+                "HelpLinkEnglishOnly": "Ajuda (link externo, apenas em inglês)",
+                "ItemEffects": "Efeitos coletados de itens neste documento",
                 "OnlyAllFilteredUsed": "Este efeito só se aplicará para testes que correspondam a todas as seleções",
                 "OnlyFilteredUsed": "Este efeito só se aplicará para testes que correspondam a pelo menos uma seleção",
                 "OnlyForItemTest": "Apenas afeta o teste do item pai",
-                "OnlyForWireless": "Este efeito se aplicará apenas para itens que tenham conexão sem fio habilitado"
+                "OnlyForWireless": "Este efeito se aplicará apenas para itens que tenham conexão sem fio habilitado",
+                "OpenValueEditor": "Abrir editor de valor",
+                "PriorityFieldDisabled": "Prioridade personalizada não é suportada no momento"
             },
             "Item": {
                 "ActionCategories": "Selecione categorias de ação para usar em vez das categorias padrão do teste. Usando Efeitos Ativos, você pode usar categorias para modificar valores de teste",
                 "ActionModifier": "Selecione modificadores de reserva de dados para usar em vez dos modificadores padrão do teste",
                 "ActionRollMode": "Modo de rolagem padrão ao lançar esta ação. Substituirá a configuração global do chat",
+                "AddQuantity": "Adicionar 1 Qtd. {qtySome}: Adicionar 5 Qtd. {qtyMany}: Adicionar 20 Qtd.",
                 "AmmoReplaceDamage": "Defina para substituir o dano da arma em vez de modificá-lo",
-                "DisabledForPreparedActor": "Desativado devido ao uso de ator preparado"
+                "DisabledForPreparedActor": "Desativado devido ao uso de ator preparado",
+                "EssenceAdjustment": "Ajustar o custo real de essência com base no nível do item",
+                "RemoveQuantity": "Remover 1 Qtd. {qtySome}: Remover 5 Qtd. {qtyMany}: Remover 20 Qtd.",
+                "ToggleFavorite": "Marcar como favorito e exibir na Barra de Favoritos",
+                "ToggleVisibility": "Alternar a visibilidade deste item durante o Modo de Jogo"
             },
-            "Modifiers": {
-                "armor": "Modifica o valor total da armadura",
-                "astral_initiative": "Modifica a iniciativa astral base",
-                "astral_initiative_dice": "Modifica os dados de iniciativa astral",
-                "astral_limit": "Modifica o limite astral",
-                "composure": "Modifica o pool de testes de compostura",
-                "defense": "Modifica o pool de testes de defesa",
-                "defense_block": "Adiciona ao modificador de defesa para bloqueio ativo",
-                "defense_dodge": "Adiciona ao modificador de defesa para esquiva ativa",
-                "defense_melee": "Adiciona ao modificador de defesa para defesa corpo a corpo",
-                "defense_parry": "Adiciona ao modificador de defesa para aparar ativamente",
-                "defense_ranged": "Adiciona ao modificador de defesa para ataque à distância",
-                "drain": "Modifica a reserva de dados de testes de drenagem",
-                "essence": "Modifica o atributo essência",
-                "fade": "Modifica a reserva de dados de testes de enfraquecimento",
-                "global": "Modifica todos os pools de teste, excluindo testes de redução de dano",
-                "judge_intentions": "Modifica a reserva de dados de testes de julgar intenções",
-                "lift_carry": "Modifica a reserva de dados de testes de levantar e carregar",
-                "matrix_initiative": "Modifica a iniciativa da matriz base",
-                "matrix_initiative_dice": "Modifica os dados de iniciativa da matriz",
-                "matrix_track": "Modifica a monitor de dano da matriz",
-                "meat_initiative": "Modifica a iniciativa física base",
-                "meat_initiative_dice": "Modifica os dados de iniciativa física",
-                "memory": "Modifica a reserva de dados de testes de memória",
-                "mental_limit": "Modifica o limite mental",
-                "multi_defense": "Modifica a reserva de dados de testes de defesa para múltiplas defesas por turno de combate",
-                "pain_tolerance_physical": "Modifica o dano a ser ignorado antes do primeiro modificador de ferida",
-                "pain_tolerance_stun": "Modifica o dano a ser ignorado antes do primeiro modificador de ferida",
-                "physical_limit": "Modifica o limite físico",
-                "physical_overflow_track": "Modifica o monitor de dano de excesso de dano",
-                "physical_track": "Modifica o monitor de dano físico",
-                "reach": "Modifica o alcance dos ataques corpo a corpo",
-                "run": "Modifica a distância de corrida por múltiplos do atributo de agilidade",
-                "soak": "Modifica a reserva de dados de testes de resistência a danos físicos",
-                "social_limit": "Modifica o limite social",
-                "stun_track": "Modifica a monitor de dano atordoante",
-                "walk": "Modifica a distância de caminhada por múltiplos do atributo de agilidade",
-                "wound_tolerance": "Modifica o dano por modificador de ferida"
+            "MatrixTest": {
+                "SameGridDisabled": "Como os ícones ativo e alvo usam grades, isto é determinado automaticamente"
             },
             "Preparation": {
                 "Craft": "Tempo de preparo ininterrupto necessário antes de rolar o teste",
@@ -2139,8 +3353,8 @@
                 "RecoilBeforeAttack": "Recuo Progressivo agora, antes de atacar",
                 "RecoilCompensation": "CR total, incluindo CR do ator e do item",
                 "ResetRecoil": "Redefinir recuo progressivo para nenhum",
-                "ShowSuppressiveFireTemplate": "Colocar cone de fogo supressivo",
                 "ShowShotgunTemplate": "Colocar cone de disparo de espingarda",
+                "ShowSuppressiveFireTemplate": "Colocar cone de fogo supressivo",
                 "ShowWeaponRanges": "Visualizar alcances da arma"
             },
             "Ritual": {
@@ -2153,24 +3367,26 @@
             "SummoningTest": {
                 "DragOnCanvas": "Arraste o espírito no canvas",
                 "Force": "Força do espírito invocado",
+                "OptionalPowerCount": "Contagem informativa de poderes opcionais do espírito (piso(Força / 3)).",
                 "PreparedSpirit": "Use um ator espírito preparado em vez de criar um genérico",
                 "ReagentDrams": "Dracmas de reagentes usados para alterar o limite de invocação",
-                "SpiritType": "Tipo do espírito invocado",
-                "OptionalPowerCount": "Contagem informativa de poderes opcionais do espírito (piso(força / 3))."
+                "SpiritType": "Tipo do espírito invocado"
             },
             "Test": {
                 "BuyHits": "Não rola dados. Compra acertos usando ⌊reserva de dados / 4⌋.",
                 "Extended": "O teste será rolado como um teste estendido até que o limiar seja alcançado. Defina o intervalo como zero para rolá-lo como um teste normal.",
                 "ExtendedInterval": "Tempo de jogo entre as rolagens. Zero rola como um teste normal, não estendido.",
                 "Limit": "Valor do limite calculado",
+                "LimitIgnored": "O limite está atualmente ignorado neste teste",
                 "Modifier": "Soma de todos os modificadores aplicados à reserva de dados",
                 "Pool": "Quantidade de dados para rolar",
-                "PushTheLimit": "Aplicar regras de vantagem ao limite",
+                "PushTheLimit": "Aplicar regras de trunfo ao Forçar o Limite",
                 "ResultOverrideGlitches": "Substitui as falhas para este resultado de teste.",
                 "ResultOverrideHits": "Substitui os acertos para este resultado de teste.",
                 "RollMode": "Visibilidade da mensagem de rolagem do chat FoundryVTT",
                 "Threshold": "Valor do limite calculado"
-            }
+            },
+            "ToggleEditMode": "Alternar Modo de Edição"
         },
         "Top": "Topo",
         "Total": "Total",
@@ -2195,21 +3411,20 @@
             }
         },
         "UnderBarrel": "Sob o Cano",
-        "UseEdgeForInitiativeRoll": "Use a regra de vantagem blitz para iniciativa",
+        "UseEdgeForInitiativeRoll": "Use a regra de trunfo blitz para iniciativa",
         "Value": "Valor",
-        "VehicleStunImmunity": "Imunidade de veículos a dano de atordoamento",
         "Vehicle": {
-            "Category": "Categoria",
             "Categories": {
+                "Anthro": "Anthromórfico",
+                "Huge": "Enorme",
+                "Large": "Grande",
+                "Medium": "Médio",
                 "Micro": "Micro",
                 "Mini": "Mini",
-                "Small": "Pequeno",
-                "Medium": "Médio",
-                "Large": "Grande",
-                "Huge": "Enorme",
-                "Anthro": "Anthromórfico",
-                "Missile": "Míssil"
+                "Missile": "Míssil",
+                "Small": "Pequeno"
             },
+            "Category": "Categoria",
             "ChaseEnvironment": "Ambiente de Perseguição",
             "Clearsight": "Visão Clara",
             "ControlMode": "Modo de Controle",
@@ -2219,8 +3434,8 @@
                 "Remote": "Remoto",
                 "Rigger": "Rigger"
             },
-            "Driver": "Motorista",
             "DamagedVehicle": "Veículo Danificado",
+            "Driver": "Motorista",
             "Drone": "Drone",
             "Environments": {
                 "Handling": "Manuseio",
@@ -2266,6 +3481,7 @@
         "VehicleImport": {
             "MissingPermission": "Você não tem permissão para criar atores"
         },
+        "VehicleStunImmunity": "Imunidade de veículos a dano de atordoamento",
         "Vision": {
             "AstralPerception": "Percepção Astral",
             "AugmentedReality": "Realidade Aumentada",
@@ -2275,9 +3491,11 @@
         "Walk": "Caminhar",
         "WalkingSpeed": "Caminhando",
         "Warnings": {
-            "InvalidWeaponRanges": "Os alcances da arma devem estar em ordem crescente e terminar acima de zero.",
+            "ActorMissingRequirements": "O ator deve atender ao requisito de perícia despertada ou emergida",
             "AlreadyExistingInventory": "Um inventário com este nome já existe",
+            "AlreadyJoinedNetwork": "{name} já entrou nesta rede",
             "BulkImportPerformanceWarning": "Se você importou um grande número de itens, o Foundry pode funcionar lentamente até que você atualize seu navegador. É recomendado atualizar agora.",
+            "CantCombineBuyHitsWithEdge": "Comprar Acertos não pode ser combinado com Segunda Chance.",
             "CantEditDefaultInventory": "O inventário padrão não pode ser renomeado",
             "CantExtendTest": "O tipo de teste não pode ser estendido.",
             "CantExtendTestFurther": "O teste não pode ser estendido por falta de dados ou limite alcançado",
@@ -2289,27 +3507,29 @@
             "CantSecondChanceAGlitch": "Não pode ter uma segunda chance neste teste. O resultado do teste é falho.",
             "CantSecondChanceWithoutNoneHits": "Não pode ter uma segunda chance neste teste. Só restam dados de acerto.",
             "CantSpendMulitplePointsOfEdge": "Não pode gastar vários pontos de trunfo em um teste ou ação",
-            "CantCombineBuyHitsWithEdge": "Comprar Acertos não pode ser combinado com Segunda Chance.",
             "CompilationNotConcluded": "Compilação incompleta. Aguarde o sprite se opor à compilação para determinar o enfraquecimento.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Pontos de trunfo não podem ser gastos em testes sem atores",
             "HostItemOnlyAcceptIC": "Apenas atores GELOs podem ser adicionados aos hosts",
             "InvalidCompilationLevel": "Atributo de ressonância muito baixo para este nível de sprite",
             "InvalidMarksCount": "Você está tentando colocar um número estranho de marcas",
-            "InvalidSummoningForce": "O valor da força escolhido não adere às regras",
+            "InvalidSummoningForce": "O valor de Força escolhido não respeita as regras",
+            "InvalidWeaponRanges": "Os alcances da arma devem estar em ordem crescente e terminar acima de zero.",
             "NegativeLimitValue": "Os valores do limite devem ser números positivos",
+            "NoActorCreatePermission": "Você não tem permissão para criar atores.",
             "NoFireModeConfigured": "A arma de fogo não tem modo de fogo configurado. Usará tiro único.",
+            "OnlyGMCanDoThis": "Somente um usuário GM pode fazer isso",
             "PreparationDepleted": "Este preparado não tem mais potência. Seu feitiço foi perdido.",
             "PreparationForceTooHigh": "A Força do preparado é inválida ou maior que o dobro do seu atributo Magia.",
             "PreparationNotConcluded": "O preparado ainda não está pronto. Deixe a Força dele resistir primeiro.",
             "PreparationTriggerTimeTooLong": "O gatilho de tempo está além da potência do preparado em horas. Ele será ativado antes do previsto.",
-            "RitualInvalidForce": "A força do ritual é inválida ou maior do que a nível do seu alojamento.",
+            "RitualInvalidForce": "A Força do ritual é inválida ou maior do que o Nível da sua Loja.",
             "RitualNotConcluded": "Ritual incompleto. Aguarde o ritual se opor à conjuração para determinar o dreno.",
             "RitualNotEnoughReagents": "Não foram oferecidos reagentes suficientes.",
             "SkillAlreadyExists": "A perícia {name} já existe no ator {actorName} ({actorUuid}). Use cada nome de perícia apenas uma vez por categoria.",
             "SkillCantBeDefault": "Esta pericia não pode ser lançada, pois não pode ser feita sem perícia",
+            "SkillSetDefaultTypeOutsideCompendium": "Somente conjuntos de perícias no compêndio de conjuntos de perícias configurado afetarão a criação de atores",
             "SummoningNotConcluded": "Invocação incompleta. Aguarde o espírito se opor à invocação para determinar o dreno.",
-            "TokenSelectionNeeded": "Um ou mais tokens precisam ser selecionados",
-            "NoActorCreatePermission": "Você não tem permissão para criar atores."
+            "TokenSelectionNeeded": "Um ou mais tokens precisam ser selecionados"
         },
         "Weapon": {
             "AmmoCount": "Qtd Munição",
@@ -2329,7 +3549,105 @@
                 "RemovableClip": "Pente Removível"
             },
             "FIELDS": {
+                "category": {
+                    "hint": "O tipo de arma que este item representa. Tipos diferentes exigem configurações diferentes",
+                    "label": "Tipo de Arma"
+                },
+                "melee": {
+                    "reach": {
+                        "hint": "Alcance da arma, usado como modificador em combate",
+                        "label": "Alcance"
+                    }
+                },
+                "range": {
+                    "modes": {
+                        "burst_fire": {
+                            "hint": "Se a arma suporta Rajada (RJ)",
+                            "label": "Rajada"
+                        },
+                        "full_auto": {
+                            "hint": "Se a arma suporta Automático (RC)",
+                            "label": "Automático"
+                        },
+                        "semi_auto": {
+                            "hint": "Se a arma suporta Semiautomático (SA)",
+                            "label": "Semiautomático"
+                        },
+                        "single_shot": {
+                            "hint": "Se a arma suporta Tiro Único (TS)",
+                            "label": "Tiro Único"
+                        }
+                    },
+                    "ranges": {
+                        "attribute": {
+                            "hint": "Atributo do ator pelo qual multiplicar os alcances acima",
+                            "label": "Atributo de Alcance"
+                        },
+                        "category": {
+                            "hint": "Determina os alcances da arma com base na sua categoria. Selecione 'Manual' se a arma usar valores personalizados",
+                            "label": "Categoria de Alcance"
+                        },
+                        "extreme": {
+                            "hint": "Distância do alcance extremo da arma, em metros",
+                            "label": "Alcance Extremo"
+                        },
+                        "long": {
+                            "hint": "Distância do alcance longo da arma, em metros",
+                            "label": "Alcance Longo"
+                        },
+                        "medium": {
+                            "hint": "Distância do alcance médio da arma, em metros",
+                            "label": "Alcance Médio"
+                        },
+                        "short": {
+                            "hint": "Distância do alcance curto da arma, em metros",
+                            "label": "Alcance Curto"
+                        }
+                    },
+                    "rc": {
+                        "base": {
+                            "hint": "Compensação de recuo da arma",
+                            "label": "Compensação de Recuo"
+                        }
+                    }
+                },
                 "thrown": {
+                    "blast": {
+                        "dropoff": {
+                            "hint": "A redução de dano por metro a partir da explosão",
+                            "label": "Redução da Explosão (por m)"
+                        },
+                        "radius": {
+                            "hint": "Raio do ataque da arma, em metros",
+                            "label": "Raio da Explosão (m)"
+                        }
+                    },
+                    "ranges": {
+                        "attribute": {
+                            "hint": "Atributo do ator pelo qual multiplicar os alcances acima",
+                            "label": "Atributo de Alcance"
+                        },
+                        "category": {
+                            "hint": "Determina os alcances da arma com base na sua categoria. Selecione 'Manual' se a arma usar valores personalizados",
+                            "label": "Categoria de Alcance"
+                        },
+                        "extreme": {
+                            "hint": "Distância do alcance extremo da arma, em metros",
+                            "label": "Alcance Extremo"
+                        },
+                        "long": {
+                            "hint": "Distância do alcance longo da arma, em metros",
+                            "label": "Alcance Longo"
+                        },
+                        "medium": {
+                            "hint": "Distância do alcance médio da arma, em metros",
+                            "label": "Alcance Médio"
+                        },
+                        "short": {
+                            "hint": "Distância do alcance curto da arma, em metros",
+                            "label": "Alcance Curto"
+                        }
+                    },
                     "thrown_type": {
                         "hint": "Tipo de arma arremessada usado para a distância de dispersão. Deixe vazio para armas arremessadas sem explosão.",
                         "label": "Tipo de Arma Arremessada"
@@ -2339,6 +3657,18 @@
             "FullReload": "Carregado",
             "Mod": "Mod",
             "Mode": {
+                "Full": {
+                    "BurstFire": "Rajada",
+                    "BurstFireLong": "Rajada Longa",
+                    "FullAuto": "Automático",
+                    "FullAutoLong": "Automático (Complexa)",
+                    "FullAutoShort": "Automático (Simples)",
+                    "SemiAuto": "Semiautomático",
+                    "SemiAutoBurst": "Rajada Semiautomática",
+                    "SemiAutoShort": "Semiautomático",
+                    "SingleShot": "Tiro Único",
+                    "Suppressing": "Fogo de Supressão"
+                },
                 "Mode": "Modos",
                 "Short": {
                     "BurstFire": "RJ",
@@ -2352,18 +3682,6 @@
                     "SemiAutoShort": "SA",
                     "SingleShot": "TS",
                     "SingleShotShort": "TS"
-                },
-                "Full": {
-                    "BurstFire": "Rajada",
-                    "BurstFireLong": "Rajada Longa",
-                    "FullAuto": "Automático",
-                    "FullAutoLong": "Automático (Complexa)",
-                    "FullAutoShort": "Automático (Simples)",
-                    "SemiAuto": "Semiautomático",
-                    "SemiAutoBurst": "Rajada Semiautomática",
-                    "SemiAutoShort": "Semiautomático",
-                    "SingleShot": "Tiro Único",
-                    "Suppressing": "Fogo de Supressão"
                 }
             },
             "Mods": "Mods",
@@ -2405,6 +3723,8 @@
                 "Extreme": "Extremo",
                 "Long": "Longo",
                 "Medium": "Médio",
+                "Modes": "Modos",
+                "Range": "Alcance",
                 "Ranges": "Distâncias",
                 "Short": "Curto"
             },
@@ -2418,16 +3738,10 @@
             "Type": "Tipo",
             "Weapon": "Arma"
         },
-        "Tabs": {
-            "Item": {
-                "Mods": "Mods"
-            }
-        },
         "Wireless": "Conexão Sem Fio",
-        "StatusEffects": {
-            "Running": "Correndo",
-            "Sprinting": "Corrida Veloz"
-        }
+        "WirelessOffline": "Offline",
+        "WirelessOnline": "Online",
+        "WirelessUnavailable": "Indisponível"
     },
     "TYPES": {
         "Actor": {
@@ -2451,6 +3765,7 @@
             "device": "Dispositivo",
             "echo": "Eco",
             "equipment": "Equipamento",
+            "grid": "Grade",
             "host": "Central",
             "lifestyle": "Estilo de Vida",
             "metamagic": "Metamagia",
@@ -2460,6 +3775,7 @@
             "quality": "Qualidade",
             "ritual": "Ritual",
             "sin": "SIN",
+            "skill": "Perícia",
             "spell": "Feitiço",
             "sprite_power": "Poder de Sprite",
             "vehicle": "Veículo",
