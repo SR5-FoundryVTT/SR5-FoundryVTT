@@ -100,7 +100,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
         const chummerId = jsonData.id?._TEXT;
         const entity = {
             img: undefined as string | undefined | null,
-            name: IH.getTranslatedValue('name', entityName, entityName, chummerId),
+            name: IH.getTranslatedValue('name', { name: entityName, id: chummerId }, entityName, true),
             type: this.parseType as any,
             system: this.getSanitizedSystem(jsonData),
             folder: (await this.getFolder(jsonData, compendiumKey)).id,
@@ -124,7 +124,8 @@ export abstract class Parser<SubType extends SystemEntityType> {
         }
 
         if (jsonData.page && jsonData.source) {
-            const page = IH.getTranslatedValue('page', IH.getArray(jsonData.altpage)[0]?._TEXT ?? jsonData.page._TEXT, entityName, chummerId);
+            const defaultPage = IH.getArray(jsonData.altpage)[0]?._TEXT ?? jsonData.page._TEXT;
+            const page = IH.getTranslatedValue('page', { name: entityName, id: chummerId }, defaultPage);
             const source = jsonData.source._TEXT;
             system.description.source = `${source} ${page}`;
         }

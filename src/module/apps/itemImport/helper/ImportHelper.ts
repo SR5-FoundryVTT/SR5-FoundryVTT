@@ -8,7 +8,7 @@ export type ArrayItem<T> = T extends (infer U)[] ? U : never;
 export type NotEmpty<T> = T extends object ? NonNullable<T> : never;
 export type RetrievedItem = Item.Source & { name_english: string };
 export type TranslatableValue = "name" | "page";
-type TranslationData = Record<TranslatableValue, string>;
+type TranslationData = Partial<Record<TranslatableValue, string>>;
 
 /**
  * A utility class providing helper methods for importing and managing data in Foundry VTT.
@@ -31,26 +31,47 @@ export class ImportHelper {
     static currentFile: string | null = null;
     static isTranslationEnabled = false;
 
+    /**
+     * @param key - What type of value we are trying to translate
+     * @param identifiers - How to locate the translated value
+     * @param defaultValue - The fallback value
+     * @param searchAllFiles - If the import should try to match the identifiers to files other than the current one
+     */
     public static getTranslatedValue(
         key: TranslatableValue,
+        identifiers: {id?: string, name?: string},
         defaultValue: string,
-        text: string | null | undefined,
-        id?: string | null,
+        searchAllFiles: boolean = false
     ): string {
-        if (!text) return "";
         if (!this.isTranslationEnabled) {
-            return text;
+            return defaultValue;
         }
-        if (id && this.currentFile && this.translationMap.files[this.currentFile]?.ids?.[id]) {
-            return this.translationMap.files[this.currentFile].ids[id][key] ?? defaultValue;
+        const { id, name } = identifiers;
+        if (!id && !name) return '';
+        if (this.currentFile) {
+            const translations = this.translationMap.files[this.currentFile];
+            if (translations) {
+                if (id && id in translations.ids) {
+                    return this.translationMap.files[this.currentFile].ids[id][key] ?? defaultValue;
+                }
+                if (name && name in translations.names) {
+                    return this.translationMap.files[this.currentFile].names[name][key] ?? defaultValue;
+                }
+            }
         }
-        if (this.currentFile && this.translationMap.files[this.currentFile]?.names?.[text]) {
-            return this.translationMap.files[this.currentFile].names[text][key] ?? defaultValue;
-        }
-        // Fallback: Check other file translation maps for a match on the name
-        for (const file of Object.keys(this.translationMap.files)) {
-            if (file !== this.currentFile && this.translationMap.files[file]?.names?.[text]) {
-                return this.translationMap.files[file].names[text][key] ?? defaultValue;
+        if (searchAllFiles) {
+            // Fallback: Check other file translation maps for a match on the name
+            for (const file of Object.keys(this.translationMap.files)) {
+                if (file === this.currentFile) {
+                    continue;
+                }
+                const translations = this.translationMap.files[file];
+                if (id && id in translations.ids) {
+                    return translations.ids[id][key] ?? defaultValue;
+                }
+                if (name && name in translations.names) {
+                    return translations.names[name][key] ?? defaultValue;
+                }
             }
         }
         return defaultValue;
