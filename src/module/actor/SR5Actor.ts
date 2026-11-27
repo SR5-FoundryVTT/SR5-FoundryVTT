@@ -1138,7 +1138,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
                 [SYSTEM_NAME]: { [FLAGS.Test]: { skill: skillId } },
                 'core.canPopout': true
             },
-            sound: CONFIG.sounds.dice,
+            sound: CONFIG.sounds.notification,
         } as const;
 
         const message = await ChatMessage.create(messageData, options);

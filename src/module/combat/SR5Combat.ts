@@ -614,7 +614,7 @@ export class SR5Combat extends Combat<"base"> {
 
             if (message)
                 for (const { combatant, roll } of rows)
-                    void combatant.playDSNInitiativeAnimation(roll, rollMode, message);
+                    void combatant.playDSNInitiativeAnimation(roll, message);
 
             hasPlayedSound = true;
         }

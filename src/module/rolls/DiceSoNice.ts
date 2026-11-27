@@ -1,4 +1,5 @@
 import { SR5Die } from "./SR5Die";
+import { FLAGS, SYSTEM_NAME } from "../constants";
 
 type DiceSoNiceDieType = `d${string}`;
 
@@ -111,6 +112,11 @@ export interface DiceSoNice {
      * Get loaded Dice So Nice systems and their registered dice presets.
      */
     getLoadedDiceSystems: () => Map<string, DiceSoNiceSystem>;
+
+    /**
+     * Whether this client animates dice, following its own Dice So Nice settings.
+     */
+    isEnabled: () => boolean;
 };
 
 const D6_DIE_TYPE = 'd6';
@@ -171,6 +177,62 @@ export function mirrorD6Presets(systems: Map<string, DiceSoNiceSystem>): DiceSoN
     return presets;
 }
 
+/**
+ * The chat message fields that decide who sees a roll's dice.
+ */
+export type DiceSoNiceMessage = {
+    whisper: readonly (string | null | undefined)[];
+    isContentVisible: boolean;
+};
+
+/**
+ * Arguments for `dice3d.showForRoll` that control which clients animate a roll.
+ */
+export type DiceSoNiceAudience = {
+    /** User ids of the other clients that animate the roll; `null` means everyone. */
+    users: string[] | null;
+    /** Skip the animation on this client. */
+    blind: boolean;
+};
+
+/**
+ * Decide which clients animate the dice of a chat message, matching who can read it.
+ *
+ * Other clients animate the roll when they receive the message: its whisper recipients,
+ * otherwise `owners` when the content is restricted to them, otherwise everyone.
+ * This client animates the roll when it can read the content, so the author of a
+ * blind roll doesn't see the dice unless they are a GM.
+ *
+ * @param message The chat message posted for the roll.
+ * @param owners User ids allowed to read the content, or `null` when it isn't restricted.
+ */
+export function diceSoNiceAudience(message: DiceSoNiceMessage, owners: string[] | null = null): DiceSoNiceAudience {
+    const whisper = message.whisper.filter((id): id is string => !!id);
+    return {
+        users: whisper.length > 0 ? whisper : owners,
+        blind: !message.isContentVisible,
+    };
+}
+
+/**
+ * Drop Foundry's dice sound from a success test or initiative message whose dice this client
+ * animates, as Dice So Nice does for the roll messages it animates itself. A success test
+ * message only carries the dice sound when dice were rolled.
+ *
+ * Foundry plays the message sound after the `createChatMessage` hooks have run. The change is
+ * made to this client's source so it survives the update a test makes right after posting.
+ */
+function muteAnimatedDiceSound(message: ChatMessage) {
+    if (message.sound !== CONFIG.sounds.dice || !message.isContentVisible || !game.dice3d?.isEnabled()) return;
+
+    const animates = message.getFlag('core', 'initiativeRoll')
+        // @ts-expect-error Accessing a setting from another module; no types available.
+        ? game.settings.get('dice-so-nice', 'disabledForInitiative') !== true
+        : !!message.getFlag(SYSTEM_NAME, FLAGS.Test);
+
+    if (animates) message.updateSource({ sound: null });
+}
+
 export function initDiceSoNice() {
     Hooks.once('diceSoNiceReady', (dice3d) => {
         if (!dice3d) return;
@@ -179,4 +241,6 @@ export function initDiceSoNice() {
             dice3d.addDicePreset(preset, D6_DIE_TYPE);
         }
     });
+
+    Hooks.on('createChatMessage', muteAnimatedDiceSound);
 }
