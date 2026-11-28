@@ -1,4 +1,4 @@
-import {SR5Actor} from "../SR5Actor";
+import { SR5Actor } from "../SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
 import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
@@ -13,7 +13,7 @@ interface VehicleSheetDataFields extends MatrixActorSheetData {
     vehicle: {
         driver: SR5Actor|undefined,
         master: SR5Item | undefined
-    }
+    };
     modifications: SR5Item<'modification'>[];
 }
 
@@ -43,6 +43,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             removeVehicleDriver: SR5VehicleActorSheet.#removeVehicleDriver,
             toggleChaseEnvironment: SR5VehicleActorSheet.#toggleChaseEnvironment,
             toggleOffRoad: SR5VehicleActorSheet.#toggleOffRoad,
+            toggleJumpIn: SR5VehicleActorSheet.#toggleJumpIn,
         }
     }
 
@@ -65,7 +66,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             'cyberware',
             'device',
             'equipment',
-            'modification'
+            'modification',
         ];
     }
 
@@ -241,5 +242,11 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
         await MatrixNetworkFlow.removeSlaveFromMaster(this.actor);
         await this.render();
+    }
+
+    static async #toggleJumpIn(this: SR5VehicleActorSheet, event: Event) {
+        event.preventDefault();
+        await this.actor.toggleJumpIn();
+        void this.render();
     }
 }

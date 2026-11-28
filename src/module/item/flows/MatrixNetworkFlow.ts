@@ -233,7 +233,7 @@ export class MatrixNetworkFlow {
         // A deleted master must be removed from all its devices.
         if (document instanceof SR5Item && document.canBeMaster) return MatrixNetworkFlow.removeAllSlaves(document);
         // A deleted device must be removed from its master.
-        if (document.canBeMatrixIcon) return MatrixNetworkFlow.disconnectNetwork(document);
+        if (document.canBeMatrixIcon) return MatrixNetworkFlow.disconnectNetwork(document, true);
     }
 
     static _currentUserCanModifyDevice(device: SR5Actor | SR5Item): boolean {
@@ -244,17 +244,20 @@ export class MatrixNetworkFlow {
      * Disconnect the given actor from the network.
      *
      * @param slave This matrix icon will be disconnected from it's network.
+     * @param isDeleting True if slave is currently in process of being deleted.
      */
-    static async disconnectNetwork(slave: SR5Actor | SR5Item) {
+    static async disconnectNetwork(slave: SR5Actor | SR5Item, isDeleting = false) {
         const master = MatrixNetworkFlow.getMaster(slave);
         await NetworkStorage.removeFromNetworks(slave);
-        await MatrixNetworkFlow._triggerUpdateForNetworkConnectionChange(master, slave);
+        await MatrixNetworkFlow._triggerUpdateForNetworkConnectionChange(master, isDeleting ? null : slave);
 
-        // Cause rerender of sheets across all user sessions.
-        await slave.update({system: {matrix: {updatedConnections: Date.now()}}});        
+        // Cause rerender of sheets across all user sessions if not being deleted.
+        if (!isDeleting) {
+            await slave.update({system: {matrix: {updatedConnections: Date.now()}}});
+        }
 
         // Reconnect to previously used grid, if any.
-        if (slave instanceof SR5Item || !(master instanceof SR5Item)) return;
+        if (isDeleting || slave instanceof SR5Item || !(master instanceof SR5Item)) return;
         await MatrixNetworkFlow.reconnectToLastGrid(slave, master);
     }
 

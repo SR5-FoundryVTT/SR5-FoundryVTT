@@ -1,6 +1,7 @@
 import { DeepReadonly } from "fvtt-types/utils";
 import { SYSTEM_NAME, FLAGS } from "../constants";
 import { StorageFlow } from "@/module/flows/StorageFlow";
+import { RiggerFlow } from "@/module/flows/RiggerFlow";
 
 /**
  * A completed action phase's endpoint in a token's recorded movement history.
@@ -44,8 +45,16 @@ export class SR5TokenDocument extends TokenDocument {
      */
     protected override async _preDelete(...args: Parameters<TokenDocument["_preDelete"]>) {
         // Disconnect from any networks before a token actor is deleted.
-        if (this.actor?.isToken) {
-            await StorageFlow.deleteStorageReferences(this.actor);
+        if (this.actor) {
+            if (this.actor.isType('vehicle') && this.actor.system.controlMode === 'rigger') {
+                const driver = this.actor.getVehicleDriver();
+                if (driver) {
+                    await RiggerFlow.jumpOut(driver, this.actor);
+                }
+            }
+            if (this.actor.isToken) {
+                await StorageFlow.deleteStorageReferences(this.actor);
+            }
         }
 
         return super._preDelete(...args);

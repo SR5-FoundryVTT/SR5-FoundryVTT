@@ -16,6 +16,28 @@ export const MatrixDamageFlow = {
      * @param damage
      */
     async determineBiofeedbackDamage(actor: SR5Actor, damage: DamageType) {
+        if (actor.isType('vehicle') && actor.system.controlMode === 'rigger' && damage.type.value === 'physical' && damage.value > 0) {
+            const driver = actor.getVehicleDriver();
+            if (driver) {
+                const biofeedbackDamage = this.getBiofeedbackResistDamage(driver, damage);
+                const action = DataDefaults.createData('action_roll', {
+                    ...BiofeedbackResistTest._getDefaultTestAction(),
+                    test: 'BiofeedbackResistTest',
+                });
+                const data = TestCreator._prepareTestDataWithAction(action, driver, {
+                    ...TestCreator._minimalTestData(),
+                    action,
+                    type: 'BiofeedbackResistTest',
+                }) as ResistTestData;
+                data.incomingDamage = biofeedbackDamage;
+                data.modifiedDamage = data.incomingDamage;
+
+                const test = TestCreator.fromTestData(data, { source: driver });
+                await test.execute();
+            }
+            return;
+        }
+
         if (actor.takesBiofeedbackDamageFrom(damage)) {
             const biofeedbackDamage = this.getBiofeedbackResistDamage(actor, damage);
             const action = DataDefaults.createData('action_roll', {

@@ -1,5 +1,6 @@
 import { DeepPartial } from 'fvtt-types/utils';
 
+import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 import { SR5 } from '../../config';
 import { Helpers } from '../../helpers';
 import { SR5Actor } from '../SR5Actor';
@@ -36,6 +37,7 @@ import { CreateItemFlow } from '@/module/item/flows/CreateItemFlow';
 import { ActorSkillFlow } from '../flows/ActorSkillFlow';
 import { ModifiableValueType } from '@/module/types/template/Base';
 import { isElementInstance } from '@/module/utils/dom';
+import { MatrixRepairFlow } from '@/module/flows/MatrixRepairFlow';
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -181,22 +183,6 @@ const sortByLocalizedLabel = <T extends { label: string }>(a: T, b: T) => {
 };
 
 /**
- * Sort a list of items by equipped and name in ascending alphabetical order.
- *
- * @param a Any type of item data
- * @param b Any type of item data
- * @returns
- */
-const sortByEquipped = (a: SR5Item, b: SR5Item) => {
-    const leftEquipped = a.system?.technology?.equipped;
-    const rightEquipped = b.system?.technology?.equipped;
-
-    if (leftEquipped && !rightEquipped) return -1;
-    if (rightEquipped && !leftEquipped) return 1;
-    return sortByName(a, b);
-};
-
-/**
  * Sort a list of items by quality type and name in ascending alphabetical order.
  *
  * @param a A quality item data
@@ -329,6 +315,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
             addItem: SR5BaseActorSheet.#createItem,
             editItem: SR5BaseActorSheet.#editItem,
+            repairMatrixDevice: SR5BaseActorSheet.#repairMatrixDevice,
             moveItem: SR5BaseActorSheet.#moveItem,
             deleteItem: SR5BaseActorSheet.#deleteItem,
             favoriteItem: SR5BaseActorSheet.#favoriteItem,
@@ -713,7 +700,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await Promise.all([
             this._applyModifierTooltip("[data-attribute-modifier-tooltip]", (id) => this.actor.getAttribute(id)),
             this._applyModifierTooltip("[data-limit-modifier-tooltip]", (id) => this.actor.getLimit(id)),
-            this._applyModifierTooltip("[data-skill-modifier-tooltip]", (id) => this.actor.getSkillById(id)),
+            this._applyModifierTooltip("[data-skill-modifier-tooltip]", (id) => this.actor.getSkillById(id) ?? this.actor.getSkill(id, { byId: true })),
             this._applyModifierTooltip("[data-modifier-tooltip-path]", (path) =>
                 foundry.utils.getProperty(this.actor.system, path) as ModifiableValueType | undefined
             ),
@@ -825,6 +812,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Show all item types but remove empty unexpected item types.
         const inventoryTypes = this.getInventoryItemTypes();
         for (const type of Object.keys(inventory.types)) {
+            if (!Object.hasOwn(SR5.itemTypes, type)) {
+                delete inventory.types[type];
+                continue;
+            }
             if (inventoryTypes.includes(type as Item.ConfiguredSubType)) continue;
             if (inventory.types[type].items.length === 0) delete inventory.types[type];
         }
@@ -869,6 +860,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (targetElement?.dataset && 'link' in targetElement.dataset) return;
 
         let dragData;
+
+        if (target?.dataset.actorUuid) {
+            const actor = fromUuidSync(target.dataset.actorUuid);
+            if (actor instanceof SR5Actor) {
+                dragData = actor.toDragData();
+            }
+        }
 
         if (target?.dataset.itemId) {
             const item = this.actor.items.get(target.dataset.itemId);
@@ -1129,6 +1127,18 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await this._moveItemToInventory(event.target);
     }
 
+    static async #repairMatrixDevice(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
+        const itemUuid = SheetFlow.closestUuid(event.target) || event.target.dataset.itemUuid;
+        if (!itemUuid) return;
+        const doc = (await fromUuid(itemUuid)) as SR5Item | SR5Actor | null;
+        if (!doc || !(doc instanceof SR5Item || doc instanceof SR5Actor)) return;
+
+        await MatrixRepairFlow.runRepair(this.actor, doc);
+    }
+
     async _handleDeleteItem(item: SR5Item) {
         // remove from the inventory tracking system
         return this.actor.inventory.removeItem(item).then(async () => {
@@ -1381,6 +1391,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             // Handled types are on the sheet outside the inventory.
             if (handledTypes.includes(item.type)) continue;
 
+            // Skip items with invalid types that have no template definition
+            if (!Object.hasOwn(SR5.itemTypes, item.type)) continue;
+
             // Determine what inventory the item sits in.
             const inventory = itemIdInventory[item.id] || this.actor.defaultInventory;
             // Build inventory list this item should be shown an.
@@ -1533,9 +1546,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 case 'quality':
                     (items as SR5Item<'quality'>[]).sort(sortByQuality);
                     break;
-                case 'program':
-                    items.sort(sortByEquipped);
-                    break;
                 default:
                     items.sort(sortByName);
                     break;
@@ -1598,7 +1608,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param sheetData What is to be displayed on sheet.
      */
     _prepareSkills(sheetData: SR5ActorSheetData) {
-        sheetData.system.skills = this._sortSkills(sheetData, this.document.system.skills);
+        const skills = this.actor.isType('vehicle') && this.actor.isControlledByDriver()
+            ? this.actor.getRollData({ copySystem: true }).skills
+            : this.document.system.skills;
+        sheetData.system.skills = this._sortSkills(sheetData, skills);
     }
 
     _sortSkills(sheetData: SR5ActorSheetData, skills: SR5Actor['system']['skills']) {
@@ -1668,7 +1681,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             const skillId = listItemElem.dataset.skillId;
             if (!skillId) return null;
 
-            const skill = this.actor.getSkillById(skillId);
+            const skill = this.actor.getSkillById(skillId) ?? this.actor.getSkill(skillId, { byId: true });
             if (!skill) return null;
 
             return { container, skillId, skill };
@@ -1904,6 +1917,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     static async #onToggleEquippedItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        event.stopPropagation();
         if (!isElementInstance(event.target, HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
         const item = this.actor.items.get(id);

@@ -10,13 +10,12 @@ export class RiggingRules {
      * @param rollData
      */
     static modifyRollDataForDriver(driver: SR5Actor, rollData: SR5Actor['system']) {
-
         const injectAttributes = ['intuition', 'reaction', 'logic', 'agility'];
         AttributeRules.injectAttributes(injectAttributes, driver, rollData, { bigger: false });
 
-        const injectSkills = ['perception', 'sneaking', 'gunnery', ...this.PilotSkills];
+        const injectSkills = ['perception', 'sneaking', 'gunnery', 'electronic_warfare', ...this.PilotSkills];
         SkillRules.injectSkills(injectSkills, driver, rollData, { bigger: false });
-    };
+    }
 
     static readonly PilotSkills = [
         'pilot_aerospace',
@@ -37,5 +36,5 @@ export class RiggingRules {
         if (['sensor', 'handling', 'speed'].includes(testData.action.limit.attribute)) return true;
         if (['gunnery', ...this.PilotSkills].includes(testData.action.skill)) return true;
         return false;
-    };
+    }
 }
