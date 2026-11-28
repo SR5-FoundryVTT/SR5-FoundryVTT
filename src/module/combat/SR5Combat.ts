@@ -102,6 +102,17 @@ export class SR5Combat extends Combat<"base"> {
         return this.system.pass;
     }
 
+    /**
+     * A round is in review while no combatant holds the turn (turn is null).
+     */
+    get turnAsReview(): null {
+        return null;
+    }
+
+    get turnInReview(): boolean {
+        return this.turn === this.turnAsReview;
+    }
+
     // Foundry's Combat interface defines nextCombatant as a getter, but SR5's initiative flow
     // doesn't have a single "next" combatant due to initiative passes.
     override get nextCombatant(): null { return null; }
@@ -212,7 +223,7 @@ export class SR5Combat extends Combat<"base"> {
 
         // Update the document, passing data through a hook first
         const updateData = {
-            turn: null,
+            turn: this.turnAsReview,
             round: nextRound,
             system: { pass: SR.combat.FIRST_PASS },
             combatants: this.combatants.map((c) => c.roundUpdateData()),

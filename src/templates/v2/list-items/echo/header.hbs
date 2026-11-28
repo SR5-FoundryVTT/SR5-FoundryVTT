@@ -5,6 +5,17 @@
         </label>
     </div>
 
+    <div class="list-item-col">
+        <label>
+            {{localize "SR5.Submersion"}}&nbsp;
+            {{#if @root.isEditMode}}
+                {{formInput systemFields.technomancer.fields.submersion value=source.system.technomancer.submersion rootId=rootId classes="short skinny"}}
+            {{else}}
+                {{system.attributes.submersion.value}}
+            {{/if}}
+        </label>
+    </div>
+
     <div class="list-item-icons">
         {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type=type }}
     </div>

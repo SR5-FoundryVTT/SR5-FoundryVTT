@@ -1027,6 +1027,7 @@ body.theme-light .sr5v2:not(.theme-dark),
     --sr5v2-negative-bg: rgba(140, 61, 61, 0.16);
     --sr5v2-list-selected-bg: radial-gradient(rgba(7, 145, 35, 0.22), rgba(7, 145, 35, 0.03));
     --sr5v2-icon-filter: none;
+    --sr5v2-icon-filter-light: brightness(0) saturate(100%) invert(13%) sepia(13%) saturate(756%) hue-rotate(176deg) brightness(93%) contrast(88%);
 }
 
 body.theme-light .sr5v2:not(.theme-dark) .window-header > button.header-control.icon.fa-stack > .edit-wrench-icon,
@@ -1043,5 +1044,5 @@ body.theme-light .sr5v2:not(.theme-dark) .list-item img[src*='/icons/'][src$='.s
 .sr5v2.theme-light .no-shrink img[src$='.svg'],
 .sr5v2.theme-light .list-item-image-container img[src$='.svg'],
 .sr5v2.theme-light .list-item img[src*='/icons/'][src$='.svg'] {
-    filter: brightness(0) saturate(100%) invert(13%) sepia(13%) saturate(756%) hue-rotate(176deg) brightness(93%) contrast(88%);
+    filter: var(--sr5v2-icon-filter-light);
 }
